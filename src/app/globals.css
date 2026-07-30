@@ -1,110 +1,115 @@
 @import "tailwindcss";
 
 /* ============================
+   Local Font Face Definitions
+   ============================ */
+@font-face {
+  font-family: 'Nohemi';
+  src: url('/fonts/Nohemi/Nohemi-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nohemi';
+  src: url('/fonts/Nohemi/Nohemi-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nohemi';
+  src: url('/fonts/Nohemi/Nohemi-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nohemi';
+  src: url('/fonts/Nohemi/Nohemi-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nohemi';
+  src: url('/fonts/Nohemi/Nohemi-ExtraBold.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nohemi';
+  src: url('/fonts/Nohemi/Nohemi-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Thunder';
+  src: url('/fonts/Thunder/Thunder-BoldHC.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Thunder';
+  src: url('/fonts/Thunder/Thunder-ExtraBoldHC.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Dirtyline';
+  src: url('/fonts/Dirtyline/Dirtyline-36daysoftype2022.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================
    Tailwind v4 Theme Tokens
    ============================ */
 @theme inline {
-  /* --- Colors (Material Design 3 inspired) --- */
-  --color-tertiary: #4d556b;
-  --color-secondary: #4648d4;
-  --color-primary-fixed-dim: #b4c5ff;
-  --color-surface-dim: #d8dadc;
-  --color-tertiary-fixed: #dae2fd;
-  --color-error: #ba1a1a;
-  --color-on-primary-fixed-variant: #003ea8;
-  --color-on-primary: #ffffff;
-  --color-on-tertiary-fixed-variant: #3f465c;
-  --color-on-surface-variant: #434655;
-  --color-secondary-container: #6063ee;
+  /* --- Colors (Refined Modern Palette) --- */
   --color-primary: #004ac6;
-  --color-tertiary-fixed-dim: #bec6e0;
-  --color-on-secondary-container: #fffbff;
-  --color-surface-bright: #f7f9fb;
-  --color-on-error: #ffffff;
-  --color-surface-variant: #e0e3e5;
-  --color-outline-variant: #c3c6d7;
-  --color-surface: #f7f9fb;
-  --color-on-secondary-fixed-variant: #2f2ebe;
-  --color-inverse-surface: #2d3133;
-  --color-inverse-on-surface: #eff1f3;
-  --color-inverse-primary: #b4c5ff;
+  --color-primary-hover: #003db3;
   --color-primary-container: #2563eb;
-  --color-primary-fixed: #dbe1ff;
-  --color-on-tertiary-container: #eef0ff;
-  --color-surface-tint: #0053db;
-  --color-surface-container-low: #f2f4f6;
-  --color-on-surface: #191c1e;
-  --color-on-background: #191c1e;
-  --color-on-secondary-fixed: #07006c;
+  --color-secondary: #4648d4;
+  --color-tertiary: #4d556b;
+  
+  --color-surface-bright: #f8fafc;
+  --color-surface: #f1f5f9;
+  --color-surface-container-low: #f8fafc;
+  --color-surface-container: #f1f5f9;
+  --color-surface-container-high: #e2e8f0;
   --color-surface-container-lowest: #ffffff;
-  --color-on-tertiary-fixed: #131b2e;
-  --color-surface-container-high: #e6e8ea;
-  --color-outline: #737686;
-  --color-surface-container-highest: #e0e3e5;
-  --color-background: #f7f9fb;
-  --color-on-secondary: #ffffff;
-  --color-on-tertiary: #ffffff;
-  --color-on-primary-container: #eeefff;
-  --color-tertiary-container: #656d84;
-  --color-on-primary-fixed: #00174b;
-  --color-secondary-fixed-dim: #c0c1ff;
-  --color-surface-container: #eceef0;
-  --color-error-container: #ffdad6;
-  --color-secondary-fixed: #e1e0ff;
-  --color-on-error-container: #93000a;
 
-  /* --- Spacing --- */
-  --spacing-margin-x-desktop: 80px;
-  --spacing-base: 4px;
-  --spacing-stack-md: 16px;
-  --spacing-section-gap: 120px;
+  --color-on-surface: #0f172a;
+  --color-on-surface-variant: #475569;
+  --color-on-primary: #ffffff;
+
+  --color-outline: #94a3b8;
+  --color-outline-variant: #e2e8f0;
+  --color-background: #f8fafc;
+
+  /* --- Professional Spacing Scale (8pt Grid System) --- */
+  --spacing-section-padding-y: 112px;
+  --spacing-section-padding-y-mobile: 64px;
   --spacing-container-max: 1280px;
-  --spacing-gutter: 24px;
-  --spacing-margin-x-mobile: 20px;
-  --spacing-stack-sm: 8px;
-  --spacing-stack-lg: 32px;
 
-  /* --- Font Family --- */
-  --font-inter: "Inter", sans-serif;
-
-  /* --- Font Sizes (with line-height, letter-spacing, weight) --- */
-  --font-size-display-lg: 60px;
-  --font-size-display-lg--line-height: 72px;
-  --font-size-display-lg--letter-spacing: -0.02em;
-
-  --font-size-display-lg-mobile: 40px;
-  --font-size-display-lg-mobile--line-height: 48px;
-  --font-size-display-lg-mobile--letter-spacing: -0.02em;
-
-  --font-size-headline-lg: 36px;
-  --font-size-headline-lg--line-height: 44px;
-  --font-size-headline-lg--letter-spacing: -0.01em;
-
-  --font-size-headline-lg-mobile: 28px;
-  --font-size-headline-lg-mobile--line-height: 36px;
-  --font-size-headline-lg-mobile--letter-spacing: -0.01em;
-
-  --font-size-headline-md: 24px;
-  --font-size-headline-md--line-height: 32px;
-
-  --font-size-body-lg: 18px;
-  --font-size-body-lg--line-height: 28px;
-
-  --font-size-body-md: 16px;
-  --font-size-body-md--line-height: 24px;
-
-  --font-size-label-md: 14px;
-  --font-size-label-md--line-height: 20px;
-  --font-size-label-md--letter-spacing: 0.01em;
-
-  --font-size-label-sm: 12px;
-  --font-size-label-sm--line-height: 16px;
-
-  /* --- Border Radius --- */
-  --radius-DEFAULT: 0.25rem;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.75rem;
-  --radius-full: 9999px;
+  /* --- Font Family Mapping --- */
+  --font-nohemi: "Nohemi", system-ui, -apple-system, sans-serif;
+  --font-thunder: "Thunder", system-ui, -apple-system, sans-serif;
+  --font-dirtyline: "Dirtyline", cursive;
 }
 
 /* ============================
@@ -115,125 +120,101 @@
 }
 
 /* ============================
-   Custom Utility Classes
+   Professional Typographic Scale
    ============================ */
 
-/* Typography composites */
-.text-display-lg {
-  font-size: 60px;
-  line-height: 72px;
-  letter-spacing: -0.02em;
+/* Display / Hero Titles */
+.font-display-hero {
+  font-family: "Nohemi", sans-serif;
+  font-size: clamp(2.5rem, 5vw + 1rem, 4.25rem);
+  line-height: 1.08;
+  letter-spacing: -0.025em;
   font-weight: 800;
-  font-family: "Inter", sans-serif;
 }
 
-.text-display-lg-mobile {
-  font-size: 40px;
-  line-height: 48px;
-  letter-spacing: -0.02em;
-  font-weight: 800;
-  font-family: "Inter", sans-serif;
+/* Section Headings (H2) */
+.font-section-heading {
+  font-family: "Nohemi", sans-serif;
+  font-size: clamp(1.875rem, 3vw + 1rem, 2.75rem);
+  line-height: 1.15;
+  letter-spacing: -0.018em;
+  font-weight: 700;
 }
 
-.text-headline-lg {
-  font-size: 36px;
-  line-height: 44px;
+/* Card / Component Headings (H3) */
+.font-card-title {
+  font-family: "Nohemi", sans-serif;
+  font-size: clamp(1.25rem, 1.5vw + 0.5rem, 1.5rem);
+  line-height: 1.3;
   letter-spacing: -0.01em;
   font-weight: 700;
-  font-family: "Inter", sans-serif;
 }
 
-.text-headline-lg-mobile {
-  font-size: 28px;
-  line-height: 36px;
-  letter-spacing: -0.01em;
-  font-weight: 700;
-  font-family: "Inter", sans-serif;
-}
-
-.text-headline-md {
-  font-size: 24px;
-  line-height: 32px;
-  font-weight: 600;
-  font-family: "Inter", sans-serif;
-}
-
-.text-body-lg {
-  font-size: 18px;
-  line-height: 28px;
+/* Body Large (Intro / Subtitles) */
+.font-body-lead {
+  font-family: "Nohemi", sans-serif;
+  font-size: clamp(1.0625rem, 1vw + 0.5rem, 1.25rem);
+  line-height: 1.6;
   font-weight: 400;
-  font-family: "Inter", sans-serif;
+  color: var(--color-on-surface-variant);
 }
 
-.text-body-md {
-  font-size: 16px;
-  line-height: 24px;
+/* Standard Body Copy */
+.font-body-base {
+  font-family: "Nohemi", sans-serif;
+  font-size: 1rem;
+  line-height: 1.625;
   font-weight: 400;
-  font-family: "Inter", sans-serif;
 }
 
-.text-label-md {
-  font-size: 14px;
-  line-height: 20px;
-  letter-spacing: 0.01em;
+/* Micro & Labels */
+.font-label-caption {
+  font-family: "Nohemi", sans-serif;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
   font-weight: 600;
-  font-family: "Inter", sans-serif;
+  text-transform: uppercase;
 }
 
-.text-label-sm {
-  font-size: 12px;
-  line-height: 16px;
-  font-weight: 500;
-  font-family: "Inter", sans-serif;
-}
+/* ============================
+   Component Utilities
+   ============================ */
 
-/* Browser mockup frame */
 .browser-frame {
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.12);
+  border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
-/* Browser window dots */
 .browser-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
 }
 
-/* Card hover effect */
 .card-hover {
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+  transform: translateY(-6px);
+  box-shadow: 0 20px 30px -10px rgba(15, 23, 42, 0.08);
 }
 
-/* FAQ accordion transition */
-.faq-transition {
-  transition:
-    max-height 0.3s ease-out,
-    padding 0.3s ease;
-}
-
-/* Selection colors */
 ::selection {
-  background-color: var(--color-primary-fixed);
-  color: var(--color-on-primary-fixed);
+  background-color: #dbe1ff;
+  color: #00174b;
 }
 
-/* Smooth scrolling */
 html {
   scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Base body */
 body {
   background-color: var(--color-background);
   color: var(--color-on-surface);
-  font-family: "Inter", sans-serif;
-  font-size: 16px;
-  line-height: 24px;
+  font-family: "Nohemi", sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
 }

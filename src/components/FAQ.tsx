@@ -1,109 +1,121 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState } from "react";
 
 const faqItems = [
   {
-    question: "Do I own my site?",
+    question: "Do I own 100% of my site and content?",
     answer:
-      "Yes! Once the final payment is made, you own 100% of the design and content. While we host it for you to keep things simple, you can request a file export at any time.",
+      "Yes! Once your build is complete and final payment is made, you own all the design, code, and content 100%. While we handle hosting for convenience, you can request a complete file export at any time with no lock-in.",
+    icon: "verified_user",
   },
   {
-    question: "How long does it take?",
+    question: "How long does a typical build take?",
     answer:
-      "Our standard timeline is 7-10 business days for a Landing Page or Sales Funnel, and 14-21 days for an E-commerce Store, depending on your responsiveness during the review phase.",
+      "Our standard timeline is 7–10 business days for a Landing Page or Sales Funnel, and 14–21 business days for a full E-commerce Store. We move fast and keep you updated at every stage.",
+    icon: "timer",
   },
   {
-    question: "Can I use my own domain?",
+    question: "Can I use my existing custom domain?",
     answer:
-      "Absolutely. We can connect your existing domain or help you purchase and set up a new one directly through our platform.",
+      "Abolutely. We can seamlessly connect your current custom domain (from GoDaddy, Namecheap, Google, etc.) or help you register and set up a new domain at no extra charge.",
+    icon: "language",
   },
   {
-    question: "What if I need changes later?",
+    question: "What if I need updates or changes later?",
     answer:
-      "Every site comes with an easy-to-use editor. You can change text and images yourself, or subscribe to our 'Concierge' plan where we handle all updates for you.",
+      "Every site includes an intuitive editor allowing you to update text and photos easily. Additionally, we offer an optional 'Concierge Plan' where our team handles all future updates and maintenance for you.",
+    icon: "edit_note",
+  },
+  {
+    question: "Are your websites optimized for mobile and SEO?",
+    answer:
+      "Yes. Every single site we deliver is 100% responsive across mobile, tablet, and desktop, with lightning-fast load speeds and built-in search engine optimization best practices.",
+    icon: "devices",
   },
 ];
-
-function FaqItem({
-  question,
-  answer,
-  isOpen,
-  onToggle,
-}: {
-  question: string;
-  answer: string;
-  isOpen: boolean;
-  onToggle: () => void;
-}) {
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  return (
-    <div className="faq-item border border-outline-variant rounded-2xl overflow-hidden bg-surface-container-lowest">
-      <button
-        className="w-full px-8 py-6 flex justify-between items-center text-left cursor-pointer"
-        onClick={onToggle}
-        aria-expanded={isOpen}
-      >
-        <span className="text-headline-md text-lg">{question}</span>
-        <span
-          className="material-symbols-outlined transition-transform duration-300"
-          style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}
-        >
-          expand_more
-        </span>
-      </button>
-      <div
-        ref={contentRef}
-        className="faq-content overflow-hidden faq-transition bg-surface-container-low px-8"
-        style={{
-          maxHeight: isOpen ? `${contentRef.current?.scrollHeight ?? 0}px` : "0px",
-        }}
-      >
-        <p className="py-6 text-on-surface-variant">{answer}</p>
-      </div>
-    </div>
-  );
-}
 
 export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number>(0);
 
-  const handleToggle = useCallback((index: number) => {
+  const toggleAccordion = (index: number) => {
     setOpenIndex((prev) => (prev === index ? -1 : index));
-  }, []);
-
-  // Force re-render to get correct scrollHeight after mount
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  };
 
   return (
     <section
       id="faq"
-      className="py-section-gap px-margin-x-mobile md:px-margin-x-desktop bg-surface"
+      className="py-20 md:py-28 lg:py-32 px-4 sm:px-6 lg:px-8 bg-surface relative"
     >
       <div className="max-w-3xl mx-auto">
+        {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="text-headline-lg-mobile md:text-headline-lg text-on-surface mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
+            Support & Answers
+          </div>
+          <h2 className="font-section-heading text-on-surface mb-4">
             Frequently Asked Questions
           </h2>
-          <p className="text-on-surface-variant">
-            Everything you need to know about getting started.
+          <p className="font-body-lead">
+            Got questions? We&apos;ve got clear answers to get you launched with confidence.
           </p>
         </div>
 
+        {/* Accordion List */}
         <div className="space-y-4">
-          {faqItems.map((item, index) => (
-            <FaqItem
-              key={item.question}
-              question={item.question}
-              answer={item.answer}
-              isOpen={mounted && openIndex === index}
-              onToggle={() => handleToggle(index)}
-            />
-          ))}
+          {faqItems.map((item, index) => {
+            const isOpen = openIndex === index;
+
+            return (
+              <div
+                key={item.question}
+                className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
+                  isOpen
+                    ? "bg-surface-container-lowest border-primary shadow-lg shadow-primary/5"
+                    : "bg-surface-container-lowest/80 border-outline-variant/60 hover:border-outline-variant"
+                }`}
+              >
+                <button
+                  onClick={() => toggleAccordion(index)}
+                  className="w-full px-6 py-5 md:px-8 md:py-6 flex items-center justify-between gap-4 text-left cursor-pointer transition-colors"
+                  aria-expanded={isOpen}
+                >
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors shrink-0 ${
+                        isOpen ? "bg-primary text-on-primary" : "bg-primary/10 text-primary"
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-xl">{item.icon}</span>
+                    </div>
+                    <span className="font-card-title text-base md:text-lg text-on-surface">
+                      {item.question}
+                    </span>
+                  </div>
+
+                  <span
+                    className={`material-symbols-outlined text-2xl transition-transform duration-300 shrink-0 ${
+                      isOpen ? "rotate-180 text-primary" : "text-on-surface-variant"
+                    }`}
+                  >
+                    expand_more
+                  </span>
+                </button>
+
+                <div
+                  className={`grid transition-all duration-300 ease-in-out ${
+                    isOpen ? "grid-rows-[1fr] opacity-100 px-6 pb-6 md:px-8 md:pb-8" : "grid-rows-[0fr] opacity-0 px-6 md:px-8"
+                  }`}
+                >
+                  <div className="overflow-hidden">
+                    <p className="text-on-surface-variant text-base leading-relaxed pt-3 border-t border-outline-variant/40">
+                      {item.answer}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

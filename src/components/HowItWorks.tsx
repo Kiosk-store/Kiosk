@@ -27,26 +27,29 @@ export default function HowItWorks() {
   return (
     <section
       id="how-it-works"
-      className="py-section-gap px-margin-x-mobile md:px-margin-x-desktop bg-surface"
+      className="py-20 md:py-28 lg:py-32 px-4 sm:px-6 lg:px-8 bg-surface relative"
     >
-      <div className="max-w-[1280px] mx-auto text-center mb-16">
-        <h2 className="text-headline-lg-mobile md:text-headline-lg text-on-surface mb-4">
+      <div className="max-w-7xl mx-auto text-center mb-16">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
+          Simple Process
+        </div>
+        <h2 className="font-section-heading text-on-surface mb-4">
           Your journey to a professional online presence
         </h2>
-        <div className="w-20 h-1.5 bg-primary mx-auto rounded-full" />
+        <div className="w-20 h-1.5 bg-primary mx-auto rounded-full mt-6" />
       </div>
 
-      <div className="max-w-[1280px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {steps.map((step) => (
           <div
             key={step.title}
-            className="bg-surface-container-lowest p-8 rounded-2xl card-hover transition-all text-center md:text-left"
+            className="bg-surface-container-lowest p-8 rounded-[24px] card-hover border border-outline-variant/50 text-center md:text-left"
           >
-            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold text-xl mb-6 mx-auto md:mx-0">
+            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold text-xl mb-6 mx-auto md:mx-0 shrink-0">
               <span className="material-symbols-outlined">{step.icon}</span>
             </div>
-            <h3 className="text-headline-md mb-3">{step.title}</h3>
-            <p className="text-on-surface-variant">{step.description}</p>
+            <h3 className="font-card-title mb-3 text-on-surface">{step.title}</h3>
+            <p className="text-on-surface-variant text-sm leading-relaxed">{step.description}</p>
           </div>
         ))}
       </div>

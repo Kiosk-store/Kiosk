@@ -28,38 +28,43 @@ export default function Portfolio() {
   return (
     <section
       id="portfolio"
-      className="py-section-gap px-margin-x-mobile md:px-margin-x-desktop bg-surface"
+      className="py-20 md:py-28 lg:py-32 px-4 sm:px-6 lg:px-8 bg-surface relative"
     >
-      <div className="max-w-[1280px] mx-auto mb-16">
-        <h2 className="text-headline-lg-mobile md:text-headline-lg text-on-surface mb-2">
+      <div className="max-w-7xl mx-auto mb-16 text-center md:text-left">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
+          Client Showcase
+        </div>
+        <h2 className="font-section-heading text-on-surface mb-3">
           Recent client launches
         </h2>
-        <p className="text-on-surface-variant">Real websites for real small businesses.</p>
+        <p className="font-body-lead">Real websites built for real small business owners.</p>
       </div>
 
-      <div className="max-w-[1280px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-gutter">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
         {projects.map((project) => (
           <div key={project.title} className="group cursor-pointer">
-            <div className="browser-frame rounded-2xl bg-white overflow-hidden mb-6 transition-transform group-hover:-translate-y-2">
-              <div className="bg-surface-container-high px-3 py-2 flex gap-1 border-b border-outline-variant">
-                <div className="w-2 h-2 rounded-full bg-outline" />
-                <div className="w-2 h-2 rounded-full bg-outline" />
-                <div className="w-2 h-2 rounded-full bg-outline" />
+            <div className="browser-frame rounded-2xl bg-white overflow-hidden mb-6 transition-transform duration-300 group-hover:-translate-y-2">
+              <div className="bg-surface-container-high px-3 py-2 flex gap-1.5 border-b border-outline-variant/50">
+                <div className="w-2.5 h-2.5 rounded-full bg-red-400/80" />
+                <div className="w-2.5 h-2.5 rounded-full bg-yellow-400/80" />
+                <div className="w-2.5 h-2.5 rounded-full bg-green-400/80" />
               </div>
               <div className="aspect-[4/3] relative bg-slate-100">
                 <Image
                   src={project.image}
                   alt={project.alt}
                   fill
-                  className="object-cover"
+                  className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
               </div>
             </div>
-            <h4 className="text-headline-md group-hover:text-primary transition-colors">
+            <h4 className="font-card-title text-on-surface group-hover:text-primary transition-colors mb-1">
               {project.title}
             </h4>
-            <p className="text-on-surface-variant text-label-sm">{project.category}</p>
+            <p className="text-on-surface-variant text-xs font-semibold uppercase tracking-wider">
+              {project.category}
+            </p>
           </div>
         ))}
       </div>
