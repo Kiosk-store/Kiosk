@@ -2,28 +2,45 @@
 
 "use client";
 
-import PillNav from "./PillNav";
+import StaggeredMenu from "./StaggeredMenu";
 
 const navItems = [
-	{ label: "Services", href: "#services" },
 	{ label: "Pricing", href: "#pricing" },
 	{ label: "About", href: "#about" },
-	{ label: "Portfolio", href: "#portfolio" },
-	{ label: "FAQ", href: "#faq" },
+	{ label: "Log in", href: "/login" },
+	{ label: "Get Started", href: "/get-started" },
 ];
 
 export default function Navbar() {
+	const menuItems = navItems.map((n) => ({
+		label: n.label,
+		ariaLabel: `Go to ${n.label.toLowerCase()}`,
+		link: n.href,
+	}));
+
+	const socialItems = [
+		{ label: "Twitter", link: "https://twitter.com" },
+		{ label: "GitHub", link: "https://github.com" },
+		{ label: "LinkedIn", link: "https://linkedin.com" },
+	];
+
 	return (
-		<PillNav
-			items={navItems}
-			logoAlt="Kiosk"
-			baseColor="var(--color-primary)"
-			pillColor="var(--color-surface-container-lowest)"
-			hoveredPillTextColor="var(--color-on-primary)"
-			pillTextColor="var(--color-primary)"
-			initialLoadAnimation
-		/>
+		<div>
+			<StaggeredMenu
+				position="right"
+				items={menuItems}
+				socialItems={socialItems}
+				displaySocials={true}
+				displayItemNumbering={true}
+				menuButtonColor="#0a0a0a"
+				openMenuButtonColor="#0a0a0a"
+				changeMenuColorOnOpen={true}
+				colors={["#B497CF", "#5227FF"]}
+				logoUrl="/logo.svg"
+				accentColor="#ff6b6b"
+				isFixed={true}
+				showMenuText={false}
+			/>
+		</div>
 	);
 }
-
-export { PillNav };

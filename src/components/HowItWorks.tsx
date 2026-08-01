@@ -2,6 +2,9 @@
 
 "use client";
 
+import React, { useEffect } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ScrollStack, { ScrollStackItem } from "@/components/ScrollStack";
 
 const steps = [
@@ -32,6 +35,34 @@ const steps = [
 ];
 
 export default function HowItWorks() {
+	useEffect(() => {
+		if (typeof window === "undefined") return;
+		gsap.registerPlugin(ScrollTrigger);
+
+		const els = document.querySelectorAll(".howit-card");
+		els.forEach((el) => {
+			gsap.fromTo(
+				el,
+				{ y: 40, opacity: 0 },
+				{
+					y: 0,
+					opacity: 1,
+					duration: 0.8,
+					ease: "power3.out",
+					scrollTrigger: {
+						trigger: el,
+						start: "top 85%",
+						toggleActions: "play none none reverse",
+					},
+				},
+			);
+		});
+
+		return () => {
+			ScrollTrigger.getAll().forEach((t) => t.kill());
+		};
+	}, []);
+
 	return (
 		<section
 			id="how-it-works"
@@ -52,17 +83,18 @@ export default function HowItWorks() {
 					stackPosition="10%"
 					blurAmount={3}>
 					{steps.map((s, i) => {
-						const ink = "#1a1a1a";
-						const numColor =
-							i === 0 ? "rgba(0,0,0,0.06)" : "var(--color-on-primary)";
-						const titleColor = i === 0 ? "var(--color-ink)" : ink;
-						const bodyColor = i === 0 ? "var(--color-ink)" : ink;
+						// use a fixed black to avoid prefers-color-scheme overrides
+						const ink = "#0a0a0a";
+						const numColor = "#0a0a0a";
+						const titleColor = "#0a0a0a";
+						const bodyColor = "#0a0a0a";
 
 						return (
 							<ScrollStackItem
 								key={s.num}
 								itemClassName="!rounded-none !shadow-none !bg-transparent !my-0 !p-0 !h-auto">
 								<article
+									className="howit-card"
 									style={{
 										background: s.bg,
 										color: ink,

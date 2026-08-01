@@ -1,133 +1,140 @@
+/** @format */
+
 @import "tailwindcss";
 
 /* ============================
    Local Font Face Definitions
    ============================ */
 @font-face {
-  font-family: 'Nohemi';
-  src: url('/fonts/Nohemi/Nohemi-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
+	font-family: "Nohemi";
+	src: url("/fonts/Nohemi/Nohemi-Regular.woff2") format("woff2");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
 }
 
 @font-face {
-  font-family: 'Nohemi';
-  src: url('/fonts/Nohemi/Nohemi-Medium.woff2') format('woff2');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
+	font-family: "Nohemi";
+	src: url("/fonts/Nohemi/Nohemi-Medium.woff2") format("woff2");
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
 }
 
 @font-face {
-  font-family: 'Nohemi';
-  src: url('/fonts/Nohemi/Nohemi-SemiBold.woff2') format('woff2');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
+	font-family: "Nohemi";
+	src: url("/fonts/Nohemi/Nohemi-SemiBold.woff2") format("woff2");
+	font-weight: 600;
+	font-style: normal;
+	font-display: swap;
 }
 
 @font-face {
-  font-family: 'Nohemi';
-  src: url('/fonts/Nohemi/Nohemi-Bold.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
+	font-family: "Nohemi";
+	src: url("/fonts/Nohemi/Nohemi-Bold.woff2") format("woff2");
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
 }
 
 @font-face {
-  font-family: 'Nohemi';
-  src: url('/fonts/Nohemi/Nohemi-ExtraBold.woff2') format('woff2');
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
+	font-family: "Nohemi";
+	src: url("/fonts/Nohemi/Nohemi-ExtraBold.woff2") format("woff2");
+	font-weight: 800;
+	font-style: normal;
+	font-display: swap;
 }
 
 @font-face {
-  font-family: 'Nohemi';
-  src: url('/fonts/Nohemi/Nohemi-Black.woff2') format('woff2');
-  font-weight: 900;
-  font-style: normal;
-  font-display: swap;
+	font-family: "Nohemi";
+	src: url("/fonts/Nohemi/Nohemi-Black.woff2") format("woff2");
+	font-weight: 900;
+	font-style: normal;
+	font-display: swap;
 }
 
 @font-face {
-  font-family: 'Thunder';
-  src: url('/fonts/Thunder/Thunder-BoldHC.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
+	font-family: "Thunder";
+	src: url("/fonts/Thunder/Thunder-BoldHC.woff2") format("woff2");
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
 }
 
 @font-face {
-  font-family: 'Thunder';
-  src: url('/fonts/Thunder/Thunder-ExtraBoldHC.woff2') format('woff2');
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
+	font-family: "Thunder";
+	src: url("/fonts/Thunder/Thunder-ExtraBoldHC.woff2") format("woff2");
+	font-weight: 800;
+	font-style: normal;
+	font-display: swap;
 }
 
 @font-face {
-  font-family: 'Dirtyline';
-  src: url('/fonts/Dirtyline/Dirtyline-36daysoftype2022.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
+	font-family: "Dirtyline";
+	src: url("/fonts/Dirtyline/Dirtyline-36daysoftype2022.woff2") format("woff2");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
 }
 
 /* ============================
    Tailwind v4 Theme Tokens
    ============================ */
 @theme inline {
-  /* --- Colors (Refined Modern Palette) --- */
-  --color-primary: #004ac6;
-  --color-primary-hover: #003db3;
-  --color-primary-container: #2563eb;
-  --color-secondary: #4648d4;
-  --color-tertiary: #4d556b;
-  
-  --color-surface-bright: #f8fafc;
-  --color-surface: #f1f5f9;
-  --color-surface-container-low: #f8fafc;
-  --color-surface-container: #f1f5f9;
-  --color-surface-container-high: #e2e8f0;
-  --color-surface-container-lowest: #ffffff;
+	/* --- Colors (Refined Modern Palette) --- */
+	--color-primary: #004ac6;
+	--color-primary-hover: #003db3;
+	--color-primary-container: #2563eb;
+	--color-secondary: #4648d4;
+	--color-tertiary: #4d556b;
 
-  --color-on-surface: #0f172a;
-  --color-on-surface-variant: #475569;
-  --color-on-primary: #ffffff;
+	--color-surface-bright: #f8fafc;
+	--color-surface: #f1f5f9;
+	--color-surface-container-low: #f8fafc;
+	--color-surface-container: #f1f5f9;
+	--color-surface-container-high: #e2e8f0;
+	--color-surface-container-lowest: #ffffff;
 
-  --color-outline: #94a3b8;
-  --color-outline-variant: #e2e8f0;
-  --color-background: #f8fafc;
+	--color-on-surface: #0f172a;
+	--color-on-surface-variant: #475569;
+	--color-on-primary: #ffffff;
 
-  /* --- Custom Colors for Dark Sections --- */
-  --color-ink: #0a0a0a;
-  --color-paper: #f5f5f0;
-  --color-paper-soft: #e8e8e0;
-  --color-sage: #d4d9c8;
+	--color-outline: #94a3b8;
+	--color-outline-variant: #e2e8f0;
+	--color-background: #f8fafc;
 
-  /* --- Professional Spacing Scale (8pt Grid System) --- */
-  --spacing-section-padding-y: 112px;
-  --spacing-section-padding-y-mobile: 64px;
-  --spacing-container-max: 1280px;
+	/* --- Custom Colors for Dark Sections --- */
+	--color-ink: #0a0a0a;
+	--color-paper: #f5f5f0;
+	--color-paper-soft: #e8e8e0;
+	--color-sage: #d4d9c8;
 
-  /* --- Font Family Mapping --- */
-  --font-nohemi: "Nohemi", system-ui, -apple-system, sans-serif;
-  --font-thunder: "Thunder", system-ui, -apple-system, sans-serif;
-  --font-dirtyline: "Dirtyline", cursive;
+	/* --- Professional Spacing Scale (8pt Grid System) --- */
+	--spacing-section-padding-y: 112px;
+	--spacing-section-padding-y-mobile: 64px;
+	--spacing-container-max: 1280px;
 
-  /* --- ScrollStack Card Colors --- */
-  --card-blue-light: #e8f0fe;
-  --card-blue-mid: #dce8f5;
-  --card-blue-soft: #eef4fa;
+	/* --- Font Family Mapping --- */
+	--font-nohemi: "Nohemi", system-ui, -apple-system, sans-serif;
+	--font-thunder: "Thunder", system-ui, -apple-system, sans-serif;
+	--font-dirtyline: "Dirtyline", cursive;
+
+	/* --- ScrollStack Card Colors --- */
+	--card-blue-light: #e8f0fe;
+	--card-blue-mid: #dce8f5;
+	--card-blue-soft: #eef4fa;
 }
 
 /* ============================
    Material Symbols (Icons)
    ============================ */
 .material-symbols-outlined {
-  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+	font-family: "Material Symbols Outlined";
+	font-variation-settings:
+		"FILL" 0,
+		"wght" 400,
+		"GRAD" 0,
+		"opsz" 24;
 }
 
 /* ============================
@@ -136,56 +143,56 @@
 
 /* Display / Hero Titles */
 .font-display-hero {
-  font-family: var(--font-nohemi);
-  font-size: clamp(2.5rem, 5vw + 1rem, 4.25rem);
-  line-height: 1.08;
-  letter-spacing: -0.025em;
-  font-weight: 800;
+	font-family: var(--font-nohemi);
+	font-size: clamp(2.5rem, 5vw + 1rem, 4.25rem);
+	line-height: 1.08;
+	letter-spacing: -0.025em;
+	font-weight: 800;
 }
 
 /* Section Headings (H2) */
 .font-section-heading {
-  font-family: var(--font-nohemi);
-  font-size: clamp(1.875rem, 3vw + 1rem, 2.75rem);
-  line-height: 1.15;
-  letter-spacing: -0.018em;
-  font-weight: 700;
+	font-family: var(--font-nohemi);
+	font-size: clamp(1.875rem, 3vw + 1rem, 2.75rem);
+	line-height: 1.15;
+	letter-spacing: -0.018em;
+	font-weight: 700;
 }
 
 /* Card / Component Headings (H3) */
 .font-card-title {
-  font-family: var(--font-nohemi);
-  font-size: clamp(1.25rem, 1.5vw + 0.5rem, 1.5rem);
-  line-height: 1.3;
-  letter-spacing: -0.01em;
-  font-weight: 700;
+	font-family: var(--font-nohemi);
+	font-size: clamp(1.25rem, 1.5vw + 0.5rem, 1.5rem);
+	line-height: 1.3;
+	letter-spacing: -0.01em;
+	font-weight: 700;
 }
 
 /* Body Large (Intro / Subtitles) */
 .font-body-lead {
-  font-family: var(--font-nohemi);
-  font-size: clamp(1.0625rem, 1vw + 0.5rem, 1.25rem);
-  line-height: 1.6;
-  font-weight: 400;
-  color: var(--color-on-surface-variant);
+	font-family: var(--font-nohemi);
+	font-size: clamp(1.0625rem, 1vw + 0.5rem, 1.25rem);
+	line-height: 1.6;
+	font-weight: 400;
+	color: var(--color-on-surface-variant);
 }
 
 /* Standard Body Copy */
 .font-body-base {
-  font-family: var(--font-nohemi);
-  font-size: 1rem;
-  line-height: 1.625;
-  font-weight: 400;
+	font-family: var(--font-nohemi);
+	font-size: 1rem;
+	line-height: 1.625;
+	font-weight: 400;
 }
 
 /* Micro & Labels */
 .font-label-caption {
-  font-family: var(--font-nohemi);
-  font-size: 0.75rem;
-  line-height: 1.4;
-  letter-spacing: 0.08em;
-  font-weight: 600;
-  text-transform: uppercase;
+	font-family: var(--font-nohemi);
+	font-size: 0.75rem;
+	line-height: 1.4;
+	letter-spacing: 0.08em;
+	font-weight: 600;
+	text-transform: uppercase;
 }
 
 /* ============================
@@ -195,12 +202,12 @@
 /* ScrollStack card text alignment */
 .scroll-stack-card h3,
 .scroll-stack-card p {
-  text-align: left;
+	text-align: left;
 }
 
 /* ScrollStack card hover effect */
 .scroll-stack-card article {
-  transition: transform 0.2s ease;
+	transition: transform 0.2s ease;
 }
 
 /* ============================
@@ -208,63 +215,65 @@
    ============================ */
 
 .browser-frame {
-  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.12);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+	box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.12);
+	border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .browser-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
 }
 
 .card-hover {
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+	transition:
+		transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+		box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .card-hover:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 20px 30px -10px rgba(15, 23, 42, 0.08);
+	transform: translateY(-6px);
+	box-shadow: 0 20px 30px -10px rgba(15, 23, 42, 0.08);
 }
 
 ::selection {
-  background-color: #dbe1ff;
-  color: #00174b;
+	background-color: #dbe1ff;
+	color: #00174b;
 }
 
 html {
-  scroll-behavior: smooth;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+	scroll-behavior: smooth;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background-color: var(--color-background);
-  color: var(--color-on-surface);
-  font-family: var(--font-nohemi);
-  font-size: 1rem;
-  line-height: 1.6;
+	background-color: var(--color-background);
+	color: var(--color-on-surface);
+	font-family: var(--font-nohemi);
+	font-size: 1rem;
+	line-height: 1.6;
 }
 
 /* ============================
    Marquee Animation
    ============================ */
 @keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
+	0% {
+		transform: translateX(0);
+	}
+	100% {
+		transform: translateX(-50%);
+	}
 }
 
 /* ============================
    Dark Mode Support
    ============================ */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --color-ink: #f5f5f0;
-    --color-paper: #0a0a0a;
-    --color-paper-soft: #1a1a1a;
-    --color-sage: #2a2a2a;
-  }
+	:root {
+		--color-ink: #f5f5f0;
+		--color-paper: #0a0a0a;
+		--color-paper-soft: #1a1a1a;
+		--color-sage: #2a2a2a;
+	}
 }
