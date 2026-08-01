@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<!-- @format -->
 
-## Getting Started
+Kiosk — marketing & portfolio site built with Next.js
 
-First, run the development server:
+## Overview
+
+`kiosk` is a marketing and portfolio site built with Next.js and React. The project focuses on high-quality visuals, smooth interactions, and a modular component-driven structure. It uses Tailwind-inspired utility classes and a small set of design system conventions located in `src/components` and `src/lib`.
+
+## About Kiosk
+
+**Kiosk makes it simple for small businesses to get online.**
+
+Most small business owners don’t need a complicated website. They just need a clean place to show what they offer, share their contact details, and start selling — without spending weeks learning tools or paying high monthly fees.
+
+That’s why we built Kiosk.
+
+With Kiosk, you can choose the package that fits your business:
+
+- **Landing Page** — A simple, professional page with your business info, photos, WhatsApp button, and contact details.
+- **Online Store** — A full e-commerce store where customers can browse products and pay online.
+
+Everything is hosted for you. No technical setup. No complicated builders. Just fill in your details and go live.
+
+We’re building Kiosk for the everyday business owner — the ones who are too busy running their business to become website experts.
+
+**Simple. Affordable. Built for small businesses.**
+
+---
+
+### Shorter version (for a homepage About section)
+
+**About Kiosk**
+Kiosk helps small businesses get online without the stress.
+Choose a simple landing page or a full online store — we handle the rest.
+No complicated tools. No steep learning curve. Just a clean online home for your business.
+
+## Quick links
+
+- Design & architecture: [docs/DESIGN_ARCHITECTURE.md](docs/DESIGN_ARCHITECTURE.md)
+- System design: [docs/SYSTEM_DESIGN.md](docs/SYSTEM_DESIGN.md)
+- Developer documentation: [docs/DEVELOPER_DOCUMENTATION.md](docs/DEVELOPER_DOCUMENTATION.md)
+
+## Getting started (development)
+
+Install dependencies and run the dev server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000 to preview locally. The main entry is `src/app/page.tsx` which composes the top-level sections (Navbar, Hero, Pricing, CTA, etc.).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Available scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `npm run dev` — start Next.js in development mode
+- `npm run build` — production build
+- `npm run start` — start the production server after build
+- `npm run lint` — run ESLint
 
-## Learn More
+## Tech stack & notable dependencies
 
-To learn more about Next.js, take a look at the following resources:
+- Framework: Next.js (app router)
+- UI: React 19 and component-driven layout in `src/components`
+- Styling: Tailwind-ish utilities (Tailwind CSS v4 + utilities/plugins)
+- Motion & scroll: `gsap` and `lenis` for smooth scroll and animations
+- Icons: `lucide-react`
+- Other: `clsx`, `class-variance-authority`, `shadcn` bits
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Repository layout (high level)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `src/app` — Next.js app entry, global styles, and route-level files
+- `src/components` — UI components used to compose the homepage and other views
+- `src/lib` — small utilities and stores (for example: `lenis-store.ts`)
+- `public` — static assets and fonts
 
-## Deploy on Vercel
+## Design & docs
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Detailed design architecture, system design, and developer documentation have been added under `docs/`. These files explain the component model, data flow, deployment recommendations, accessibility guidelines, and developer conventions to help the team onboard quickly.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deployment
+
+This app is well suited for Vercel (recommended). For production builds, run `npm run build` then `npm run start` (or deploy via the Vercel platform for automatic builds and CDN delivery).
+
+## Contributing
+
+- Follow the component and styling conventions in `docs/DEVELOPER_DOCUMENTATION.md` when adding or updating UI.
+- Run `npm run lint` to check code quality before committing.
+
+## Where to go next
+
+- Review the design architecture: [docs/DESIGN_ARCHITECTURE.md](docs/DESIGN_ARCHITECTURE.md)
+- Review the system design: [docs/SYSTEM_DESIGN.md](docs/SYSTEM_DESIGN.md)
+- Read developer setup and coding guidelines: [docs/DEVELOPER_DOCUMENTATION.md](docs/DEVELOPER_DOCUMENTATION.md)

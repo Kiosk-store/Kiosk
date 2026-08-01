@@ -38,10 +38,9 @@ export default function HowItWorks() {
         background: "var(--ink)",
         color: "var(--paper)",
         position: "relative",
-        padding: "60px 0",
+        padding: "0",
       }}
     >
-      {/* Reduced horizontal spacing for ScrollStack */}
       <div style={{ position: "relative", margin: "0 -10px" }}>
         <ScrollStack
           useWindowScroll={true}
