@@ -145,7 +145,7 @@ export default function Hero() {
 								<span
 									className="hover-circle absolute left-1/2 bottom-0 rounded-full z-[1] block pointer-events-none"
 									style={{
-										background: "#ffffff",
+										background: "var(--color-surface-container-lowest)",
 										willChange: "transform",
 									}}
 									aria-hidden="true"
@@ -162,7 +162,7 @@ export default function Hero() {
 									<span
 										className="btn-label-hover absolute left-0 top-0 z-[3] inline-block"
 										style={{
-											color: "#004ac6",
+											color: "var(--color-primary)",
 											willChange: "transform, opacity",
 										}}
 										aria-hidden="true">
@@ -183,7 +183,7 @@ export default function Hero() {
 								<span
 									className="hover-circle absolute left-1/2 bottom-0 rounded-full z-[1] block pointer-events-none"
 									style={{
-										background: "#004ac6",
+										background: "var(--color-primary)",
 										willChange: "transform",
 									}}
 									aria-hidden="true"
@@ -201,7 +201,7 @@ export default function Hero() {
 									<span
 										className="btn-label-hover absolute left-0 top-0 z-[3] inline-block flex items-center gap-2"
 										style={{
-											color: "#ffffff",
+											color: "var(--color-on-primary)",
 											willChange: "transform, opacity",
 										}}
 										aria-hidden="true">
