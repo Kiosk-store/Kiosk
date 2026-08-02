@@ -1,3 +1,15 @@
+/**
+ * StaggeredMenu
+ *
+ * Client-side animated navigation panel using GSAP. This component
+ * renders a mobile-first slide-in menu with layered pre-layers,
+ * staggered item reveals, and a menu toggle that animates the icon
+ * and label text. It exposes a small API via props for colors,
+ * numbering, socials and callbacks for open/close events.
+ *
+ * @format
+ */
+
 /** @format */
 
 "use client";
@@ -88,6 +100,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
 			if (!panel || !icon || !textInner) return;
 
+			// collect pre-layer elements used to create the layered slide effect
 			let preLayers: HTMLElement[] = [];
 			if (preContainer) {
 				preLayers = Array.from(
@@ -103,6 +116,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 			}
 			gsap.set(icon, { rotate: 0, transformOrigin: "50% 50%" });
 
+			// ensure the cycling text strip starts at the top
 			gsap.set(textInner, { yPercent: 0 });
 
 			if (toggleBtnRef.current)
@@ -111,6 +125,12 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 		return () => ctx.revert();
 	}, [menuButtonColor, position]);
 
+	/**
+	 * buildOpenTimeline
+	 * Construct the GSAP timeline used to open the menu. This prepares
+	 * initial states for items, numbers and socials and then animates
+	 * the pre-layers, panel and children with staggered timing.
+	 */
 	const buildOpenTimeline = useCallback(() => {
 		const panel = panelRef.current;
 		const layers = preLayerElsRef.current;
@@ -225,10 +245,12 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 			}
 		}
 
+		// keep the built timeline so callers can play/kill it
 		openTlRef.current = tl;
 		return tl;
 	}, [position]);
 
+	// Play the open timeline while guarding against re-entrancy
 	const playOpen = useCallback(() => {
 		if (busyRef.current) return;
 		busyRef.current = true;
@@ -243,6 +265,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 		}
 	}, [buildOpenTimeline]);
 
+	// Play the close animation that quickly moves layers + panel offscreen
 	const playClose = useCallback(() => {
 		openTlRef.current?.kill();
 		openTlRef.current = null;
@@ -290,6 +313,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 		});
 	}, [position]);
 
+	// Subtle rotate/scale animation for the single React icon glyph
 	const animateIcon = useCallback((opening: boolean) => {
 		const icon = iconRef.current;
 		if (!icon) return;
@@ -312,6 +336,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 		}
 	}, []);
 
+	// Animate toggle button color when opening/closing (optional)
 	const animateColor = useCallback(
 		(opening: boolean) => {
 			const btn = toggleBtnRef.current;
@@ -345,6 +370,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 		}
 	}, [changeMenuColorOnOpen, menuButtonColor, openMenuButtonColor]);
 
+	// Cycle the toggle label text between "Menu" and "Close" for visual feedback
 	const animateText = useCallback((opening: boolean) => {
 		const inner = textInnerRef.current;
 		if (!inner) return;
@@ -377,6 +403,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 		});
 	}, []);
 
+	// Toggle menu open/closed and trigger animations/callbacks
 	const toggleMenu = useCallback(() => {
 		const target = !openRef.current;
 		openRef.current = target;
@@ -480,14 +507,10 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 					<div
 						className="sm-logo flex items-center select-none pointer-events-auto"
 						aria-label="Logo">
-						<img
-							src={logoUrl || "/src/assets/logos/reactbits-gh-white.svg"}
-							alt="Logo"
-							className="sm-logo-img block h-8 w-auto object-contain"
-							draggable={false}
-							width={110}
-							height={24}
-						/>
+						{/* Render a simple text logo to keep header minimal */}
+						<span className="sm-logo-text block h-8 align-middle font-nohemi font-bold text-lg">
+							Kiosk
+						</span>
 					</div>
 
 					<button

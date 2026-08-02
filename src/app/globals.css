@@ -78,9 +78,9 @@
 }
 
 /* ============================
-   Tailwind v4 Theme Tokens
-   ============================ */
-@theme inline {
+	Tailwind v4 Theme Tokens
+	============================ */
+:root {
 	/* --- Colors (Refined Modern Palette) --- */
 	--color-primary: #004ac6;
 	--color-primary-hover: #003db3;
@@ -123,6 +123,14 @@
 	--card-blue-light: #e8f0fe;
 	--card-blue-mid: #dce8f5;
 	--card-blue-soft: #eef4fa;
+}
+
+/* Default pill/nav variables so standalone buttons inherit the same design as PillNav */
+:root {
+	--base: var(--color-on-surface);
+	--pill-bg: var(--color-surface-container-lowest);
+	--hover-text: var(--color-on-primary);
+	--pill-text: var(--color-on-surface);
 }
 
 /* ============================
@@ -217,6 +225,37 @@
 .browser-frame {
 	box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.12);
 	border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+/* Fallback CSS hover for PillButton when JS/GSAP isn't running */
+.pill-fallback .hover-circle {
+	transition:
+		transform 260ms cubic-bezier(0.22, 0.9, 0.32, 1),
+		opacity 200ms ease;
+	transform-origin: 50% 100%;
+	transform: scale(0) translateZ(0);
+}
+.pill-fallback:hover .hover-circle {
+	transform: scale(1.15);
+	opacity: 1;
+}
+.pill-fallback .btn-label {
+	transition: transform 260ms cubic-bezier(0.22, 0.9, 0.32, 1);
+	transform: translateY(0);
+}
+.pill-fallback:hover .btn-label {
+	transform: translateY(calc(-100% - 8px));
+}
+.pill-fallback .btn-label-hover {
+	transition:
+		transform 260ms cubic-bezier(0.22, 0.9, 0.32, 1),
+		opacity 200ms ease;
+	transform: translateY(100%);
+	opacity: 0;
+}
+.pill-fallback:hover .btn-label-hover {
+	transform: translateY(0);
+	opacity: 1;
 }
 
 .browser-dot {

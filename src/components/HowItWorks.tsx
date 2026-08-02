@@ -1,3 +1,13 @@
+/**
+ * HowItWorks
+ *
+ * Section component that displays the step-by-step process. Uses
+ * `ScrollStack` for the stacked visual and GSAP/ScrollTrigger for
+ * per-card reveal animations.
+ *
+ * @format
+ */
+
 /** @format */
 
 "use client";
@@ -35,6 +45,7 @@ const steps = [
 ];
 
 export default function HowItWorks() {
+	// Setup per-card scroll-triggered reveal animations
 	useEffect(() => {
 		if (typeof window === "undefined") return;
 		gsap.registerPlugin(ScrollTrigger);
@@ -59,6 +70,7 @@ export default function HowItWorks() {
 		});
 
 		return () => {
+			// cleanup ScrollTrigger instances when unmounting
 			ScrollTrigger.getAll().forEach((t) => t.kill());
 		};
 	}, []);
@@ -82,7 +94,7 @@ export default function HowItWorks() {
 					scaleEndPosition="5%"
 					stackPosition="10%"
 					blurAmount={3}>
-					{steps.map((s, i) => {
+					{steps.map((s) => {
 						// use a fixed black to avoid prefers-color-scheme overrides
 						const ink = "#0a0a0a";
 						const numColor = "#0a0a0a";

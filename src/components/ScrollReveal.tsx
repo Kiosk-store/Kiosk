@@ -1,4 +1,13 @@
-/** @format */
+/**
+ * ScrollReveal
+ *
+ * Global small utility to register GSAP's ScrollTrigger and add a simple
+ * fade/slide reveal for every `section` on the page. This keeps the
+ * animation logic centralized rather than duplicating ScrollTrigger calls
+ * across many components.
+ *
+ * @format
+ */
 
 "use client";
 
@@ -11,10 +20,11 @@ export default function ScrollReveal() {
 		if (typeof window === "undefined") return;
 		gsap.registerPlugin(ScrollTrigger);
 
+		// animate all top-level sections with the same reveal settings
 		const sections = Array.from(document.querySelectorAll("section"));
 
 		sections.forEach((el) => {
-			// skip if already animated
+			// skip if already initialized to avoid duplicate triggers
 			if (el.classList.contains("sr-initialized")) return;
 			el.classList.add("sr-initialized");
 
@@ -36,6 +46,7 @@ export default function ScrollReveal() {
 		});
 
 		return () => {
+			// cleanup any ScrollTrigger instances when the component unmounts
 			ScrollTrigger.getAll().forEach((t) => t.kill());
 		};
 	}, []);

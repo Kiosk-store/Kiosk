@@ -3,122 +3,79 @@
 "use client";
 
 import Image from "next/image";
-import { useRef } from "react";
-import { gsap } from "gsap";
+import PillButton from "./PillButton";
 
 export default function Hero() {
-	const buttonRefs = useRef<(HTMLButtonElement | HTMLAnchorElement | null)[]>(
-		[],
-	);
-	const circleRefs = useRef<(HTMLSpanElement | null)[]>([]);
-	const tlRefs = useRef<(gsap.core.Timeline | null)[]>([]);
-	const activeTweenRefs = useRef<(gsap.core.Tween | null)[]>([]);
-
-	const handleEnter = (i: number) => {
-		const tl = tlRefs.current[i];
-		if (!tl) return;
-		activeTweenRefs.current[i]?.kill();
-		activeTweenRefs.current[i] = tl.tweenTo(tl.duration(), {
-			duration: 0.3,
-			ease: "power3.easeOut",
-			overwrite: "auto",
-		});
-	};
-
-	const handleLeave = (i: number) => {
-		const tl = tlRefs.current[i];
-		if (!tl) return;
-		activeTweenRefs.current[i]?.kill();
-		activeTweenRefs.current[i] = tl.tweenTo(0, {
-			duration: 0.2,
-			ease: "power3.easeOut",
-			overwrite: "auto",
-		});
-	};
-
-	const initPillEffect = (index: number, element: HTMLElement) => {
-		const circle = circleRefs.current[index];
-		if (!circle) return;
-
-		const rect = element.getBoundingClientRect();
-		const { width: w, height: h } = rect;
-		const R = ((w * w) / 4 + h * h) / (2 * h);
-		const D = Math.ceil(2 * R) + 2;
-		const delta =
-			Math.ceil(R - Math.sqrt(Math.max(0, R * R - (w * w) / 4))) + 1;
-		const originY = D - delta;
-
-		circle.style.width = `${D}px`;
-		circle.style.height = `${D}px`;
-		circle.style.bottom = `-${delta}px`;
-
-		gsap.set(circle, {
-			xPercent: -50,
-			scale: 0,
-			transformOrigin: `50% ${originY}px`,
-		});
-
-		const label = element.querySelector<HTMLElement>(".btn-label");
-		const white = element.querySelector<HTMLElement>(".btn-label-hover");
-
-		if (label) gsap.set(label, { y: 0 });
-		if (white) gsap.set(white, { y: h + 12, opacity: 0 });
-
-		const tl = gsap.timeline({ paused: true });
-
-		tl.to(
-			circle,
-			{
-				scale: 1.2,
-				xPercent: -50,
-				duration: 2,
-				ease: "power3.easeOut",
-				overwrite: "auto",
-			},
-			0,
-		);
-
-		if (label) {
-			tl.to(
-				label,
-				{ y: -(h + 8), duration: 2, ease: "power3.easeOut", overwrite: "auto" },
-				0,
-			);
-		}
-
-		if (white) {
-			gsap.set(white, { y: Math.ceil(h + 100), opacity: 0 });
-			tl.to(
-				white,
-				{
-					y: 0,
-					opacity: 1,
-					duration: 2,
-					ease: "power3.easeOut",
-					overwrite: "auto",
-				},
-				0,
-			);
-		}
-
-		tlRefs.current[index] = tl;
-	};
-
-	// This would be called when buttons mount
-	const setButtonRef =
-		(index: number) => (el: HTMLButtonElement | HTMLAnchorElement | null) => {
-			buttonRefs.current[index] = el;
-			if (el) {
-				setTimeout(() => initPillEffect(index, el), 50);
-			}
-		};
-
 	return (
 		<section className="relative pt-32 pb-20 md:pt-44 md:pb-28 lg:pt-48 lg:pb-32 bg-white overflow-hidden">
 			{/* Decorative geometric elements - no gradients */}
 			<div className="absolute top-0 right-0 w-[500px] h-[500px] border-2 border-blue-100 rotate-12 pointer-events-none" />
 			<div className="absolute bottom-0 left-0 w-[400px] h-[400px] border-2 border-blue-50 -rotate-6 pointer-events-none" />
 			<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-blue-50 rounded-full pointer-events-none" />
+
+			{/* Subtle light shapes to enrich the hero background (increased visibility) */}
+			<div
+				aria-hidden
+				className="pointer-events-none absolute inset-0 z-0">
+				{/* stronger radial highlights */}
+				<div className="absolute -top-24 -left-24 w-[520px] h-[520px] rounded-full bg-[radial-gradient(circle,_rgba(82,39,255,0.18)_0%,_rgba(82,39,255,0)_45%)] blur-2xl opacity-90" />
+				<div className="absolute -right-12 top-24 w-[420px] h-[420px] rounded-full bg-[radial-gradient(circle,_rgba(181,151,207,0.14)_0%,_rgba(181,151,207,0)_50%)] blur-xl opacity-88" />
+
+				{/* decorative SVG strokes/shapes with increased visibility */}
+				<svg
+					className="absolute inset-0 w-full h-full overflow-visible"
+					viewBox="0 0 1200 800"
+					preserveAspectRatio="xMidYMid slice"
+					xmlns="http://www.w3.org/2000/svg">
+					<defs>
+						<linearGradient
+							id="g1"
+							x1="0%"
+							x2="100%"
+							y1="0%"
+							y2="100%">
+							<stop
+								offset="0%"
+								stopColor="var(--color-primary, #5227FF)"
+								stopOpacity="0.12"
+							/>
+							<stop
+								offset="100%"
+								stopColor="var(--color-primary, #5227FF)"
+								stopOpacity="0.04"
+							/>
+						</linearGradient>
+					</defs>
+					<path
+						d="M0 600 C300 520 600 720 900 640 C1150 560 1250 480 1400 420"
+						fill="none"
+						stroke="url(#g1)"
+						strokeWidth="140"
+						strokeLinecap="round"
+					/>
+					<circle
+						cx="980"
+						cy="140"
+						r="56"
+						fill="var(--color-primary, #5227FF)"
+						opacity="0.12"
+					/>
+					<circle
+						cx="160"
+						cy="200"
+						r="36"
+						fill="var(--color-primary, #5227FF)"
+						opacity="0.08"
+					/>
+					<circle
+						cx="420"
+						cy="520"
+						r="24"
+						fill="var(--color-primary, #5227FF)"
+						opacity="0.06"
+					/>
+				</svg>
+			</div>
 
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center relative z-10">
 				{/* Left Column: Copy & CTA */}
@@ -133,84 +90,29 @@ export default function Hero() {
 						Landing pages or online stores — we build and host them.
 					</p>
 
-					{/* CTAs - pill buttons with navbar transition styling */}
+					{/* CTAs */}
 					<div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
-						<div className="relative inline-block">
-							<button
-								ref={setButtonRef(0)}
-								onMouseEnter={() => handleEnter(0)}
-								onMouseLeave={() => handleLeave(0)}
-								className="relative overflow-hidden bg-blue-600 text-white px-8 py-4 font-bold text-base border-2 border-blue-700 rounded-full cursor-pointer"
-								style={{ minWidth: "180px" }}>
-								<span
-									className="hover-circle absolute left-1/2 bottom-0 rounded-full z-[1] block pointer-events-none"
-									style={{
-										background: "var(--color-surface-container-lowest)",
-										willChange: "transform",
-									}}
-									aria-hidden="true"
-									ref={(el) => {
-										circleRefs.current[0] = el;
-									}}
-								/>
-								<span className="label-stack relative inline-block leading-[1] z-[2]">
-									<span
-										className="btn-label relative z-[2] inline-block leading-[1]"
-										style={{ willChange: "transform" }}>
-										Get Started Now
-									</span>
-									<span
-										className="btn-label-hover absolute left-0 top-0 z-[3] inline-block"
-										style={{
-											color: "var(--color-primary)",
-											willChange: "transform, opacity",
-										}}
-										aria-hidden="true">
-										Get Started Now
-									</span>
-								</span>
-							</button>
-						</div>
+						{/* CTAs - pill buttons with navbar transition styling */}
+						{/* Primary Button - blue */}
+						<PillButton
+							baseColor="#2563eb"
+							circleColor="var(--color-surface-container-lowest)"
+							textColor="#ffffff"
+							hoverTextColor="var(--color-primary)"
+							className="min-w-[180px] border-2 border-blue-700">
+							Get Started Now
+						</PillButton>
 
-						<div className="relative inline-block">
-							<a
-								ref={setButtonRef(1)}
-								href="#how-it-works"
-								onMouseEnter={() => handleEnter(1)}
-								onMouseLeave={() => handleLeave(1)}
-								className="relative overflow-hidden text-gray-700 font-bold text-base px-7 py-4 border-2 border-gray-300 rounded-full inline-flex items-center justify-center gap-2 cursor-pointer"
-								style={{ minWidth: "180px" }}>
-								<span
-									className="hover-circle absolute left-1/2 bottom-0 rounded-full z-[1] block pointer-events-none"
-									style={{
-										background: "var(--color-primary)",
-										willChange: "transform",
-									}}
-									aria-hidden="true"
-									ref={(el) => {
-										circleRefs.current[1] = el;
-									}}
-								/>
-								<span className="label-stack relative inline-block leading-[1] z-[2]">
-									<span
-										className="btn-label relative z-[2] inline-block leading-[1] flex items-center gap-2"
-										style={{ willChange: "transform" }}>
-										<span>See How It Works</span>
-										<span className="text-xl text-blue-600">→</span>
-									</span>
-									<span
-										className="btn-label-hover absolute left-0 top-0 z-[3] inline-block flex items-center gap-2"
-										style={{
-											color: "var(--color-on-primary)",
-											willChange: "transform, opacity",
-										}}
-										aria-hidden="true">
-										<span>See How It Works</span>
-										<span className="text-xl">→</span>
-									</span>
-								</span>
-							</a>
-						</div>
+						{/* Secondary Button - outline */}
+						<PillButton
+							href="#how-it-works"
+							baseColor="#ffffff"
+							circleColor="#2563eb"
+							textColor="#374151"
+							hoverTextColor="#ffffff"
+							className="min-w-[180px] border-2 border-gray-300">
+							See How It Works →
+						</PillButton>
 					</div>
 
 					{/* Quick Metrics Strip - flat design */}

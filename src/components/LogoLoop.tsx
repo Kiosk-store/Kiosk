@@ -1,3 +1,13 @@
+/**
+ * LogoLoop
+ *
+ * Continuously scrolling set of logos. Handles sizing, copies and an
+ * RAF-based animation loop with optional hover slow-down. Designed to
+ * be performant and motion-respecting.
+ *
+ * @format
+ */
+
 /** @format */
 
 import React, {

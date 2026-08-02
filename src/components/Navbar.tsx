@@ -1,3 +1,13 @@
+/**
+ * Navbar
+ *
+ * Thin wrapper that provides the nav item configuration and renders the
+ * `StaggeredMenu` as the global navigation. Kept intentionally small;
+ * complex menu behavior lives in `StaggeredMenu`.
+ *
+ * @format
+ */
+
 /** @format */
 
 "use client";

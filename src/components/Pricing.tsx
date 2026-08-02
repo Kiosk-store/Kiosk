@@ -1,8 +1,18 @@
+/**
+ * Pricing
+ *
+ * Pricing grid with simple billing cycle toggle. Data-driven via the
+ * `tiers` array so copy updates are straightforward.
+ *
+ * @format
+ */
+
 /** @format */
 
 "use client";
 
 import { useState } from "react";
+import PillButton from "./PillButton";
 
 const tiers = [
 	{
@@ -173,14 +183,14 @@ export default function Pricing() {
 							</div>
 
 							{/* Action Button */}
-							<button
+							<PillButton
 								className={`w-full py-4 rounded-full font-semibold text-base cursor-pointer transition-all duration-300 ${
 									tier.featured
 										? "bg-primary text-on-primary hover:bg-primary-hover shadow-lg shadow-primary/25 hover:shadow-primary/40 active:scale-95"
 										: "border-2 border-primary text-primary hover:bg-primary/5 active:scale-95"
 								}`}>
 								{tier.cta}
-							</button>
+							</PillButton>
 						</div>
 					);
 				})}

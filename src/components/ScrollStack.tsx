@@ -1,3 +1,13 @@
+/**
+ * ScrollStack
+ *
+ * A performant, scroll-driven stacked card layout. Cards scale/blur/translate
+ * as the user scrolls to create a stacked, depth-like presentation. Works
+ * with or without the `lenis` smooth-scroll instance.
+ *
+ * @format
+ */
+
 /** @format */
 
 import React, { useLayoutEffect, useRef, useCallback, useEffect } from "react";
@@ -61,7 +71,7 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
 	const isUpdatingRef = useRef(false);
 	const scrollYRef = useRef(0);
 
-	// Use requestAnimationFrame for smooth updates
+	// Use requestAnimationFrame for smooth updates and avoid layout thrashing
 	useEffect(() => {
 		const handleScroll = () => {
 			if (!isUpdatingRef.current) {
@@ -88,6 +98,7 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
 		};
 	}, []);
 
+	// Normalize progress between start and end positions (0..1)
 	const calculateProgress = useCallback(
 		(scrollTop: number, start: number, end: number) => {
 			if (scrollTop < start) return 0;
@@ -97,6 +108,7 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
 		[],
 	);
 
+	// Convert percentage strings like "10%" into pixel values
 	const parsePercentage = useCallback(
 		(value: string | number, containerHeight: number) => {
 			if (typeof value === "string" && value.includes("%")) {
@@ -114,11 +126,14 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
 		};
 	}, []);
 
+	// Return the element's top offset relative to the document
 	const getElementOffset = useCallback((element: HTMLElement) => {
 		const rect = element.getBoundingClientRect();
 		return rect.top + window.scrollY;
 	}, []);
 
+	// Update per-card transforms (translate, scale, rotation, blur)
+	// This is called on scroll via RAF for smooth, composited updates.
 	const updateCardTransforms = useCallback(() => {
 		if (!cardsRef.current.length) return;
 
@@ -244,6 +259,7 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
 		getElementOffset,
 	]);
 
+	// Initialize card DOM refs and base styles when component mounts
 	useLayoutEffect(() => {
 		const cards = Array.from(
 			document.querySelectorAll(".scroll-stack-card"),

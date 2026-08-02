@@ -4,8 +4,5 @@
 			"command": "npx",
 			"args": ["shadcn@latest", "mcp"]
 		}
-	},
-	"registries": {
-		"@react-bits": "https://reactbits.dev/r/{name}.json"
 	}
 }
