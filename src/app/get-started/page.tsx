@@ -1,12 +1,15 @@
 /**
- * Get Started Page (Optimized Mobile Responsiveness)
+ * Get Started Page (Corrected Slide Swap Animation & Mobile Responsiveness)
  *
  * Smooth sliding dual-panel onboarding interface:
  * - Top Switcher: Centered "Sign Up" / "Sign In" pill toggle below the header.
- * - Mobile Optimized: Forms sit on top, decorative Lottie animations sit below.
- * - Clean visual hierarchy and responsive sizing.
- * - Hardware-accelerated smooth CSS translation on desktop (duration-700 ease-[cubic-bezier(0.65,0,0.35,1)]).
- * - Responsive architectural grid lines.
+ * - Desktop Layout:
+ *   - Sign Up (activeTab === 'signup'): Lottie on the Left, Form on the Right.
+ *   - Sign In (activeTab === 'login'): Form on the Left, Lottie on the Right.
+ * - Swapping Animation Math (Form starts left in JSX, Lottie starts right):
+ *   - signup (default): Form translates RIGHT [calc(100%+3rem)], Lottie translates LEFT [calc(-100%-3rem)].
+ *   - login: Both translate to 0 (Form is left, Lottie is right).
+ * - Mobile Optimized: Form stacked on top (order-1), Lottie stacked below (order-2), with translations disabled.
  *
  * @format
  */
@@ -60,11 +63,12 @@ export default function GetStartedPage() {
 		}, 800);
 	};
 
-	const isLogin = activeTab === "login";
+	// Determine if signup state is active to apply swap transforms
+	const isSignup = activeTab === "signup";
 
 	return (
 		<div className="min-h-screen w-full bg-[#f8fafc] text-slate-900 flex flex-col justify-between overflow-x-hidden relative select-none">
-			{/* Responsive Architectural Accent Lines */}
+			{/* Responsive Architectural Accent Grid Lines */}
 			<div
 				aria-hidden="true"
 				className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
@@ -150,11 +154,16 @@ export default function GetStartedPage() {
 					</div>
 				) : (
 					<div className="relative w-full max-w-5xl mx-auto flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
-						{/* FORM PANEL: On mobile, this comes first (order-1) */}
+						{/* 
+						  FORM PANEL
+						  - Sits on the left side on desktop in standard JSX ordering.
+						  - On mobile, this stacked layout comes first (order-1).
+						  - When in "signup" mode, it translates RIGHT to swap places with Lottie.
+						*/}
 						<div
 							className={`w-full lg:w-1/2 flex justify-center order-1 lg:order-none transition-transform duration-700 ease-[cubic-bezier(0.65,0,0.35,1)] ${
-								isLogin
-									? "lg:translate-x-[calc(-100%-3rem)]"
+								isSignup
+									? "lg:translate-x-[calc(100%+3rem)]"
 									: "lg:translate-x-0"
 							}`}>
 							<div className="w-full max-w-md px-1 sm:px-4">
@@ -402,10 +411,10 @@ export default function GetStartedPage() {
 										<div className="pt-2">
 											<PillButton
 												type="submit"
-												baseColor="#004ac6"
-												circleColor="#ffffff"
-												textColor="#ffffff"
-												hoverTextColor="#004ac6"
+												baseColor="#ffffff"
+												circleColor="#004ac6"
+												textColor="#004ac6"
+												hoverTextColor="#ffffff"
 												useThunderFont={true}
 												className="w-full py-3.5 rounded-full font-bold text-sm sm:text-base border-2 border-blue-600 shadow-md cursor-pointer">
 												{isLoading ? "Signing In..." : "Sign In"}
@@ -416,11 +425,16 @@ export default function GetStartedPage() {
 							</div>
 						</div>
 
-						{/* LOTTIE PANEL: On mobile, this fits elegantly below the form (order-2) */}
+						{/* 
+						  LOTTIE PANEL
+						  - Sits on the right side on desktop in standard JSX ordering.
+						  - On mobile, this stacked layout fits below the form (order-2).
+						  - When in "signup" mode, it translates LEFT to swap places with Form.
+						*/}
 						<div
 							className={`w-full lg:w-1/2 flex flex-col items-center justify-center text-center order-2 lg:order-none mt-8 lg:mt-0 transition-transform duration-700 ease-[cubic-bezier(0.65,0,0.35,1)] ${
-								isLogin
-									? "lg:translate-x-[calc(100%+3rem)]"
+								isSignup
+									? "lg:translate-x-[calc(-100%-3rem)]"
 									: "lg:translate-x-0"
 							}`}>
 							<div
