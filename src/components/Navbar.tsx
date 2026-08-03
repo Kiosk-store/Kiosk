@@ -15,11 +15,11 @@
 import StaggeredMenu from "./StaggeredMenu";
 
 const navItems = [
-	{ label: "Services", href: "#services" },
-	{ label: "Pricing", href: "#pricing" },
-	{ label: "Portfolio", href: "#portfolio" },
-	{ label: "About", href: "#about" },
-	{ label: "FAQ", href: "#faq" },
+	{ label: "Services", href: "/#services" },
+	{ label: "Pricing", href: "/#pricing" },
+	{ label: "Portfolio", href: "/#portfolio" },
+	{ label: "About", href: "/#about" },
+	{ label: "FAQ", href: "/#faq" },
 ];
 
 export default function Navbar() {
@@ -30,7 +30,7 @@ export default function Navbar() {
 	}));
 
 	const actionItems = [
-		{ label: "Login / Sign up", link: "/login", primary: true },
+		{ label: "Get Started", link: "/get-started", primary: true },
 	];
 
 	return (

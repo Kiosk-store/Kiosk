@@ -15,6 +15,7 @@
 "use client";
 
 import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { gsap } from "gsap";
 import { Menu as IconMenu, X as IconX } from "lucide-react";
 import PillButton from "./PillButton";
@@ -514,14 +515,15 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 				<header
 					className="staggered-menu-header absolute top-0 left-0 w-full flex items-center justify-between p-[2em] bg-transparent pointer-events-none z-20"
 					aria-label="Main navigation header">
-					<div
-						className="sm-logo flex items-center select-none pointer-events-auto"
-						aria-label="Logo">
-						{/* Render a simple text logo to keep header minimal */}
-						<span className="sm-logo-text block h-8 align-middle font-nohemi font-bold text-lg">
-							Kiosk
+					<Link
+						href="/"
+						className="sm-logo flex items-center gap-2 select-none pointer-events-auto group"
+						aria-label="Kiosk Home">
+						<span className="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block transition-transform group-hover:scale-125" />
+						<span className="sm-logo-text block h-8 align-middle font-nohemi font-extrabold text-xl tracking-tight text-[#0a0a0a]">
+							KIOSK
 						</span>
-					</div>
+					</Link>
 
 					<button
 						ref={toggleBtnRef}
