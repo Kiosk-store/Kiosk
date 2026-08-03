@@ -1,9 +1,11 @@
 /**
- * Get Started Page (Smooth Sliding Layout)
+ * Get Started Page (Top Switcher & Smooth Sliding Layout)
  *
  * Smooth sliding dual-panel onboarding interface:
+ * - Top Switcher: Centered "Sign Up" / "Sign In" pill toggle below the header.
  * - Sign Up: Lottie on the Left, Form on the Right.
  * - Sign In (Login): Form on the Left, Lottie on the Right.
+ * - Cardless clean form design blending seamlessly with the light background.
  * - Hardware-accelerated smooth CSS translation (duration-700 ease-[cubic-bezier(0.65,0,0.35,1)]).
  * - Dedicated Sign Up and Login Lottie animations with crossfade.
  * - Minimal light theme styling with Thunder LC typography.
@@ -84,11 +86,35 @@ export default function GetStartedPage() {
 					</Link>
 				</div>
 
-				{/* Title Section */}
-				<div className="text-center max-w-xl mx-auto mb-8 sm:mb-10">
-					<h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold font-thunder-lc tracking-tight text-slate-900 uppercase leading-none">
+				{/* Title & Top Switcher Section */}
+				<div className="text-center max-w-xl mx-auto mb-8 sm:mb-12 flex flex-col items-center">
+					<h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold font-thunder-lc tracking-tight text-slate-900 uppercase leading-none mb-6">
 						GET STARTED
 					</h1>
+
+					{/* Top Tab Toggle: Sign Up vs Sign In */}
+					<div className="inline-flex p-1 bg-slate-200/80 border border-slate-300/70 rounded-full w-full max-w-[280px]">
+						<button
+							type="button"
+							onClick={() => setActiveTab("signup")}
+							className={`flex-1 py-2 text-xs sm:text-sm font-bold rounded-full transition-all duration-200 cursor-pointer ${
+								activeTab === "signup"
+									? "bg-white text-slate-900 shadow-sm"
+									: "text-slate-600 hover:text-slate-900"
+							}`}>
+							Sign Up
+						</button>
+						<button
+							type="button"
+							onClick={() => setActiveTab("login")}
+							className={`flex-1 py-2 text-xs sm:text-sm font-bold rounded-full transition-all duration-200 cursor-pointer ${
+								activeTab === "login"
+									? "bg-white text-slate-900 shadow-sm"
+									: "text-slate-600 hover:text-slate-900"
+							}`}>
+							Sign In
+						</button>
+					</div>
 				</div>
 
 				{/* Success State */}
@@ -115,8 +141,8 @@ export default function GetStartedPage() {
 						</div>
 					</div>
 				) : (
-					<div className="relative w-full max-w-5xl mx-auto flex flex-col lg:flex-row items-center gap-8 lg:gap-12 min-h-[520px]">
-						{/* LOTTIE CARD: Left on Sign Up (0%), Right on Login (+100% + gap) */}
+					<div className="relative w-full max-w-5xl mx-auto flex flex-col lg:flex-row items-center gap-8 lg:gap-12 min-h-[480px]">
+						{/* LOTTIE PANEL: Left on Sign Up (0%), Right on Login (+100% + gap) */}
 						<div
 							className={`w-full lg:w-1/2 flex flex-col items-center justify-center text-center transition-transform duration-700 ease-[cubic-bezier(0.65,0,0.35,1)] ${
 								isLogin
@@ -144,38 +170,14 @@ export default function GetStartedPage() {
 							</p>
 						</div>
 
-						{/* FORM CARD: Right on Sign Up (0%), Left on Login (-100% - gap) */}
+						{/* FORM PANEL (Cardless): Right on Sign Up (0%), Left on Login (-100% - gap) */}
 						<div
 							className={`w-full lg:w-1/2 flex justify-center transition-transform duration-700 ease-[cubic-bezier(0.65,0,0.35,1)] ${
 								isLogin
 									? "lg:translate-x-[calc(-100%-3rem)]"
 									: "lg:translate-x-0"
 							}`}>
-							<div className="w-full max-w-md bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-200/50">
-								{/* Tab Toggle: Sign Up vs Sign In */}
-								<div className="grid grid-cols-2 p-1 bg-slate-100 border border-slate-200/60 rounded-2xl mb-6">
-									<button
-										type="button"
-										onClick={() => setActiveTab("signup")}
-										className={`py-2 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 cursor-pointer ${
-											activeTab === "signup"
-												? "bg-white text-slate-900 shadow-sm"
-												: "text-slate-500 hover:text-slate-900"
-										}`}>
-										Sign Up
-									</button>
-									<button
-										type="button"
-										onClick={() => setActiveTab("login")}
-										className={`py-2 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 cursor-pointer ${
-											activeTab === "login"
-												? "bg-white text-slate-900 shadow-sm"
-												: "text-slate-500 hover:text-slate-900"
-										}`}>
-										Sign In
-									</button>
-								</div>
-
+							<div className="w-full max-w-md px-2 sm:px-4">
 								{/* Social Auth Providers */}
 								<div className="grid grid-cols-2 gap-3 mb-5">
 									<button
@@ -187,7 +189,7 @@ export default function GetStartedPage() {
 												setIsSuccess(true);
 											}, 600);
 										}}
-										className="flex items-center justify-center gap-2 py-2 px-3 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition-all cursor-pointer">
+										className="flex items-center justify-center gap-2 py-2 px-3 rounded-xl border border-slate-300/80 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-all shadow-xs cursor-pointer">
 										<svg className="w-4 h-4" viewBox="0 0 24 24">
 											<path
 												fill="#EA4335"
@@ -218,7 +220,7 @@ export default function GetStartedPage() {
 												setIsSuccess(true);
 											}, 600);
 										}}
-										className="flex items-center justify-center gap-2 py-2 px-3 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition-all cursor-pointer">
+										className="flex items-center justify-center gap-2 py-2 px-3 rounded-xl border border-slate-300/80 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-all shadow-xs cursor-pointer">
 										<svg
 											className="w-4 h-4 fill-current text-slate-900"
 											viewBox="0 0 24 24">
@@ -231,7 +233,7 @@ export default function GetStartedPage() {
 								{/* Divider */}
 								<div className="relative flex items-center justify-center my-5">
 									<div className="w-full border-t border-slate-200" />
-									<span className="absolute bg-white px-3 text-[11px] text-slate-400 font-mono uppercase tracking-wider">
+									<span className="absolute bg-[#f8fafc] px-3 text-[11px] text-slate-400 font-mono uppercase tracking-wider">
 										or
 									</span>
 								</div>
@@ -261,7 +263,7 @@ export default function GetStartedPage() {
 													onChange={(e) =>
 														setSignupName(e.target.value)
 													}
-													className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all placeholder:text-slate-400"
+													className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300/80 bg-white text-slate-900 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all placeholder:text-slate-400 shadow-xs"
 												/>
 											</div>
 										</div>
@@ -285,7 +287,7 @@ export default function GetStartedPage() {
 													onChange={(e) =>
 														setSignupEmail(e.target.value)
 													}
-													className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all placeholder:text-slate-400"
+													className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300/80 bg-white text-slate-900 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all placeholder:text-slate-400 shadow-xs"
 												/>
 											</div>
 										</div>
@@ -309,7 +311,7 @@ export default function GetStartedPage() {
 													onChange={(e) =>
 														setSignupPassword(e.target.value)
 													}
-													className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all placeholder:text-slate-400"
+													className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300/80 bg-white text-slate-900 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all placeholder:text-slate-400 shadow-xs"
 												/>
 												<button
 													type="button"
@@ -366,7 +368,7 @@ export default function GetStartedPage() {
 													onChange={(e) =>
 														setLoginEmail(e.target.value)
 													}
-													className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all placeholder:text-slate-400"
+													className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300/80 bg-white text-slate-900 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all placeholder:text-slate-400 shadow-xs"
 												/>
 											</div>
 										</div>
@@ -400,7 +402,7 @@ export default function GetStartedPage() {
 													onChange={(e) =>
 														setLoginPassword(e.target.value)
 													}
-													className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all placeholder:text-slate-400"
+													className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300/80 bg-white text-slate-900 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all placeholder:text-slate-400 shadow-xs"
 												/>
 												<button
 													type="button"
