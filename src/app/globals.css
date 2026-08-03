@@ -314,6 +314,8 @@ html {
 	scroll-behavior: smooth;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+	overflow-x: hidden;
+	width: 100%;
 }
 
 body {
@@ -322,6 +324,9 @@ body {
 	font-family: var(--font-nohemi);
 	font-size: 1rem;
 	line-height: 1.6;
+	overflow-x: hidden;
+	width: 100%;
+	min-height: 100vh;
 }
 
 /* ============================

@@ -2,6 +2,7 @@
  * Pricing
  *
  * Fullscreen Scroll-Driven Pricing Showcase:
+ * - Fully responsive across all mobile, tablet, and desktop screen sizes.
  * - One prominent large Lottie animation + One prominent pricing card displayed at a time.
  * - Zero card background on Lottie for seamless integration.
  * - On vertical scroll, pins and smoothly moves to the next pair:
@@ -142,22 +143,22 @@ export default function Pricing() {
 			{/* Pinned Fullscreen Stage */}
 			<div
 				ref={pinContainerRef}
-				className="w-full min-h-screen flex flex-col justify-between py-8 sm:py-10 md:py-12 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto">
+				className="w-full min-h-screen flex flex-col justify-between py-6 sm:py-8 lg:py-12 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto">
 				{/* Top Header & Toggle */}
-				<div className="w-full flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 border-b border-white/10 pb-5 shrink-0 relative z-20">
+				<div className="w-full flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-6 border-b border-white/10 pb-4 sm:pb-5 shrink-0 relative z-20">
 					<div>
-						<h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white font-nohemi">
-							Simple pricing.{" "}
-							<span className="text-blue-400">Zero surprises.</span>
+						<h2 className="text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white font-nohemi uppercase">
+							SIMPLE PRICING.{" "}
+							<span className="text-blue-400">ZERO SURPRISES.</span>
 						</h2>
 					</div>
 
 					{/* Right: Billing Cycle Toggle */}
-					<div className="inline-flex items-center p-1 rounded-full bg-[#161922] border border-white/15 self-start md:self-auto">
+					<div className="inline-flex items-center p-1 rounded-full bg-[#161922] border border-white/15 self-start sm:self-auto shrink-0">
 						<button
 							type="button"
 							onClick={() => setBillingCycle("one-time")}
-							className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
+							className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
 								billingCycle === "one-time"
 									? "bg-white text-[#0a0a0a] shadow-sm"
 									: "text-slate-400 hover:text-white"
@@ -168,7 +169,7 @@ export default function Pricing() {
 						<button
 							type="button"
 							onClick={() => setBillingCycle("monthly")}
-							className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
+							className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer flex items-center gap-1 sm:gap-1.5 ${
 								billingCycle === "monthly"
 									? "bg-white text-[#0a0a0a] shadow-sm"
 									: "text-slate-400 hover:text-white"
@@ -182,7 +183,7 @@ export default function Pricing() {
 				</div>
 
 				{/* Main Stage: 1 Lottie Showcase + 1 Pricing Card */}
-				<div className="w-full flex-1 relative flex items-center justify-center my-4 sm:my-6 min-h-[520px]">
+				<div className="w-full flex-1 relative flex items-center justify-center my-3 sm:my-6 min-h-[480px] sm:min-h-[520px]">
 					{tiers.map((tier, idx) => {
 						const isVisible = idx === activeIndex;
 						const price =
@@ -201,18 +202,18 @@ export default function Pricing() {
 									transform: isVisible
 										? "translateY(0) scale(1)"
 										: idx < activeIndex
-										? "translateY(-30px) scale(0.96)"
-										: "translateY(30px) scale(0.96)",
+										? "translateY(-20px) scale(0.97)"
+										: "translateY(20px) scale(0.97)",
 									pointerEvents: isVisible ? "auto" : "none",
 									transition:
 										"opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
 								}}
-								className={`absolute inset-0 w-full h-full flex flex-col items-center justify-center gap-6 sm:gap-10 lg:gap-16 ${
+								className={`absolute inset-0 w-full h-full flex flex-col items-center justify-center gap-4 sm:gap-8 lg:gap-16 ${
 									idx === 1 ? "lg:flex-row-reverse" : "lg:flex-row"
 								}`}>
 								{/* Left: Large Borderless Lottie Animation Showcase */}
-								<div className="w-full lg:w-1/2 flex items-center justify-center">
-									<div className="w-full max-w-[480px] sm:max-w-[540px] md:max-w-[580px] h-[340px] sm:h-[420px] md:h-[480px] flex items-center justify-center p-2">
+								<div className="w-full lg:w-1/2 flex items-center justify-center shrink-0">
+									<div className="w-full max-w-[280px] sm:max-w-[400px] md:max-w-[480px] lg:max-w-[580px] h-[160px] sm:h-[240px] md:h-[320px] lg:h-[480px] flex items-center justify-center p-1 sm:p-2">
 										<LottiePlayer
 											src={tier.lottieSrc}
 											className="w-full h-full object-contain"
@@ -225,46 +226,46 @@ export default function Pricing() {
 								{/* Right: Prominent Pricing Card */}
 								<div className="w-full lg:w-1/2 flex items-center justify-center">
 									<div
-										className={`w-full max-w-[460px] sm:max-w-[500px] rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 ${
+										className={`w-full max-w-[360px] sm:max-w-[440px] lg:max-w-[500px] rounded-2xl sm:rounded-3xl p-5 sm:p-7 md:p-8 flex flex-col justify-between transition-all duration-300 ${
 											tier.featured
 												? "bg-[#141824] border-2 border-blue-600 shadow-2xl shadow-blue-600/10"
 												: "bg-[#11131a] border border-white/15 shadow-2xl shadow-black/60"
 										}`}>
 										<div>
 											{/* Plan Name & Tag */}
-											<div className="flex items-center justify-between mb-2">
-												<h3 className="text-2xl sm:text-3xl font-bold text-white font-nohemi">
+											<div className="flex items-center justify-between mb-1.5 sm:mb-2">
+												<h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white font-nohemi">
 													{tier.name}
 												</h3>
 												{tier.featured && (
-													<span className="text-xs uppercase font-bold tracking-wider px-3 py-1 rounded-full bg-blue-600 text-white">
+													<span className="text-[10px] sm:text-xs uppercase font-bold tracking-wider px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-blue-600 text-white">
 														Featured
 													</span>
 												)}
 											</div>
 
-											<p className="text-slate-300 text-sm mb-6 leading-relaxed">
+											<p className="text-slate-300 text-xs sm:text-sm mb-4 sm:mb-6 leading-relaxed">
 												{tier.description}
 											</p>
 
 											{/* Price Display */}
-											<div className="mb-6 flex items-baseline gap-2.5">
-												<span className="text-3xl sm:text-4xl font-medium text-white tracking-tight font-nohemi">
+											<div className="mb-4 sm:mb-6 flex items-baseline gap-2 sm:gap-2.5">
+												<span className="text-2xl sm:text-3xl md:text-4xl font-medium text-white tracking-tight font-nohemi">
 													{price}
 												</span>
-												<span className="text-xs text-slate-400 font-normal uppercase tracking-wider">
+												<span className="text-[10px] sm:text-xs text-slate-400 font-normal uppercase tracking-wider">
 													{period}
 												</span>
 											</div>
 
 											{/* Feature Checklist */}
-											<ul className="space-y-3 mb-8">
+											<ul className="space-y-2 sm:space-y-3 mb-5 sm:mb-8">
 												{tier.features.map((feat) => (
 													<li
 														key={feat}
-														className="flex items-center gap-3 text-sm text-slate-200">
-														<div className="w-4 h-4 rounded-full bg-blue-600/20 text-blue-400 flex items-center justify-center shrink-0">
-															<Check className="w-3 h-3 stroke-[3]" />
+														className="flex items-center gap-2.5 sm:gap-3 text-xs sm:text-sm text-slate-200">
+														<div className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-blue-600/20 text-blue-400 flex items-center justify-center shrink-0">
+															<Check className="w-2.5 h-2.5 sm:w-3 sm:h-3 stroke-[3]" />
 														</div>
 														<span>{feat}</span>
 													</li>
@@ -281,7 +282,7 @@ export default function Pricing() {
 												textColor={tier.featured ? "#ffffff" : "#0a0a0a"}
 												hoverTextColor={tier.featured ? "#0a0a0a" : "#ffffff"}
 												useThunderFont={true}
-												className={`w-full py-4 rounded-full font-bold text-base shadow-xl cursor-pointer ${
+												className={`w-full py-3 sm:py-4 rounded-full font-bold text-sm sm:text-base shadow-xl cursor-pointer ${
 													tier.featured
 														? "border-2 border-blue-600"
 														: "border-2 border-white hover:border-blue-600"

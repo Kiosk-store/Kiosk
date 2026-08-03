@@ -110,8 +110,8 @@ export default function HowItWorks() {
 									style={{
 										background: s.bg,
 										color: ink,
-										minHeight: 240,
-										padding: "32px 40px",
+										minHeight: 200,
+										padding: "clamp(20px, 4vw, 32px) clamp(20px, 4vw, 40px)",
 										display: "flex",
 										flexDirection: "column",
 										alignItems: "flex-start",
