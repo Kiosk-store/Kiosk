@@ -134,10 +134,11 @@ export default function Pricing() {
 	}, []);
 
 	return (
-		<section
-			id="pricing"
-			ref={sectionRef}
-			tabIndex={0}
+		<div className="pricing-wrapper">
+			<section
+				id="pricing"
+				ref={sectionRef}
+				tabIndex={0}
 			aria-label="Pricing Packages"
 			className="relative w-full bg-[#0a0c10] text-white overflow-hidden select-none">
 			{/* Visible Price-Related Minimal Floating Background */}
@@ -317,5 +318,6 @@ export default function Pricing() {
 				</div>
 			</div>
 		</section>
+		</div>
 	);
 }
