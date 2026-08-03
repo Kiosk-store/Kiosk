@@ -1,14 +1,12 @@
 /**
- * Get Started Page (Top Switcher & Smooth Sliding Layout)
+ * Get Started Page (Optimized Mobile Responsiveness)
  *
  * Smooth sliding dual-panel onboarding interface:
  * - Top Switcher: Centered "Sign Up" / "Sign In" pill toggle below the header.
- * - Sign Up: Lottie on the Left, Form on the Right.
- * - Sign In (Login): Form on the Left, Lottie on the Right.
- * - Cardless clean form design blending seamlessly with the light background.
- * - Hardware-accelerated smooth CSS translation (duration-700 ease-[cubic-bezier(0.65,0,0.35,1)]).
- * - Dedicated Sign Up and Login Lottie animations with crossfade.
- * - Minimal light theme styling with Thunder LC typography.
+ * - Mobile Optimized: Forms sit on top, decorative Lottie animations sit below.
+ * - Clean visual hierarchy and responsive sizing.
+ * - Hardware-accelerated smooth CSS translation on desktop (duration-700 ease-[cubic-bezier(0.65,0,0.35,1)]).
+ * - Responsive architectural grid lines.
  *
  * @format
  */
@@ -66,16 +64,26 @@ export default function GetStartedPage() {
 
 	return (
 		<div className="min-h-screen w-full bg-[#f8fafc] text-slate-900 flex flex-col justify-between overflow-x-hidden relative select-none">
-			{/* Minimal Light Background */}
+			{/* Responsive Architectural Accent Lines */}
 			<div
 				aria-hidden="true"
 				className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
 				<div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[radial-gradient(circle,_rgba(37,99,235,0.06)_0%,_rgba(248,250,252,0)_70%)] blur-3xl" />
-				<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-slate-200/50 rounded-full" />
+				<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-slate-200/40 rounded-full" />
+				
+				{/* Vertical Grid Accent Lines */}
+				<div className="absolute top-0 bottom-0 left-[5%] md:left-[10%] w-px bg-slate-300/50" />
+				<div className="absolute top-0 bottom-0 left-[30%] w-px bg-slate-300/20 hidden md:block" />
+				<div className="absolute top-0 bottom-0 right-[30%] w-px bg-slate-300/20 hidden md:block" />
+				<div className="absolute top-0 bottom-0 right-[5%] md:right-[10%] w-px bg-slate-300/50" />
+				
+				{/* Horizontal Grid Accent Lines */}
+				<div className="absolute top-[10%] sm:top-[15%] left-0 right-0 h-px bg-slate-300/40" />
+				<div className="absolute bottom-[10%] sm:bottom-[15%] left-0 right-0 h-px bg-slate-300/40" />
 			</div>
 
 			{/* Main Content Area */}
-			<main className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-8 pt-24 sm:pt-32 pb-12 flex-1 flex flex-col justify-center">
+			<main className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-8 pt-20 sm:pt-32 pb-12 flex-1 flex flex-col justify-center">
 				{/* Back link */}
 				<div className="mb-4">
 					<Link
@@ -87,7 +95,7 @@ export default function GetStartedPage() {
 				</div>
 
 				{/* Title & Top Switcher Section */}
-				<div className="text-center max-w-xl mx-auto mb-8 sm:mb-12 flex flex-col items-center">
+				<div className="text-center max-w-xl mx-auto mb-6 sm:mb-12 flex flex-col items-center">
 					<h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold font-thunder-lc tracking-tight text-slate-900 uppercase leading-none mb-6">
 						GET STARTED
 					</h1>
@@ -119,7 +127,7 @@ export default function GetStartedPage() {
 
 				{/* Success State */}
 				{isSuccess ? (
-					<div className="max-w-md mx-auto w-full p-8 rounded-3xl bg-white border border-emerald-200 text-center shadow-xl shadow-emerald-500/10 animate-in fade-in zoom-in-95 duration-300">
+					<div className="max-w-md mx-auto w-full p-6 sm:p-8 rounded-3xl bg-white border border-emerald-200 text-center shadow-xl shadow-emerald-500/10 animate-in fade-in zoom-in-95 duration-300">
 						<CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto mb-3" />
 						<h2 className="text-xl font-bold text-slate-900 font-nohemi">
 							{activeTab === "signup" ? "Account Created" : "Welcome Back"}
@@ -141,43 +149,15 @@ export default function GetStartedPage() {
 						</div>
 					</div>
 				) : (
-					<div className="relative w-full max-w-5xl mx-auto flex flex-col lg:flex-row items-center gap-8 lg:gap-12 min-h-[480px]">
-						{/* LOTTIE PANEL: Left on Sign Up (0%), Right on Login (+100% + gap) */}
+					<div className="relative w-full max-w-5xl mx-auto flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+						{/* FORM PANEL: On mobile, this comes first (order-1) */}
 						<div
-							className={`w-full lg:w-1/2 flex flex-col items-center justify-center text-center transition-transform duration-700 ease-[cubic-bezier(0.65,0,0.35,1)] ${
-								isLogin
-									? "lg:translate-x-[calc(100%+3rem)]"
-									: "lg:translate-x-0"
-							}`}>
-							<div
-								key={activeTab}
-								className="w-full max-w-[340px] sm:max-w-[420px] h-[260px] sm:h-[320px] flex items-center justify-center animate-in fade-in zoom-in-95 duration-300">
-								<LottiePlayer
-									src={
-										activeTab === "signup"
-											? "/lotties/Sign up.json"
-											: "/lotties/Login.json"
-									}
-									className="w-full h-full object-contain"
-									loop={true}
-									autoplay={true}
-								/>
-							</div>
-							<p className="text-xs text-slate-500 font-medium mt-1">
-								{activeTab === "signup"
-									? "Create your Kiosk workspace"
-									: "Welcome back to Kiosk"}
-							</p>
-						</div>
-
-						{/* FORM PANEL (Cardless): Right on Sign Up (0%), Left on Login (-100% - gap) */}
-						<div
-							className={`w-full lg:w-1/2 flex justify-center transition-transform duration-700 ease-[cubic-bezier(0.65,0,0.35,1)] ${
+							className={`w-full lg:w-1/2 flex justify-center order-1 lg:order-none transition-transform duration-700 ease-[cubic-bezier(0.65,0,0.35,1)] ${
 								isLogin
 									? "lg:translate-x-[calc(-100%-3rem)]"
 									: "lg:translate-x-0"
 							}`}>
-							<div className="w-full max-w-md px-2 sm:px-4">
+							<div className="w-full max-w-md px-1 sm:px-4">
 								{/* Social Auth Providers */}
 								<div className="grid grid-cols-2 gap-3 mb-5">
 									<button
@@ -434,6 +414,34 @@ export default function GetStartedPage() {
 									</form>
 								)}
 							</div>
+						</div>
+
+						{/* LOTTIE PANEL: On mobile, this fits elegantly below the form (order-2) */}
+						<div
+							className={`w-full lg:w-1/2 flex flex-col items-center justify-center text-center order-2 lg:order-none mt-8 lg:mt-0 transition-transform duration-700 ease-[cubic-bezier(0.65,0,0.35,1)] ${
+								isLogin
+									? "lg:translate-x-[calc(100%+3rem)]"
+									: "lg:translate-x-0"
+							}`}>
+							<div
+								key={activeTab}
+								className="w-full max-w-[300px] sm:max-w-[420px] h-[160px] sm:h-[240px] lg:h-[320px] flex items-center justify-center animate-in fade-in zoom-in-95 duration-300">
+								<LottiePlayer
+									src={
+										activeTab === "signup"
+											? "/lotties/Sign up.json"
+											: "/lotties/Login.json"
+									}
+									className="w-full h-full object-contain"
+									loop={true}
+									autoplay={true}
+								/>
+							</div>
+							<p className="text-xs text-slate-500 font-medium mt-1">
+								{activeTab === "signup"
+									? "Create your Kiosk workspace"
+									: "Welcome back to Kiosk"}
+							</p>
 						</div>
 					</div>
 				)}
