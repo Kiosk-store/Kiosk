@@ -3,6 +3,7 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
+import Link from "next/link";
 import { gsap } from "gsap";
 
 export type PillButtonProps = {
@@ -245,8 +246,31 @@ const PillButton: React.FC<PillButtonProps> = ({
 	const { style: restStyle, ...restProps } = rest as Record<string, unknown>;
 
 	if (href) {
+		const isExternal = href.startsWith("http");
+		if (isExternal) {
+			return (
+				<a
+					href={href}
+					ref={(el: HTMLAnchorElement | null) => {
+						rootRef.current = el as HTMLElement | null;
+					}}
+					onMouseEnter={handleEnter}
+					onMouseLeave={handleLeave}
+					className={baseClasses}
+					style={{
+						backgroundColor: baseColor,
+						cursor: "pointer",
+						pointerEvents: "auto",
+						...fontStyle,
+						...(restStyle || {}),
+					}}
+					{...restProps}>
+					{content}
+				</a>
+			);
+		}
 		return (
-			<a
+			<Link
 				href={href}
 				ref={(el: HTMLAnchorElement | null) => {
 					rootRef.current = el as HTMLElement | null;
@@ -263,7 +287,7 @@ const PillButton: React.FC<PillButtonProps> = ({
 				}}
 				{...restProps}>
 				{content}
-			</a>
+			</Link>
 		);
 	}
 
