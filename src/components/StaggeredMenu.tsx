@@ -15,7 +15,6 @@
 "use client";
 
 import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { gsap } from "gsap";
 import { Menu as IconMenu, X as IconX } from "lucide-react";
 import PillButton from "./PillButton";
@@ -67,7 +66,6 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 	actionTitle,
 	displayItemNumbering = true,
 	className,
-	logoUrl = "/src/assets/logos/reactbits-gh-white.svg",
 	menuButtonColor = "#fff",
 	openMenuButtonColor = "#fff",
 	changeMenuColorOnOpen = true,
@@ -174,7 +172,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
 		if (itemEls.length) gsap.set(itemEls, { yPercent: 140, rotate: 10 });
 		if (numberEls.length)
-			gsap.set(numberEls, { ["--sm-num-opacity" as any]: 0 });
+			gsap.set(numberEls, { ["--sm-num-opacity" as string]: 0 });
 		if (actionTitleEl) gsap.set(actionTitleEl, { opacity: 0 });
 		if (actionEls.length) gsap.set(actionEls, { y: 25, opacity: 0 });
 
@@ -222,7 +220,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 					{
 						duration: 0.6,
 						ease: "power2.out",
-						["--sm-num-opacity" as any]: 1,
+						["--sm-num-opacity" as string]: 1,
 						stagger: { each: 0.08, from: "start" },
 					},
 					itemsStart + 0.1,
@@ -309,7 +307,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 					),
 				) as HTMLElement[];
 				if (numberEls.length)
-					gsap.set(numberEls, { ["--sm-num-opacity" as any]: 0 });
+					gsap.set(numberEls, { ["--sm-num-opacity" as string]: 0 });
 
 				const actionTitleEl = panel.querySelector(
 					".sm-actions-title, .sm-socials-title",
@@ -476,15 +474,15 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
 	return (
 		<div
-			className={`sm-scope z-40 ${isFixed ? "fixed top-0 left-0 w-screen h-screen overflow-hidden" : "w-full h-full"}`}>
+			className={`sm-scope z-40 ${open ? "pointer-events-auto" : "pointer-events-none"} ${isFixed ? "fixed top-0 left-0 w-screen h-screen overflow-hidden" : "w-full h-full"}`}>
 			<div
 				className={
 					(className ? className + " " : "") +
-					"staggered-menu-wrapper pointer-events-none relative w-full h-full z-40"
+					`staggered-menu-wrapper relative w-full h-full z-40 ${open ? "pointer-events-auto" : "pointer-events-none"}`
 				}
 				style={
 					accentColor
-						? ({ ["--sm-accent" as any]: accentColor } as React.CSSProperties)
+						? ({ "--sm-accent": accentColor } as React.CSSProperties)
 						: undefined
 				}
 				data-position={position}
@@ -498,7 +496,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 							colors && colors.length
 								? colors.slice(0, 4)
 								: ["#1e1e22", "#35353c"];
-						let arr = [...raw];
+						const arr = [...raw];
 						if (arr.length >= 3) {
 							const mid = Math.floor(arr.length / 2);
 							arr.splice(mid, 1);

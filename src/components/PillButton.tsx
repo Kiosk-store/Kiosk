@@ -15,9 +15,9 @@ export type PillButtonProps = {
 	textColor?: string;
 	hoverTextColor?: string;
 	useThunderFont?: boolean;
-	onClick?: (e: React.MouseEvent<any>) => void;
+	onClick?: (e: React.MouseEvent<HTMLElement>) => void;
 	style?: React.CSSProperties;
-	[key: string]: any;
+	[key: string]: unknown;
 };
 
 const PillButton: React.FC<PillButtonProps> = ({
@@ -242,7 +242,7 @@ const PillButton: React.FC<PillButtonProps> = ({
 		</>
 	);
 
-	const { style: restStyle, ...restProps } = rest as any;
+	const { style: restStyle, ...restProps } = rest as Record<string, unknown>;
 
 	if (href) {
 		return (
@@ -256,6 +256,8 @@ const PillButton: React.FC<PillButtonProps> = ({
 				className={baseClasses}
 				style={{
 					backgroundColor: baseColor,
+					cursor: "pointer",
+					pointerEvents: "auto",
 					...fontStyle,
 					...(restStyle || {}),
 				}}
@@ -276,6 +278,8 @@ const PillButton: React.FC<PillButtonProps> = ({
 			className={baseClasses}
 			style={{
 				backgroundColor: baseColor,
+				cursor: "pointer",
+				pointerEvents: "auto",
 				...fontStyle,
 				...(restStyle || {}),
 			}}

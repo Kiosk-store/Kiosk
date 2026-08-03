@@ -61,42 +61,12 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
 	scaleDuration = 0.5,
 	rotationAmount = 0,
 	blurAmount = 3,
-	useWindowScroll = true,
 	onStackComplete,
 }) => {
 	const scrollerRef = useRef<HTMLDivElement>(null);
 	const stackCompletedRef = useRef(false);
-	const animationFrameRef = useRef<number | null>(null);
 	const cardsRef = useRef<HTMLElement[]>([]);
 	const isUpdatingRef = useRef(false);
-	const scrollYRef = useRef(0);
-
-	// Use requestAnimationFrame for smooth updates and avoid layout thrashing
-	useEffect(() => {
-		const handleScroll = () => {
-			if (!isUpdatingRef.current) {
-				isUpdatingRef.current = true;
-				requestAnimationFrame(() => {
-					updateCardTransforms();
-					isUpdatingRef.current = false;
-				});
-			}
-		};
-
-		const lenis = lenisStore.get();
-		if (lenis) {
-			lenis.on("scroll", handleScroll);
-		}
-
-		window.addEventListener("scroll", handleScroll, { passive: true });
-
-		return () => {
-			if (lenis) {
-				lenis.off("scroll", handleScroll);
-			}
-			window.removeEventListener("scroll", handleScroll);
-		};
-	}, []);
 
 	// Normalize progress between start and end positions (0..1)
 	const calculateProgress = useCallback(
@@ -148,10 +118,6 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
 			".scroll-stack-end",
 		) as HTMLElement | null;
 		const endElementTop = endElement ? getElementOffset(endElement) : 0;
-
-		// Calculate smooth scroll progress
-		const scrollProgress = scrollTop / (endElementTop - containerHeight * 0.5);
-		const clampedProgress = Math.max(0, Math.min(1, scrollProgress));
 
 		let topCardIndex = 0;
 		cardsRef.current.forEach((card, i) => {
@@ -258,6 +224,33 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
 		getScrollData,
 		getElementOffset,
 	]);
+
+	// Use requestAnimationFrame for smooth updates and avoid layout thrashing
+	useEffect(() => {
+		const handleScroll = () => {
+			if (!isUpdatingRef.current) {
+				isUpdatingRef.current = true;
+				requestAnimationFrame(() => {
+					updateCardTransforms();
+					isUpdatingRef.current = false;
+				});
+			}
+		};
+
+		const lenis = lenisStore.get();
+		if (lenis) {
+			lenis.on("scroll", handleScroll);
+		}
+
+		window.addEventListener("scroll", handleScroll, { passive: true });
+
+		return () => {
+			if (lenis) {
+				lenis.off("scroll", handleScroll);
+			}
+			window.removeEventListener("scroll", handleScroll);
+		};
+	}, [updateCardTransforms]);
 
 	// Initialize card DOM refs and base styles when component mounts
 	useLayoutEffect(() => {

@@ -79,7 +79,7 @@ export default function Hero() {
 				{/* Left Column */}
 				<div className="lg:col-span-7 space-y-6 md:space-y-8 text-center lg:text-left">
 					<h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight text-gray-900">
-						Kiosk: simple websites for small businesses
+						KIOSK: simple websites for small businesses
 					</h1>
 
 					<p className="text-lg md:text-xl text-gray-600 max-w-xl mx-auto lg:mx-0 leading-relaxed">
