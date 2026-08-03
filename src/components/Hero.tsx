@@ -90,7 +90,7 @@ export default function Hero() {
 					<div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
 						{/* Primary Button */}
 						<PillButton
-							href="#pricing"
+							href="/get-started"
 							baseColor="#004ac6"
 							circleColor="#ffffff"
 							textColor="#ffffff"

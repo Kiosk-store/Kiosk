@@ -723,11 +723,11 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 /* also allow reveal when hovering the header/toggle (icon hover) */
 .sm-scope .staggered-menu-header:hover ~ .staggered-menu-panel { transform: translateX(0); pointer-events: auto; }
 
-@media (max-width: 1024px) { .sm-scope .staggered-menu-panel { width: 100%; left: 0; right: 0; } .sm-scope .sm-prelayers { width: 100%; left: 0; right: 0; } .sm-scope .staggered-menu-wrapper[data-open] .sm-logo-img { filter: invert(100%); } }
+@media (max-width: 1024px) { .sm-scope .staggered-menu-panel { width: 100%; } .sm-scope .sm-prelayers { width: 100%; } .sm-scope .staggered-menu-wrapper[data-open] .sm-logo-img { filter: invert(100%); } }
 @media (max-width: 640px) { 
-  .sm-scope .staggered-menu-panel { width: 100%; left: 0; right: 0; padding: 5em 1.5em 1.5em 1.5em; } 
+  .sm-scope .staggered-menu-panel { width: 100%; padding: 5em 1.5em 1.5em 1.5em; } 
   .sm-scope .staggered-menu-header { padding: 1.5em; }
-  .sm-scope .sm-prelayers { width: 100%; left: 0; right: 0; } 
+  .sm-scope .sm-prelayers { width: 100%; } 
   .sm-scope .staggered-menu-wrapper[data-open] .sm-logo-img { filter: invert(100%); } 
   .sm-scope .sm-panel-item { font-size: 2.5rem; }
   .sm-scope .sm-actions-btn { font-size: 1.5rem !important; min-height: 48px !important; }

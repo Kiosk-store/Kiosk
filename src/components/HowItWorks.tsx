@@ -152,6 +152,7 @@ export default function HowItWorks() {
 											letterSpacing: "0.00em",
 											zIndex: 1,
 											opacity: 0.8,
+											paddingRight: "80px",
 										}}>
 										{s.body}
 									</p>
