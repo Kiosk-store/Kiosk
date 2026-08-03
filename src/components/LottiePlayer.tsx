@@ -50,6 +50,10 @@ export default function LottiePlayer({
 					loop,
 					autoplay,
 					path: encodeURI(src),
+					rendererSettings: {
+						preserveAspectRatio: "xMidYMid meet",
+						progressiveLoad: true,
+					},
 				});
 
 				animInstance.setSpeed(speed);

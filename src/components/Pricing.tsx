@@ -140,10 +140,29 @@ export default function Pricing() {
 			tabIndex={0}
 			aria-label="Pricing Packages"
 			className="relative w-full bg-[#0a0c10] text-white overflow-hidden select-none">
+			{/* Visible Price-Related Minimal Floating Background */}
+			<div
+				aria-hidden="true"
+				className="pointer-events-none absolute inset-0 z-0 overflow-hidden select-none">
+				{/* Ambient Glow */}
+				<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[850px] h-[850px] rounded-full bg-[radial-gradient(circle,_rgba(37,99,235,0.12)_0%,_rgba(10,12,16,0)_70%)] blur-3xl" />
+
+				{/* Floating Large Currency & Value Glyphs */}
+				<div className="absolute top-12 left-8 sm:left-16 text-7xl sm:text-9xl font-extrabold text-blue-500/[0.07] font-thunder-lc -rotate-12 select-none">
+					$
+				</div>
+				<div className="absolute bottom-16 right-8 sm:right-20 text-7xl sm:text-9xl font-extrabold text-emerald-500/[0.07] font-thunder-lc rotate-12 select-none">
+					%
+				</div>
+
+				{/* Minimal Concentric Structure */}
+				<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[760px] sm:w-[900px] h-[760px] sm:h-[900px] border border-blue-500/10 rounded-full" />
+			</div>
+
 			{/* Pinned Fullscreen Stage */}
 			<div
 				ref={pinContainerRef}
-				className="w-full min-h-screen flex flex-col justify-between py-6 sm:py-8 lg:py-12 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto">
+				className="relative z-10 w-full min-h-screen flex flex-col justify-between py-6 sm:py-8 lg:py-12 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto">
 				{/* Top Header & Toggle */}
 				<div className="w-full flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-6 border-b border-white/10 pb-4 sm:pb-5 shrink-0 relative z-20">
 					<div>
@@ -211,12 +230,12 @@ export default function Pricing() {
 								className={`absolute inset-0 w-full h-full flex flex-col items-center justify-center gap-4 sm:gap-8 lg:gap-16 ${
 									idx === 1 ? "lg:flex-row-reverse" : "lg:flex-row"
 								}`}>
-								{/* Left: Large Borderless Lottie Animation Showcase */}
+								{/* Left: Extra Large Borderless Lottie Animation Showcase */}
 								<div className="w-full lg:w-1/2 flex items-center justify-center shrink-0">
-									<div className="w-full max-w-[280px] sm:max-w-[400px] md:max-w-[480px] lg:max-w-[580px] h-[160px] sm:h-[240px] md:h-[320px] lg:h-[480px] flex items-center justify-center p-1 sm:p-2">
+									<div className="w-full max-w-[340px] sm:max-w-[480px] md:max-w-[580px] lg:max-w-[680px] xl:max-w-[760px] h-[220px] sm:h-[300px] md:h-[400px] lg:h-[520px] xl:h-[580px] flex items-center justify-center p-1 sm:p-2">
 										<LottiePlayer
 											src={tier.lottieSrc}
-											className="w-full h-full object-contain"
+											className="w-full h-full object-contain flex items-center justify-center [&>svg]:w-full [&>svg]:h-full [&>svg]:max-h-full"
 											loop={true}
 											autoplay={true}
 										/>
