@@ -15,10 +15,11 @@
 import StaggeredMenu from "./StaggeredMenu";
 
 const navItems = [
+	{ label: "Services", href: "#services" },
 	{ label: "Pricing", href: "#pricing" },
+	{ label: "Portfolio", href: "#portfolio" },
 	{ label: "About", href: "#about" },
-	{ label: "Log in", href: "/login" },
-	{ label: "Get Started", href: "/get-started" },
+	{ label: "FAQ", href: "#faq" },
 ];
 
 export default function Navbar() {
@@ -28,10 +29,8 @@ export default function Navbar() {
 		link: n.href,
 	}));
 
-	const socialItems = [
-		{ label: "Twitter", link: "https://twitter.com" },
-		{ label: "GitHub", link: "https://github.com" },
-		{ label: "LinkedIn", link: "https://linkedin.com" },
+	const actionItems = [
+		{ label: "Login / Sign up", link: "#login", primary: true },
 	];
 
 	return (
@@ -39,15 +38,15 @@ export default function Navbar() {
 			<StaggeredMenu
 				position="right"
 				items={menuItems}
-				socialItems={socialItems}
-				displaySocials={true}
+				actionItems={actionItems}
+				displaySocials={false}
 				displayItemNumbering={true}
 				menuButtonColor="#0a0a0a"
 				openMenuButtonColor="#0a0a0a"
 				changeMenuColorOnOpen={true}
 				colors={["#B497CF", "#5227FF"]}
 				logoUrl="/logo.svg"
-				accentColor="#ff6b6b"
+				accentColor="#2563eb"
 				isFixed={true}
 				showMenuText={false}
 			/>

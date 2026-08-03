@@ -8,20 +8,18 @@ import PillButton from "./PillButton";
 export default function Hero() {
 	return (
 		<section className="relative pt-32 pb-20 md:pt-44 md:pb-28 lg:pt-48 lg:pb-32 bg-white overflow-hidden">
-			{/* Decorative geometric elements - no gradients */}
+			{/* Decorative elements */}
 			<div className="absolute top-0 right-0 w-[500px] h-[500px] border-2 border-blue-100 rotate-12 pointer-events-none" />
 			<div className="absolute bottom-0 left-0 w-[400px] h-[400px] border-2 border-blue-50 -rotate-6 pointer-events-none" />
 			<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-blue-50 rounded-full pointer-events-none" />
 
-			{/* Subtle light shapes to enrich the hero background (increased visibility) */}
+			{/* Background effects */}
 			<div
 				aria-hidden
 				className="pointer-events-none absolute inset-0 z-0">
-				{/* stronger radial highlights */}
 				<div className="absolute -top-24 -left-24 w-[520px] h-[520px] rounded-full bg-[radial-gradient(circle,_rgba(82,39,255,0.18)_0%,_rgba(82,39,255,0)_45%)] blur-2xl opacity-90" />
 				<div className="absolute -right-12 top-24 w-[420px] h-[420px] rounded-full bg-[radial-gradient(circle,_rgba(181,151,207,0.14)_0%,_rgba(181,151,207,0)_50%)] blur-xl opacity-88" />
 
-				{/* decorative SVG strokes/shapes with increased visibility */}
 				<svg
 					className="absolute inset-0 w-full h-full overflow-visible"
 					viewBox="0 0 1200 800"
@@ -78,44 +76,42 @@ export default function Hero() {
 			</div>
 
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center relative z-10">
-				{/* Left Column: Copy & CTA */}
+				{/* Left Column */}
 				<div className="lg:col-span-7 space-y-6 md:space-y-8 text-center lg:text-left">
-					{/* Headline - concise and professional */}
 					<h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight text-gray-900">
 						Kiosk: simple websites for small businesses
 					</h1>
 
-					{/* Subtitle */}
 					<p className="text-lg md:text-xl text-gray-600 max-w-xl mx-auto lg:mx-0 leading-relaxed">
 						Landing pages or online stores — we build and host them.
 					</p>
 
 					{/* CTAs */}
 					<div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
-						{/* CTAs - pill buttons with navbar transition styling */}
-						{/* Primary Button - blue */}
+						{/* Primary Button */}
 						<PillButton
-							baseColor="#2563eb"
-							circleColor="var(--color-surface-container-lowest)"
+							href="#pricing"
+							baseColor="#004ac6"
+							circleColor="#ffffff"
 							textColor="#ffffff"
-							hoverTextColor="var(--color-primary)"
-							className="min-w-[180px] border-2 border-blue-700">
-							Get Started Now
+							hoverTextColor="#004ac6"
+							className="min-w-[180px] border-2 border-primary shadow-lg shadow-primary/20">
+							Get Started
 						</PillButton>
 
-						{/* Secondary Button - outline */}
+						{/* Secondary Button */}
 						<PillButton
 							href="#how-it-works"
 							baseColor="#ffffff"
-							circleColor="#2563eb"
-							textColor="#374151"
+							circleColor="#004ac6"
+							textColor="#0f172a"
 							hoverTextColor="#ffffff"
-							className="min-w-[180px] border-2 border-gray-300">
-							See How It Works →
+							className="min-w-[180px] border-2 border-slate-300 hover:border-primary">
+							How It Works →
 						</PillButton>
 					</div>
 
-					{/* Quick Metrics Strip - flat design */}
+					{/* Metrics */}
 					<div className="pt-8 border-t-2 border-gray-200 flex flex-wrap justify-center lg:justify-start items-center gap-8 text-gray-600">
 						<div className="flex items-center gap-3">
 							<div
@@ -145,15 +141,12 @@ export default function Hero() {
 					</div>
 				</div>
 
-				{/* Right Column: Hero Preview Card - flat design */}
+				{/* Right Column - Preview Card */}
 				<div className="lg:col-span-5 relative">
-					{/* Decorative flat elements - no blur or gradients */}
 					<div className="absolute -top-4 -right-4 w-24 h-24 border-2 border-blue-200 bg-blue-50 rounded-full" />
 					<div className="absolute -bottom-4 -left-4 w-16 h-16 border-2 border-blue-100 bg-white rounded-full" />
 
-					{/* Flat Card - no glassmorphism */}
 					<div className="relative border-2 border-gray-200 bg-white rounded-2xl overflow-hidden">
-						{/* Browser Header - flat */}
 						<div className="bg-gray-50 px-4 py-3 flex items-center justify-between border-b-2 border-gray-200">
 							<div className="flex items-center gap-2">
 								<div className="w-3 h-3 border border-red-400 bg-red-400 rounded-full" />
@@ -167,18 +160,17 @@ export default function Hero() {
 							<span className="text-sm text-gray-400">Secure</span>
 						</div>
 
-						{/* Showcase Image */}
 						<div className="aspect-[4/3] relative bg-gray-100">
 							<Image
 								src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8aQk-KbKq9uq35WVpvTGYdN49vv_82NRAiRkb7WhCYwvPU1ULvlJ2Z20SYODhiByYVtUOZpH4KiT-NHZf8R_BGqRAw9s9nU8WXx6e_tTImQxFc2JpJ5ks6nQOkXWnremwqd3HVKKVtvtHwL4qkIrRQFroX_cd3cpvT6gL9PG7bhjjyIWP2DGKgoGK1A5cgeGCa7SET1iJSmL34Kfa0m38BMJQkhFqwdDGzMEuDXUO_ABi5UfR8kJB"
 								alt="Bakery custom website preview created by Kiosk"
 								fill
+								sizes="(max-width: 1024px) 100vw, 42vw"
 								className="object-cover"
 								priority
 							/>
 						</div>
 
-						{/* Flat Badge - no shadows or blur */}
 						<div className="absolute -bottom-5 -left-5 bg-white p-4 border-2 border-gray-200 flex items-center gap-3 rounded-2xl">
 							<div
 								className="w-10 h-10 border-2 border-emerald-500 bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0 rounded-full"

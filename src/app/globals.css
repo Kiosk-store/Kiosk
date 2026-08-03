@@ -80,6 +80,39 @@
 /* ============================
 	Tailwind v4 Theme Tokens
 	============================ */
+@theme {
+	--color-primary: #004ac6;
+	--color-primary-hover: #003db3;
+	--color-primary-container: #2563eb;
+	--color-secondary: #4648d4;
+	--color-tertiary: #4d556b;
+
+	--color-surface-bright: #f8fafc;
+	--color-surface: #f1f5f9;
+	--color-surface-container-low: #f8fafc;
+	--color-surface-container: #f1f5f9;
+	--color-surface-container-high: #e2e8f0;
+	--color-surface-container-lowest: #ffffff;
+
+	--color-on-surface: #0f172a;
+	--color-on-surface-variant: #475569;
+	--color-on-primary: #ffffff;
+
+	--color-outline: #94a3b8;
+	--color-outline-variant: #e2e8f0;
+	--color-background: #f8fafc;
+
+	--color-ink: #0a0a0a;
+	--color-paper: #f5f5f0;
+	--color-paper-soft: #e8e8e0;
+	--color-sage: #d4d9c8;
+
+	--font-nohemi: "Nohemi", system-ui, -apple-system, sans-serif;
+	--font-thunder: "Thunder", system-ui, -apple-system, sans-serif;
+	--font-thunder-lc: var(--font-thunder-lc, "Thunder", system-ui, sans-serif);
+	--font-dirtyline: "Dirtyline", cursive;
+}
+
 :root {
 	/* --- Colors (Refined Modern Palette) --- */
 	--color-primary: #004ac6;
@@ -123,10 +156,8 @@
 	--card-blue-light: #e8f0fe;
 	--card-blue-mid: #dce8f5;
 	--card-blue-soft: #eef4fa;
-}
 
-/* Default pill/nav variables so standalone buttons inherit the same design as PillNav */
-:root {
+	/* Default pill/nav variables so standalone buttons inherit the same design as PillNav */
 	--base: var(--color-on-surface);
 	--pill-bg: var(--color-surface-container-lowest);
 	--hover-text: var(--color-on-primary);

@@ -87,25 +87,16 @@ const PillNav: React.FC<PillNavProps> = ({
 				tlRefs.current[index]?.kill();
 				const tl = gsap.timeline({ paused: true });
 
-				// Use shorter hover durations for snappy interactions
-				const hoverDur = 0.28;
-
 				tl.to(
 					circle,
-					{
-						scale: 1.2,
-						xPercent: -50,
-						duration: hoverDur,
-						ease,
-						overwrite: "auto",
-					},
+					{ scale: 1.2, xPercent: -50, duration: 2, ease, overwrite: "auto" },
 					0,
 				);
 
 				if (label) {
 					tl.to(
 						label,
-						{ y: -(h + 8), duration: hoverDur, ease, overwrite: "auto" },
+						{ y: -(h + 8), duration: 2, ease, overwrite: "auto" },
 						0,
 					);
 				}
@@ -114,7 +105,7 @@ const PillNav: React.FC<PillNavProps> = ({
 					gsap.set(white, { y: Math.ceil(h + 100), opacity: 0 });
 					tl.to(
 						white,
-						{ y: 0, opacity: 1, duration: hoverDur, ease, overwrite: "auto" },
+						{ y: 0, opacity: 1, duration: 2, ease, overwrite: "auto" },
 						0,
 					);
 				}
@@ -149,11 +140,15 @@ const PillNav: React.FC<PillNavProps> = ({
 					ease,
 				});
 			}
-			gsap.set(navItems, { width: 0, overflow: "hidden" });
-			gsap.to(navItems, {
-				duration: 0.6,
-				ease,
-			});
+
+			if (navItems) {
+				gsap.set(navItems, { width: 0, overflow: "hidden" });
+				gsap.to(navItems, {
+					width: "auto",
+					duration: 0.6,
+					ease,
+				});
+			}
 		}
 
 		return () => window.removeEventListener("resize", onResize);

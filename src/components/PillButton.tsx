@@ -5,16 +5,20 @@
 import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 
-export interface PillButtonProps extends React.HTMLAttributes<HTMLElement> {
+export type PillButtonProps = {
 	href?: string;
+	type?: "button" | "submit" | "reset";
 	className?: string;
 	children?: React.ReactNode;
-	// Optional color overrides
-	baseColor?: string; // Button background
-	circleColor?: string; // Hover circle color
-	textColor?: string; // Normal text
-	hoverTextColor?: string; // Text color on hover
-}
+	baseColor?: string;
+	circleColor?: string;
+	textColor?: string;
+	hoverTextColor?: string;
+	useThunderFont?: boolean;
+	onClick?: (e: React.MouseEvent<any>) => void;
+	style?: React.CSSProperties;
+	[key: string]: any;
+};
 
 const PillButton: React.FC<PillButtonProps> = ({
 	href,
@@ -24,6 +28,8 @@ const PillButton: React.FC<PillButtonProps> = ({
 	circleColor = "#ffffff",
 	textColor = "#ffffff",
 	hoverTextColor = "#120F17",
+	type = "button",
+	useThunderFont = true,
 	...rest
 }) => {
 	const rootRef = useRef<HTMLElement | null>(null);
@@ -31,6 +37,8 @@ const PillButton: React.FC<PillButtonProps> = ({
 	const labelRef = useRef<HTMLSpanElement | null>(null);
 	const hoverLabelRef = useRef<HTMLSpanElement | null>(null);
 	const tlRef = useRef<gsap.core.Timeline | null>(null);
+	const activeTweenRef = useRef<gsap.core.Tween | null>(null);
+	const layoutRef = useRef<(() => void) | null>(null);
 
 	useEffect(() => {
 		const root = rootRef.current;
@@ -38,14 +46,16 @@ const PillButton: React.FC<PillButtonProps> = ({
 		if (!root || !circle) return;
 
 		const layout = () => {
-			const rect = root.getBoundingClientRect();
+			if (!rootRef.current || !circleRef.current) return;
+			const rect = rootRef.current.getBoundingClientRect();
 			const { width: w, height: h } = rect;
+			if (!w || !h) return;
 
-			// Calculate circle size so it fully covers the button
+			// Calculate circle size matching PillNav geometry
 			const R = ((w * w) / 4 + h * h) / (2 * h);
-			const D = Math.ceil(2 * R) + 2;
+			const D = Math.ceil(2 * R) + 4;
 			const delta =
-				Math.ceil(R - Math.sqrt(Math.max(0, R * R - (w * w) / 4))) + 1;
+				Math.ceil(R - Math.sqrt(Math.max(0, R * R - (w * w) / 4))) + 2;
 			const originY = D - delta;
 
 			circle.style.width = `${D}px`;
@@ -60,11 +70,14 @@ const PillButton: React.FC<PillButtonProps> = ({
 			});
 
 			if (labelRef.current) {
-				gsap.set(labelRef.current, { y: 0, color: textColor });
+				gsap.set(labelRef.current, {
+					y: 0,
+					color: textColor,
+				});
 			}
 			if (hoverLabelRef.current) {
 				gsap.set(hoverLabelRef.current, {
-					y: h + 20,
+					y: Math.ceil(h + 12),
 					opacity: 0,
 					color: hoverTextColor,
 				});
@@ -75,39 +88,41 @@ const PillButton: React.FC<PillButtonProps> = ({
 
 			const tl = gsap.timeline({ paused: true });
 
-			// Circle expands
+			// Animation matching PillNav exactly
 			tl.to(
 				circle,
 				{
-					scale: 1.2,
-					duration: 0.55,
+					scale: 1.25,
+					xPercent: -50,
+					duration: 1.5,
 					ease: "power3.out",
+					overwrite: "auto",
 				},
 				0,
 			);
 
-			// Original text slides up
 			if (labelRef.current) {
 				tl.to(
 					labelRef.current,
 					{
-						y: -(h + 10),
-						duration: 0.55,
+						y: -(h + 12),
+						duration: 1.5,
 						ease: "power3.out",
+						overwrite: "auto",
 					},
 					0,
 				);
 			}
 
-			// Hover text slides in
 			if (hoverLabelRef.current) {
 				tl.to(
 					hoverLabelRef.current,
 					{
 						y: 0,
 						opacity: 1,
-						duration: 0.55,
+						duration: 1.5,
 						ease: "power3.out",
+						overwrite: "auto",
 					},
 					0,
 				);
@@ -116,29 +131,44 @@ const PillButton: React.FC<PillButtonProps> = ({
 			tlRef.current = tl;
 		};
 
-		layout();
+		layoutRef.current = layout;
 
-		// Re-run after paint & fonts
-		requestAnimationFrame(layout);
-		const timeout = setTimeout(layout, 60);
+		// Initial setup with delay to ensure DOM is ready
+		const timeoutId = setTimeout(layout, 60);
+
+		// Re-run on resize
+		const resizeObserver = new ResizeObserver(() => {
+			layout();
+		});
+
+		if (rootRef.current) {
+			resizeObserver.observe(rootRef.current);
+		}
 
 		window.addEventListener("resize", layout);
+
 		if (document.fonts) {
 			document.fonts.ready.then(layout).catch(() => {});
 		}
 
 		return () => {
+			clearTimeout(timeoutId);
 			window.removeEventListener("resize", layout);
-			clearTimeout(timeout);
+			resizeObserver.disconnect();
 			tlRef.current?.kill();
+			activeTweenRef.current?.kill();
 		};
 	}, [baseColor, circleColor, textColor, hoverTextColor, children]);
 
 	const handleEnter = () => {
+		if (!tlRef.current && layoutRef.current) {
+			layoutRef.current();
+		}
 		const tl = tlRef.current;
 		if (!tl) return;
-		tl.tweenTo(tl.duration(), {
-			duration: 0.3,
+		activeTweenRef.current?.kill();
+		activeTweenRef.current = tl.tweenTo(tl.duration(), {
+			duration: 0.32,
 			ease: "power3.out",
 			overwrite: "auto",
 		});
@@ -147,44 +177,64 @@ const PillButton: React.FC<PillButtonProps> = ({
 	const handleLeave = () => {
 		const tl = tlRef.current;
 		if (!tl) return;
-		tl.tweenTo(0, {
+		activeTweenRef.current?.kill();
+		activeTweenRef.current = tl.tweenTo(0, {
 			duration: 0.22,
 			ease: "power3.out",
 			overwrite: "auto",
 		});
 	};
 
+	const fontStyle: React.CSSProperties = useThunderFont
+		? {
+				fontFamily:
+					'var(--font-thunder-lc), var(--font-thunder), "Thunder", system-ui, -apple-system, sans-serif',
+				textTransform: "uppercase",
+				letterSpacing: "-0.5px",
+			}
+		: {};
+
 	const baseClasses = `
     relative inline-flex items-center justify-center
-    h-12 px-8 rounded-full
-    font-semibold text-[15px] uppercase tracking-wide
+    min-h-[50px] px-7 py-3 rounded-full
+    font-bold text-[1.4rem] md:text-[1.55rem] uppercase tracking-[-0.5px] leading-none
     overflow-hidden cursor-pointer select-none
-    transition-none
-    pill-fallback ${className}
+    no-underline box-border whitespace-nowrap
+    ${className}
   `;
 
 	const content = (
 		<>
-			{/* Expanding Circle */}
+			{/* Expanding Circle - matches PillNav */}
 			<span
 				ref={circleRef}
-				className="hover-circle absolute left-1/2 bottom-0 rounded-full pointer-events-none z-[1] block"
-				style={{ willChange: "transform, opacity" }}
+				className="absolute left-1/2 bottom-0 rounded-full pointer-events-none z-[1] block"
+				style={{
+					willChange: "transform, opacity",
+				}}
 				aria-hidden
 			/>
 
-			{/* Text Stack */}
-			<span className="relative inline-block leading-none z-[2]">
+			{/* Text Stack - matches PillNav */}
+			<span
+				className="relative inline-flex items-center justify-center leading-none z-[2] w-full"
+				style={fontStyle}>
 				<span
 					ref={labelRef}
-					className="btn-label inline-block z-[2]"
-					style={{ willChange: "transform" }}>
+					className="inline-block z-[2] whitespace-nowrap leading-none"
+					style={{
+						...fontStyle,
+						willChange: "transform",
+					}}>
 					{children}
 				</span>
 				<span
 					ref={hoverLabelRef}
-					className="btn-label-hover absolute left-0 top-0 inline-block z-[3]"
-					style={{ willChange: "transform, opacity" }}
+					className="absolute left-0 right-0 top-0 inline-flex items-center justify-center z-[3] whitespace-nowrap leading-none"
+					style={{
+						...fontStyle,
+						willChange: "transform, opacity",
+					}}
 					aria-hidden>
 					{children}
 				</span>
@@ -192,8 +242,6 @@ const PillButton: React.FC<PillButtonProps> = ({
 		</>
 	);
 
-	// split out style from rest so we can pass explicit props with correct ref types
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const { style: restStyle, ...restProps } = rest as any;
 
 	if (href) {
@@ -206,7 +254,11 @@ const PillButton: React.FC<PillButtonProps> = ({
 				onMouseEnter={handleEnter}
 				onMouseLeave={handleLeave}
 				className={baseClasses}
-				style={{ backgroundColor: baseColor, ...(restStyle || {}) }}
+				style={{
+					backgroundColor: baseColor,
+					...fontStyle,
+					...(restStyle || {}),
+				}}
 				{...restProps}>
 				{content}
 			</a>
@@ -215,14 +267,18 @@ const PillButton: React.FC<PillButtonProps> = ({
 
 	return (
 		<button
-			type="button"
+			type={type}
 			ref={(el: HTMLButtonElement | null) => {
 				rootRef.current = el as HTMLElement | null;
 			}}
 			onMouseEnter={handleEnter}
 			onMouseLeave={handleLeave}
 			className={baseClasses}
-			style={{ backgroundColor: baseColor, ...(restStyle || {}) }}
+			style={{
+				backgroundColor: baseColor,
+				...fontStyle,
+				...(restStyle || {}),
+			}}
 			{...restProps}>
 			{content}
 		</button>

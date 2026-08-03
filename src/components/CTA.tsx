@@ -24,12 +24,22 @@ export default function CTA() {
 						presence.
 					</p>
 					<div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
-						<PillButton className="bg-white text-primary px-9 py-4 rounded-full font-bold text-base hover:bg-opacity-95 transition-all duration-300 shadow-xl cursor-pointer">
+						<PillButton
+							href="#pricing"
+							baseColor="#ffffff"
+							circleColor="#0a0a0a"
+							textColor="#004ac6"
+							hoverTextColor="#ffffff"
+							className="px-9 py-4 rounded-full font-bold text-base shadow-xl cursor-pointer">
 							Get Started Now
 						</PillButton>
 						<PillButton
-							href="#"
-							className="bg-white/10 text-white px-9 py-4 rounded-full font-bold text-base border border-white/30 backdrop-blur-sm hover:bg-white/20 transition-all duration-300 cursor-pointer">
+							href="#faq"
+							baseColor="rgba(255, 255, 255, 0.15)"
+							circleColor="#ffffff"
+							textColor="#ffffff"
+							hoverTextColor="#004ac6"
+							className="px-9 py-4 rounded-full font-bold text-base border-2 border-white/50 backdrop-blur-sm shadow-xl cursor-pointer">
 							Talk to an Expert
 						</PillButton>
 					</div>

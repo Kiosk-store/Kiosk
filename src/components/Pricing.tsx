@@ -184,10 +184,14 @@ export default function Pricing() {
 
 							{/* Action Button */}
 							<PillButton
-								className={`w-full py-4 rounded-full font-semibold text-base cursor-pointer transition-all duration-300 ${
+								baseColor={tier.featured ? "#004ac6" : "#ffffff"}
+								circleColor={tier.featured ? "#ffffff" : "#004ac6"}
+								textColor={tier.featured ? "#ffffff" : "#004ac6"}
+								hoverTextColor={tier.featured ? "#004ac6" : "#ffffff"}
+								className={`w-full py-4 rounded-full font-semibold text-base cursor-pointer ${
 									tier.featured
-										? "bg-primary text-on-primary hover:bg-primary-hover shadow-lg shadow-primary/25 hover:shadow-primary/40 active:scale-95"
-										: "border-2 border-primary text-primary hover:bg-primary/5 active:scale-95"
+										? "border-2 border-primary shadow-lg shadow-primary/25"
+										: "border-2 border-primary"
 								}`}>
 								{tier.cta}
 							</PillButton>
