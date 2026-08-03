@@ -689,9 +689,9 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 .sm-scope .sm-panel-itemWrap { position: relative; overflow: hidden; line-height: 1; }
 .sm-scope .sm-icon-line { position: absolute; left: 50%; top: 50%; width: 100%; height: 2px; background: currentColor; border-radius: 2px; transform: translate(-50%, -50%); will-change: transform; }
 .sm-scope .sm-line { display: none !important; }
-.sm-scope .staggered-menu-panel { position: absolute; top: 0; right: 0; width: clamp(260px, 38vw, 420px); height: 100%; background: white; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex; flex-direction: column; padding: 6em 2em 2em 2em; overflow-y: auto; z-index: 10; transform: translateX(100%); pointer-events: none; transition: transform 0.28s ease, opacity 0.28s ease; }
+.sm-scope .staggered-menu-panel { position: absolute; top: 0; right: 0; width: clamp(260px, 38vw, 420px); height: 100%; background: white; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex; flex-direction: column; padding: 6em 2em 2em 2em; overflow-y: auto; z-index: 10; transform: translateX(100%); pointer-events: none; }
 .sm-scope [data-position='left'] .staggered-menu-panel { right: auto; left: 0; }
-.sm-scope .sm-prelayers { position: absolute; top: 0; right: 0; bottom: 0; width: clamp(260px, 38vw, 420px); pointer-events: none; z-index: 5; transform: translateX(100%); opacity: 0; transition: transform 0.28s ease, opacity 0.28s ease; }
+.sm-scope .sm-prelayers { position: absolute; top: 0; right: 0; bottom: 0; width: clamp(260px, 38vw, 420px); pointer-events: none; z-index: 5; transform: translateX(100%); opacity: 0; }
 .sm-scope [data-position='left'] .sm-prelayers { right: auto; left: 0; }
 .sm-scope .sm-prelayer { position: absolute; top: 0; right: 0; height: 100%; width: 100%; transform: translateX(0); }
 .sm-scope .sm-panel-inner { flex: 1; display: flex; flex-direction: column; gap: 1.25rem; }
@@ -717,11 +717,11 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 .sm-scope .sm-panel-list[data-numbering] { counter-reset: smItem; }
 .sm-scope .sm-panel-list[data-numbering] .sm-panel-item::after { counter-increment: smItem; content: counter(smItem, decimal-leading-zero); position: absolute; top: 0.1em; right: 3.2em; font-size: 18px; font-weight: 400; color: var(--sm-accent, #ff0000); letter-spacing: 0; pointer-events: none; user-select: none; opacity: var(--sm-num-opacity, 0); }
 /* show panel when wrapper has data-open */
-.sm-scope .staggered-menu-wrapper[data-open] .staggered-menu-panel { transform: translateX(0); pointer-events: auto; }
-.sm-scope .staggered-menu-wrapper[data-open] .sm-prelayers { transform: translateX(0); opacity: 1; }
+.sm-scope .staggered-menu-wrapper[data-open] .staggered-menu-panel { pointer-events: auto; }
+.sm-scope .staggered-menu-wrapper[data-open] .sm-prelayers { opacity: 1; }
 
 /* also allow reveal when hovering the header/toggle (icon hover) */
-.sm-scope .staggered-menu-header:hover ~ .staggered-menu-panel { transform: translateX(0); pointer-events: auto; }
+.sm-scope .staggered-menu-header:hover ~ .staggered-menu-panel { pointer-events: auto; }
 
 @media (max-width: 1024px) { .sm-scope .staggered-menu-panel { width: 100%; } .sm-scope .sm-prelayers { width: 100%; } .sm-scope .staggered-menu-wrapper[data-open] .sm-logo-img { filter: invert(100%); } }
 @media (max-width: 640px) { 
