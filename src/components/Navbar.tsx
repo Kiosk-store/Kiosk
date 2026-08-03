@@ -30,7 +30,7 @@ export default function Navbar() {
 	}));
 
 	const actionItems = [
-		{ label: "Login / Sign up", link: "#login", primary: true },
+		{ label: "Login / Sign up", link: "/login", primary: true },
 	];
 
 	return (
