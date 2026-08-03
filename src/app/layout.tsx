@@ -3,7 +3,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import ScrollReveal from "@/components/ScrollReveal";
 import Navbar from "@/components/Navbar";
 
 const thunderLC = localFont({
@@ -153,7 +152,6 @@ export default function RootLayout({
 			</head>
 			<body className="font-nohemi antialiased">
 				<Navbar />
-				<ScrollReveal />
 				{children}
 			</body>
 		</html>

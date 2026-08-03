@@ -5,6 +5,7 @@
 // Simple showcase grid for recent client projects. Images are loaded
 // via Next.js `Image` for optimized delivery.
 import Image from "next/image";
+import ScrollReveal from "./ScrollReveal";
 
 const projects = [
 	{
@@ -35,22 +36,26 @@ export default function Portfolio() {
 		<section
 			id="portfolio"
 			className="py-20 md:py-28 lg:py-32 px-4 sm:px-6 lg:px-8 bg-surface relative">
-			<div className="max-w-7xl mx-auto mb-16 text-center md:text-left">
-				<div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
-					Client Showcase
+			<ScrollReveal direction="up">
+				<div className="max-w-7xl mx-auto mb-16 text-center md:text-left">
+					<div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
+						Client Showcase
+					</div>
+					<h2 className="font-section-heading text-on-surface mb-3">
+						Recent client launches
+					</h2>
+					<p className="font-body-lead">
+						Real websites built for real small business owners.
+					</p>
 				</div>
-				<h2 className="font-section-heading text-on-surface mb-3">
-					Recent client launches
-				</h2>
-				<p className="font-body-lead">
-					Real websites built for real small business owners.
-				</p>
-			</div>
+			</ScrollReveal>
 
 			<div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-				{projects.map((project) => (
-					<div
+				{projects.map((project, i) => (
+					<ScrollReveal
 						key={project.title}
+						direction="up"
+						delay={i * 150}
 						className="group cursor-pointer">
 						<div className="browser-frame rounded-2xl bg-white overflow-hidden mb-6 transition-transform duration-300 group-hover:-translate-y-2">
 							<div className="bg-surface-container-high px-3 py-2 flex gap-1.5 border-b border-outline-variant/50">
@@ -74,7 +79,7 @@ export default function Portfolio() {
 						<p className="text-on-surface-variant text-xs font-semibold uppercase tracking-wider">
 							{project.category}
 						</p>
-					</div>
+					</ScrollReveal>
 				))}
 			</div>
 		</section>

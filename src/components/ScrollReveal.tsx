@@ -1,55 +1,91 @@
 /**
- * ScrollReveal
+ * ScrollReveal Component
  *
- * Global small utility to register GSAP's ScrollTrigger and add a simple
- * fade/slide reveal for every `section` on the page. This keeps the
- * animation logic centralized rather than duplicating ScrollTrigger calls
- * across many components.
+ * Smooth scroll-driven entry animations using IntersectionObserver.
+ * Triggers fade & slide transforms when elements enter the viewport.
  *
  * @format
  */
 
 "use client";
 
-import { useEffect } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import React, { useEffect, useRef, useState } from "react";
 
-export default function ScrollReveal() {
+interface ScrollRevealProps {
+	children: React.ReactNode;
+	className?: string;
+	direction?: "up" | "down" | "left" | "right" | "fade";
+	delay?: number; // Delay in milliseconds
+	duration?: number; // Duration in milliseconds
+	threshold?: number; // Intersection threshold ratio (0 to 1)
+}
+
+export default function ScrollReveal({
+	children,
+	className = "",
+	direction = "up",
+	delay = 0,
+	duration = 800,
+	threshold = 0.05,
+}: ScrollRevealProps) {
+	const ref = useRef<HTMLDivElement>(null);
+	const [isVisible, setIsVisible] = useState(false);
+
 	useEffect(() => {
-		if (typeof window === "undefined") return;
-		gsap.registerPlugin(ScrollTrigger);
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				if (entry.isIntersecting) {
+					setIsVisible(true);
+					if (ref.current) {
+						observer.unobserve(ref.current);
+					}
+				}
+			},
+			{
+				threshold,
+				rootMargin: "0px 0px -80px 0px", // Triggers just before coming into view
+			}
+		);
 
-		// animate all top-level sections with the same reveal settings
-		const sections = Array.from(document.querySelectorAll("section"));
-
-		sections.forEach((el) => {
-			// skip if already initialized to avoid duplicate triggers
-			if (el.classList.contains("sr-initialized")) return;
-			el.classList.add("sr-initialized");
-
-			gsap.fromTo(
-				el,
-				{ y: 40, opacity: 0 },
-				{
-					y: 0,
-					opacity: 1,
-					duration: 0.8,
-					ease: "power3.out",
-					scrollTrigger: {
-						trigger: el,
-						start: "top 85%",
-						toggleActions: "play none none reverse",
-					},
-				},
-			);
-		});
+		const currentRef = ref.current;
+		if (currentRef) {
+			observer.observe(currentRef);
+		}
 
 		return () => {
-			// cleanup any ScrollTrigger instances when the component unmounts
-			ScrollTrigger.getAll().forEach((t) => t.kill());
+			if (currentRef) {
+				observer.unobserve(currentRef);
+			}
 		};
-	}, []);
+	}, [threshold]);
 
-	return null;
+	const getDirectionStyles = () => {
+		switch (direction) {
+			case "up":
+				return isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-16";
+			case "down":
+				return isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-16";
+			case "left":
+				return isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-16";
+			case "right":
+				return isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-16";
+			case "fade":
+				return isVisible ? "opacity-100" : "opacity-0";
+			default:
+				return "";
+		}
+	};
+
+	return (
+		<div
+			ref={ref}
+			className={`${className} transition-all ease-[cubic-bezier(0.16,1,0.3,1)] ${getDirectionStyles()}`}
+			style={{
+				transitionDuration: `${duration}ms`,
+				transitionDelay: `${delay}ms`,
+			}}
+		>
+			{children}
+		</div>
+	);
 }

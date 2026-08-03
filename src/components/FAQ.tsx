@@ -7,6 +7,7 @@
 // Accessible accordion for frequently asked questions. Keeps state
 // locally and toggles expanded items for each question.
 import { useState } from "react";
+import ScrollReveal from "./ScrollReveal";
 
 const faqItems = [
 	{
@@ -54,18 +55,20 @@ export default function FAQ() {
 			className="py-20 md:py-28 lg:py-32 px-4 sm:px-6 lg:px-8 bg-surface relative">
 			<div className="max-w-3xl mx-auto">
 				{/* Header */}
-				<div className="text-center mb-16">
-					<div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
-						Support & Answers
+				<ScrollReveal direction="up">
+					<div className="text-center mb-16">
+						<div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase tracking-wider mb-4">
+							Support & Answers
+						</div>
+						<h2 className="font-section-heading text-on-surface mb-4">
+							Frequently Asked Questions
+						</h2>
+						<p className="font-body-lead">
+							Got questions? We&apos;ve got clear answers to get you launched with
+							confidence.
+						</p>
 					</div>
-					<h2 className="font-section-heading text-on-surface mb-4">
-						Frequently Asked Questions
-					</h2>
-					<p className="font-body-lead">
-						Got questions? We&apos;ve got clear answers to get you launched with
-						confidence.
-					</p>
-				</div>
+				</ScrollReveal>
 
 				{/* Accordion List */}
 				<div className="space-y-4">
@@ -73,56 +76,60 @@ export default function FAQ() {
 						const isOpen = openIndex === index;
 
 						return (
-							<div
+							<ScrollReveal
 								key={item.question}
-								className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
-									isOpen
-										? "bg-surface-container-lowest border-primary shadow-lg shadow-primary/5"
-										: "bg-surface-container-lowest/80 border-outline-variant/60 hover:border-outline-variant"
-								}`}>
-								<button
-									onClick={() => toggleAccordion(index)}
-									className="w-full px-6 py-5 md:px-8 md:py-6 flex items-center justify-between gap-4 text-left cursor-pointer transition-colors"
-									aria-expanded={isOpen}>
-									<div className="flex items-center gap-4">
-										<div
-											className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors shrink-0 ${
-												isOpen
-													? "bg-primary text-on-primary"
-													: "bg-primary/10 text-primary"
-											}`}>
-											<span className="material-symbols-outlined text-xl">
-												{item.icon}
+								direction="up"
+								delay={index * 80}>
+								<div
+									className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
+										isOpen
+											? "bg-surface-container-lowest border-primary shadow-lg shadow-primary/5"
+											: "bg-surface-container-lowest/80 border-outline-variant/60 hover:border-outline-variant"
+									}`}>
+									<button
+										onClick={() => toggleAccordion(index)}
+										className="w-full px-6 py-5 md:px-8 md:py-6 flex items-center justify-between gap-4 text-left cursor-pointer transition-colors"
+										aria-expanded={isOpen}>
+										<div className="flex items-center gap-4">
+											<div
+												className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors shrink-0 ${
+													isOpen
+														? "bg-primary text-on-primary"
+														: "bg-primary/10 text-primary"
+												}`}>
+												<span className="material-symbols-outlined text-xl">
+													{item.icon}
+												</span>
+											</div>
+											<span className="font-card-title text-base md:text-lg text-on-surface">
+												{item.question}
 											</span>
 										</div>
-										<span className="font-card-title text-base md:text-lg text-on-surface">
-											{item.question}
+
+										<span
+											className={`material-symbols-outlined text-2xl transition-transform duration-300 shrink-0 ${
+												isOpen
+													? "rotate-180 text-primary"
+													: "text-on-surface-variant"
+											}`}>
+											expand_more
 										</span>
-									</div>
+									</button>
 
-									<span
-										className={`material-symbols-outlined text-2xl transition-transform duration-300 shrink-0 ${
+									<div
+										className={`grid transition-all duration-300 ease-in-out ${
 											isOpen
-												? "rotate-180 text-primary"
-												: "text-on-surface-variant"
+												? "grid-rows-[1fr] opacity-100 px-6 pb-6 md:px-8 md:pb-8"
+												: "grid-rows-[0fr] opacity-0 px-6 md:px-8"
 										}`}>
-										expand_more
-									</span>
-								</button>
-
-								<div
-									className={`grid transition-all duration-300 ease-in-out ${
-										isOpen
-											? "grid-rows-[1fr] opacity-100 px-6 pb-6 md:px-8 md:pb-8"
-											: "grid-rows-[0fr] opacity-0 px-6 md:px-8"
-									}`}>
-									<div className="overflow-hidden">
-										<p className="text-on-surface-variant text-base leading-relaxed pt-3 border-t border-outline-variant/40">
-											{item.answer}
-										</p>
+										<div className="overflow-hidden">
+											<p className="text-on-surface-variant text-base leading-relaxed pt-3 border-t border-outline-variant/40">
+												{item.answer}
+											</p>
+										</div>
 									</div>
 								</div>
-							</div>
+							</ScrollReveal>
 						);
 					})}
 				</div>
