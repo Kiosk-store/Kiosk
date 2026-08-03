@@ -104,29 +104,6 @@ export default function GetStartedPage() {
 						GET STARTED
 					</h1>
 
-					{/* Top Tab Toggle: Sign Up vs Sign In */}
-					<div className="inline-flex p-1 bg-slate-200/80 border border-slate-300/70 rounded-full w-full max-w-[280px]">
-						<button
-							type="button"
-							onClick={() => setActiveTab("signup")}
-							className={`flex-1 py-2 text-xs sm:text-sm font-bold rounded-full transition-all duration-200 cursor-pointer ${
-								activeTab === "signup"
-									? "bg-white text-slate-900 shadow-sm"
-									: "text-slate-600 hover:text-slate-900"
-							}`}>
-							Sign Up
-						</button>
-						<button
-							type="button"
-							onClick={() => setActiveTab("login")}
-							className={`flex-1 py-2 text-xs sm:text-sm font-bold rounded-full transition-all duration-200 cursor-pointer ${
-								activeTab === "login"
-									? "bg-white text-slate-900 shadow-sm"
-									: "text-slate-600 hover:text-slate-900"
-							}`}>
-							Sign In
-						</button>
-					</div>
 				</div>
 
 				{/* Success State */}
@@ -456,6 +433,14 @@ export default function GetStartedPage() {
 									? "Create your Kiosk workspace"
 									: "Welcome back to Kiosk"}
 							</p>
+							<div className="mt-4">
+								<button
+									type="button"
+									onClick={() => setActiveTab(activeTab === "signup" ? "login" : "signup")}
+									className="text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors cursor-pointer underline hover:no-underline">
+									{activeTab === "signup" ? "Already have an account? Sign In" : "Don't have an account? Sign Up"}
+								</button>
+							</div>
 						</div>
 					</div>
 				)}

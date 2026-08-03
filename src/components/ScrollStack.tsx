@@ -297,7 +297,7 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
 		<div
 			className={`relative w-full ${className}`.trim()}
 			ref={scrollerRef}>
-			<div className="scroll-stack-inner pt-[10vh] px-20 pb-20 min-h-screen">
+			<div className="scroll-stack-inner pt-[10vh] px-4 md:px-12 lg:px-20 pb-20 min-h-screen">
 				{children}
 				<div className="scroll-stack-end w-full h-px" />
 			</div>
