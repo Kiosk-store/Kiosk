@@ -8,7 +8,7 @@ This document describes the visual and component architecture for the `kiosk` ma
 
 ## Design goals
 
-- Premium, luxury visual direction with a near-black dark theme (not pure black).
+- Premium, luxury visual direction with a light theme.
 - Consistent, prominent CTAs across sections.
 - Smooth, high-performance interactions and subtle motion.
 - Mobile-first responsiveness and progressive enhancement.

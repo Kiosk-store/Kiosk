@@ -52,12 +52,14 @@ npm run dev
 ## Animations
 
 - Use `gsap` for complex timeline animations and `lenis` for smooth scrolling. Keep heavy computation off the main render path and memoize expensive values where possible.
+- **CRITICAL NOTE ON ROUTING & GSAP**: When using GSAP ScrollTrigger with `pin: true`, GSAP wraps elements in dynamic pin-spacers. If standard `<a>` tags are used for internal links, Next.js performs a hard reload or React loses track of the DOM structure, causing a `NotFoundError` (Failed to execute 'removeChild') on unmount. **Always use `next/link` for internal navigation** to ensure React properly tracks and unmounts GSAP-manipulated DOM nodes during client-side routing.
 
 ## Adding a new page or section
 
 1. Create the component under `src/components`.
 2. Add the section to `src/app/page.tsx` in the desired order.
-3. Ensure responsive behavior and test on narrow viewports.
+3. Wrap any GSAP pinned sections in a stable outer `div` container to prevent React unmount crashes.
+4. Ensure responsive behavior and test on narrow viewports.
 
 ## Forms & integrations
 

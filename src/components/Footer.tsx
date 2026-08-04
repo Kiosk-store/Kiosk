@@ -33,9 +33,9 @@ export default function Footer() {
 				</svg>
 			</div>
 
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8 mb-20 md:mb-32 relative z-10">
+			<div className="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12 mb-20 md:mb-32 relative z-10">
 				{/* Brand Info */}
-				<div className="col-span-1 md:col-span-1 space-y-5">
+				<div className="col-span-2 md:col-span-1 space-y-5 pr-4 md:pr-0">
 					<span className="font-card-title text-2xl font-bold tracking-tight text-white block">
 						Kiosk
 					</span>
@@ -46,7 +46,7 @@ export default function Footer() {
 				</div>
 
 				{/* Company */}
-				<div>
+				<div className="col-span-1">
 					<h5 className="font-label-caption mb-6 text-white/40 uppercase tracking-[0.15em] text-[11px] font-bold">Company</h5>
 					<ul className="space-y-4 text-[15px]">
 						{footerLinks.company.map((link) => (
@@ -61,8 +61,24 @@ export default function Footer() {
 					</ul>
 				</div>
 
+				{/* Legal */}
+				<div className="col-span-1">
+					<h5 className="font-label-caption mb-6 text-white/40 uppercase tracking-[0.15em] text-[11px] font-bold">Legal</h5>
+					<ul className="space-y-4 text-[15px]">
+						{footerLinks.legal.map((link) => (
+							<li key={link.label}>
+								<a
+									href={link.href}
+									className="text-white/70 hover:text-white transition-colors duration-300">
+									{link.label}
+								</a>
+							</li>
+						))}
+					</ul>
+				</div>
+
 				{/* Contact */}
-				<div>
+				<div className="col-span-2 md:col-span-1">
 					<h5 className="font-label-caption mb-6 text-white/40 uppercase tracking-[0.15em] text-[11px] font-bold">Contact</h5>
 					<ul className="space-y-4 text-[15px]">
 						<li>
@@ -88,40 +104,30 @@ export default function Footer() {
 						</li>
 					</ul>
 				</div>
-
-				{/* Legal */}
-				<div>
-					<h5 className="font-label-caption mb-6 text-white/40 uppercase tracking-[0.15em] text-[11px] font-bold">Legal</h5>
-					<ul className="space-y-4 text-[15px]">
-						{footerLinks.legal.map((link) => (
-							<li key={link.label}>
-								<a
-									href={link.href}
-									className="text-white/70 hover:text-white transition-colors duration-300">
-									{link.label}
-								</a>
-							</li>
-						))}
-					</ul>
-				</div>
 			</div>
 
 			{/* Bottom Section & Massive Typography */}
-			<div className="relative w-full flex flex-col items-center justify-end overflow-hidden pt-10">
+			<div className="relative w-full flex flex-col items-center justify-end overflow-hidden pt-6 md:pt-10">
 				{/* Copyright & Socials */}
-				<div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6 text-white/50 text-xs md:text-sm mb-6 md:mb-2 relative z-10">
-					<p className="font-medium tracking-wide">&copy; {new Date().getFullYear()} Kiosk. All rights reserved.</p>
+				<div className="w-full max-w-7xl mx-auto px-6 lg:px-8 flex flex-col-reverse md:flex-row justify-between items-center gap-8 md:gap-4 text-white/50 text-xs md:text-sm mb-10 md:mb-2 relative z-10">
+					<p className="font-medium tracking-wide text-center md:text-left">&copy; {new Date().getFullYear()} Kiosk. All rights reserved.</p>
 					
 					<div className="flex flex-wrap items-center justify-center gap-6 md:gap-8">
 						<a
 							href="#"
-							className="hover:text-white transition-colors font-medium">
-							Twitter
+							className="text-white/50 hover:text-white transition-colors"
+							aria-label="Twitter">
+							<svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+								<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.005 4.15H5.059z" />
+							</svg>
 						</a>
 						<a
 							href="#"
-							className="hover:text-white transition-colors font-medium">
-							LinkedIn
+							className="text-white/50 hover:text-white transition-colors"
+							aria-label="LinkedIn">
+							<svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+								<path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+							</svg>
 						</a>
 						
 						{/* Back to Top Button */}
@@ -139,7 +145,7 @@ export default function Footer() {
 				</div>
 
 				{/* Massive Edge-to-Edge Typography */}
-				<div className="w-full flex justify-center leading-[0.75] select-none pointer-events-none translate-y-[12%] mt-4 md:mt-0">
+				<div className="w-full flex justify-center leading-[0.75] select-none pointer-events-none translate-y-[12%] mt-2 md:mt-0">
 					<span 
 						className="font-thunder-lc uppercase text-[24vw] md:text-[25vw] font-bold tracking-[-0.02em] whitespace-nowrap"
 						style={{

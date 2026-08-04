@@ -22,8 +22,8 @@ export default function CTA() {
 							Ready to grow your business online?
 						</h2>
 						<p className="text-body-lead text-white/90">
-							Join over 50 small businesses who trust Kiosk for their digital
-							presence.
+							Stop struggling with website builders. Let our team launch your
+							professional digital presence in days.
 						</p>
 						<div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
 							<PillButton

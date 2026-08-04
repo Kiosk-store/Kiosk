@@ -2,25 +2,21 @@
 
 # About Kiosk
 
-Kiosk makes it simple for small businesses to get online.
+Kiosk makes it simple for small businesses to get online, without making them do the work.
 
-Most small business owners don’t need a complicated website. They just need a clean place to show what they offer, share their contact details, and start selling — without spending weeks learning tools or paying high monthly fees.
+**Vision:** A world where every small business, regardless of technical skill, budget, or time, has a professional online presence within days of deciding they need one.
 
-That’s why we built Kiosk.
+**Mission:** Remove the technical barrier between small business owners and a great website by personalizing proven, pre-built pages for them — combining the speed and affordability of templated tools with the polish and hands-on support of a dedicated team.
 
-With Kiosk, you can choose the package that fits your business:
+Most small business owners don't have the time, design skill, or desire to learn a website builder — and they shouldn't have to. Kiosk exists to remove that barrier entirely: you tell us about your business, and our team personalizes a proven, professionally designed page for you.
 
-- Landing Page — A simple, professional page with your business info, photos, WhatsApp button, and contact details.
-- Online Store — A full e-commerce store where customers can browse products and pay online.
+With Kiosk, you choose the package that fits your business:
+- **Landing Page** — A single, high-converting page perfect for a first professional presence.
+- **Sales Funnel** — Multiple connected pages with lead capture and email integration for driving traffic.
+- **E-commerce Store** — A full product catalog, cart, and checkout for selling online.
 
-Everything is hosted for you. No technical setup. No complicated builders. Just fill in your details and go live.
-
-We’re building Kiosk for the everyday business owner — the ones who are too busy running their business to become website experts.
-
-Simple. Affordable. Built for small businesses.
+Everything is hosted and managed for you. No technical setup. No complicated builders. 
 
 ## Short version (homepage)
 
-About Kiosk
-
-Kiosk helps small businesses get online without the stress. Choose a simple landing page or a full online store — we handle the rest. No complicated tools. No steep learning curve. Just a clean online home for your business.
+Kiosk helps small businesses get online without the stress. Choose a package, tell us about your business, and our team will build and personalize a proven template for you. No complicated tools. No steep learning curve. Just a professional digital presence launched in days.
