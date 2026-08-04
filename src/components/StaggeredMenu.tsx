@@ -78,6 +78,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 	onMenuClose,
 }: StaggeredMenuProps) => {
 	const [open, setOpen] = useState(false);
+	const [isMounted, setIsMounted] = useState(false);
 	const openRef = useRef(false);
 
 	const panelRef = useRef<HTMLDivElement | null>(null);
@@ -102,6 +103,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 	const itemEntranceTweenRef = useRef<gsap.core.Tween | null>(null);
 
 	useLayoutEffect(() => {
+		setIsMounted(true);
 		const ctx = gsap.context(() => {
 			const panel = panelRef.current;
 			const preContainer = preLayersRef.current;
@@ -109,7 +111,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 			const icon = iconRef.current;
 			const textInner = textInnerRef.current;
 
-			if (!panel || !icon || !textInner) return;
+			if (!panel || !icon) return;
 
 			// collect pre-layer elements used to create the layered slide effect
 			let preLayers: HTMLElement[] = [];
@@ -121,14 +123,16 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 			preLayerElsRef.current = preLayers;
 
 			const offscreen = position === "left" ? -100 : 100;
-			gsap.set([panel, ...preLayers], { xPercent: offscreen, opacity: 1, visibility: "visible" });
+			gsap.set([panel, ...preLayers], { xPercent: offscreen, opacity: 1 });
 			if (preContainer) {
-				gsap.set(preContainer, { xPercent: 0, opacity: 1, visibility: "visible" });
+				gsap.set(preContainer, { xPercent: 0, opacity: 1 });
 			}
 			gsap.set(icon, { rotate: 0, transformOrigin: "50% 50%" });
 
 			// ensure the cycling text strip starts at the top
-			gsap.set(textInner, { yPercent: 0 });
+			if (textInner) {
+				gsap.set(textInner, { yPercent: 0 });
+			}
 
 			if (toggleBtnRef.current)
 				gsap.set(toggleBtnRef.current, { color: menuButtonColor });
@@ -505,8 +509,8 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 						return arr.map((c, i) => (
 							<div
 								key={i}
-								className="sm-prelayer absolute top-0 right-0 h-full w-full"
-								style={{ background: c, visibility: "hidden" }}
+								className={`sm-prelayer absolute top-0 right-0 h-full w-full ${!isMounted ? "invisible" : ""}`}
+								style={{ background: c }}
 							/>
 						));
 					})()}
@@ -579,8 +583,8 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 				<aside
 					id="staggered-menu-panel"
 					ref={panelRef}
-					className="staggered-menu-panel absolute top-0 right-0 h-full bg-white flex flex-col p-[6em_2em_2em_2em] overflow-y-auto z-10 backdrop-blur-[12px] pointer-events-auto"
-					style={{ WebkitBackdropFilter: "blur(12px)", visibility: "hidden" }}
+					className={`staggered-menu-panel absolute top-0 right-0 h-full bg-white flex flex-col p-[6em_2em_2em_2em] overflow-y-auto z-10 backdrop-blur-[12px] pointer-events-auto ${!isMounted ? "invisible" : ""}`}
+					style={{ WebkitBackdropFilter: "blur(12px)" }}
 					aria-hidden={!open}>
 					<div className="sm-panel-inner flex-1 flex flex-col gap-5">
 						<ul
