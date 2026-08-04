@@ -91,8 +91,8 @@ const tiers: PricingTier[] = [
 ];
 
 export default function Pricing() {
-	const [billingCycle, setBillingCycle] = useState<"one-time" | "monthly">(
-		"one-time",
+	const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">(
+		"monthly",
 	);
 	const [activeIndex, setActiveIndex] = useState(0);
 
@@ -177,24 +177,24 @@ export default function Pricing() {
 					<div className="inline-flex items-center p-1 rounded-full bg-[#161922] border border-white/15 self-start sm:self-auto shrink-0">
 						<button
 							type="button"
-							onClick={() => setBillingCycle("one-time")}
-							className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
-								billingCycle === "one-time"
-									? "bg-white text-[#0a0a0a] shadow-sm"
-									: "text-slate-400 hover:text-white"
-							}`}>
-							One-Time
-						</button>
-
-						<button
-							type="button"
 							onClick={() => setBillingCycle("monthly")}
-							className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer flex items-center gap-1 sm:gap-1.5 ${
+							className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
 								billingCycle === "monthly"
 									? "bg-white text-[#0a0a0a] shadow-sm"
 									: "text-slate-400 hover:text-white"
 							}`}>
-							<span>Monthly</span>
+							Monthly
+						</button>
+
+						<button
+							type="button"
+							onClick={() => setBillingCycle("yearly")}
+							className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer flex items-center gap-1 sm:gap-1.5 ${
+								billingCycle === "yearly"
+									? "bg-white text-[#0a0a0a] shadow-sm"
+									: "text-slate-400 hover:text-white"
+							}`}>
+							<span>Yearly</span>
 							<span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-600 text-white font-bold uppercase">
 								-20%
 							</span>
@@ -207,11 +207,11 @@ export default function Pricing() {
 					{tiers.map((tier, idx) => {
 						const isVisible = idx === activeIndex;
 						const price =
-							billingCycle === "one-time"
+							billingCycle === "yearly"
 								? tier.priceOneTime
 								: tier.priceMonthly;
 						const period =
-							billingCycle === "one-time" ? "one-time investment" : "/ month";
+							billingCycle === "yearly" ? "/ year" : "/ month";
 
 						return (
 							<div

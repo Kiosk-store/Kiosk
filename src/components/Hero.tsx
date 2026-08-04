@@ -119,7 +119,7 @@ export default function Hero() {
 								aria-hidden="true"
 							/>
 							<div className="text-left">
-								<p className="text-sm font-bold text-gray-900">7-10 Days</p>
+								<p className="text-sm font-bold text-gray-900">3-5 Days</p>
 								<p className="text-xs text-gray-500 font-medium">
 									Fast Launch Time
 								</p>
@@ -132,9 +132,9 @@ export default function Hero() {
 								aria-hidden="true"
 							/>
 							<div className="text-left">
-								<p className="text-sm font-bold text-gray-900">100% Owned</p>
+								<p className="text-sm font-bold text-gray-900">100% Yours</p>
 								<p className="text-xs text-gray-500 font-medium">
-									Your Content & Code
+									Your Brand & Content
 								</p>
 							</div>
 						</div>
