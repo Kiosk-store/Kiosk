@@ -121,9 +121,9 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 			preLayerElsRef.current = preLayers;
 
 			const offscreen = position === "left" ? -100 : 100;
-			gsap.set([panel, ...preLayers], { xPercent: offscreen, opacity: 1 });
+			gsap.set([panel, ...preLayers], { xPercent: offscreen, opacity: 1, visibility: "visible" });
 			if (preContainer) {
-				gsap.set(preContainer, { xPercent: 0, opacity: 1 });
+				gsap.set(preContainer, { xPercent: 0, opacity: 1, visibility: "visible" });
 			}
 			gsap.set(icon, { rotate: 0, transformOrigin: "50% 50%" });
 
@@ -505,8 +505,8 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 						return arr.map((c, i) => (
 							<div
 								key={i}
-								className={`sm-prelayer absolute top-0 right-0 h-full w-full ${position === 'left' ? '-translate-x-full' : 'translate-x-full'}`}
-								style={{ background: c }}
+								className="sm-prelayer absolute top-0 right-0 h-full w-full"
+								style={{ background: c, visibility: "hidden" }}
 							/>
 						));
 					})()}
@@ -579,8 +579,8 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 				<aside
 					id="staggered-menu-panel"
 					ref={panelRef}
-					className={`staggered-menu-panel absolute top-0 right-0 h-full bg-white flex flex-col p-[6em_2em_2em_2em] overflow-y-auto z-10 backdrop-blur-[12px] pointer-events-auto ${position === 'left' ? '-translate-x-full' : 'translate-x-full'}`}
-					style={{ WebkitBackdropFilter: "blur(12px)" }}
+					className="staggered-menu-panel absolute top-0 right-0 h-full bg-white flex flex-col p-[6em_2em_2em_2em] overflow-y-auto z-10 backdrop-blur-[12px] pointer-events-auto"
+					style={{ WebkitBackdropFilter: "blur(12px)", visibility: "hidden" }}
 					aria-hidden={!open}>
 					<div className="sm-panel-inner flex-1 flex flex-col gap-5">
 						<ul
