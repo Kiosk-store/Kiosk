@@ -9,6 +9,8 @@ import PillButton from "@/components/PillButton";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import HowItWorks from "@/components/HowItWorks";
+import LottiePlayer from "@/components/LottiePlayer";
+import CTA from "@/components/CTA";
 import {
 	Globe,
 	Zap,
@@ -30,66 +32,179 @@ import {
 	RefreshCw,
 	TrendingUp,
 	ExternalLink,
+	Star,
 } from "lucide-react";
 
 export default function ServicesPage() {
 	const [activeQuizChoice, setActiveQuizChoice] = useState<string | null>(null);
+	const [activeHeroLottie, setActiveHeroLottie] = useState<string>(
+		"/lotties/funnel.json",
+	);
+
+	const heroLottieTabs = [
+		{ id: "funnel", label: "Sales Funnel", src: "/lotties/funnel.json" },
+		{ id: "landing", label: "Landing Page", src: "/lotties/A small shop.json" },
+		{ id: "store", label: "E-commerce", src: "/lotties/shopping Ecommerce.json" },
+	];
 
 	return (
 		<main className="min-h-screen bg-[#f8fafc] w-full overflow-x-hidden text-gray-900">
 			<Navbar />
 
 			{/* ==========================================
-          SECTION 1: HERO INTRO & HIGH-LEVEL FRAME
+          SECTION 1: HERO INTRO & HIGH-LEVEL FRAME (CREATIVE MINIMAL LINES & OBJECTS)
       ========================================== */}
-			<section className="relative pt-32 pb-16 md:pt-44 md:pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
-				<ScrollReveal>
-					<div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50/80 border border-blue-200/60 text-blue-700 text-xs font-extrabold uppercase tracking-wider mb-6">
-						<Sparkles className="w-3.5 h-3.5 text-blue-600" />
-						<span>Done-For-You Website Packages</span>
+			<section className="relative pt-32 pb-20 md:pt-44 md:pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden">
+				{/* Background Architectural Grid Lines */}
+				<div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-60 pointer-events-none" />
+
+				{/* Corner Technical Crosshair Accent Lines */}
+				<div className="absolute top-36 left-4 sm:left-8 hidden md:flex items-center gap-2 font-mono text-[10px] text-gray-400 select-none pointer-events-none">
+					<span>+</span>
+					<span className="w-12 h-px bg-gray-200" />
+					<span>SYS_REF // 01</span>
+				</div>
+
+				<div className="absolute top-36 right-4 sm:right-8 hidden md:flex items-center gap-2 font-mono text-[10px] text-gray-400 select-none pointer-events-none">
+					<span>SPEC_BUILD</span>
+					<span className="w-12 h-px bg-gray-200" />
+					<span>+</span>
+				</div>
+
+				<div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center relative z-10">
+					{/* Left Column: Text & CTAs */}
+					<div className="lg:col-span-7 space-y-6 text-left">
+						<ScrollReveal>
+							<div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-gray-200/90 text-gray-700 text-[11px] font-mono tracking-wider shadow-2xs">
+								<span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+								<span className="font-bold text-blue-600">[ 01 ]</span>
+								<span className="text-gray-400">|</span>
+								<span>TURNKEY WEBSITE PACKAGES</span>
+							</div>
+						</ScrollReveal>
+
+						<ScrollReveal delay={0.1}>
+							<h1 className="text-4xl sm:text-5xl md:text-6xl font-bold font-nohemi tracking-tight text-gray-900 leading-[1.08]">
+								Professional websites,
+								<br />
+								<span className="text-blue-600">built for you.</span>
+							</h1>
+						</ScrollReveal>
+
+						{/* High-level framing statement */}
+						<ScrollReveal delay={0.2}>
+							<p className="text-base sm:text-lg text-gray-600 font-medium leading-relaxed max-w-2xl">
+								Kiosk doesn&apos;t hand you a complicated editor and wish you luck.
+								We take your business details, pick the right pre-built design,
+								personalize it with your content and branding, and hand you a live site,{" "}
+								<strong className="text-gray-900 font-bold">ready to take customers in days.</strong>
+							</p>
+						</ScrollReveal>
+
+						{/* Value Guarantee Pills with Minimal Nodes */}
+						<ScrollReveal delay={0.25}>
+							<div className="flex flex-wrap items-center gap-3 pt-1">
+								{[
+									{ icon: Clock, text: "3–5 Days Turnaround" },
+									{ icon: ShieldCheck, text: "SSL & Hosting Included" },
+									{ icon: Smartphone, text: "100% Mobile Ready" },
+								].map((item) => {
+									const Icon = item.icon;
+									return (
+										<div
+											key={item.text}
+											className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white border border-gray-200/90 text-xs font-semibold text-gray-700 shadow-2xs">
+											<div className="w-1.5 h-1.5 rounded-full bg-blue-600/70" />
+											<Icon className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+											<span>{item.text}</span>
+										</div>
+									);
+								})}
+							</div>
+						</ScrollReveal>
+
+						<ScrollReveal delay={0.3}>
+							<div className="flex flex-wrap items-center gap-4 pt-4">
+								<PillButton
+									href="/get-started"
+									baseColor="#004ac6"
+									circleColor="#ffffff"
+									textColor="#ffffff"
+									hoverTextColor="#004ac6"
+									useThunderFont={true}
+									className="px-8 py-3.5 text-xs font-bold border border-blue-600 shadow-md">
+									Start Your Project Now
+								</PillButton>
+
+								<a
+									href="#services-tiers"
+									className="px-6 py-3.5 rounded-full bg-white hover:bg-gray-50 border border-gray-200/90 text-xs font-semibold text-gray-700 transition-colors">
+									Explore Service Tiers ↓
+								</a>
+							</div>
+						</ScrollReveal>
 					</div>
-				</ScrollReveal>
 
-				<ScrollReveal delay={0.1}>
-					<h1 className="text-4xl sm:text-5xl md:text-6xl font-bold font-nohemi tracking-tight text-gray-900 max-w-4xl mx-auto mb-6 leading-[1.1]">
-						Professional websites,
-						<br />
-						<span className="text-blue-600">built for you.</span>
-					</h1>
-				</ScrollReveal>
+					{/* Right Column: Lottie Interactive Showcase Container with Architectural Frame */}
+					<div className="lg:col-span-5 relative">
+						{/* Background Offset Framing Lines */}
+						<div className="absolute -inset-2 rounded-[32px] border border-blue-200/50 pointer-events-none -z-10" />
 
-				{/* High-level framing statement */}
-				<ScrollReveal delay={0.2}>
-					<div className="max-w-3xl mx-auto bg-white border border-gray-200/90 rounded-3xl p-6 sm:p-8 shadow-xs mb-10 text-left sm:text-center">
-						<p className="text-base sm:text-lg text-gray-600 font-medium leading-relaxed">
-							Kiosk doesn&apos;t hand you a complicated editor and wish you luck.
-							We take your business details, pick the right pre-built design,
-							personalize it with your content and branding, and hand you a live site
-							— <strong className="text-gray-900 font-bold">ready to take customers in days.</strong>
-						</p>
+						<ScrollReveal delay={0.2} direction="up">
+							<div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 text-white shadow-2xl relative overflow-hidden flex flex-col justify-between min-h-[440px]">
+								{/* Top Lottie Selector Tabs */}
+								<div className="flex items-center justify-between gap-2 border-b border-slate-800 pb-4 mb-4">
+									<div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+										{heroLottieTabs.map((tab) => (
+											<button
+												key={tab.id}
+												type="button"
+												onClick={() => setActiveHeroLottie(tab.src)}
+												className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap ${
+													activeHeroLottie === tab.src
+														? "bg-blue-600 text-white shadow-xs"
+														: "bg-slate-800 text-slate-400 hover:text-white"
+												}`}>
+												{tab.label}
+											</button>
+										))}
+									</div>
+
+									<div className="flex items-center gap-1 shrink-0 font-mono text-[10px] text-slate-500">
+										<span>+</span>
+									</div>
+								</div>
+
+								{/* Interactive Lottie Animation Canvas */}
+								<div className="relative flex-1 flex items-center justify-center py-4">
+									<LottiePlayer
+										src={activeHeroLottie}
+										className="w-full h-56 sm:h-64 object-contain"
+										loop={true}
+										autoplay={true}
+									/>
+
+									{/* Minimal Node Badge */}
+									<div className="absolute bottom-2 left-2 bg-slate-800/95 backdrop-blur-md border border-slate-700 rounded-2xl px-3.5 py-2 flex items-center gap-2 shadow-lg">
+										<div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+										<span className="text-[11px] font-bold text-slate-200">
+											Done-For-You Build
+										</span>
+									</div>
+								</div>
+
+								{/* Bottom Status Strip */}
+								<div className="pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400 font-medium">
+									<div className="flex items-center gap-1 text-amber-400">
+										<Star className="w-3.5 h-3.5 fill-current" />
+										<span className="font-bold text-white text-[11px]">5.0 Rated Build Service</span>
+									</div>
+									<span className="text-[11px] font-mono text-blue-400">LIVE PREVIEW</span>
+								</div>
+							</div>
+						</ScrollReveal>
 					</div>
-				</ScrollReveal>
-
-				<ScrollReveal delay={0.3}>
-					<div className="flex flex-wrap items-center justify-center gap-4">
-						<PillButton
-							href="/get-started"
-							baseColor="#004ac6"
-							circleColor="#ffffff"
-							textColor="#ffffff"
-							hoverTextColor="#004ac6"
-							useThunderFont={true}
-							className="px-8 py-3.5 text-xs font-bold border border-blue-600 shadow-md">
-							Start Your Project Now
-						</PillButton>
-
-						<a
-							href="#services-tiers"
-							className="px-6 py-3.5 rounded-full bg-white hover:bg-gray-50 border border-gray-200/90 text-xs font-semibold text-gray-700 transition-colors">
-							Explore Service Tiers ↓
-						</a>
-					</div>
-				</ScrollReveal>
+				</div>
 			</section>
 
 			{/* ==========================================
@@ -609,53 +724,9 @@ export default function ServicesPage() {
 			</section>
 
 			{/* ==========================================
-          SECTION 7: FINAL CTA ("READY TO GET STARTED?")
+          SECTION 7: FINAL CTA
       ========================================== */}
-			<section className="py-20 md:py-28 bg-blue-600 text-white text-center px-4 sm:px-6 lg:px-8">
-				<div className="max-w-4xl mx-auto space-y-6">
-					<h2 className="text-3xl sm:text-4xl md:text-5xl font-bold font-nohemi tracking-tight">
-						Ready to get your website built?
-					</h2>
-					<p className="text-blue-100 text-sm sm:text-base font-medium max-w-2xl mx-auto leading-relaxed">
-						Select your service tier below to pre-select your package and launch your new site in days.
-					</p>
-
-					<div className="pt-6 flex flex-wrap items-center justify-center gap-4">
-						<PillButton
-							href="/get-started?tier=landing"
-							baseColor="#ffffff"
-							circleColor="#004ac6"
-							textColor="#004ac6"
-							hoverTextColor="#ffffff"
-							useThunderFont={true}
-							className="px-6 py-3.5 text-xs font-bold border border-white">
-							Start Landing Page ($499)
-						</PillButton>
-
-						<PillButton
-							href="/get-started?tier=funnel"
-							baseColor="#ffffff"
-							circleColor="#004ac6"
-							textColor="#004ac6"
-							hoverTextColor="#ffffff"
-							useThunderFont={true}
-							className="px-6 py-3.5 text-xs font-bold border border-white">
-							Start Sales Funnel ($799)
-						</PillButton>
-
-						<PillButton
-							href="/get-started?tier=store"
-							baseColor="#ffffff"
-							circleColor="#004ac6"
-							textColor="#004ac6"
-							hoverTextColor="#ffffff"
-							useThunderFont={true}
-							className="px-6 py-3.5 text-xs font-bold border border-white">
-							Start E-commerce ($1,199)
-						</PillButton>
-					</div>
-				</div>
-			</section>
+			<CTA />
 
 			<Footer />
 		</main>
