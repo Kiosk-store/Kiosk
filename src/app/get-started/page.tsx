@@ -18,6 +18,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
 	Mail,
 	Lock,
@@ -26,11 +27,13 @@ import {
 	EyeOff,
 	ArrowLeft,
 	CheckCircle2,
+	Loader2,
 } from "lucide-react";
 import PillButton from "@/components/PillButton";
 import LottiePlayer from "@/components/LottiePlayer";
 
 export default function GetStartedPage() {
+	const router = useRouter();
 	const [activeTab, setActiveTab] = useState<"signup" | "login">("signup");
 	const [showPassword, setShowPassword] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
@@ -47,19 +50,39 @@ export default function GetStartedPage() {
 
 	const handleSignupSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
+		if (isLoading) return;
 		setIsLoading(true);
 		setTimeout(() => {
 			setIsLoading(false);
 			setIsSuccess(true);
-		}, 800);
+			setTimeout(() => {
+				router.push("/dashboard");
+			}, 700);
+		}, 900);
 	};
 
 	const handleLoginSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
+		if (isLoading) return;
 		setIsLoading(true);
 		setTimeout(() => {
 			setIsLoading(false);
 			setIsSuccess(true);
+			setTimeout(() => {
+				router.push("/dashboard");
+			}, 700);
+		}, 900);
+	};
+
+	const handleSocialAuth = () => {
+		if (isLoading) return;
+		setIsLoading(true);
+		setTimeout(() => {
+			setIsLoading(false);
+			setIsSuccess(true);
+			setTimeout(() => {
+				router.push("/dashboard");
+			}, 700);
 		}, 800);
 	};
 
@@ -74,13 +97,13 @@ export default function GetStartedPage() {
 				className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
 				<div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[radial-gradient(circle,_rgba(37,99,235,0.06)_0%,_rgba(248,250,252,0)_70%)] blur-3xl" />
 				<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-slate-200/40 rounded-full" />
-				
+
 				{/* Vertical Grid Accent Lines */}
 				<div className="absolute top-0 bottom-0 left-[5%] md:left-[10%] w-px bg-slate-300/50" />
 				<div className="absolute top-0 bottom-0 left-[30%] w-px bg-slate-300/20 hidden md:block" />
 				<div className="absolute top-0 bottom-0 right-[30%] w-px bg-slate-300/20 hidden md:block" />
 				<div className="absolute top-0 bottom-0 right-[5%] md:right-[10%] w-px bg-slate-300/50" />
-				
+
 				{/* Horizontal Grid Accent Lines */}
 				<div className="absolute top-[10%] sm:top-[15%] left-0 right-0 h-px bg-slate-300/40" />
 				<div className="absolute bottom-[10%] sm:bottom-[15%] left-0 right-0 h-px bg-slate-300/40" />
@@ -103,7 +126,6 @@ export default function GetStartedPage() {
 					<h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold font-thunder-lc tracking-tight text-slate-900 uppercase leading-none mb-6">
 						GET STARTED
 					</h1>
-
 				</div>
 
 				{/* Success State */}
@@ -114,29 +136,24 @@ export default function GetStartedPage() {
 							{activeTab === "signup" ? "Account Created" : "Welcome Back"}
 						</h2>
 						<p className="text-xs text-slate-500 mt-1.5">
-							Redirecting to dashboard...
+							Redirecting to your dashboard...
 						</p>
 						<div className="mt-6">
 							<PillButton
-								href="/"
+								href="/dashboard"
 								baseColor="#059669"
 								circleColor="#ffffff"
 								textColor="#ffffff"
 								hoverTextColor="#059669"
 								useThunderFont={true}
 								className="w-full py-3 text-sm font-bold border border-emerald-600 shadow-md">
-								Continue →
+								Continue to Dashboard →
 							</PillButton>
 						</div>
 					</div>
 				) : (
 					<div className="relative w-full max-w-5xl mx-auto flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
-						{/* 
-						  FORM PANEL
-						  - Sits on the left side on desktop in standard JSX ordering.
-						  - On mobile, this stacked layout comes first (order-1).
-						  - When in "signup" mode, it translates RIGHT to swap places with Lottie.
-						*/}
+						{/* FORM PANEL */}
 						<div
 							className={`w-full lg:w-1/2 flex justify-center order-1 lg:order-none transition-transform duration-700 ease-[cubic-bezier(0.65,0,0.35,1)] ${
 								isSignup
@@ -148,14 +165,9 @@ export default function GetStartedPage() {
 								<div className="grid grid-cols-2 gap-3 mb-5">
 									<button
 										type="button"
-										onClick={() => {
-											setIsLoading(true);
-											setTimeout(() => {
-												setIsLoading(false);
-												setIsSuccess(true);
-											}, 600);
-										}}
-										className="flex items-center justify-center gap-2 py-2 px-3 rounded-xl border border-slate-300/80 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-all shadow-xs cursor-pointer">
+										onClick={handleSocialAuth}
+										disabled={isLoading}
+										className="flex items-center justify-center gap-2 py-2 px-3 rounded-xl border border-slate-300/80 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-all shadow-xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
 										<svg className="w-4 h-4" viewBox="0 0 24 24">
 											<path
 												fill="#EA4335"
@@ -179,14 +191,9 @@ export default function GetStartedPage() {
 
 									<button
 										type="button"
-										onClick={() => {
-											setIsLoading(true);
-											setTimeout(() => {
-												setIsLoading(false);
-												setIsSuccess(true);
-											}, 600);
-										}}
-										className="flex items-center justify-center gap-2 py-2 px-3 rounded-xl border border-slate-300/80 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-all shadow-xs cursor-pointer">
+										onClick={handleSocialAuth}
+										disabled={isLoading}
+										className="flex items-center justify-center gap-2 py-2 px-3 rounded-xl border border-slate-300/80 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-all shadow-xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
 										<svg
 											className="w-4 h-4 fill-current text-slate-900"
 											viewBox="0 0 24 24">
@@ -297,13 +304,21 @@ export default function GetStartedPage() {
 										<div className="pt-2">
 											<PillButton
 												type="submit"
+												disabled={isLoading}
 												baseColor="#004ac6"
 												circleColor="#ffffff"
 												textColor="#ffffff"
 												hoverTextColor="#004ac6"
 												useThunderFont={true}
-												className="w-full py-3.5 rounded-full font-bold text-sm sm:text-base border-2 border-blue-600 shadow-md cursor-pointer">
-												{isLoading ? "Creating Account..." : "Get Started"}
+												className="w-full py-3.5 rounded-full font-bold text-sm sm:text-base border-2 border-blue-600 shadow-md cursor-pointer disabled:opacity-80 disabled:cursor-not-allowed">
+												{isLoading ? (
+													<span className="inline-flex items-center justify-center gap-2">
+														<Loader2 className="w-4 h-4 animate-spin" />
+														<span>Creating Account...</span>
+													</span>
+												) : (
+													"Get Started"
+												)}
 											</PillButton>
 										</div>
 									</form>
@@ -388,13 +403,21 @@ export default function GetStartedPage() {
 										<div className="pt-2">
 											<PillButton
 												type="submit"
+												disabled={isLoading}
 												baseColor="#ffffff"
 												circleColor="#004ac6"
 												textColor="#004ac6"
 												hoverTextColor="#ffffff"
 												useThunderFont={true}
-												className="w-full py-3.5 rounded-full font-bold text-sm sm:text-base border-2 border-blue-600 shadow-md cursor-pointer">
-												{isLoading ? "Signing In..." : "Sign In"}
+												className="w-full py-3.5 rounded-full font-bold text-sm sm:text-base border-2 border-blue-600 shadow-md cursor-pointer disabled:opacity-80 disabled:cursor-not-allowed">
+												{isLoading ? (
+													<span className="inline-flex items-center justify-center gap-2">
+														<Loader2 className="w-4 h-4 animate-spin" />
+														<span>Signing In...</span>
+													</span>
+												) : (
+													"Sign In"
+												)}
 											</PillButton>
 										</div>
 									</form>
@@ -402,12 +425,7 @@ export default function GetStartedPage() {
 							</div>
 						</div>
 
-						{/* 
-						  LOTTIE PANEL
-						  - Sits on the right side on desktop in standard JSX ordering.
-						  - On mobile, this stacked layout fits below the form (order-2).
-						  - When in "signup" mode, it translates LEFT to swap places with Form.
-						*/}
+						{/* LOTTIE PANEL */}
 						<div
 							className={`w-full lg:w-1/2 flex flex-col items-center justify-center text-center order-2 lg:order-none mt-8 lg:mt-0 transition-transform duration-700 ease-[cubic-bezier(0.65,0,0.35,1)] ${
 								isSignup

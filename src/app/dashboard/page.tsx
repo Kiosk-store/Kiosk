@@ -4,6 +4,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import ProjectCard from "@/components/dashboard/ProjectCard";
 import type { ProjectCardProps } from "@/components/dashboard/ProjectCard";
 
@@ -126,7 +127,9 @@ const quickActions: QuickAction[] = [
 ];
 
 export default function DashboardPage() {
+	const router = useRouter();
 	const [greeting, setGreeting] = useState("Good morning");
+	const [isProfileOpen, setIsProfileOpen] = useState(false);
 
 	useEffect(() => {
 		const hour = new Date().getHours();
@@ -139,9 +142,14 @@ export default function DashboardPage() {
 		}
 	}, []);
 
+	const handleLogout = () => {
+		setIsProfileOpen(false);
+		router.push("/get-started");
+	};
+
 	return (
 		<div className="w-full min-h-screen bg-[#f8fafc]">
-			{/* Sleek Header: Logo on Left, Background-less Notifications & Profile on Right */}
+			{/* Header with Logo and Profile Dropdown */}
 			<header className="sticky top-0 z-30 bg-[#f8fafc]/90 backdrop-blur-md border-b border-gray-200/80 px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
 				{/* Logo */}
 				<Link
@@ -153,9 +161,9 @@ export default function DashboardPage() {
 					<span>Kiosk</span>
 				</Link>
 
-				{/* Right: Transparent Notifications & Profile (No Backgrounds) */}
+				{/* Right Controls */}
 				<div className="flex items-center gap-2">
-					{/* Notifications Button - Background-less */}
+					{/* Notifications Button */}
 					<button
 						type="button"
 						aria-label="Notifications"
@@ -169,20 +177,92 @@ export default function DashboardPage() {
 					{/* Vertical Separator */}
 					<div className="h-5 w-px bg-gray-200 mx-1" />
 
-					{/* User Profile Pill - Background-less */}
-					<button
-						type="button"
-						className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-xl text-gray-800 hover:bg-gray-200/50 transition-colors duration-200 cursor-pointer">
-						<div className="w-7 h-7 rounded-full bg-blue-600 text-white text-[11px] font-bold flex items-center justify-center">
-							JV
-						</div>
-						<span className="text-sm font-semibold text-gray-900">
-							Jeremiah
-						</span>
-						<span className="material-symbols-outlined text-gray-400 text-[18px]">
-							expand_more
-						</span>
-					</button>
+					{/* User Profile Pill & Dropdown */}
+					<div className="relative">
+						<button
+							type="button"
+							onClick={() => setIsProfileOpen(!isProfileOpen)}
+							aria-expanded={isProfileOpen}
+							className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-xl text-gray-800 hover:bg-gray-200/50 transition-colors duration-200 cursor-pointer select-none">
+							<div className="w-7 h-7 rounded-full bg-blue-600 text-white text-[11px] font-bold flex items-center justify-center">
+								JV
+							</div>
+							<span className="text-sm font-semibold text-gray-900">
+								Jeremiah
+							</span>
+							<span
+								className={`material-symbols-outlined text-gray-400 text-[18px] transition-transform duration-200 ${
+									isProfileOpen ? "rotate-180" : ""
+								}`}>
+								expand_more
+							</span>
+						</button>
+
+						{/* Dropdown Menu */}
+						{isProfileOpen && (
+							<>
+								{/* Backdrop to close on outside click */}
+								<div
+									className="fixed inset-0 z-40"
+									onClick={() => setIsProfileOpen(false)}
+								/>
+
+								<div className="absolute right-0 top-full mt-2 w-60 bg-white border border-gray-200/90 rounded-2xl shadow-xl z-50 p-1.5 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+									{/* User Info Header */}
+									<div className="px-3.5 py-3 border-b border-gray-100 mb-1">
+										<p className="text-sm font-bold text-gray-900 leading-snug">
+											Jeremiah Victor
+										</p>
+										<p className="text-xs text-gray-500 truncate mt-0.5 font-medium">
+											jeremiah@kiosk.com
+										</p>
+									</div>
+
+									{/* Quick Links */}
+									<div className="space-y-0.5">
+										<button
+											type="button"
+											onClick={() => {
+												setIsProfileOpen(false);
+												router.push("/dashboard/settings");
+											}}
+											className="group w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-gray-700 hover:bg-blue-50/80 hover:text-blue-600 transition-all duration-150 cursor-pointer">
+											<span className="material-symbols-outlined text-[18px] text-gray-400 group-hover:text-blue-600 group-hover:scale-110 transition-all">
+												settings
+											</span>
+											<span>Account Settings</span>
+										</button>
+
+										<button
+											type="button"
+											onClick={() => {
+												setIsProfileOpen(false);
+												router.push("/dashboard/billing");
+											}}
+											className="group w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-gray-700 hover:bg-blue-50/80 hover:text-blue-600 transition-all duration-150 cursor-pointer">
+											<span className="material-symbols-outlined text-[18px] text-gray-400 group-hover:text-blue-600 group-hover:scale-110 transition-all">
+												receipt_long
+											</span>
+											<span>Billing & Plan</span>
+										</button>
+									</div>
+
+									{/* Log Out Button */}
+									<div className="border-t border-gray-100 mt-1 pt-1">
+										<button
+											type="button"
+											onClick={handleLogout}
+											className="group w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 hover:text-red-700 transition-all duration-150 cursor-pointer">
+											<span className="material-symbols-outlined text-[18px] text-red-500 group-hover:scale-110 transition-transform">
+												logout
+											</span>
+											<span>Log Out</span>
+										</button>
+									</div>
+								</div>
+							</>
+						)}
+					</div>
 				</div>
 			</header>
 
@@ -198,7 +278,7 @@ export default function DashboardPage() {
 					</p>
 				</div>
 
-				{/* Stats Grid - Solid Clean Styling (No Gradients) */}
+				{/* Stats Grid */}
 				<div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-10">
 					{stats.map((stat) => (
 						<div
@@ -257,7 +337,7 @@ export default function DashboardPage() {
 					</div>
 				</div>
 
-				{/* Quick Actions - Clean Cards */}
+				{/* Quick Actions */}
 				<div className="mb-8 sm:mb-10">
 					<h2 className="text-lg sm:text-xl font-bold font-nohemi text-gray-900 mb-5">
 						Quick Actions
