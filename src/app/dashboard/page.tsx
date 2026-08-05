@@ -157,7 +157,7 @@ export default function DashboardPage() {
 				{/* Header Actions: Notifications & User Profile */}
 				<div className="flex items-center gap-3">
 					{/* Notifications Dropdown Container */}
-					<div className="relative">
+					<div ref={notifRef} className="relative">
 						<button
 							type="button"
 							aria-label="Notifications"
@@ -176,86 +176,81 @@ export default function DashboardPage() {
 
 						{/* Notifications Dropdown Menu */}
 						{isNotifOpen && (
-							<>
-								{/* Backdrop to close on outside click */}
-								<div
-									className="fixed inset-0 z-40"
-									onClick={() => setIsNotifOpen(false)}
-								/>
-
-								<div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white border border-gray-200/90 rounded-2xl shadow-xl z-50 p-2 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-									{/* Dropdown Header */}
-									<div className="px-3.5 py-2.5 border-b border-gray-100 flex items-center justify-between">
-										<div className="flex items-center gap-2">
-											<h3 className="text-xs font-bold text-gray-900 font-nohemi">
-												Notifications
-											</h3>
-											{unreadCount > 0 && (
-												<span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 text-[10px] font-extrabold">
-													{unreadCount} New
-												</span>
-											)}
-										</div>
-
+							<div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white border border-gray-200/90 rounded-2xl shadow-xl z-50 p-2 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+								{/* Dropdown Header */}
+								<div className="px-3.5 py-2.5 border-b border-gray-100 flex items-center justify-between">
+									<div className="flex items-center gap-2">
+										<h3 className="text-xs font-bold text-gray-900 font-nohemi">
+											Notifications
+										</h3>
 										{unreadCount > 0 && (
-											<button
-												type="button"
-												onClick={() => {
-													setNotifications((prev) =>
-														prev.map((n) => ({ ...n, unread: false })),
-													);
-												}}
-												className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 transition-colors cursor-pointer">
-												Mark all as read
-											</button>
+											<span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 text-[10px] font-extrabold">
+												{unreadCount} New
+											</span>
 										)}
 									</div>
 
-									{/* Notification Items List */}
-									<div className="divide-y divide-gray-100 max-h-80 overflow-y-auto">
-										{notifications.map((n) => (
-											<button
-												key={n.id}
-												type="button"
-												onClick={() => {
-													setNotifications((prev) =>
-														prev.map((item) =>
-															item.id === n.id
-																? { ...item, unread: false }
-																: item,
-														),
-													);
-													setIsNotifOpen(false);
-												}}
-												className={`w-full text-left p-3.5 transition-colors duration-150 cursor-pointer ${
-													n.unread
-														? "bg-blue-50/40 hover:bg-blue-50/70"
-														: "hover:bg-gray-50/70"
-												}`}>
-												<div className="flex items-center justify-between gap-2 mb-1">
-													<p className="text-xs font-bold text-gray-900 truncate">
-														{n.title}
-													</p>
-													<span className="text-[10px] text-gray-400 font-medium shrink-0">
-														{n.time}
-													</span>
-												</div>
-												<p className="text-[11px] text-gray-500 line-clamp-2 leading-relaxed">
-													{n.message}
-												</p>
-											</button>
-										))}
-									</div>
+									{unreadCount > 0 && (
+										<button
+											type="button"
+											onClick={() => {
+												setNotifications((prev) =>
+													prev.map((n) => ({ ...n, unread: false })),
+												);
+											}}
+											className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 transition-colors cursor-pointer">
+											Mark all as read
+										</button>
+									)}
 								</div>
-							</>
+
+								{/* Notification Items List */}
+								<div className="divide-y divide-gray-100 max-h-80 overflow-y-auto">
+									{notifications.map((n) => (
+										<button
+											key={n.id}
+											type="button"
+											onClick={() => {
+												setNotifications((prev) =>
+													prev.map((item) =>
+														item.id === n.id
+															? { ...item, unread: false }
+															: item,
+													),
+												);
+												setIsNotifOpen(false);
+											}}
+											className={`w-full text-left p-3.5 transition-colors duration-150 cursor-pointer ${
+												n.unread
+													? "bg-blue-50/40 hover:bg-blue-50/70"
+													: "hover:bg-gray-50/70"
+											}`}>
+											<div className="flex items-center justify-between gap-2 mb-1">
+												<p className="text-xs font-bold text-gray-900 truncate">
+													{n.title}
+												</p>
+												<span className="text-[10px] text-gray-400 font-medium shrink-0">
+													{n.time}
+												</span>
+											</div>
+											<p className="text-[11px] text-gray-500 line-clamp-2 leading-relaxed">
+												{n.message}
+											</p>
+										</button>
+									))}
+								</div>
+							</div>
 						)}
 					</div>
 
 					{/* Profile Dropdown Container */}
-					<div className="relative">
+					<div ref={profileRef} className="relative">
 						<button
 							type="button"
-							onClick={() => setIsProfileOpen(!isProfileOpen)}
+							onClick={() => {
+								setIsProfileOpen(!isProfileOpen);
+								setIsNotifOpen(false);
+							}}
 							className="flex items-center gap-2.5 p-1 sm:px-2 py-1 rounded-xl text-gray-800 hover:bg-gray-100/70 transition-colors duration-150 cursor-pointer">
 							<div className="w-8 h-8 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center shadow-xs shrink-0">
 								JV
@@ -270,14 +265,7 @@ export default function DashboardPage() {
 
 						{/* Dropdown Menu */}
 						{isProfileOpen && (
-							<>
-								{/* Backdrop to close on outside click */}
-								<div
-									className="fixed inset-0 z-40"
-									onClick={() => setIsProfileOpen(false)}
-								/>
-
-								<div className="absolute right-0 top-full mt-2 w-52 bg-white border border-gray-200/90 rounded-2xl shadow-lg z-50 p-1.5 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+							<div className="absolute right-0 top-full mt-2 w-52 bg-white border border-gray-200/90 rounded-2xl shadow-lg z-50 p-1.5 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
 									{/* User Info Header */}
 									<div className="px-3 py-2.5 border-b border-gray-100 mb-1">
 										<p className="text-xs font-bold text-gray-900 leading-snug">
@@ -321,7 +309,6 @@ export default function DashboardPage() {
 										</button>
 									</div>
 								</div>
-							</>
 						)}
 					</div>
 				</div>
@@ -357,8 +344,8 @@ export default function DashboardPage() {
 					{/* BENTO TILE 1: Welcome & Active Project Summary Banner (Span 2 cols on MD/LG) */}
 					<div className="md:col-span-2 lg:col-span-2 bg-white border border-gray-200/90 rounded-3xl p-6 sm:p-8 flex flex-col justify-between hover:border-blue-500/40 transition-all duration-200 shadow-2xs">
 						<div>
-							<div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-extrabold uppercase tracking-wider mb-4">
-								<Sparkles className="w-3.5 h-3.5" />
+							<div className="inline-flex items-center gap-2 text-blue-600 text-[11px] font-extrabold uppercase tracking-wider mb-4">
+								<span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
 								<span>Active Workspace</span>
 							</div>
 

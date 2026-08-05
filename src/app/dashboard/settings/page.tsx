@@ -3,13 +3,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { User, Mail, Phone, Lock, Bell, CheckCircle2 } from "lucide-react";
+import { User, Mail, Phone, Lock, Bell, CheckCircle2, Loader2 } from "lucide-react";
 import PillButton from "@/components/PillButton";
 
 type SettingsTab = "profile" | "security" | "notifications";
 
 export default function SettingsPage() {
 	const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
+	const [isLoading, setIsLoading] = useState(false);
 	const [isSaved, setIsSaved] = useState(false);
 
 	// Profile Form
@@ -31,10 +32,14 @@ export default function SettingsPage() {
 
 	const handleSave = (e: React.FormEvent) => {
 		e.preventDefault();
-		setIsSaved(true);
+		setIsLoading(true);
 		setTimeout(() => {
-			setIsSaved(false);
-		}, 3000);
+			setIsLoading(false);
+			setIsSaved(true);
+			setTimeout(() => {
+				setIsSaved(false);
+			}, 3000);
+		}, 1000);
 	};
 
 	return (
@@ -167,13 +172,21 @@ export default function SettingsPage() {
 						<div className="pt-4 flex justify-end">
 							<PillButton
 								type="submit"
+								disabled={isLoading}
 								baseColor="#004ac6"
 								circleColor="#ffffff"
 								textColor="#ffffff"
 								hoverTextColor="#004ac6"
 								useThunderFont={true}
 								className="px-6 py-2.5 rounded-full font-bold text-xs border border-blue-600 shadow-md">
-								Save Changes
+								{isLoading ? (
+									<span className="inline-flex items-center gap-2">
+										<Loader2 className="w-3.5 h-3.5 animate-spin" />
+										<span>Saving...</span>
+									</span>
+								) : (
+									<span>Save Changes</span>
+								)}
 							</PillButton>
 						</div>
 					</form>
@@ -257,13 +270,21 @@ export default function SettingsPage() {
 						<div className="pt-4 flex justify-end">
 							<PillButton
 								type="submit"
+								disabled={isLoading}
 								baseColor="#004ac6"
 								circleColor="#ffffff"
 								textColor="#ffffff"
 								hoverTextColor="#004ac6"
 								useThunderFont={true}
 								className="px-6 py-2.5 rounded-full font-bold text-xs border border-blue-600 shadow-md">
-								Update Security
+								{isLoading ? (
+									<span className="inline-flex items-center gap-2">
+										<Loader2 className="w-3.5 h-3.5 animate-spin" />
+										<span>Updating...</span>
+									</span>
+								) : (
+									<span>Update Security</span>
+								)}
 							</PillButton>
 						</div>
 					</form>
@@ -355,13 +376,21 @@ export default function SettingsPage() {
 						<div className="pt-4 flex justify-end">
 							<PillButton
 								type="submit"
+								disabled={isLoading}
 								baseColor="#004ac6"
 								circleColor="#ffffff"
 								textColor="#ffffff"
 								hoverTextColor="#004ac6"
 								useThunderFont={true}
 								className="px-6 py-2.5 rounded-full font-bold text-xs border border-blue-600 shadow-md">
-								Save Preferences
+								{isLoading ? (
+									<span className="inline-flex items-center gap-2">
+										<Loader2 className="w-3.5 h-3.5 animate-spin" />
+										<span>Saving...</span>
+									</span>
+								) : (
+									<span>Save Preferences</span>
+								)}
 							</PillButton>
 						</div>
 					</form>
