@@ -40,6 +40,9 @@ export default function ServicesPage() {
 	const [activeHeroLottie, setActiveHeroLottie] = useState<string>(
 		"/lotties/funnel.json",
 	);
+	const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">(
+		"monthly",
+	);
 
 	const heroLottieTabs = [
 		{ id: "funnel", label: "Sales Funnel", src: "/lotties/funnel.json" },
@@ -212,7 +215,46 @@ export default function ServicesPage() {
           SECTION 2: THE THREE SERVICE TIERS (FULL DEEP DIVE SECTIONS)
       ========================================== */}
 			<section id="services-tiers" className="py-12 md:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-16 md:space-y-24">
-				
+				{/* Billing Toggle Banner */}
+				<div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white border border-gray-200/90 rounded-2xl p-4 sm:p-6 shadow-2xs">
+					<div>
+						<h3 className="text-lg font-bold font-nohemi text-gray-900">
+							Transparent Pricing Architecture
+						</h3>
+						<p className="text-xs text-gray-500 font-medium mt-0.5">
+							One-time setup fee + hosting & maintenance (billed monthly or annually with 20% discount).
+						</p>
+					</div>
+
+					<div className="inline-flex items-center p-1 rounded-xl bg-gray-100 border border-gray-200 shrink-0">
+						<button
+							type="button"
+							onClick={() => setBillingCycle("monthly")}
+							className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+								billingCycle === "monthly"
+									? "bg-white text-gray-900 shadow-xs"
+									: "text-gray-500 hover:text-gray-900"
+							}`}>
+							Monthly
+						</button>
+						<button
+							type="button"
+							onClick={() => setBillingCycle("yearly")}
+							className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+								billingCycle === "yearly"
+									? "bg-blue-600 text-white shadow-xs"
+									: "text-gray-500 hover:text-gray-900"
+							}`}>
+							<span>Yearly</span>
+							<span className={`text-[10px] px-1.5 py-0.2 rounded-full font-extrabold uppercase ${
+								billingCycle === "yearly" ? "bg-white/20 text-white" : "bg-emerald-100 text-emerald-700"
+							}`}>
+								Save 20%
+							</span>
+						</button>
+					</div>
+				</div>
+
 				{/* TIER 1: LANDING PAGE */}
 				<ScrollReveal direction="up">
 					<div className="bg-white border border-gray-200/90 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-2xs grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative overflow-hidden">
@@ -266,14 +308,23 @@ export default function ServicesPage() {
 									The Turnkey Process:
 								</p>
 								<p className="text-xs text-gray-500 font-medium leading-relaxed">
-									Intake Form → Template Selection → Branding & Copy Personalization → Client Review → Live in 3–5 Days.
+									Intake Form → Template Selection → Branding & Copy Personalization → Client Review → Live in 3-5 Days.
 								</p>
 							</div>
 
-							<div className="pt-4 border-t border-gray-100 flex items-center justify-between gap-4">
+							<div className="pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-4">
 								<div>
-									<span className="text-2xl font-bold font-nohemi text-gray-900">$499</span>
-									<span className="text-xs text-gray-400 font-medium ml-1">Setup + $20/mo hosting</span>
+									<div className="flex items-baseline gap-1.5">
+										<span className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900">$499</span>
+										<span className="text-xs text-gray-500 font-semibold">Setup</span>
+										<span className="text-gray-300">+</span>
+										<span className="text-sm font-bold text-blue-600">
+											{billingCycle === "yearly" ? "$192/yr" : "$20/mo"}
+										</span>
+									</div>
+									<span className="text-[11px] text-gray-400 font-medium">
+										{billingCycle === "yearly" ? "Billed annually ($16/mo equivalent)" : "Cancel or upgrade anytime"}
+									</span>
 								</div>
 
 								<PillButton
@@ -352,7 +403,7 @@ export default function ServicesPage() {
 								</p>
 								<div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
 									{[
-										"3–5 Connected sales pages",
+										"3-5 Connected sales pages",
 										"Opt-in, Offer & Thank-you pages",
 										"Lead capture & CRM integration",
 										"Mailchimp / Email automation",
@@ -372,14 +423,23 @@ export default function ServicesPage() {
 									The Turnkey Process:
 								</p>
 								<p className="text-xs text-gray-500 font-medium leading-relaxed">
-									Offer Intake → Funnel Flow Mapping → Copy Integration → Analytics & Email Setup → Live in 3–5 Days.
+									Offer Intake → Funnel Flow Mapping → Copy Integration → Analytics & Email Setup → Live in 3-5 Days.
 								</p>
 							</div>
 
-							<div className="pt-4 border-t border-gray-100 flex items-center justify-between gap-4">
+							<div className="pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-4">
 								<div>
-									<span className="text-2xl font-bold font-nohemi text-gray-900">$799</span>
-									<span className="text-xs text-gray-400 font-medium ml-1">Setup + $35/mo hosting</span>
+									<div className="flex items-baseline gap-1.5">
+										<span className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900">$799</span>
+										<span className="text-xs text-gray-500 font-semibold">Setup</span>
+										<span className="text-gray-300">+</span>
+										<span className="text-sm font-bold text-purple-600">
+											{billingCycle === "yearly" ? "$288/yr" : "$30/mo"}
+										</span>
+									</div>
+									<span className="text-[11px] text-gray-400 font-medium">
+										{billingCycle === "yearly" ? "Billed annually ($24/mo equivalent)" : "Cancel or upgrade anytime"}
+									</span>
 								</div>
 
 								<PillButton
@@ -474,14 +534,23 @@ export default function ServicesPage() {
 									The Turnkey Process:
 								</p>
 								<p className="text-xs text-gray-500 font-medium leading-relaxed">
-									Product Intake → Storefront Design → Payment Gateway Wiring → Test Purchase Validation → Live in 5–10 Days.
+									Product Intake → Storefront Design → Payment Gateway Wiring → Test Purchase Validation → Live in 5-10 Days.
 								</p>
 							</div>
 
-							<div className="pt-4 border-t border-gray-100 flex items-center justify-between gap-4">
+							<div className="pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-4">
 								<div>
-									<span className="text-2xl font-bold font-nohemi text-gray-900">$1,199</span>
-									<span className="text-xs text-gray-400 font-medium ml-1">Setup + $43/mo hosting</span>
+									<div className="flex items-baseline gap-1.5">
+										<span className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900">$1,199</span>
+										<span className="text-xs text-gray-500 font-semibold">Setup</span>
+										<span className="text-gray-300">+</span>
+										<span className="text-sm font-bold text-emerald-600">
+											{billingCycle === "yearly" ? "$408/yr" : "$43/mo"}
+										</span>
+									</div>
+									<span className="text-[11px] text-gray-400 font-medium">
+										{billingCycle === "yearly" ? "Billed annually ($34/mo equivalent)" : "Cancel or upgrade anytime"}
+									</span>
 								</div>
 
 								<PillButton
