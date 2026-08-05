@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import PillButton from "@/components/PillButton";
 import ProjectCard from "@/components/dashboard/ProjectCard";
 import type { ProjectCardProps } from "@/components/dashboard/ProjectCard";
+import RevisionModal from "@/components/dashboard/RevisionModal";
 import {
 	FolderOpen,
 	Globe,
@@ -22,9 +23,12 @@ import {
 	CheckCircle2,
 	Clock,
 	Sparkles,
+	ExternalLink,
+	Monitor,
+	Smartphone,
 } from "lucide-react";
 
-/* Mock data for demonstration */
+/* Mock data for demonstration - Landing Page subscriber */
 const mockProjects: ProjectCardProps[] = [
 	{
 		name: "My Business Page",
@@ -32,20 +36,6 @@ const mockProjects: ProjectCardProps[] = [
 		status: "In Progress",
 		progress: 65,
 		lastUpdated: "2 hours ago",
-	},
-	{
-		name: "Summer Launch Funnel",
-		type: "Sales Funnel",
-		status: "In Review",
-		progress: 90,
-		lastUpdated: "1 day ago",
-	},
-	{
-		name: "Online Store",
-		type: "E-commerce Store",
-		status: "Draft",
-		progress: 10,
-		lastUpdated: "3 days ago",
 	},
 ];
 
@@ -55,6 +45,8 @@ export default function DashboardPage() {
 	const [isProfileOpen, setIsProfileOpen] = useState(false);
 	const [isNotifOpen, setIsNotifOpen] = useState(false);
 	const [isSupportOpen, setIsSupportOpen] = useState(false);
+	const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+	const [isRevisionOpen, setIsRevisionOpen] = useState(false);
 	const [supportMessage, setSupportMessage] = useState("");
 	const [supportSent, setSupportSent] = useState(false);
 
@@ -344,9 +336,20 @@ export default function DashboardPage() {
 					{/* BENTO TILE 1: Welcome & Active Project Summary Banner (Span 2 cols on MD/LG) */}
 					<div className="md:col-span-2 lg:col-span-2 bg-white border border-gray-200/90 rounded-3xl p-6 sm:p-8 flex flex-col justify-between hover:border-blue-500/40 transition-all duration-200 shadow-2xs">
 						<div>
-							<div className="inline-flex items-center gap-2 text-blue-600 text-[11px] font-extrabold uppercase tracking-wider mb-4">
-								<span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
-								<span>Active Workspace</span>
+							<div className="flex items-center justify-between gap-2 mb-4">
+								<div className="inline-flex items-center gap-2 text-blue-600 text-[11px] font-extrabold uppercase tracking-wider">
+									<span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+									<span>Active Workspace</span>
+								</div>
+
+								{/* Direct Preview Link */}
+								<button
+									type="button"
+									onClick={() => setIsPreviewOpen(true)}
+									className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold transition-colors cursor-pointer border border-blue-200/60">
+									<ExternalLink className="w-3.5 h-3.5" />
+									<span>Preview Your Site →</span>
+								</button>
 							</div>
 
 							<h2 className="text-xl sm:text-2xl font-bold font-nohemi text-gray-900 mb-2">
@@ -368,16 +371,25 @@ export default function DashboardPage() {
 							</div>
 						</div>
 
-						<div className="pt-4 border-t border-gray-100 flex items-center justify-between">
+						<div className="pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
 							<span className="text-[11px] text-gray-400 font-medium flex items-center gap-1">
 								<Clock className="w-3.5 h-3.5" />
 								Updated 2 hours ago
 							</span>
-							<Link
-								href="/dashboard/projects"
-								className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors">
-								View Details →
-							</Link>
+
+							<div className="flex items-center gap-3">
+								<button
+									type="button"
+									onClick={() => setIsRevisionOpen(true)}
+									className="text-xs font-bold text-gray-700 hover:text-blue-600 transition-colors cursor-pointer">
+									Request Revision
+								</button>
+								<Link
+									href="/dashboard/projects"
+									className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors">
+									View Details →
+								</Link>
+							</div>
 						</div>
 					</div>
 
@@ -390,10 +402,10 @@ export default function DashboardPage() {
 							</div>
 							<div>
 								<p className="text-2xl font-bold font-nohemi text-gray-900">
-									2
+									1
 								</p>
 								<p className="text-xs text-gray-500 font-medium">
-									Active Projects
+									Active Project
 								</p>
 							</div>
 						</div>
@@ -408,7 +420,7 @@ export default function DashboardPage() {
 									1
 								</p>
 								<p className="text-xs text-gray-500 font-medium">
-									Live Website
+									Landing Page Plan
 								</p>
 							</div>
 						</div>
@@ -421,10 +433,10 @@ export default function DashboardPage() {
 								<Crown className="w-4 h-4" />
 							</div>
 							<h3 className="text-base font-bold font-nohemi text-gray-900 mb-1">
-								Free Plan
+								Landing Page Plan
 							</h3>
 							<p className="text-xs text-gray-500 font-medium mb-4">
-								Upgrade to launch custom sales funnels & e-commerce stores.
+								Add a Sales Funnel or E-commerce Store to your account anytime.
 							</p>
 						</div>
 
@@ -436,7 +448,7 @@ export default function DashboardPage() {
 							hoverTextColor="#ffffff"
 							useThunderFont={true}
 							className="w-full py-2.5 text-xs font-bold border border-blue-600">
-							Upgrade Plan
+							Add More Services
 						</PillButton>
 					</div>
 
@@ -454,7 +466,7 @@ export default function DashboardPage() {
 						</div>
 
 						<div className="space-y-3">
-							{mockProjects.slice(0, 2).map((project) => (
+							{mockProjects.map((project) => (
 								<div
 									key={project.name}
 									className="p-4 rounded-2xl bg-gray-50/70 border border-gray-200/70 flex items-center justify-between gap-4">
@@ -482,21 +494,7 @@ export default function DashboardPage() {
 
 						<div className="grid grid-cols-2 gap-3">
 							<Link
-								href="/dashboard/projects/new"
-								className="p-4 rounded-2xl bg-blue-50/50 border border-blue-100 hover:bg-blue-50 transition-colors flex items-center gap-3 group">
-								<PlusCircle className="w-5 h-5 text-blue-600 shrink-0" />
-								<div>
-									<p className="text-xs font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-										New Project
-									</p>
-									<p className="text-[10px] text-gray-500 font-medium">
-										Start a new build
-									</p>
-								</div>
-							</Link>
-
-							<Link
-								href="/dashboard/settings"
+								href="/dashboard/content"
 								className="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-100 hover:bg-emerald-50 transition-colors flex items-center gap-3 group">
 								<FileEdit className="w-5 h-5 text-emerald-600 shrink-0" />
 								<div>
@@ -509,8 +507,23 @@ export default function DashboardPage() {
 								</div>
 							</Link>
 
+							<button
+								type="button"
+								onClick={() => setIsRevisionOpen(true)}
+								className="p-4 rounded-2xl bg-blue-50/50 border border-blue-100 hover:bg-blue-50 transition-colors flex items-center gap-3 text-left group cursor-pointer">
+								<MessageSquare className="w-5 h-5 text-blue-600 shrink-0" />
+								<div>
+									<p className="text-xs font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+										Request Revision
+									</p>
+									<p className="text-[10px] text-gray-500 font-medium">
+										Send feedback
+									</p>
+								</div>
+							</button>
+
 							<Link
-								href="/dashboard/projects"
+								href="/dashboard/templates"
 								className="p-4 rounded-2xl bg-purple-50/50 border border-purple-100 hover:bg-purple-50 transition-colors flex items-center gap-3 group">
 								<Palette className="w-5 h-5 text-purple-600 shrink-0" />
 								<div>
@@ -527,7 +540,7 @@ export default function DashboardPage() {
 								type="button"
 								onClick={() => setIsSupportOpen(true)}
 								className="p-4 rounded-2xl bg-amber-50/50 border border-amber-100 hover:bg-amber-50 transition-colors flex items-center gap-3 text-left group cursor-pointer">
-								<MessageSquare className="w-5 h-5 text-amber-600 shrink-0" />
+								<Headset className="w-5 h-5 text-amber-600 shrink-0" />
 								<div>
 									<p className="text-xs font-bold text-gray-900 group-hover:text-amber-600 transition-colors">
 										Get Support
@@ -626,6 +639,105 @@ export default function DashboardPage() {
 								</div>
 							</form>
 						)}
+					</div>
+				</div>
+			)}
+
+			{/* REVISION REQUEST MODAL */}
+			<RevisionModal
+				isOpen={isRevisionOpen}
+				onClose={() => setIsRevisionOpen(false)}
+				projectName="My Business Page"
+			/>
+
+			{/* LIVE SITE DRAFT PREVIEW MODAL */}
+			{isPreviewOpen && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200">
+					<div className="bg-white border border-gray-200/90 rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
+						{/* Browser Header Bar */}
+						<div className="px-6 py-4 bg-gray-100 border-b border-gray-200 flex items-center justify-between">
+							<div className="flex items-center gap-3">
+								<div className="flex items-center gap-1.5">
+									<div className="w-3 h-3 rounded-full bg-rose-400" />
+									<div className="w-3 h-3 rounded-full bg-amber-400" />
+									<div className="w-3 h-3 rounded-full bg-emerald-400" />
+								</div>
+
+								<div className="px-4 py-1 rounded-full bg-white border border-gray-200 text-xs font-medium text-gray-600 flex items-center gap-2">
+									<span className="w-2 h-2 rounded-full bg-emerald-500" />
+									<span>mybusinesspage.preview.kiosk.com</span>
+								</div>
+							</div>
+
+							<div className="flex items-center gap-2">
+								<button
+									type="button"
+									onClick={() => setIsPreviewOpen(false)}
+									className="text-gray-400 hover:text-gray-600 p-1.5 rounded-full hover:bg-gray-200 transition-colors cursor-pointer">
+									<X className="w-5 h-5" />
+								</button>
+							</div>
+						</div>
+
+						{/* Mock Preview Canvas */}
+						<div className="p-8 sm:p-12 overflow-y-auto bg-slate-50 space-y-8 flex-1">
+							{/* Hero Banner */}
+							<div className="bg-white border border-gray-200/90 rounded-3xl p-8 sm:p-12 text-center shadow-xs">
+								<span className="px-3.5 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-wider mb-4 inline-block">
+									My Business Page Draft
+								</span>
+								<h1 className="text-3xl sm:text-4xl font-bold font-nohemi text-gray-900 tracking-tight mb-3">
+									Personalized Growth Solutions for Your Business
+								</h1>
+								<p className="text-sm text-gray-500 font-medium max-w-xl mx-auto mb-6 leading-relaxed">
+									We craft bespoke systems, website funnels, and landing pages designed to convert cold traffic into loyal clients.
+								</p>
+								<div className="inline-flex items-center gap-3">
+									<span className="px-6 py-3 rounded-full bg-blue-600 text-white font-bold text-xs shadow-md">
+										Get Started Now
+									</span>
+									<span className="px-6 py-3 rounded-full bg-gray-100 text-gray-700 font-semibold text-xs">
+										Learn More
+									</span>
+								</div>
+							</div>
+
+							{/* Feature Grid */}
+							<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+								{["Strategic Design", "Lead Capture", "Fast Delivery"].map((title) => (
+									<div key={title} className="p-6 rounded-2xl bg-white border border-gray-200/90 shadow-2xs">
+										<h4 className="text-sm font-bold text-gray-900 mb-1">{title}</h4>
+										<p className="text-xs text-gray-500 font-medium">Tailored for maximum conversion rates and smooth user experience.</p>
+									</div>
+								))}
+							</div>
+						</div>
+
+						{/* Footer Actions */}
+						<div className="p-4 px-6 bg-white border-t border-gray-100 flex items-center justify-between">
+							<span className="text-xs font-bold text-emerald-600 flex items-center gap-1.5">
+								<CheckCircle2 className="w-4 h-4" />
+								<span>Site Draft (65% Complete)</span>
+							</span>
+
+							<div className="flex items-center gap-3">
+								<button
+									type="button"
+									onClick={() => {
+										setIsPreviewOpen(false);
+										setIsRevisionOpen(true);
+									}}
+									className="px-4 py-2 rounded-full border border-gray-200 text-gray-700 text-xs font-bold hover:bg-gray-50 transition-colors cursor-pointer">
+									Request Revision
+								</button>
+								<button
+									type="button"
+									onClick={() => setIsPreviewOpen(false)}
+									className="px-5 py-2 rounded-full bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition-colors cursor-pointer">
+									Close Preview
+								</button>
+							</div>
+						</div>
 					</div>
 				</div>
 			)}

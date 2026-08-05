@@ -71,9 +71,9 @@ const mockInvoices: Invoice[] = [
 	{
 		id: "INV-2026-001",
 		date: "Aug 01, 2026",
-		amount: "$0.00",
+		amount: "$499.00",
 		status: "Paid",
-		plan: "Free Tier",
+		plan: "Landing Page Plan",
 	},
 ];
 
@@ -108,10 +108,10 @@ export default function BillingPage() {
 							</span>
 						</div>
 						<h2 className="text-2xl font-bold font-nohemi text-gray-900 mb-1">
-							Free Plan
+							Landing Page Plan
 						</h2>
 						<p className="text-xs text-gray-500 max-w-lg">
-							You are currently on the Free plan. Upgrade to launch custom high-converting pages and access priority support.
+							You are currently on the Landing Page plan ($499 Setup + $20/mo Hosting). Add a Sales Funnel or E-commerce Store to your account anytime.
 						</p>
 					</div>
 
