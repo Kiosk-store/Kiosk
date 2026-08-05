@@ -84,16 +84,17 @@ export default function ServicesPage() {
 						</ScrollReveal>
 
 						<ScrollReveal delay={0.1}>
-							<h1 className="text-4xl sm:text-5xl md:text-6xl font-bold font-nohemi tracking-tight text-gray-900 leading-[1.08]">
+							<h1 className="text-3xl sm:text-5xl md:text-6xl font-bold font-nohemi tracking-tight text-gray-900 leading-[1.12]">
 								Professional websites,
-								<br />
+								<br className="hidden sm:inline" />
+								{" "}
 								<span className="text-blue-600">built for you.</span>
 							</h1>
 						</ScrollReveal>
 
 						{/* High-level framing statement */}
 						<ScrollReveal delay={0.2}>
-							<p className="text-base sm:text-lg text-gray-600 font-medium leading-relaxed max-w-2xl">
+							<p className="text-sm sm:text-base md:text-lg text-gray-600 font-medium leading-relaxed max-w-2xl">
 								Kiosk doesn&apos;t hand you a complicated editor and wish you luck.
 								We take your business details, pick the right pre-built design,
 								personalize it with your content and branding, and hand you a live site,{" "}
@@ -103,7 +104,7 @@ export default function ServicesPage() {
 
 						{/* Value Guarantee Pills with Minimal Nodes */}
 						<ScrollReveal delay={0.25}>
-							<div className="flex flex-wrap items-center gap-3 pt-1">
+							<div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-1">
 								{[
 									{ icon: Clock, text: "3–5 Days Turnaround" },
 									{ icon: ShieldCheck, text: "SSL & Hosting Included" },
@@ -113,8 +114,8 @@ export default function ServicesPage() {
 									return (
 										<div
 											key={item.text}
-											className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white border border-gray-200/90 text-xs font-semibold text-gray-700 shadow-2xs">
-											<div className="w-1.5 h-1.5 rounded-full bg-blue-600/70" />
+											className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 sm:px-3.5 sm:py-1.5 rounded-xl bg-white border border-gray-200/90 text-[11px] sm:text-xs font-semibold text-gray-700 shadow-2xs">
+											<div className="w-1.5 h-1.5 rounded-full bg-blue-600/70 shrink-0" />
 											<Icon className="w-3.5 h-3.5 text-blue-600 shrink-0" />
 											<span>{item.text}</span>
 										</div>
@@ -124,7 +125,7 @@ export default function ServicesPage() {
 						</ScrollReveal>
 
 						<ScrollReveal delay={0.3}>
-							<div className="flex flex-wrap items-center gap-4 pt-4">
+							<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-4 max-w-md sm:max-w-none">
 								<PillButton
 									href="/get-started"
 									baseColor="#004ac6"
@@ -132,13 +133,13 @@ export default function ServicesPage() {
 									textColor="#ffffff"
 									hoverTextColor="#004ac6"
 									useThunderFont={true}
-									className="px-8 py-3.5 text-xs font-bold border border-blue-600 shadow-md">
+									className="w-full sm:w-auto px-7 py-3.5 text-xs font-bold border border-blue-600 shadow-md text-center">
 									Start Your Project Now
 								</PillButton>
 
 								<a
 									href="#services-tiers"
-									className="px-6 py-3.5 rounded-full bg-white hover:bg-gray-50 border border-gray-200/90 text-xs font-semibold text-gray-700 transition-colors">
+									className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-white hover:bg-gray-50 border border-gray-200/90 text-xs font-semibold text-gray-700 transition-colors text-center">
 									Explore Service Tiers ↓
 								</a>
 							</div>
@@ -148,19 +149,19 @@ export default function ServicesPage() {
 					{/* Right Column: Lottie Interactive Showcase Container with Architectural Frame */}
 					<div className="lg:col-span-5 relative">
 						{/* Background Offset Framing Lines */}
-						<div className="absolute -inset-2 rounded-[32px] border border-blue-200/50 pointer-events-none -z-10" />
+						<div className="absolute -inset-2 rounded-[32px] border border-blue-200/50 pointer-events-none -z-10 hidden sm:block" />
 
 						<ScrollReveal delay={0.2} direction="up">
-							<div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 text-white shadow-2xl relative overflow-hidden flex flex-col justify-between min-h-[440px]">
+							<div className="bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-6 md:p-8 text-white shadow-2xl relative overflow-hidden flex flex-col justify-between min-h-[360px] sm:min-h-[440px]">
 								{/* Top Lottie Selector Tabs */}
-								<div className="flex items-center justify-between gap-2 border-b border-slate-800 pb-4 mb-4">
-									<div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+								<div className="flex items-center justify-between gap-2 border-b border-slate-800 pb-3 mb-3 sm:pb-4 sm:mb-4">
+									<div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none max-w-[80vw] sm:max-w-none">
 										{heroLottieTabs.map((tab) => (
 											<button
 												key={tab.id}
 												type="button"
 												onClick={() => setActiveHeroLottie(tab.src)}
-												className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap ${
+												className={`px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl text-[10px] sm:text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap ${
 													activeHeroLottie === tab.src
 														? "bg-blue-600 text-white shadow-xs"
 														: "bg-slate-800 text-slate-400 hover:text-white"
