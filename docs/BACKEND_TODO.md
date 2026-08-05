@@ -6,7 +6,7 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
 
 ---
 
-## 🛠️ Scalable Stack Architecture Overview
+## Scalable Stack Architecture Overview
 
 | Layer | Enterprise Scalable Technology Stack |
 | :--- | :--- |
@@ -24,7 +24,7 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
 
 ---
 
-## 🚀 Phase 1: Authentication & Authorization Engine (STARTING PRIORITY)
+## Phase 1: Authentication & Authorization Engine (STARTING PRIORITY)
 
 ### 1. Stack Dependencies & Database Schema
 - [ ] Install core Auth dependencies (`npm install next-auth@beta @auth/drizzle-adapter @auth/prisma-adapter zod`).
