@@ -296,7 +296,7 @@ export default function Pricing() {
 										{/* Call To Action Button */}
 										<div>
 											<PillButton
-												href="#contact"
+												href={`/checkout?plan=${tier.id}&billing=${billingCycle}`}
 												baseColor={tier.featured ? "#004ac6" : "#ffffff"}
 												circleColor={tier.featured ? "#ffffff" : "#004ac6"}
 												textColor={tier.featured ? "#ffffff" : "#0a0a0a"}

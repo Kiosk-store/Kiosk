@@ -26,7 +26,7 @@ export default function CTA() {
 					</p>
 					<div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-stretch sm:items-center pt-2 sm:pt-4 max-w-md sm:max-w-none mx-auto">
 						<PillButton
-							href="/get-started"
+							href="/checkout?plan=landing"
 							baseColor="#ffffff"
 							circleColor="#0a0a0a"
 							textColor="#004ac6"

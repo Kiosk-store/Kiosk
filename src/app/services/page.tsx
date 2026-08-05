@@ -130,7 +130,7 @@ export default function ServicesPage() {
 						<ScrollReveal delay={0.3}>
 							<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-4 max-w-md sm:max-w-none">
 								<PillButton
-									href="/get-started"
+									href="/checkout?plan=landing"
 									baseColor="#004ac6"
 									circleColor="#ffffff"
 									textColor="#ffffff"
@@ -315,11 +315,11 @@ export default function ServicesPage() {
 							<div className="pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-4">
 								<div>
 									<div className="flex items-baseline gap-1.5">
-										<span className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900">$499</span>
-										<span className="text-xs text-gray-500 font-semibold">Setup</span>
-										<span className="text-gray-300">+</span>
-										<span className="text-sm font-bold text-blue-600">
-											{billingCycle === "yearly" ? "$192/yr" : "$20/mo"}
+										<span className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900">
+											{billingCycle === "yearly" ? "$192" : "$20"}
+										</span>
+										<span className="text-xs font-semibold text-gray-500">
+											{billingCycle === "yearly" ? "/ year" : "/ month"}
 										</span>
 									</div>
 									<span className="text-[11px] text-gray-400 font-medium">
@@ -328,7 +328,7 @@ export default function ServicesPage() {
 								</div>
 
 								<PillButton
-									href="/get-started?tier=landing"
+									href={`/checkout?plan=landing&billing=${billingCycle}`}
 									baseColor="#004ac6"
 									circleColor="#ffffff"
 									textColor="#ffffff"
@@ -430,11 +430,11 @@ export default function ServicesPage() {
 							<div className="pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-4">
 								<div>
 									<div className="flex items-baseline gap-1.5">
-										<span className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900">$799</span>
-										<span className="text-xs text-gray-500 font-semibold">Setup</span>
-										<span className="text-gray-300">+</span>
-										<span className="text-sm font-bold text-purple-600">
-											{billingCycle === "yearly" ? "$288/yr" : "$30/mo"}
+										<span className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900">
+											{billingCycle === "yearly" ? "$288" : "$30"}
+										</span>
+										<span className="text-xs font-semibold text-gray-500">
+											{billingCycle === "yearly" ? "/ year" : "/ month"}
 										</span>
 									</div>
 									<span className="text-[11px] text-gray-400 font-medium">
@@ -443,7 +443,7 @@ export default function ServicesPage() {
 								</div>
 
 								<PillButton
-									href="/get-started?tier=funnel"
+									href={`/checkout?plan=funnel&billing=${billingCycle}`}
 									baseColor="#004ac6"
 									circleColor="#ffffff"
 									textColor="#ffffff"
@@ -541,11 +541,11 @@ export default function ServicesPage() {
 							<div className="pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-4">
 								<div>
 									<div className="flex items-baseline gap-1.5">
-										<span className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900">$1,199</span>
-										<span className="text-xs text-gray-500 font-semibold">Setup</span>
-										<span className="text-gray-300">+</span>
-										<span className="text-sm font-bold text-emerald-600">
-											{billingCycle === "yearly" ? "$408/yr" : "$43/mo"}
+										<span className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900">
+											{billingCycle === "yearly" ? "$408" : "$43"}
+										</span>
+										<span className="text-xs font-semibold text-gray-500">
+											{billingCycle === "yearly" ? "/ year" : "/ month"}
 										</span>
 									</div>
 									<span className="text-[11px] text-gray-400 font-medium">
@@ -554,7 +554,7 @@ export default function ServicesPage() {
 								</div>
 
 								<PillButton
-									href="/get-started?tier=store"
+									href={`/checkout?plan=store&billing=${billingCycle}`}
 									baseColor="#004ac6"
 									circleColor="#ffffff"
 									textColor="#ffffff"

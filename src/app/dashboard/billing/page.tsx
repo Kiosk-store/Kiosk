@@ -71,7 +71,7 @@ const mockInvoices: Invoice[] = [
 	{
 		id: "INV-2026-001",
 		date: "Aug 01, 2026",
-		amount: "$499.00",
+		amount: "$20.00",
 		status: "Paid",
 		plan: "Landing Page Plan",
 	},
@@ -83,9 +83,8 @@ export default function BillingPage() {
 	);
 
 	return (
-		<div className="w-full min-h-screen bg-[#f8fafc]">
-			{/* Main Container */}
-			<div className="px-4 sm:px-6 lg:px-8 pt-10 pb-16 max-w-[1400px] mx-auto">
+		<div className="min-h-screen bg-[#f8fafc] text-gray-900 pb-20">
+			<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
 				{/* Page Header */}
 				<div className="pb-6 border-b border-gray-200/80 mb-8">
 					<h1 className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900 tracking-tight mb-1">
@@ -111,7 +110,7 @@ export default function BillingPage() {
 							Landing Page Plan
 						</h2>
 						<p className="text-xs text-gray-500 max-w-lg">
-							You are currently on the Landing Page plan ($499 Setup + $20/mo Hosting). Add a Sales Funnel or E-commerce Store to your account anytime.
+							You are currently on the Landing Page subscription ($20/mo). Add a Sales Funnel or E-commerce Store to your account anytime.
 						</p>
 					</div>
 
@@ -206,7 +205,7 @@ export default function BillingPage() {
 									</div>
 
 									<PillButton
-										href="/get-started"
+										href={`/checkout?plan=${plan.id}&billing=${billingCycle}`}
 										baseColor={plan.popular ? "#004ac6" : "#ffffff"}
 										circleColor={plan.popular ? "#ffffff" : "#004ac6"}
 										textColor={plan.popular ? "#ffffff" : "#004ac6"}
