@@ -11,11 +11,19 @@ Kiosk makes it simple for small businesses to get online, without making them do
 Most small business owners don't have the time, design skill, or desire to learn a website builder — and they shouldn't have to. Kiosk exists to remove that barrier entirely: you tell us about your business, and our team personalizes a proven, professionally designed page for you.
 
 With Kiosk, you choose the package that fits your business:
-- **Landing Page** — A single, high-converting page perfect for a first professional presence.
-- **Sales Funnel** — Multiple connected pages with lead capture and email integration for driving traffic.
-- **E-commerce Store** — A full product catalog, cart, and checkout for selling online.
+- **Landing Page ($20/mo, $192/yr)** — A single, high-converting custom page perfect for a first professional presence. Delivered in 3-5 days.
+- **Sales Funnel ($30/mo, $288/yr)** — Up to 5 custom conversion pages with lead capture and CRM integration for driving traffic. Delivered in 5-7 days.
+- **E-commerce Store ($43/mo, $408/yr)** — A full product catalog, cart, checkout, and payment gateways for selling online. Delivered in 7-10 days.
 
 Everything is hosted and managed for you. No technical setup. No complicated builders. 
+
+## Client Portal & Dashboard
+
+Logged-in clients access a sleek, professional light-mode dashboard (`/dashboard`) featuring:
+- **Project Tracking & Management (`/dashboard/projects`)**: Filter, search, and monitor real-time project progress.
+- **Start New Project Wizard (`/dashboard/projects/new`)**: Interactive 4-step wizard to order and configure new custom site builds.
+- **Billing & Subscription (`/dashboard/billing`)**: Plan status, monthly/yearly billing cycle toggles (-20% discount), and invoice history.
+- **Account Settings (`/dashboard/settings`)**: Profile info management, password security, 2FA toggles, and notification preferences.
 
 ## Short version (homepage)
 

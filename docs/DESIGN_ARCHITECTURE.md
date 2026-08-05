@@ -1,73 +1,56 @@
 <!-- @format -->
 
-# Design architecture — Kiosk
+# Design Architecture — Kiosk
 
 ## Purpose
 
-This document describes the visual and component architecture for the `kiosk` marketing site. It is written to help designers and engineers reason about the component model, visual tokens, layout rules, interaction patterns, and accessibility expectations.
+This document describes the visual and component architecture for the `kiosk` web application and client dashboard. It is written to help designers and engineers reason about the component model, visual tokens, layout rules, interaction patterns, and accessibility expectations.
 
-## Design goals
+## Design Goals
 
-- Premium, luxury visual direction with a light theme.
-- Consistent, prominent CTAs across sections.
-- Smooth, high-performance interactions and subtle motion.
-- Mobile-first responsiveness and progressive enhancement.
+- **Sleek & Professionally Neat Light Mode**: Premium light theme (`bg-[#f8fafc]`, crisp `border-gray-200/90` containers, solid color accents).
+- **Zero Gradients**: All UI components use solid, curated harmonious color palettes (slate, blue, emerald) without gradient background fills.
+- **Enhanced Legibility**: Primary font scale set to 18px base / 1.125rem for maximum visibility.
+- **Standardized Button System (`PillButton`)**: Uniform pill-shaped interactive buttons with GSAP hover circle expansion and dual-label sliding transitions.
+- **Interactive Navigation**: Bottom floating `<Dock />` component built with Framer Motion spring physics for dashboard navigation.
+- **Mobile-First Responsiveness**: Responsive grid systems and progressive enhancement across viewports.
 
-## Key principles
+## Visual System
 
-- Component-driven: UI is broken into small, composable components in `src/components`.
-- Token-based styling: use a small set of color, spacing and type tokens rather than one-off values.
-- Accessibility-first: semantic markup, keyboard focus states, color contrast, and ARIA where necessary.
-- Minimal global state: prefer props and local state; central stores only for cross-cutting concerns (e.g., scroll/lenis store).
+- **Color Tokens**:
+  - `--color-background` (`#f8fafc`) — Primary app background.
+  - `--color-primary` (`#004ac6`) — Brand primary blue accent.
+  - `--color-surface-container-lowest` (`#ffffff`) — Card surface background.
+  - `--color-on-surface` (`#0f172a`) — Primary text color.
+  - `--color-on-surface-variant` (`#475569`) — Muted body & label text color.
+- **Typography Tokens**:
+  - **Nohemi**: Primary body and UI heading font (`var(--font-nohemi)`).
+  - **Thunder**: High-impact display font (`var(--font-thunder)`, `var(--font-thunder-lc)`).
+  - **Scale**: Base font size set to 18px (`1.125rem`) for enhanced visibility across all viewports.
 
-## Visual system
+## Component Hierarchy & Layout Rules
 
-- Color tokens (recommended):
-  - `--color-bg` — primary background (near-black)
-  - `--color-primary` — accent/brand color
-  - `--color-on-primary` — text/icon color used on primary surfaces
-  - `--color-muted` — secondary, supporting elements
-- Typography:
-  - Display heading: large, expressive type for hero and section headers (`font-display-hero`).
-  - Body: readable, relaxed line-height for paragraphs.
-  - Scale: maintain consistent font-size scale (base, lead, small).
-- Spacing:
-  - Use an 8px baseline grid where possible for margins, padding, and radius values.
-  - Large sections use `py-20` / `md:py-28` patterns as seen in `CTA`.
+### Public Marketing Site
+- **Header Navigation**: `NavbarWrapper` conditionally renders `Navbar` / `StaggeredMenu` on public marketing pages (`/`, `/about`, `/pricing`, `/services`, `/contact`).
+- **Pages**: Hero, Services preview, Portfolio showcase, Pricing tables, FAQ accordion, CTA section, Footer.
 
-## Component hierarchy and responsibilities
+### Dashboard Application (`/dashboard/*`)
+- **Header**: Sticky brand logo header bar with dynamic time-based greeting (*Good morning / afternoon / evening*), notification icon trigger, and interactive profile dropdown menu (*Account Settings*, *Billing & Plan*, *Log Out*).
+- **Navigation Dock (`Sidebar.tsx`)**: Bottom floating `<Dock />` component using Framer Motion magnification effects for quick route switching (`/dashboard`, `/dashboard/projects`, `/dashboard/billing`, `/dashboard/settings`).
+- **Main Views**:
+  - **Overview (`/dashboard`)**: Dynamic greeting, project cards, and quick actions.
+  - **Projects (`/dashboard/projects`)**: Status filter tabs (*All*, *In Progress*, *In Review*, *Live*, *Drafts*), search input, and project grid.
+  - **New Project Wizard (`/dashboard/projects/new`)**: 4-step wizard (*Type → Details → Content → Review*).
+  - **Billing & Subscription (`/dashboard/billing`)**: Plan overview, monthly/yearly cycle toggle (-20% discount), upgrade grid, and invoice history table.
+  - **Settings (`/dashboard/settings`)**: Tabbed forms (*Profile Info*, *Security/2FA*, *Notifications*).
+  - **404 Not Found (`src/app/not-found.tsx`)**: High-aesthetic 404 display with brand typography and architectural grid lines.
 
-- Page (root) — composes sections in `src/app/page.tsx`.
-- Section — a full-width block with internal max-width and padding. Responsible for spacing and background.
-- Molecules — small grouped UI (e.g., TrustStrip, Testimonials list).
-- Atoms — buttons, headings, badges, icons.
+## Button System (`PillButton`)
 
-## CTA design
+- Built with GSAP animations for spring hover interaction.
+- Uses `rounded-full` pill geometry with explicit color tokens (`baseColor`, `circleColor`, `textColor`, `hoverTextColor`).
+- Supports both Link navigation (`href`) and button form submission (`type="submit"`).
 
-- CTAs must be visually prominent and consistent across pages:
-  - Primary CTA: high contrast (white on brand color) with rounded pill shape (e.g., `rounded-full`) and shadow.
-  - Secondary CTA: subtle outline or semi-transparent surface with backdrop blur for layered depth.
+## Revision Notes
 
-## Motion and interactions
-
-- Use `gsap` and `lenis` for scroll-driven effects; keep motion subtle and performant.
-- Respect reduced-motion: provide a global `prefers-reduced-motion` check and reduce animation intensity when requested.
-
-## Accessibility checklist
-
-- Ensure 4.5:1 contrast for body text against background where possible.
-- Provide `:focus-visible` states for keyboard users on interactive elements (buttons, links).
-- Use semantic HTML (`section`, `nav`, `header`, `main`) and landmarks.
-
-## Design tokens and where they live
-
-- Place tokens in `globals.css` or a small `design-tokens.css` if introduced. Use Tailwind theme extensions where applicable.
-
-## Onboarding guidance for designers
-
-- When adding new sections, create a small Figma or design artifact and annotate tokens used.
-- Keep CTA styles in a single place so updates propagate across the site.
-
-## Revision notes
-
-- Treat this as a living document; update when adding new major components or when the theme changes.
+- Updated visual system to Light Mode, removed dark gradients, updated base font size to 18px, and documented the `<Dock />` navigation component.

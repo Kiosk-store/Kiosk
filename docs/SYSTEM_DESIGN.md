@@ -1,58 +1,56 @@
 <!-- @format -->
 
-# System design — Kiosk
+# System Design — Kiosk
 
 ## Overview
 
-`kiosk` is primarily a static marketing site composed of modular components. The system design below describes runtime behavior, rendering strategy, integrations, and operational guidance for deployment and scaling.
+`kiosk` is a modern Next.js 16 web application consisting of two primary subsystems:
+1. **Public Marketing Application**: Modular marketing pages (`/`, `/about`, `/services`, `/pricing`, `/contact`, `/get-started`).
+2. **Authenticated Client Dashboard**: Single-page app workspace (`/dashboard`, `/dashboard/projects`, `/dashboard/projects/new`, `/dashboard/billing`, `/dashboard/settings`).
 
-## High-level architecture
+## High-Level Architecture
 
-- Client: Modern browsers running a React/Next.js app. Interactions and animations are handled client-side using `gsap` and `lenis`.
-- Server: Next.js build produces static and server-rendered assets. Static pages are served from a CDN when deployed.
-- Integrations: analytics, contact forms (serverless or third-party), CMS (optional), and monitoring.
+```
+                  ┌──────────────────────────────────────────────┐
+                  │                 User Client                  │
+                  │         (Modern Web Browser / Mobile)        │
+                  └──────────────────────┬───────────────────────┘
+                                         │
+                 ┌───────────────────────┴───────────────────────┐
+                 │          Next.js App Router (CDN/Edge)        │
+                 └───────────┬───────────────────────┬───────────┘
+                             │                       │
+           ┌─────────────────┴──────────────┐ ┌──────┴────────────────────────┐
+           │      Public Marketing Pages    │ │   Authenticated Client Portal   │
+           │  (/, /about, /services, etc.)  │ │          (/dashboard/*)         │
+           └────────────────────────────────┘ └─────────────────────────────────┘
+```
 
-## Rendering strategy
+- **Client Runtime**: React 19, Framer Motion (Dock spring physics), GSAP (PillButton animation), Tailwind CSS v4.
+- **Rendering Strategy**: Static Generation (SSG) for marketing content and Client-Side Rendering (CSR) for interactive dashboard views.
 
-- Use static rendering (SSG) for marketing content where possible to maximize performance and cacheability.
-- For any dynamic features (contact forms, lead capture), use API routes or third-party services (Formspree, Netlify Forms, or a serverless function).
+## Subsystems & Data Flow
 
-## Data flow and component interactions
+### 1. Public Marketing Subsystem
+- **Routing & Layout**: Global `layout.tsx` wraps pages with `NavbarWrapper` to conditionally render `Navbar` and `StaggeredMenu`.
+- **User Onboarding Flow**: Users click "Get Started" to reach `/get-started`. On form submission, a loading spinner is triggered, followed by client-side navigation to `/dashboard`.
 
-- Top-level composition: `src/app/page.tsx` imports sections (Navbar, Hero, Pricing, CTA, Footer).
-- Each section is self-contained and receives either static content props or fetches (if integrated with a CMS).
-- Global utilities: `src/lib/lenis-store.ts` exposes the Lenis scroll instance (if needed) so components can subscribe to scroll events.
+### 2. Client Dashboard Subsystem
+- **Layout & Navigation**: `/dashboard/layout.tsx` enforces light mode styling (`bg-[#f8fafc]`) and renders the persistent floating bottom `<Dock />` component wrapper (`Sidebar.tsx`).
+- **Header Profile State**: `page.tsx` renders dynamic greetings based on client local time (`00:00-11:59` Morning, `12:00-16:59` Afternoon, `17:00-23:59` Evening) and toggles the profile dropdown menu.
+- **Log Out Behavior**: Selecting "Log Out" closes state and redirects to `/get-started`.
 
-## Integration points
+### 3. Start New Project Wizard Subsystem
+- **Wizard Flow (`/dashboard/projects/new`)**: 4-step interactive configuration form (*Type → Details → Content → Review*).
+- **Submission State**: Simulates backend project initialization with progress state indicators and redirects to `/dashboard/projects`.
 
-- Analytics: instrument page views and key CTA clicks with an analytics provider (GA4, Plausible, or Segment).
-- Forms: prefer a dedicated serverless endpoint or third-party provider to avoid hosting complexity.
-- Images & assets: host on CDN (Vercel or external) and use Next.js image optimization where applicable.
+## Performance & UX Guidelines
 
-## Performance and caching
+- **Zero Gradients**: High-contrast, clean solid colors with slate/blue accents.
+- **Typographic Accessibility**: 18px base font scale for legibility across viewports.
+- **Error Handling**: Native Next.js `not-found.tsx` fallback page handles 404 routes gracefully.
 
-- Serve static pages from CDN with long TTLs and use cache invalidation during deploys.
-- Minimize JavaScript bundle by code-splitting large animation logic and only mounting expensive motion code on visible sections.
+## Security & Deployment
 
-## Security
-
-- Sanitize any user-submitted data (forms) and validate serverless endpoints.
-- Follow standard headers (CSP, HSTS) via platform configuration.
-
-## Observability & monitoring
-
-- Add basic uptime and error monitoring (Sentry or similar) and capture client-side exceptions.
-- Track performance metrics (RUM) focusing on Largest Contentful Paint (LCP) and Time to Interactive (TTI).
-
-## Deployment recommendations
-
-- Preferred: Vercel — automatic builds, deployment previews, and static asset CDN.
-- Alternative: Netlify or any static host + edge CDN.
-
-## Scalability considerations
-
-- The site is low-compute; scale is handled by the CDN. For dynamic endpoints (form handlers), ensure serverless concurrency limits are considered.
-
-## Evolution notes
-
-- If the product grows to include user accounts or CMS-driven pages, introduce a lightweight backend (serverless or managed) and a content model for pages.
+- Deployments hosted on Vercel with automatic edge CDN caching for static assets.
+- Input validation on onboarding and project wizard forms.

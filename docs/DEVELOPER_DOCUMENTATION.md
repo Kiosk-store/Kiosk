@@ -1,12 +1,12 @@
 <!-- @format -->
 
-# Developer documentation — Kiosk
+# Developer Documentation — Kiosk
 
 ## Purpose
 
-This document provides onboarding and day-to-day guidance for engineers working on `kiosk`. It covers environment setup, coding conventions, component guidelines, testing, and deployment steps.
+This document provides onboarding and technical guidance for engineers working on `kiosk`. It covers environment setup, routing, component guidelines, dependency rules, and deployment instructions.
 
-## Local setup
+## Local Setup
 
 1. Clone the repository and install dependencies:
 
@@ -16,74 +16,80 @@ cd kiosk
 npm install
 ```
 
-2. Start the dev server:
+2. Start the development server:
 
 ```bash
 npm run dev
 ```
 
-3. Open http://localhost:3000 to view the app.
+3. Open http://localhost:3000 to view the application.
+
+## Key Dependencies
+
+- **Next.js 16 (App Router)**: Framework powering client and server routes.
+- **React 19**: UI library.
+- **Framer Motion 11.18.2**: Component animations and React Bits `<Dock />` spring physics.
+- **GSAP & `@gsap/react`**: Timeline motion and `PillButton` hover effects.
+- **Tailwind CSS v4**: Utility styling framework.
+- **Lucide React & Material Symbols**: Icon system.
+
+> [!IMPORTANT]
+> **Dependency Stability Notice**: Keep `framer-motion` pinned at `11.18.2` (or stable v11) to avoid Next.js Turbopack missing module errors (`../../../motion/utils/valid-prop.mjs`) found in v12 preview tarballs.
+
+## Application Routes & Structure
+
+```
+src/
+├── app/
+│   ├── layout.tsx              # Root layout with NavbarWrapper
+│   ├── page.tsx                # Marketing landing page
+│   ├── about/page.tsx          # About page
+│   ├── pricing/page.tsx        # Pricing page
+│   ├── services/page.tsx       # Services overview page
+│   ├── contact/page.tsx        # Contact page
+│   ├── get-started/page.tsx    # Sign In / Sign Up authentication page
+│   ├── not-found.tsx           # Custom 404 Page Not Found
+│   └── dashboard/
+│       ├── layout.tsx          # Dashboard light theme container & Sidebar Dock
+│       ├── page.tsx            # Main dashboard overview & dynamic greeting
+│       ├── projects/
+│       │   ├── page.tsx        # Projects list, search, and status filters
+│       │   └── new/page.tsx    # Multi-step Start New Project wizard
+│       ├── billing/page.tsx    # Subscription plans & billing history
+│       └── settings/page.tsx   # Profile, security, and notification settings
+└── components/
+    ├── NavbarWrapper.tsx       # Route-aware wrapper to hide marketing nav on /dashboard
+    ├── PillButton.tsx          # Flagship GSAP animated pill button component
+    └── dashboard/
+        ├── Dock.tsx            # React Bits dock component for bottom navigation
+        ├── ProjectCard.tsx     # Light card component for projects
+        └── Sidebar.tsx         # Sidebar container wrapping Dock
+```
+
+## Coding Conventions
+
+- **TypeScript**: Strict mode enabled. Run `npx tsc --noEmit` to verify type safety.
+- **Design System Rules**:
+  - Light mode theme (`bg-[#f8fafc]`, `bg-white`, `border-gray-200/90`).
+  - No background gradients (`bg-gradient-to-*` is prohibited).
+  - Use `PillButton` component for primary call-to-actions.
+  - Base typography font-size set to 18px (`1.125rem`).
+
+## Navigation & Routing Best Practices
+
+1. **Client Navigation**: Always use `next/link` or `router.push()` from `next/navigation`.
+2. **Dashboard Isolation**: The marketing navbar (`StaggeredMenu`) is hidden on `/dashboard` routes via `NavbarWrapper.tsx`.
+3. **Log Out Flow**: Log out in the dashboard profile dropdown triggers `router.push('/get-started')`.
 
 ## Scripts
 
-- `npm run dev` — development server
-- `npm run build` — production build
-- `npm run start` — serve production build
-- `npm run lint` — run ESLint
+- `npm run dev` — Start Next.js development server
+- `npm run build` — Build production bundle
+- `npm run start` — Serve production build
+- `npx tsc --noEmit` — Type-check TypeScript codebase without emitting files
 
-## Coding conventions
+## Verification & QA
 
-- TypeScript: prefer typed props for public components. Keep `any` to an absolute minimum.
-- File names: use PascalCase for React components (`Hero.tsx`, `Navbar.tsx`) and kebab-case for utility files when appropriate.
-- Exports: prefer default export for single-component files; named exports for utility modules.
-- CSS: prefer utility classes; when a repeated pattern emerges, refactor into a small class or component.
-
-## Component guidelines
-
-- Keep components small and focused. If a component grows beyond ~200 lines, consider splitting it.
-- Props: use a single interface for props and keep callback props well-named (e.g., `onSubmit`, `onClose`).
-- Accessibility: buttons and links must include discernible text and `aria` attributes when required.
-
-## State management
-
-- Prefer local state and prop drilling for simple flows.
-- Use `src/lib/lenis-store.ts` for global scroll instance sharing only — avoid creating multiple global stores unless necessary.
-
-## Animations
-
-- Use `gsap` for complex timeline animations and `lenis` for smooth scrolling. Keep heavy computation off the main render path and memoize expensive values where possible.
-- **CRITICAL NOTE ON ROUTING & GSAP**: When using GSAP ScrollTrigger with `pin: true`, GSAP wraps elements in dynamic pin-spacers. If standard `<a>` tags are used for internal links, Next.js performs a hard reload or React loses track of the DOM structure, causing a `NotFoundError` (Failed to execute 'removeChild') on unmount. **Always use `next/link` for internal navigation** to ensure React properly tracks and unmounts GSAP-manipulated DOM nodes during client-side routing.
-
-## Adding a new page or section
-
-1. Create the component under `src/components`.
-2. Add the section to `src/app/page.tsx` in the desired order.
-3. Wrap any GSAP pinned sections in a stable outer `div` container to prevent React unmount crashes.
-4. Ensure responsive behavior and test on narrow viewports.
-
-## Forms & integrations
-
-- Prefer third-party form endpoints or serverless functions for lead capture. Sanitize and validate inputs server-side.
-
-## Testing & linting
-
-- ESLint is configured; run `npm run lint` before committing.
-- Add unit tests for critical logic where it makes sense. For UI, prefer visual/manual checks and small Jest/React Testing Library tests for component behavior when applicable.
-
-## CI / CD
-
-- Use platform (Vercel) previews for pull requests and run linters as part of CI. Keep deploys atomic and use branch previews for QA.
-
-## Release process
-
-- For a marketing site, releases are normally gated by commits to `main` and validated by preview deploys. Tag releases as necessary.
-
-## Onboarding checklist for new contributors
-
-- Run the dev server and explore `src/components`.
-- Read `docs/DESIGN_ARCHITECTURE.md` and `docs/SYSTEM_DESIGN.md`.
-- Run `npm run lint` and ensure your editor uses the project's TypeScript version.
-
-## Contacts and ownership
-
-- Keep a short OWNERS file or GitHub CODEOWNERS if the project will have multiple maintainers. Document primary contacts for design and engineering in the repository root if needed.
+Before submitting changes:
+1. Run `npx tsc --noEmit` and ensure **0 errors**.
+2. Verify responsive layout across mobile, tablet, and desktop viewports.
