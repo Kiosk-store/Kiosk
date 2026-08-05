@@ -15,13 +15,13 @@ const faqItems = [
 		icon: "rocket_launch",
 		question: "Why Kiosk instead of building it myself?",
 		answer:
-			"Most small business owners don't have the time, design skill, or desire to learn a website builder — and they shouldn't have to. Kiosk exists to remove that barrier entirely: you tell us about your business, and our team personalizes a proven, professionally designed page for you. You get the speed and affordability of a templated platform, with a real team doing the work instead of you.",
+			"Most small business owners don't have the time, design skill, or desire to learn a website builder - and they shouldn't have to. Kiosk exists to remove that barrier entirely: you tell us about your business, and our team personalizes a proven, professionally designed page for you. You get the speed and affordability of a templated platform, with a real team doing the work instead of you.",
 	},
 	{
 		icon: "verified_user",
 		question: "Do I own my site and content?",
 		answer:
-			"Your business, brand, and content are 100% yours — always. Kiosk builds and hosts your site on our platform, similar to how a Shopify or Squarespace site works, so you get a professional, fully managed site without needing to manage code, servers, or updates yourself. If you ever want to leave, we'll help you transition your content elsewhere.",
+			"Your business, brand, and content are 100% yours - always. Kiosk builds and hosts your site on our platform, similar to how a Shopify or Squarespace site works, so you get a professional, fully managed site without needing to manage code, servers, or updates yourself. If you ever want to leave, we'll help you transition your content elsewhere.",
 	},
 	{
 		icon: "timer",
@@ -33,13 +33,13 @@ const faqItems = [
 		icon: "language",
 		question: "Can I use my existing custom domain?",
 		answer:
-			"Absolutely. Every site launches on a free Kiosk subdomain (yourbusiness.kiosk.com) so you're live immediately, and you can connect your own custom domain any time as your business grows — from GoDaddy, Namecheap, Google, or another registrar. We'll walk you through the setup.",
+			"Absolutely. Every site launches on a free Kiosk subdomain (yourbusiness.kiosk.com) so you're live immediately, and you can connect your own custom domain any time as your business grows - from GoDaddy, Namecheap, Google, or another registrar. We'll walk you through the setup.",
 	},
 	{
 		icon: "compare_arrows",
 		question: "What's the difference between the three plans?",
 		answer:
-			"Landing Page is a single, high-converting page — perfect for a first professional presence. Sales Funnel adds multiple connected pages, lead capture, and email integration for businesses actively driving traffic. E-commerce Store adds a full product catalog, cart, and checkout for businesses ready to sell online. All three grow with you — upgrading tiers later is seamless.",
+			"Landing Page is a single, high-converting page - perfect for a first professional presence. Sales Funnel adds multiple connected pages, lead capture, and email integration for businesses actively driving traffic. E-commerce Store adds a full product catalog, cart, and checkout for businesses ready to sell online. All three grow with you - upgrading tiers later is seamless.",
 	},
 ];
 

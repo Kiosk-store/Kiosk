@@ -4,7 +4,7 @@
  * Horizontally scrolling card strip that loops infinitely via CSS
  * translateX(-50%) on a duplicated list. Pauses on hover so users
  * can inspect individual projects. No JS timers or requestAnimationFrame
- * needed — pure CSS animation using the existing `marquee` keyframe
+ * needed - pure CSS animation using the existing `marquee` keyframe
  * defined in globals.css.
  *
  * @format

@@ -83,7 +83,7 @@ export default function Hero() {
 					</h1>
 
 					<p className="text-lg md:text-xl text-gray-600 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-						Landing pages or online stores — we build and host them.
+						Landing pages or online stores - we build and host them.
 					</p>
 
 					{/* CTAs */}
