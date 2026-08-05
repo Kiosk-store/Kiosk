@@ -1,97 +1,113 @@
 <!-- @format -->
 
-# Backend Implementation TODO & Roadmap — Kiosk
+# Scalable Backend Architecture TODO & Technical Roadmap — Kiosk
 
-This TODO roadmap details the exact backend implementation plan for **Kiosk**, tailored to our **Next.js 16 (App Router), React 19, TypeScript, PostgreSQL, and Prisma** stack.
+This TODO roadmap defines the enterprise-scalable backend architecture for **Kiosk**, specifically tailored to our **Next.js 16 (App Router), React 19, TypeScript, and Tailwind CSS v4** tech stack.
 
 ---
 
-## 🚀 Phase 1: Authentication & Authorization Engine (CURRENT PRIORITY)
+## 🛠️ Scalable Stack Architecture Overview
 
-### 1. Database Schema & Prisma Setup
-- [ ] Install Prisma ORM & PostgreSQL client (`npm install @prisma/client` & `npm install -D prisma`).
-- [ ] Initialize Prisma (`npx prisma init`) and configure database connection string in `.env`.
-- [ ] Define core Auth models in `prisma/schema.prisma`:
-  - [ ] `User` (`id`, `name`, `email`, `passwordHash`, `avatarUrl`, `role`, `createdAt`, `updatedAt`).
-  - [ ] `Account` (OAuth provider links for Google & GitHub).
-  - [ ] `Session` & `RefreshToken` (Token rotation & revocation fields).
-- [ ] Run initial migration (`npx prisma migrate dev --name init_auth`).
+| Layer | Enterprise Scalable Technology Stack |
+| :--- | :--- |
+| **Framework** | Next.js 16 (App Router Route Handlers & Server Actions) |
+| **Authentication** | Auth.js v5 (NextAuth) + Zod + Upstash Redis Session Cache |
+| **Database** | PostgreSQL (Neon Serverless / AWS Aurora) |
+| **ORM & Querying** | Drizzle ORM / Prisma ORM + PgBouncer Connection Pooling |
+| **Payments** | Stripe Billing API + Paystack Engine + Upstash Idempotency Locks |
+| **Background Jobs** | Inngest / BullMQ (Async serverless worker queues) |
+| **Caching Engine** | Upstash Redis (Serverless-optimized HTTP/REST Redis Cluster) |
+| **Email & Transact** | Resend + React Email (`@react-email/components`) |
+| **Domain Provision**| Vercel Domains API / Cloudflare API v4 (`<client>.kiosk.site`) |
+| **Testing & TDD** | Vitest + Supertest + Playwright API Testing |
+| **Observability** | Sentry Error Tracking + Axiom Structured Logging |
 
-### 2. Password Hashing & Security Utilities
-- [ ] Install `bcryptjs` / `argon2` and `@types/bcryptjs` for secure password hashing.
-- [ ] Build utility functions for password hashing & verification (`hashPassword`, `verifyPassword`).
-- [ ] Install `jose` / `jsonwebtoken` for RS256 JWT access token generation (15-min TTL) and refresh token management (7-day TTL).
+---
+
+## 🚀 Phase 1: Authentication & Authorization Engine (STARTING PRIORITY)
+
+### 1. Stack Dependencies & Database Schema
+- [ ] Install core Auth dependencies (`npm install next-auth@beta @auth/drizzle-adapter @auth/prisma-adapter zod`).
+- [ ] Install Drizzle ORM & PostgreSQL client (`npm install drizzle-orm postgres` & `npm install -D drizzle-kit`).
+- [ ] Define core database schema in `src/db/schema.ts`:
+  - [ ] `users` (`id`, `name`, `email`, `passwordHash`, `image`, `role`, `createdAt`, `updatedAt`).
+  - [ ] `accounts` (`userId`, `type`, `provider`, `providerAccountId`, `refresh_token`, `access_token`).
+  - [ ] `sessions` (`sessionToken`, `userId`, `expires`).
+  - [ ] `verificationTokens` (`identifier`, `token`, `expires`).
+- [ ] Run migration pipeline (`npx drizzle-kit generate` & `npx drizzle-kit migrate`).
+
+### 2. Security & Password Hashing
+- [ ] Install `bcryptjs` / `argon2` for secure password hashing.
+- [ ] Create security module (`src/lib/auth/password.ts`) with Zod schema validation.
+- [ ] Configure JWT access token issuance (RS256) and HTTP-Only cookie security (`SameSite=Strict`, `Secure`).
 
 ### 3. Auth API Route Handlers (`src/app/api/auth/*`)
 - [ ] **`POST /api/auth/register`**:
-  - Validate email & password inputs using Zod.
-  - Check for existing email registration.
-  - Hash password and create `User` record in PostgreSQL.
-  - Return authenticated user DTO + set HTTP-Only Refresh Cookie.
+  - Validate email & password with Zod schema.
+  - Check database for duplicate email.
+  - Hash password and insert user record into PostgreSQL.
+  - Issue session DTO & set secure auth cookie.
 - [ ] **`POST /api/auth/login`**:
-  - Lookup user by email.
-  - Verify password hash match.
-  - Issue 15-minute RS256 JWT access token and 7-day HTTP-Only `refreshToken` cookie.
+  - Lookup user record & verify bcrypt password hash.
+  - Issue session token & HTTP-Only refresh cookie.
 - [ ] **`POST /api/auth/logout`**:
-  - Invalidate refresh token in database/Redis.
-  - Clear HTTP-Only authentication cookies (`refreshToken=; Max-Age=0`).
-- [ ] **`POST /api/auth/refresh`**:
-  - Validate refresh token signature & expiration.
-  - Issue new access token (Token Rotation).
+  - Invalidate token in Upstash Redis token revocation blacklist.
+  - Clear HTTP-Only session cookies.
 - [ ] **`GET /api/auth/me`**:
-  - Read access token from `Authorization: Bearer <token>` header.
-  - Return current authenticated user profile DTO.
+  - Return current authenticated session profile DTO.
 
-### 4. OAuth 2.0 Social Authentication (Google)
-- [ ] Configure Google Cloud Console OAuth 2.0 Client ID & Client Secret.
-- [ ] Setup `src/app/api/auth/google/route.ts` authorization URL redirect and callback code handler.
-- [ ] Upsert user record on successful Google OAuth callback.
+### 4. OAuth 2.0 Google & GitHub Providers
+- [ ] Configure Google & GitHub OAuth client keys in `.env`.
+- [ ] Mount Auth.js v5 route handler (`src/app/api/auth/[...nextauth]/route.ts`).
+- [ ] Attach Google OAuth trigger to the "Continue with Google" button on `src/app/get-started/page.tsx`.
 
-### 5. Next.js Auth Middleware (`src/middleware.ts`)
-- [ ] Create Next.js route protection middleware.
-- [ ] Restrict access to `/dashboard/*` and `/checkout` for unauthenticated visitors (auto-redirect to `/get-started?tab=login`).
+### 5. Next.js Route Protection Middleware (`src/middleware.ts`)
+- [ ] Implement Next.js edge middleware to guard `/dashboard/*` and `/checkout` routes.
+- [ ] Redirect unauthenticated visitors to `/get-started?tab=login`.
 
-### 6. Frontend Auth Integration (`src/app/get-started/page.tsx` & Context)
-- [ ] Create `AuthContext.tsx` provider with `useAuth()` custom hook (`user`, `login`, `signup`, `logout`, `isLoading`).
-- [ ] Connect `handleSignupSubmit` on `/get-started` to `POST /api/auth/register`.
-- [ ] Connect `handleLoginSubmit` on `/get-started` to `POST /api/auth/login`.
-- [ ] Connect `handleSocialAuth` on `/get-started` to Google OAuth trigger.
-- [ ] Wire dynamic profile header greetings and "Log Out" button on `/dashboard` to `logout()` context handler.
+### 6. Frontend Auth State Integration (`src/app/get-started/page.tsx`)
+- [ ] Build `AuthContext.tsx` provider with `useAuth()` custom hook (`user`, `login`, `signup`, `logout`, `isLoading`).
+- [ ] Wire `handleSignupSubmit`, `handleLoginSubmit`, and `handleSocialAuth` on `/get-started` to real API endpoints.
+- [ ] Connect dashboard profile header greetings and "Log Out" button to `logout()` context handler.
 
 ---
 
-## Phase 2: Database Infrastructure & Connection Pool
-- [ ] Setup PostgreSQL primary instance with read replicas.
-- [ ] Configure **PgBouncer** connection pool (Max Pool Size: 100).
-- [ ] Define Project, Subscription, and Invoice schemas in `prisma/schema.prisma`.
+## Phase 2: Database Infrastructure & Connection Pooling
+- [ ] Provision **Neon PostgreSQL** serverless instance.
+- [ ] Configure **PgBouncer** pooling endpoint (`max_connections=100`).
+- [ ] Write schema models for `projects`, `subscriptions`, `invoices`, and `idempotency_keys`.
 
 ---
 
 ## Phase 3: Subscriptions & Payment Integration
-- [ ] Build Stripe / Paystack webhook handlers (`src/app/api/webhooks/stripe/route.ts`).
-- [ ] Sync subscription tiers (`$20/mo`, `$30/mo`, `$43/mo` or `$192/yr`, `$288/yr`, `$408/yr`).
-- [ ] Build `Idempotency-Key` header middleware using Redis atomic locks (`SETNX`) to prevent double charging.
+- [ ] Integrate **Stripe Billing API** & **Paystack** webhooks (`src/app/api/webhooks/stripe/route.ts`).
+- [ ] Implement **Upstash Redis** distributed lock (`SETNX idempotency:<key>`) for `Idempotency-Key` headers on `/checkout` to eliminate double charging.
+- [ ] Map active plans: `$20/mo` ($192/yr), `$30/mo` ($288/yr), `$43/mo` ($408/yr).
 
 ---
 
-## Phase 4: Core Domain & Site Provisioning
+## Phase 4: Domain & Site Provisioning Engine
 - [ ] Build `SiteTemplateFactory` (Factory pattern) for dynamic site tier engines (`landing`, `funnel`, `store`).
-- [ ] Automate subdomain allocation (`<client>.kiosk.site`).
-- [ ] Setup worker threads for PDF invoice generation and asset optimization.
+- [ ] Automate wildcard subdomain allocation (`<client>.kiosk.site`) via **Vercel Domains API / Cloudflare API v4**.
+- [ ] Setup **Inngest** serverless background workers for PDF invoice generation and asset optimization.
 
 ---
 
 ## Phase 5: Observable Event Bus & Email Notifications
-- [ ] Build `ProjectSubject` publish-subscribe event engine (Observer pattern).
-- [ ] Integrate Resend / SendGrid email dispatcher for welcome & invoice emails.
+- [ ] Build `ProjectSubject` publish-subscribe event pipeline (Observer pattern).
+- [ ] Integrate **Resend API** with **React Email** templates (`@react-email/components`) for welcome & invoice receipts.
+- [ ] Wire **Upstash QStash** event bus for asynchronous decoupled event handling.
 
 ---
 
-## Phase 6: Multi-Layer Caching & Redis Sentinel
-- [ ] Setup L1 process LRU cache + L2 Redis Sentinel Cache-Aside layer.
+## Phase 6: Multi-Layer Caching Architecture
+- [ ] Setup L1 process LRU memory cache (5-second TTL).
+- [ ] Configure **Upstash Redis** Cache-Aside layer for sub-5ms user session and project metadata lookups.
+- [ ] Attach event-driven cache eviction hooks on database mutations.
 
 ---
 
 ## Phase 7: Test-Driven Development (TDD) & CI/CD Pipeline
-- [ ] Write Unit Tests (`*.spec.ts`), Integration Tests (`*.test.ts`), and Supertest E2E API Contract Tests.
-- [ ] Setup GitHub Actions CI/CD pipeline.
+- [ ] Write Unit Tests with **Vitest** (`*.spec.ts`).
+- [ ] Write E2E API tests with **Playwright** (`*.e2e-spec.ts`).
+- [ ] Setup **GitHub Actions** CI/CD pipeline for automated linting, type-checking (`npx tsc --noEmit`), Vitest suite execution, and Vercel deployment.
