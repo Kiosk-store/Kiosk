@@ -27,7 +27,7 @@ export interface PricingTier {
 	id: string;
 	name: string;
 	subtitle: string;
-	priceOneTime: string;
+	priceYearly: string;
 	priceMonthly: string;
 	description: string;
 	features: string[];
@@ -41,8 +41,8 @@ const tiers: PricingTier[] = [
 		id: "landing-page",
 		name: "Landing Page",
 		subtitle: "High-Converting Single Page",
-		priceOneTime: "$499",
-		priceMonthly: "$49",
+		priceYearly: "$192",
+		priceMonthly: "$20",
 		description: "Custom single-page website engineered for rapid lead generation and immediate launch.",
 		features: [
 			"Custom responsive single page design",
@@ -58,8 +58,8 @@ const tiers: PricingTier[] = [
 		id: "sales-funnel",
 		name: "Sales Funnel",
 		subtitle: "Multi-Step Conversion Engine",
-		priceOneTime: "$999",
-		priceMonthly: "$89",
+		priceYearly: "$288",
+		priceMonthly: "$30",
 		description: "Strategic multi-page funnel engineered to qualify prospects and convert them into clients.",
 		features: [
 			"Up to 5 custom high-impact conversion pages",
@@ -75,8 +75,8 @@ const tiers: PricingTier[] = [
 		id: "ecommerce-store",
 		name: "E-commerce Store",
 		subtitle: "Full-Featured Digital Shop",
-		priceOneTime: "$1,499",
-		priceMonthly: "$129",
+		priceYearly: "$408",
+		priceMonthly: "$43",
 		description: "Complete online storefront with seamless checkout, payment processing, and inventory management.",
 		features: [
 			"Full product catalog & variation management",
@@ -208,7 +208,7 @@ export default function Pricing() {
 						const isVisible = idx === activeIndex;
 						const price =
 							billingCycle === "yearly"
-								? tier.priceOneTime
+								? tier.priceYearly
 								: tier.priceMonthly;
 						const period =
 							billingCycle === "yearly" ? "/ year" : "/ month";
