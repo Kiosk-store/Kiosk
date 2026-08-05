@@ -24,6 +24,13 @@
            │      Public Marketing Pages    │ │   Authenticated Client Portal   │
            │  (/, /about, /services, etc.)  │ │          (/dashboard/*)         │
            └────────────────────────────────┘ └─────────────────────────────────┘
+                                                     │
+                                                     ▼
+                                       ┌───────────────────────────┐
+                                       │   Backend API Microservice│
+                                       │ (See BACKEND_SYSTEM_DESIGN│
+                                       │ & BACKEND_ARCHITECTURE)   │
+                                       └───────────────────────────┘
 ```
 
 - **Client Runtime**: React 19, Framer Motion (Dock spring physics), GSAP (PillButton animation), Tailwind CSS v4.
