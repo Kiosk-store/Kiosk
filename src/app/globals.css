@@ -219,7 +219,7 @@
 /* Standard Body Copy */
 .font-body-base {
 	font-family: var(--font-nohemi);
-	font-size: 1rem;
+	font-size: 1.125rem;
 	line-height: 1.625;
 	font-weight: 400;
 }
@@ -227,7 +227,7 @@
 /* Micro & Labels */
 .font-label-caption {
 	font-family: var(--font-nohemi);
-	font-size: 0.75rem;
+	font-size: 0.875rem;
 	line-height: 1.4;
 	letter-spacing: 0.08em;
 	font-weight: 600;
@@ -311,6 +311,7 @@
 }
 
 html {
+	font-size: 18px;
 	scroll-behavior: smooth;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
@@ -322,7 +323,7 @@ body {
 	background-color: var(--color-background);
 	color: var(--color-on-surface);
 	font-family: var(--font-nohemi);
-	font-size: 1rem;
+	font-size: 1.125rem;
 	line-height: 1.6;
 	overflow-x: hidden;
 	width: 100%;

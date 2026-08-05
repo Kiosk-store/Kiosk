@@ -5,6 +5,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import PillButton from "@/components/PillButton";
 import ProjectCard from "@/components/dashboard/ProjectCard";
 import type { ProjectCardProps } from "@/components/dashboard/ProjectCard";
 
@@ -96,7 +97,7 @@ const quickActions: QuickAction[] = [
 		label: "Start New Project",
 		description: "Create a new site from scratch",
 		icon: "add_circle",
-		href: "/get-started",
+		href: "/dashboard/projects/new",
 		iconColor: "text-blue-600",
 		bgColor: "bg-blue-50 group-hover:bg-blue-100",
 	},
@@ -207,13 +208,13 @@ export default function DashboardPage() {
 									onClick={() => setIsProfileOpen(false)}
 								/>
 
-								<div className="absolute right-0 top-full mt-2 w-60 bg-white border border-gray-200/90 rounded-2xl shadow-xl z-50 p-1.5 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+								<div className="absolute right-0 top-full mt-2 w-56 bg-white border border-gray-200/90 rounded-2xl shadow-lg z-50 p-1.5 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
 									{/* User Info Header */}
-									<div className="px-3.5 py-3 border-b border-gray-100 mb-1">
-										<p className="text-sm font-bold text-gray-900 leading-snug">
+									<div className="px-3 py-2.5 border-b border-gray-100 mb-1">
+										<p className="text-xs font-bold text-gray-900 leading-snug">
 											Jeremiah Victor
 										</p>
-										<p className="text-xs text-gray-500 truncate mt-0.5 font-medium">
+										<p className="text-[11px] text-gray-400 truncate mt-0.5 font-medium">
 											jeremiah@kiosk.com
 										</p>
 									</div>
@@ -226,8 +227,8 @@ export default function DashboardPage() {
 												setIsProfileOpen(false);
 												router.push("/dashboard/settings");
 											}}
-											className="group w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-gray-700 hover:bg-blue-50/80 hover:text-blue-600 transition-all duration-150 cursor-pointer">
-											<span className="material-symbols-outlined text-[18px] text-gray-400 group-hover:text-blue-600 group-hover:scale-110 transition-all">
+											className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-gray-700 hover:bg-gray-100/80 hover:text-gray-900 transition-colors duration-150 cursor-pointer">
+											<span className="material-symbols-outlined text-[18px] text-gray-400">
 												settings
 											</span>
 											<span>Account Settings</span>
@@ -239,8 +240,8 @@ export default function DashboardPage() {
 												setIsProfileOpen(false);
 												router.push("/dashboard/billing");
 											}}
-											className="group w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-gray-700 hover:bg-blue-50/80 hover:text-blue-600 transition-all duration-150 cursor-pointer">
-											<span className="material-symbols-outlined text-[18px] text-gray-400 group-hover:text-blue-600 group-hover:scale-110 transition-all">
+											className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-gray-700 hover:bg-gray-100/80 hover:text-gray-900 transition-colors duration-150 cursor-pointer">
+											<span className="material-symbols-outlined text-[18px] text-gray-400">
 												receipt_long
 											</span>
 											<span>Billing & Plan</span>
@@ -252,8 +253,8 @@ export default function DashboardPage() {
 										<button
 											type="button"
 											onClick={handleLogout}
-											className="group w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 hover:text-red-700 transition-all duration-150 cursor-pointer">
-											<span className="material-symbols-outlined text-[18px] text-red-500 group-hover:scale-110 transition-transform">
+											className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-red-600 hover:bg-red-50 transition-colors duration-150 cursor-pointer">
+											<span className="material-symbols-outlined text-[18px] text-red-500">
 												logout
 											</span>
 											<span>Log Out</span>
@@ -320,14 +321,16 @@ export default function DashboardPage() {
 						<h2 className="text-lg sm:text-xl font-bold font-nohemi text-gray-900">
 							Your Projects
 						</h2>
-						<Link
-							href="/get-started"
-							className="text-xs sm:text-sm text-blue-600 hover:text-blue-700 font-bold flex items-center gap-1 transition-colors duration-200">
-							<span className="material-symbols-outlined text-[16px]">
-								add
-							</span>
-							New Project
-						</Link>
+						<PillButton
+							href="/dashboard/projects/new"
+							baseColor="#004ac6"
+							circleColor="#ffffff"
+							textColor="#ffffff"
+							hoverTextColor="#004ac6"
+							useThunderFont={true}
+							className="px-5 py-2 text-xs font-bold border border-blue-600 shadow-xs">
+							+ New Project
+						</PillButton>
 					</div>
 
 					<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">

@@ -63,7 +63,7 @@ export default function ProjectCard({
 
 	return (
 		<div className="group relative bg-white border border-gray-200/90 rounded-2xl p-5 sm:p-6 transition-all duration-200 hover:border-blue-500/40 hover:shadow-xs">
-			{/* Top Row: Icon + Name + Status */}
+			{/* Top Row: Icon + Name */}
 			<div className="flex items-start justify-between gap-3 mb-5">
 				<div className="flex items-center gap-3">
 					<div
@@ -78,18 +78,6 @@ export default function ProjectCard({
 						</h3>
 						<p className="text-gray-500 text-xs mt-0.5 font-medium">{type}</p>
 					</div>
-				</div>
-
-				{/* Status Pill */}
-				<div
-					className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full ${sConf.bg}`}>
-					<div
-						className={`w-1.5 h-1.5 rounded-full ${sConf.dot}`}
-					/>
-					<span
-						className={`text-[10px] font-bold ${sConf.color} uppercase tracking-wider`}>
-						{status}
-					</span>
 				</div>
 			</div>
 
