@@ -130,7 +130,10 @@ export default function DashboardPage() {
 		};
 	}, []);
 
-	const displayName = user?.name || user?.email?.split("@")[0] || "User";
+	const rawName = user?.name || (user?.email ? user.email.split("@")[0] : "");
+	const displayName = rawName
+		? rawName.charAt(0).toUpperCase() + rawName.slice(1)
+		: "Friend";
 	const initials = displayName
 		.split(" ")
 		.map((n) => n[0])

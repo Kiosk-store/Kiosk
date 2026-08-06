@@ -2,35 +2,87 @@
 
 "use client";
 
-import React, { useState } from "react";
-import { User, Mail, Phone, Lock, Bell, CheckCircle2, Loader2 } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { User, Mail, Phone, Lock, Bell, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 import PillButton from "@/components/PillButton";
+import { useAuth } from "@/context/AuthContext";
 
 type SettingsTab = "profile" | "security" | "notifications";
 
 export default function SettingsPage() {
+	const { user, refreshUser } = useAuth();
 	const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
 	const [isLoading, setIsLoading] = useState(false);
 	const [isSaved, setIsSaved] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 
-	// Profile Form
-	const [name, setName] = useState("Jeremiah Victor");
-	const [email, setEmail] = useState("jeremiah@kiosk.com");
+	// Profile Form State
+	const [name, setName] = useState("");
+	const [email, setEmail] = useState("");
 	const [phone, setPhone] = useState("+1 (555) 234-5678");
-	const [company, setCompany] = useState("Kiosk Tech Inc.");
+	const [company, setCompany] = useState("Kiosk Tenant");
 
-	// Security Form
+	// Security Form State
 	const [currentPass, setCurrentPass] = useState("");
 	const [newPass, setNewPass] = useState("");
 	const [confirmPass, setConfirmPass] = useState("");
 	const [twoFactor, setTwoFactor] = useState(false);
 
-	// Notification Toggles
+	// Notification Toggles State
 	const [emailNotifs, setEmailNotifs] = useState(true);
 	const [projectUpdates, setProjectUpdates] = useState(true);
 	const [marketingEmails, setMarketingEmails] = useState(false);
 
-	const handleSave = (e: React.FormEvent) => {
+	// Sync state with authenticated user context
+	useEffect(() => {
+		if (user) {
+			setName(user.name || "");
+			setEmail(user.email || "");
+		}
+	}, [user]);
+
+	const displayName = user?.name || user?.email?.split("@")[0] || "User";
+	const initials = displayName
+		.split(" ")
+		.map((n) => n[0])
+		.join("")
+		.toUpperCase()
+		.slice(0, 2);
+
+	const handleSaveProfile = async (e: React.FormEvent) => {
+		e.preventDefault();
+		setError(null);
+		setIsLoading(true);
+
+		try {
+			const res = await fetch("/api/user/profile", {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ name }),
+			});
+
+			const data = await res.json();
+
+			if (!res.ok) {
+				setError(data.error || "Failed to update profile.");
+				setIsLoading(false);
+				return;
+			}
+
+			await refreshUser();
+			setIsLoading(false);
+			setIsSaved(true);
+			setTimeout(() => {
+				setIsSaved(false);
+			}, 3000);
+		} catch (err) {
+			console.error("[PROFILE_SAVE_ERROR]", err);
+			setError("An unexpected network error occurred.");
+			setIsLoading(false);
+		}
+	};
+
+	const handleSaveGeneric = (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsLoading(true);
 		setTimeout(() => {
@@ -39,7 +91,7 @@ export default function SettingsPage() {
 			setTimeout(() => {
 				setIsSaved(false);
 			}, 3000);
-		}, 1000);
+		}, 600);
 	};
 
 	return (
@@ -69,7 +121,10 @@ export default function SettingsPage() {
 							<button
 								key={tab.id}
 								type="button"
-								onClick={() => setActiveTab(tab.id as SettingsTab)}
+								onClick={() => {
+									setActiveTab(tab.id as SettingsTab);
+									setError(null);
+								}}
 								className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all cursor-pointer ${
 									isActive
 										? "border-blue-600 text-blue-600"
@@ -86,26 +141,42 @@ export default function SettingsPage() {
 				{isSaved && (
 					<div className="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold flex items-center gap-2.5 animate-in fade-in duration-200">
 						<CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-						<span>Your settings have been saved successfully.</span>
+						<span>Your profile settings have been saved to database successfully.</span>
+					</div>
+				)}
+
+				{/* Error Notification */}
+				{error && (
+					<div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold flex items-center gap-2.5 animate-in fade-in duration-200">
+						<AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+						<span>{error}</span>
 					</div>
 				)}
 
 				{/* Tab 1: Profile Info */}
 				{activeTab === "profile" && (
 					<form
-						onSubmit={handleSave}
+						onSubmit={handleSaveProfile}
 						className="bg-white border border-gray-200/90 rounded-2xl p-6 sm:p-8 space-y-6">
 						{/* Avatar Header */}
 						<div className="flex items-center gap-4 pb-6 border-b border-gray-100">
-							<div className="w-16 h-16 rounded-full bg-blue-600 text-white font-bold text-xl flex items-center justify-center shadow-xs">
-								JV
-							</div>
+							{user?.image ? (
+								<img
+									src={user.image}
+									alt={displayName}
+									className="w-16 h-16 rounded-full object-cover ring-2 ring-blue-600/30 shadow-xs"
+								/>
+							) : (
+								<div className="w-16 h-16 rounded-full bg-blue-600 text-white font-bold text-xl flex items-center justify-center shadow-xs">
+									{initials}
+								</div>
+							)}
 							<div>
 								<h3 className="text-base font-bold text-gray-900">
-									Jeremiah Victor
+									{displayName}
 								</h3>
 								<p className="text-xs text-gray-400 font-medium mt-0.5">
-									Account Owner
+									{user?.role === "ADMIN" ? "Administrator" : "Account Owner"}
 								</p>
 							</div>
 						</div>
@@ -134,9 +205,9 @@ export default function SettingsPage() {
 									<Mail className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
 									<input
 										type="email"
+										disabled
 										value={email}
-										onChange={(e) => setEmail(e.target.value)}
-										className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 transition-colors"
+										className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200/90 text-xs font-medium text-gray-500 bg-gray-50 cursor-not-allowed"
 									/>
 								</div>
 							</div>
@@ -195,7 +266,7 @@ export default function SettingsPage() {
 				{/* Tab 2: Security */}
 				{activeTab === "security" && (
 					<form
-						onSubmit={handleSave}
+						onSubmit={handleSaveGeneric}
 						className="bg-white border border-gray-200/90 rounded-2xl p-6 sm:p-8 space-y-6">
 						<h3 className="text-base font-bold font-nohemi text-gray-900 pb-4 border-b border-gray-100">
 							Change Password
@@ -293,7 +364,7 @@ export default function SettingsPage() {
 				{/* Tab 3: Notifications */}
 				{activeTab === "notifications" && (
 					<form
-						onSubmit={handleSave}
+						onSubmit={handleSaveGeneric}
 						className="bg-white border border-gray-200/90 rounded-2xl p-6 sm:p-8 space-y-6">
 						<h3 className="text-base font-bold font-nohemi text-gray-900 pb-4 border-b border-gray-100">
 							Email Preferences
