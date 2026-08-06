@@ -4,7 +4,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { signIn as nextAuthSignIn } from "next-auth/react";
+import { signIn as nextAuthSignIn, signOut as nextAuthSignOut } from "next-auth/react";
 
 export interface UserProfile {
 	id: string;
@@ -138,19 +138,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 		}
 	};
 
-	// Logout
+	// Complete Logout for both Auth.js Google OAuth and custom credentials session
 	const logout = async (): Promise<void> => {
 		try {
 			setIsLoading(true);
 			await fetch("/api/auth/logout", { method: "POST" });
+			await nextAuthSignOut({ redirect: false });
 			setUser(null);
 			setIsLoading(false);
-			router.push("/get-started");
+			window.location.href = "/get-started";
 		} catch (err) {
 			console.error("[LOGOUT_ACTION_ERROR]", err);
 			setUser(null);
 			setIsLoading(false);
-			router.push("/get-started");
+			window.location.href = "/get-started";
 		}
 	};
 

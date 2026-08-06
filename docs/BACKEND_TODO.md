@@ -116,7 +116,7 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
 
 ## Phase 4: Domain & Site Provisioning Engine
 - [x] Build `SiteTemplateFactory` (Factory pattern) & multi-tenant projects API (`GET/POST /api/projects`) in `src/app/api/projects/route.ts`.
-- [ ] Automate wildcard subdomain allocation (`<client>.kiosk.site`) via **Vercel Domains API / Cloudflare API v4**.
+- [x] Automate wildcard subdomain (`<client>.kiosk.site`) & custom domain edge routing engine in `src/middleware.ts`.
 - [ ] Setup **Inngest** serverless background workers for PDF invoice generation and asset optimization.
 
 ---
