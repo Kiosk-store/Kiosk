@@ -11,7 +11,11 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
 | Layer | Enterprise Scalable Technology Stack |
 | :--- | :--- |
 | **Framework** | Next.js 16 (App Router Route Handlers & Server Actions) |
+| **Load Balancing** | Layer 4 (AWS NLB / Cloudflare) + Layer 7 Application Load Balancer |
+| **Rate Limiting** | `@upstash/ratelimit` + Upstash Redis Sliding Window Algorithm |
 | **Authentication** | Auth.js v5 (NextAuth) + Zod + Upstash Redis Session Cache |
+| **Session Protection**| Automatic Token Refresh & Checkout State Persistence (Zero Logout During Payment) |
+| **Double-Charge Protection**| Upstash Redis Atomic Locks (`SETNX`) + Webhook Event Deduplication |
 | **Database** | PostgreSQL (Neon Serverless / AWS Aurora) |
 | **ORM & Querying** | Drizzle ORM / Prisma ORM + PgBouncer Connection Pooling |
 | **Payments** | Stripe Billing API + Paystack Engine + Upstash Idempotency Locks |
@@ -28,6 +32,7 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
 
 ### 1. Stack Dependencies & Database Schema
 - [ ] Install core Auth dependencies (`npm install next-auth@beta @auth/drizzle-adapter @auth/prisma-adapter zod`).
+- [ ] Install Rate Limiting dependencies (`npm install @upstash/ratelimit @upstash/redis`).
 - [ ] Install Drizzle ORM & PostgreSQL client (`npm install drizzle-orm postgres` & `npm install -D drizzle-kit`).
 - [ ] Define core database schema in `src/db/schema.ts`:
   - [ ] `users` (`id`, `name`, `email`, `passwordHash`, `image`, `role`, `createdAt`, `updatedAt`).
@@ -36,18 +41,26 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
   - [ ] `verificationTokens` (`identifier`, `token`, `expires`).
 - [ ] Run migration pipeline (`npx drizzle-kit generate` & `npx drizzle-kit migrate`).
 
-### 2. Security & Password Hashing
-- [ ] Install `bcryptjs` / `argon2` for secure password hashing.
+### 2. Rate Limiting Middleware (`src/lib/ratelimit.ts`)
+- [ ] Initialize Upstash Redis Sliding Window Rate Limiter.
+- [ ] Configure Auth Rate Limiter (5 requests / 1 min on `/api/auth/*` routes).
+- [ ] Configure API Rate Limiter (100 requests / 1 min on general API routes).
+- [ ] Add `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset` HTTP headers and return `429 Too Many Requests` on breach.
+
+### 3. Security & Password Hashing
+- [ ] Install `bcryptjs` for secure password hashing.
 - [ ] Create security module (`src/lib/auth/password.ts`) with Zod schema validation.
 - [ ] Configure JWT access token issuance (RS256) and HTTP-Only cookie security (`SameSite=Strict`, `Secure`).
 
-### 3. Auth API Route Handlers (`src/app/api/auth/*`)
+### 4. Auth API Route Handlers (`src/app/api/auth/*`)
 - [ ] **`POST /api/auth/register`**:
+  - Apply Rate Limiter middleware (`authRatelimit`).
   - Validate email & password with Zod schema.
   - Check database for duplicate email.
   - Hash password and insert user record into PostgreSQL.
   - Issue session DTO & set secure auth cookie.
 - [ ] **`POST /api/auth/login`**:
+  - Apply Rate Limiter middleware (`authRatelimit`).
   - Lookup user record & verify bcrypt password hash.
   - Issue session token & HTTP-Only refresh cookie.
 - [ ] **`POST /api/auth/logout`**:
@@ -56,32 +69,47 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
 - [ ] **`GET /api/auth/me`**:
   - Return current authenticated session profile DTO.
 
-### 4. OAuth 2.0 Google & GitHub Providers
+### 5. Checkout Session Protection (Zero Logout During Payment)
+- [ ] **Background Token Auto-Refresh**: Configure NextAuth silent token refresh on `/checkout` entry so JWT access tokens never expire mid-payment.
+- [ ] **Pre-Payment Auth Lock**: Validate active user session *before* submitting payment payload to Stripe/Paystack.
+- [ ] **Form State Persistence**: Store transient checkout form state in encrypted `sessionStorage` so if a user opens a 3D Secure bank verification tab, their checkout form remains fully populated upon return.
+- [ ] **Grace Period Cookie Handling**: Set a 1-hour session extension window while a user is actively on `/checkout`.
+
+### 6. OAuth 2.0 Google & GitHub Providers
 - [ ] Configure Google & GitHub OAuth client keys in `.env`.
 - [ ] Mount Auth.js v5 route handler (`src/app/api/auth/[...nextauth]/route.ts`).
 - [ ] Attach Google OAuth trigger to the "Continue with Google" button on `src/app/get-started/page.tsx`.
 
-### 5. Next.js Route Protection Middleware (`src/middleware.ts`)
+### 7. Next.js Edge Protection & Rate Limiting Middleware (`src/middleware.ts`)
 - [ ] Implement Next.js edge middleware to guard `/dashboard/*` and `/checkout` routes.
+- [ ] Attach `@upstash/ratelimit` check to all incoming requests at the edge.
 - [ ] Redirect unauthenticated visitors to `/get-started?tab=login`.
 
-### 6. Frontend Auth State Integration (`src/app/get-started/page.tsx`)
+### 8. Frontend Auth State Integration (`src/app/get-started/page.tsx`)
 - [ ] Build `AuthContext.tsx` provider with `useAuth()` custom hook (`user`, `login`, `signup`, `logout`, `isLoading`).
 - [ ] Wire `handleSignupSubmit`, `handleLoginSubmit`, and `handleSocialAuth` on `/get-started` to real API endpoints.
+- [ ] Handle `429 Too Many Requests` error responses gracefully on the UI with countdown toast notifications.
 - [ ] Connect dashboard profile header greetings and "Log Out" button to `logout()` context handler.
 
 ---
 
-## Phase 2: Database Infrastructure & Connection Pooling
-- [ ] Provision **Neon PostgreSQL** serverless instance.
-- [ ] Configure **PgBouncer** pooling endpoint (`max_connections=100`).
+## Phase 2: Load Balancing & Infrastructure Architecture
+- [ ] Configure **Layer 4 Load Balancer** (Cloudflare Anycast / AWS NLB) for TCP packet routing & DDoS protection.
+- [ ] Configure **Layer 7 Load Balancer** (AWS ALB / NGINX / Vercel Edge Router) with Weighted Round-Robin algorithm.
+- [ ] Configure health check endpoint (`GET /healthz`) returning HTTP `200 OK`.
+- [ ] Provision **Neon PostgreSQL** serverless instance with **PgBouncer** connection pool (`max_connections=100`).
 - [ ] Write schema models for `projects`, `subscriptions`, `invoices`, and `idempotency_keys`.
 
 ---
 
-## Phase 3: Subscriptions & Payment Integration
+## Phase 3: Subscriptions & Payment Double-Charge Protection
 - [ ] Integrate **Stripe Billing API** & **Paystack** webhooks (`src/app/api/webhooks/stripe/route.ts`).
-- [ ] Implement **Upstash Redis** distributed lock (`SETNX idempotency:<key>`) for `Idempotency-Key` headers on `/checkout` to eliminate double charging.
+- [ ] **Strict Payment Idempotency Engine (`Idempotency-Key`)**:
+  - [ ] Generate unique client-side `Idempotency-Key` (v4 UUID) when `/checkout` mounts.
+  - [ ] Implement Upstash Redis atomic lock (`SETNX idempotency:<key> PENDING EX 300`) to block concurrent duplicate requests.
+  - [ ] Instantly return cached `200 OK` response payload if a duplicate request with the same `Idempotency-Key` arrives.
+- [ ] **UI Submit Button Lockout**: Disable payment button immediately on first click (`isProcessing = true`) and display loading spinner to prevent double-clicking.
+- [ ] **Webhook Deduplication**: Log processed Stripe/Paystack `event_id` in Redis/PostgreSQL to prevent duplicate processing on gateway webhook retries.
 - [ ] Map active plans: `$20/mo` ($192/yr), `$30/mo` ($288/yr), `$43/mo` ($408/yr).
 
 ---
