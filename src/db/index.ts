@@ -10,5 +10,6 @@ if (!connectionString) {
 	console.warn("DATABASE_URL environment variable is not defined.");
 }
 
-const client = postgres(connectionString, { max: 10 });
+// prepare: false is required for Neon PgBouncer transaction pooling
+const client = postgres(connectionString, { max: 10, prepare: false });
 export const db = drizzle(client, { schema });

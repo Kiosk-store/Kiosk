@@ -9,7 +9,7 @@ const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
 const isUpstashConfigured = Boolean(redisUrl && redisToken);
 
-const redis = isUpstashConfigured
+export const redis = isUpstashConfigured
 	? new Redis({
 			url: redisUrl!,
 			token: redisToken!,

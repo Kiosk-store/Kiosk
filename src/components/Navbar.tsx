@@ -1,18 +1,18 @@
 /**
- * Navbar
+ * Navbar (Dynamic Auth Context Integration)
  *
- * Thin wrapper that provides the nav item configuration and renders the
- * `StaggeredMenu` as the global navigation. Kept intentionally small;
- * complex menu behavior lives in `StaggeredMenu`.
+ * Renders StaggeredMenu navigation.
+ * When logged in, displays the user's name and Google profile picture / avatar linking to /dashboard.
+ * When logged out, displays "Get Started".
  *
  * @format
  */
 
-/** @format */
-
 "use client";
 
+import React from "react";
 import StaggeredMenu from "./StaggeredMenu";
+import { useAuth } from "@/context/AuthContext";
 
 const navItems = [
 	{ label: "Services", href: "/services" },
@@ -23,15 +23,26 @@ const navItems = [
 ];
 
 export default function Navbar() {
+	const { user } = useAuth();
+
 	const menuItems = navItems.map((n) => ({
 		label: n.label,
 		ariaLabel: `Go to ${n.label.toLowerCase()}`,
 		link: n.href,
 	}));
 
-	const actionItems = [
-		{ label: "Get Started", link: "/get-started", primary: true },
-	];
+	const displayName = user?.name || user?.email?.split("@")[0] || "Dashboard";
+
+	const actionItems = user
+		? [
+				{
+					label: displayName,
+					link: "/dashboard",
+					primary: true,
+					ariaLabel: "Go to your dashboard",
+				},
+		  ]
+		: [{ label: "Get Started", link: "/get-started", primary: true }];
 
 	return (
 		<div>

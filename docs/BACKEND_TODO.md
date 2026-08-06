@@ -96,8 +96,8 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
 ## Phase 2: Load Balancing & Infrastructure Architecture
 - [ ] Configure **Layer 4 Load Balancer** (Cloudflare Anycast / AWS NLB) for TCP packet routing & DDoS protection.
 - [ ] Configure **Layer 7 Load Balancer** (AWS ALB / NGINX / Vercel Edge Router) with Weighted Round-Robin algorithm.
-- [ ] Configure health check endpoint (`GET /healthz`) returning HTTP `200 OK`.
-- [ ] Provision **Neon PostgreSQL** serverless instance with **PgBouncer** connection pool (`max_connections=100`).
+- [x] Configure health check endpoint (`GET /api/healthz`) returning HTTP `200 OK` with DB & Redis latency metrics.
+- [x] Configure **Neon PostgreSQL** serverless driver & PgBouncer connection pool (`prepare: false`) in `src/db/index.ts`.
 - [x] Write schema models for `tenants`, `projects`, `subscriptions`, and `idempotency_keys` in `src/db/schema.ts`.
 
 ---

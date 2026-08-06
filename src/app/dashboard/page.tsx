@@ -255,9 +255,17 @@ export default function DashboardPage() {
 								setIsNotifOpen(false);
 							}}
 							className="flex items-center gap-2.5 p-1 sm:px-2 py-1 rounded-xl text-gray-800 hover:bg-gray-100/70 transition-colors duration-150 cursor-pointer">
-							<div className="w-8 h-8 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center shadow-xs shrink-0">
-								{initials}
-							</div>
+							{user?.image ? (
+								<img
+									src={user.image}
+									alt={displayName}
+									className="w-8 h-8 rounded-full object-cover ring-2 ring-blue-600/30 shadow-xs shrink-0"
+								/>
+							) : (
+								<div className="w-8 h-8 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center shadow-xs shrink-0">
+									{initials}
+								</div>
+							)}
 							<span className="hidden sm:inline text-xs font-bold text-gray-800">
 								{displayName}
 							</span>
