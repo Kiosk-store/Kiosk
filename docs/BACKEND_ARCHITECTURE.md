@@ -34,9 +34,18 @@ Clients should not be forced to depend on methods they do not use.
 High-level modules do not depend on low-level modules; both depend on abstractions.
 - Services accept injected interface abstractions via Dependency Injection (DI) containers.
 
+## 2. Multi-Tenant Software Architecture & Context Isolation
+
+The Kiosk backend is designed as a Multi-Tenant SaaS application where multiple business accounts share application infrastructure while maintaining complete isolation of data, configuration, custom domains, and sessions.
+
+### Multi-Tenant Core Patterns:
+- **Tenant Context Provider**: Context-aware request middleware extracts tenant identity from host headers or session tokens and binds `tenantId` to downstream request context.
+- **Tenant Repository Decorator**: Database queries automatically inject `WHERE tenant_id = :tenantId` filters to ensure zero data leakage across tenants.
+- **Dynamic Domain Resolution**: Matches subdomains (`subdomain.kiosk.site`) and custom domains (`customdomain.com`) to tenant configurations in edge KV cache.
+
 ---
 
-## 2. Software Design Patterns Specification
+## 3. Software Design Patterns Specification
 
 ### 1. Factory Pattern (`SiteTemplateFactory`)
 Encapsulates object instantiation based on requested client service tier (`landing`, `funnel`, `store`).

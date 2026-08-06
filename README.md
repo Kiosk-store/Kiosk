@@ -1,94 +1,68 @@
 <!-- @format -->
 
-Kiosk — marketing & portfolio site built with Next.js
+# Kiosk — Multi-Tenant Web Platform for Small Businesses
 
 ## Overview
 
-`kiosk` is a marketing and portfolio site built with Next.js and React. The project focuses on high-quality visuals, smooth interactions, and a modular component-driven structure. It uses Tailwind-inspired utility classes and a small set of design system conventions located in `src/components` and `src/lib`.
+`kiosk` is a multi-tenant web platform built with Next.js 16, React 19, Auth.js v5, and Drizzle ORM PostgreSQL. The platform focuses on high-quality visuals, smooth interactions, and a multi-tenant architecture allowing small businesses to host custom websites, sales funnels, and e-commerce stores on custom subdomains or domains.
 
-## About Kiosk
+## About Kiosk (Multi-Tenant SaaS Platform)
 
-**Kiosk makes it simple for small businesses to get online.**
+**Kiosk makes it simple for small businesses to get online with dedicated multi-tenant workspaces.**
 
-Most small business owners don’t need a complicated website. They just need a clean place to show what they offer, share their contact details, and start selling — without spending weeks learning tools or paying high monthly fees.
+Most small business owners don't need a complicated website builder. They just need a clean place to show what they offer, share their contact details, and start selling — without spending weeks learning tools or paying high monthly fees.
 
-That’s why we built Kiosk.
+### Multi-Tenant Capabilities
+- **Tenant Workspace Isolation**: Row-level database isolation (`tenants` table) for projects, billing subscriptions, and custom domains.
+- **Custom Domains & Subdomains**: Dynamic routing via Next.js Edge Middleware (`business.kiosk.site` or `customdomain.com`).
+- **Subscription Packages**:
+  - **Landing Page ($20/mo, $192/yr)** — A simple, professional page with business info, contact details, and WhatsApp integration.
+  - **Sales Funnel ($30/mo, $288/yr)** — Up to 5 conversion pages with lead capture and CRM integration.
+  - **Online Store ($43/mo, $408/yr)** — A full e-commerce store with product catalog, cart, and payment gateways.
 
-With Kiosk, you can choose the package that fits your business:
-
-- **Landing Page** — A simple, professional page with your business info, photos, WhatsApp button, and contact details.
-- **Online Store** — A full e-commerce store where customers can browse products and pay online.
-
-Everything is hosted for you. No technical setup. No complicated builders. Just fill in your details and go live.
-
-We’re building Kiosk for the everyday business owner — the ones who are too busy running their business to become website experts.
-
-**Simple. Affordable. Built for small businesses.**
+Everything is hosted and managed for you. No technical setup. No complicated builders. Just fill in your details and go live.
 
 ---
 
-### Shorter version (for a homepage About section)
+## Documentation Links
 
-**About Kiosk**
-Kiosk helps small businesses get online without the stress.
-Choose a simple landing page or a full online store — we handle the rest.
-No complicated tools. No steep learning curve. Just a clean online home for your business.
+- Multi-Tenant Architecture & About: [docs/ABOUT.md](docs/ABOUT.md)
+- Backend Architecture: [docs/BACKEND_ARCHITECTURE.md](docs/BACKEND_ARCHITECTURE.md)
+- Backend System Design: [docs/BACKEND_SYSTEM_DESIGN.md](docs/BACKEND_SYSTEM_DESIGN.md)
+- Backend TODO Checklist: [docs/BACKEND_TODO.md](docs/BACKEND_TODO.md)
+- Design System: [docs/DESIGN_ARCHITECTURE.md](docs/DESIGN_ARCHITECTURE.md)
+- Developer Guidelines: [docs/DEVELOPER_DOCUMENTATION.md](docs/DEVELOPER_DOCUMENTATION.md)
 
-## Quick links
+## Getting Started (Development)
 
-- Design & architecture: [docs/DESIGN_ARCHITECTURE.md](docs/DESIGN_ARCHITECTURE.md)
-- System design: [docs/SYSTEM_DESIGN.md](docs/SYSTEM_DESIGN.md)
-- Developer documentation: [docs/DEVELOPER_DOCUMENTATION.md](docs/DEVELOPER_DOCUMENTATION.md)
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-## Getting started (development)
+2. Configure environment variables in `.env.local` (copy template from `.env.example`).
 
-Install dependencies and run the dev server:
+3. Push PostgreSQL schema:
+   ```bash
+   npx drizzle-kit push
+   ```
 
-```bash
-npm install
-npm run dev
-```
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-Open http://localhost:3000 to preview locally. The main entry is `src/app/page.tsx` which composes the top-level sections (Navbar, Hero, Pricing, CTA, etc.).
+Open http://localhost:3000 to preview locally.
 
-## Available scripts
+## Tech Stack
 
-- `npm run dev` — start Next.js in development mode
-- `npm run build` — production build
-- `npm run start` — start the production server after build
-- `npm run lint` — run ESLint
+- **Framework**: Next.js 16 (App Router & Edge Middleware)
+- **Database & ORM**: Drizzle ORM + PostgreSQL (Multi-tenant schema)
+- **Authentication**: Auth.js v5 (NextAuth) + Password Hashing (bcryptjs 12 rounds)
+- **Rate Limiting**: Upstash Redis (Sliding Window)
+- **Styling**: Vanilla Tailwind CSS v4 & custom utility design tokens
+- **Animations**: GSAP, Framer Motion, Lenis Smooth Scroll
 
-## Tech stack & notable dependencies
+## License
 
-- Framework: Next.js (app router)
-- UI: React 19 and component-driven layout in `src/components`
-- Styling: Tailwind-ish utilities (Tailwind CSS v4 + utilities/plugins)
-- Motion & scroll: `gsap` and `lenis` for smooth scroll and animations
-- Icons: `lucide-react`
-- Other: `clsx`, `class-variance-authority`, `shadcn` bits
-
-## Repository layout (high level)
-
-- `src/app` — Next.js app entry, global styles, and route-level files
-- `src/components` — UI components used to compose the homepage and other views
-- `src/lib` — small utilities and stores (for example: `lenis-store.ts`)
-- `public` — static assets and fonts
-
-## Design & docs
-
-Detailed design architecture, system design, and developer documentation have been added under `docs/`. These files explain the component model, data flow, deployment recommendations, accessibility guidelines, and developer conventions to help the team onboard quickly.
-
-## Deployment
-
-This app is well suited for Vercel (recommended). For production builds, run `npm run build` then `npm run start` (or deploy via the Vercel platform for automatic builds and CDN delivery).
-
-## Contributing
-
-- Follow the component and styling conventions in `docs/DEVELOPER_DOCUMENTATION.md` when adding or updating UI.
-- Run `npm run lint` to check code quality before committing.
-
-## Where to go next
-
-- Review the design architecture: [docs/DESIGN_ARCHITECTURE.md](docs/DESIGN_ARCHITECTURE.md)
-- Review the system design: [docs/SYSTEM_DESIGN.md](docs/SYSTEM_DESIGN.md)
-- Read developer setup and coding guidelines: [docs/DEVELOPER_DOCUMENTATION.md](docs/DEVELOPER_DOCUMENTATION.md)
+Private repository. All rights reserved.

@@ -31,42 +31,42 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
 ## Phase 1: Authentication & Authorization Engine (STARTING PRIORITY)
 
 ### 1. Stack Dependencies & Database Schema
-- [ ] Install core Auth dependencies (`npm install next-auth@beta @auth/drizzle-adapter @auth/prisma-adapter zod`).
-- [ ] Install Rate Limiting dependencies (`npm install @upstash/ratelimit @upstash/redis`).
-- [ ] Install Drizzle ORM & PostgreSQL client (`npm install drizzle-orm postgres` & `npm install -D drizzle-kit`).
-- [ ] Define core database schema in `src/db/schema.ts`:
-  - [ ] `users` (`id`, `name`, `email`, `passwordHash`, `image`, `role`, `createdAt`, `updatedAt`).
-  - [ ] `accounts` (`userId`, `type`, `provider`, `providerAccountId`, `refresh_token`, `access_token`).
-  - [ ] `sessions` (`sessionToken`, `userId`, `expires`).
-  - [ ] `verificationTokens` (`identifier`, `token`, `expires`).
+- [x] Install core Auth dependencies (`next-auth@beta`, `@auth/drizzle-adapter`, `@auth/prisma-adapter`, `zod`).
+- [x] Install Rate Limiting dependencies (`@upstash/ratelimit`, `@upstash/redis`).
+- [x] Install Drizzle ORM & PostgreSQL client (`drizzle-orm`, `postgres`).
+- [x] Define core database schema in `src/db/schema.ts`:
+  - [x] `users` (`id`, `name`, `email`, `passwordHash`, `image`, `role`, `createdAt`, `updatedAt`).
+  - [x] `accounts` (`userId`, `type`, `provider`, `providerAccountId`, `refresh_token`, `access_token`).
+  - [x] `sessions` (`sessionToken`, `userId`, `expires`).
+  - [x] `verificationTokens` (`identifier`, `token`, `expires`).
 - [ ] Run migration pipeline (`npx drizzle-kit generate` & `npx drizzle-kit migrate`).
 
 ### 2. Rate Limiting Middleware (`src/lib/ratelimit.ts`)
-- [ ] Initialize Upstash Redis Sliding Window Rate Limiter.
-- [ ] Configure Auth Rate Limiter (5 requests / 1 min on `/api/auth/*` routes).
-- [ ] Configure API Rate Limiter (100 requests / 1 min on general API routes).
-- [ ] Add `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset` HTTP headers and return `429 Too Many Requests` on breach.
+- [x] Initialize Upstash Redis Sliding Window Rate Limiter (`src/lib/ratelimit.ts`).
+- [x] Configure Auth Rate Limiter (5 requests / 1 min on `/api/auth/*` routes).
+- [x] Configure API Rate Limiter (100 requests / 1 min on general API routes).
+- [x] Add `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset` HTTP headers and return `429 Too Many Requests` on breach.
 
 ### 3. Security & Password Hashing
-- [ ] Install `bcryptjs` for secure password hashing.
-- [ ] Create security module (`src/lib/auth/password.ts`) with Zod schema validation.
+- [x] Install `bcryptjs` for secure password hashing.
+- [x] Create security module (`src/lib/auth/password.ts`) with Zod schema validation.
 - [ ] Configure JWT access token issuance (RS256) and HTTP-Only cookie security (`SameSite=Strict`, `Secure`).
 
 ### 4. Auth API Route Handlers (`src/app/api/auth/*`)
-- [ ] **`POST /api/auth/register`**:
+- [x] **`POST /api/auth/register`**:
   - Apply Rate Limiter middleware (`authRatelimit`).
   - Validate email & password with Zod schema.
   - Check database for duplicate email.
   - Hash password and insert user record into PostgreSQL.
   - Issue session DTO & set secure auth cookie.
-- [ ] **`POST /api/auth/login`**:
+- [x] **`POST /api/auth/login`**:
   - Apply Rate Limiter middleware (`authRatelimit`).
   - Lookup user record & verify bcrypt password hash.
   - Issue session token & HTTP-Only refresh cookie.
-- [ ] **`POST /api/auth/logout`**:
+- [x] **`POST /api/auth/logout`**:
   - Invalidate token in Upstash Redis token revocation blacklist.
   - Clear HTTP-Only session cookies.
-- [ ] **`GET /api/auth/me`**:
+- [x] **`GET /api/auth/me`**:
   - Return current authenticated session profile DTO.
 
 ### 5. Checkout Session Protection (Zero Logout During Payment)
@@ -76,20 +76,20 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
 - [ ] **Grace Period Cookie Handling**: Set a 1-hour session extension window while a user is actively on `/checkout`.
 
 ### 6. OAuth 2.0 Google & GitHub Providers
-- [ ] Configure Google & GitHub OAuth client keys in `.env`.
-- [ ] Mount Auth.js v5 route handler (`src/app/api/auth/[...nextauth]/route.ts`).
-- [ ] Attach Google OAuth trigger to the "Continue with Google" button on `src/app/get-started/page.tsx`.
+- [x] Configure Google & GitHub OAuth client keys template in `.env` & `.env.example`.
+- [x] Mount Auth.js v5 route handler (`src/auth.ts` & `src/app/api/auth/[...nextauth]/route.ts`).
+- [x] Attach Google OAuth trigger to the "Continue with Google" button on `src/app/get-started/page.tsx`.
 
 ### 7. Next.js Edge Protection & Rate Limiting Middleware (`src/middleware.ts`)
-- [ ] Implement Next.js edge middleware to guard `/dashboard/*` and `/checkout` routes.
-- [ ] Attach `@upstash/ratelimit` check to all incoming requests at the edge.
-- [ ] Redirect unauthenticated visitors to `/get-started?tab=login`.
+- [x] Implement Next.js edge middleware to guard `/dashboard/*` and `/checkout` routes.
+- [x] Attach rate limit checks to incoming API requests at the edge.
+- [x] Redirect unauthenticated visitors to `/get-started?tab=login`.
 
 ### 8. Frontend Auth State Integration (`src/app/get-started/page.tsx`)
-- [ ] Build `AuthContext.tsx` provider with `useAuth()` custom hook (`user`, `login`, `signup`, `logout`, `isLoading`).
-- [ ] Wire `handleSignupSubmit`, `handleLoginSubmit`, and `handleSocialAuth` on `/get-started` to real API endpoints.
-- [ ] Handle `429 Too Many Requests` error responses gracefully on the UI with countdown toast notifications.
-- [ ] Connect dashboard profile header greetings and "Log Out" button to `logout()` context handler.
+- [x] Build `AuthContext.tsx` provider with `useAuth()` custom hook (`user`, `login`, `signup`, `logout`, `isLoading`).
+- [x] Wire `handleSignupSubmit`, `handleLoginSubmit`, and `handleGoogleAuth` on `/get-started` to real API endpoints.
+- [x] Handle `429 Too Many Requests` error responses gracefully on the UI with error alerts.
+- [x] Connect dashboard profile header greetings and "Log Out" button to `logout()` context handler.
 
 ---
 
@@ -98,7 +98,7 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
 - [ ] Configure **Layer 7 Load Balancer** (AWS ALB / NGINX / Vercel Edge Router) with Weighted Round-Robin algorithm.
 - [ ] Configure health check endpoint (`GET /healthz`) returning HTTP `200 OK`.
 - [ ] Provision **Neon PostgreSQL** serverless instance with **PgBouncer** connection pool (`max_connections=100`).
-- [ ] Write schema models for `projects`, `subscriptions`, `invoices`, and `idempotency_keys`.
+- [x] Write schema models for `tenants`, `projects`, `subscriptions`, and `idempotency_keys` in `src/db/schema.ts`.
 
 ---
 

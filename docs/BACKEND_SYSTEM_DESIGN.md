@@ -4,9 +4,27 @@
 
 ## Executive Overview
 
-`Kiosk` backend is designed as an enterprise-grade, highly scalable, stateless microservice/serverless-hybrid system built to support high-throughput website provisioning, real-time client analytics, domain management, and subscriptions.
+`Kiosk` backend is designed as an enterprise-grade, highly scalable, stateless multi-tenant microservice/serverless-hybrid system built to support high-throughput website provisioning, real-time client analytics, custom domain routing, and tenant subscriptions.
 
-This document details the architectural topologies, load balancing, rate limiting, database strategies, security standards, caching layers, and idempotency guarantees.
+This document details the multi-tenant architecture, topologies, load balancing, rate limiting, database strategies, security standards, caching layers, and idempotency guarantees.
+
+---
+
+## Multi-Tenant Architecture & Data Isolation
+
+Kiosk implements a **Row-Level Pooled Database Multi-Tenant Pattern**:
+
+1. **Tenant Model (`tenants` Table)**:
+   - Every business client owns an isolated `tenant_id`.
+   - Tenants possess subdomains (e.g. `bakery.kiosk.site`) and custom domains (e.g. `bakery.com`).
+
+2. **Data Isolation Layer**:
+   - All tenant-owned tables (`projects`, `subscriptions`, `invoices`, `idempotency_keys`) strictly enforce `tenant_id` foreign keys with cascade deletions.
+   - All API endpoints filter queries by `tenant_id` extracted from the verified session context.
+
+3. **Dynamic Host & Subdomain Routing**:
+   - Next.js Edge Middleware inspects the incoming `Host` header.
+   - Subdomain and custom domain host requests are matched against Redis cache to resolve `tenant_id` in sub-millisecond response times.
 
 ---
 

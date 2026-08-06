@@ -28,6 +28,8 @@ import {
 	Smartphone,
 } from "lucide-react";
 
+import { useAuth } from "@/context/AuthContext";
+
 /* Mock data for demonstration - Landing Page subscriber */
 const mockProjects: ProjectCardProps[] = [
 	{
@@ -41,6 +43,7 @@ const mockProjects: ProjectCardProps[] = [
 
 export default function DashboardPage() {
 	const router = useRouter();
+	const { user, logout } = useAuth();
 	const [greeting, setGreeting] = useState("Good morning");
 	const [isProfileOpen, setIsProfileOpen] = useState(false);
 	const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -116,9 +119,17 @@ export default function DashboardPage() {
 		};
 	}, []);
 
-	const handleLogout = () => {
+	const displayName = user?.name || user?.email?.split("@")[0] || "User";
+	const initials = displayName
+		.split(" ")
+		.map((n) => n[0])
+		.join("")
+		.toUpperCase()
+		.slice(0, 2);
+
+	const handleLogout = async () => {
 		setIsProfileOpen(false);
-		router.push("/get-started");
+		await logout();
 	};
 
 	const handleSendSupport = (e: React.FormEvent) => {
@@ -245,10 +256,10 @@ export default function DashboardPage() {
 							}}
 							className="flex items-center gap-2.5 p-1 sm:px-2 py-1 rounded-xl text-gray-800 hover:bg-gray-100/70 transition-colors duration-150 cursor-pointer">
 							<div className="w-8 h-8 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center shadow-xs shrink-0">
-								JV
+								{initials}
 							</div>
 							<span className="hidden sm:inline text-xs font-bold text-gray-800">
-								Jeremiah
+								{displayName}
 							</span>
 							<span className="material-symbols-outlined text-gray-400 text-[18px]">
 								expand_more
@@ -261,10 +272,10 @@ export default function DashboardPage() {
 									{/* User Info Header */}
 									<div className="px-3 py-2.5 border-b border-gray-100 mb-1">
 										<p className="text-xs font-bold text-gray-900 leading-snug">
-											Jeremiah Victor
+											{displayName}
 										</p>
 										<p className="text-[11px] text-gray-400 truncate mt-0.5 font-medium">
-											jeremiah@kiosk.com
+											{user?.email || "user@kiosk.site"}
 										</p>
 									</div>
 
@@ -312,7 +323,7 @@ export default function DashboardPage() {
 				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
 					<div>
 						<h1 className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900 tracking-tight">
-							{greeting}, Jeremiah
+							{greeting}, {displayName}
 						</h1>
 						<p className="text-gray-500 text-sm font-medium mt-1">
 							Here&apos;s what&apos;s happening with your website projects today.

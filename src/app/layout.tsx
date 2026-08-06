@@ -4,7 +4,8 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import NavbarWrapper from "@/components/NavbarWrapper";
-import CookieConsent from "@/components/CookieConsent";
+import { AuthProvider } from "@/context/AuthContext";
+// import CookieConsent from "@/components/CookieConsent";
 
 const thunderLC = localFont({
 	src: [
@@ -152,9 +153,11 @@ export default function RootLayout({
 				/>
 			</head>
 			<body className="font-nohemi antialiased">
-				<NavbarWrapper />
-				{children}
-				<CookieConsent />
+				<AuthProvider>
+					<NavbarWrapper />
+					{children}
+					{/* <CookieConsent /> */}
+				</AuthProvider>
 			</body>
 		</html>
 	);

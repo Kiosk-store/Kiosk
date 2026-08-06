@@ -4,6 +4,7 @@
 
 import React from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import Dock from "./Dock";
 import type { DockItemData } from "./Dock";
 
@@ -24,33 +25,46 @@ const navItems: NavItem[] = [
 export default function Sidebar() {
 	const pathname = usePathname();
 	const router = useRouter();
+	const { logout } = useAuth();
 
-	const dockItems: DockItemData[] = navItems.map((item) => {
-		const isActive =
-			pathname === item.href ||
-			(item.href !== "/dashboard" && pathname.startsWith(item.href));
+	const dockItems: DockItemData[] = [
+		...navItems.map((item) => {
+			const isActive =
+				pathname === item.href ||
+				(item.href !== "/dashboard" && pathname.startsWith(item.href));
 
-		return {
+			return {
+				icon: (
+					<span
+						className={`material-symbols-outlined text-[22px] ${
+							isActive ? "text-blue-600" : "text-gray-500"
+						}`}
+						style={{
+							fontVariationSettings: isActive
+								? "'FILL' 1, 'wght' 500"
+								: "'FILL' 0, 'wght' 400",
+						}}>
+						{item.icon}
+					</span>
+				),
+				label: item.label,
+				onClick: () => router.push(item.href),
+				className: isActive
+					? "!bg-blue-50 !border-blue-200"
+					: "",
+			};
+		}),
+		{
 			icon: (
-				<span
-					className={`material-symbols-outlined text-[22px] ${
-						isActive ? "text-blue-600" : "text-gray-500"
-					}`}
-					style={{
-						fontVariationSettings: isActive
-							? "'FILL' 1, 'wght' 500"
-							: "'FILL' 0, 'wght' 400",
-					}}>
-					{item.icon}
+				<span className="material-symbols-outlined text-[22px] text-rose-500">
+					logout
 				</span>
 			),
-			label: item.label,
-			onClick: () => router.push(item.href),
-			className: isActive
-				? "!bg-blue-50 !border-blue-200"
-				: "",
-		};
-	});
+			label: "Log Out",
+			onClick: () => logout(),
+			className: "hover:!bg-rose-50 hover:!border-rose-200",
+		},
+	];
 
 	return (
 		<div className="fixed bottom-0 left-0 right-0 z-50">
