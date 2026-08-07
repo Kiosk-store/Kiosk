@@ -141,6 +141,10 @@ export async function POST(request: Request) {
 		// Use Factory pattern to create template configuration
 		const templateConfig = SiteTemplateFactory.createTemplate(type as SiteTier);
 
+		// Generate clean project subdomain slug directly from Project Name (e.g. "Bella Bakery" -> "bella-bakery.kioosk.online")
+		const projectSlug = name.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+		const projectSubdomain = projectSlug || "project";
+
 		const [newProject] = await db
 			.insert(projects)
 			.values({
@@ -149,7 +153,7 @@ export async function POST(request: Request) {
 				type,
 				status: "In Progress",
 				progress: templateConfig.progress,
-				publishedUrl: `https://${tenant.slug}.kioosk.online`,
+				publishedUrl: `https://${projectSubdomain}.kioosk.online`,
 			})
 			.returning();
 

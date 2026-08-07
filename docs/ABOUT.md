@@ -13,7 +13,7 @@ Most small business owners don't have the time, design skill, or desire to learn
 ## Multi-Tenant Platform Model
 
 Kiosk is engineered from the ground up as a multi-tenant platform:
-- **Tenant Isolation**: Every client business operates within an isolated tenant workspace (`tenants` table) with dedicated project spaces, custom domains, and subdomains (e.g. `business.kiosk.site` or `customdomain.com`).
+- **Tenant Isolation**: Every client business operates within an isolated tenant workspace (`tenants` table) with dedicated project spaces, custom domains, and subdomains (e.g. `business.kioosk.online` or `customdomain.com`).
 - **Subdomain Routing**: Next.js Edge Middleware dynamically routes incoming requests to the client's tenant environment.
 - **Pooled PostgreSQL Database**: Row-level tenant isolation using strict `tenant_id` foreign key scoping across all projects, billing subscriptions, and asset records.
 
