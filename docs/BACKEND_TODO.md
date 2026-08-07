@@ -33,13 +33,13 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
 ### 1. Stack Dependencies & Database Schema
 - [x] Install core Auth dependencies (`next-auth@beta`, `@auth/drizzle-adapter`, `@auth/prisma-adapter`, `zod`).
 - [x] Install Rate Limiting dependencies (`@upstash/ratelimit`, `@upstash/redis`).
-- [x] Install Drizzle ORM & PostgreSQL client (`drizzle-orm`, `postgres`).
+- [x] Install Drizzle ORM & PostgreSQL client (`drizzle-orm`, `postgres`, `drizzle-kit`).
 - [x] Define core database schema in `src/db/schema.ts`:
   - [x] `users` (`id`, `name`, `email`, `passwordHash`, `image`, `role`, `createdAt`, `updatedAt`).
   - [x] `accounts` (`userId`, `type`, `provider`, `providerAccountId`, `refresh_token`, `access_token`).
   - [x] `sessions` (`sessionToken`, `userId`, `expires`).
   - [x] `verificationTokens` (`identifier`, `token`, `expires`).
-- [ ] Run migration pipeline (`npx drizzle-kit generate` & `npx drizzle-kit migrate`).
+- [x] Push migration schema to Neon PostgreSQL (`npm run db:push`).
 
 ### 2. Rate Limiting Middleware (`src/lib/ratelimit.ts`)
 - [x] Initialize Upstash Redis Sliding Window Rate Limiter (`src/lib/ratelimit.ts`).
@@ -50,9 +50,10 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
 ### 3. Security & Password Hashing
 - [x] Install `bcryptjs` for secure password hashing.
 - [x] Create security module (`src/lib/auth/password.ts`) with Zod schema validation.
-- [ ] Configure JWT access token issuance (RS256) and HTTP-Only cookie security (`SameSite=Strict`, `Secure`).
+- [x] Configure HTTP-Only session cookie security (`SameSite=Lax`, `Secure` in production, dual-token flush on logout).
+- [x] Conduct code security & vulnerability audit (`security_audit_report.md`).
 
-### 4. Auth API Route Handlers (`src/app/api/auth/*`)
+### 4. Auth & User Profile API Route Handlers (`src/app/api/auth/*` & `src/app/api/user/*`)
 - [x] **`POST /api/auth/register`**:
   - Apply Rate Limiter middleware (`authRatelimit`).
   - Validate email & password with Zod schema.
@@ -64,10 +65,12 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
   - Lookup user record & verify bcrypt password hash.
   - Issue session token & HTTP-Only refresh cookie.
 - [x] **`POST /api/auth/logout`**:
-  - Invalidate token in Upstash Redis token revocation blacklist.
-  - Clear HTTP-Only session cookies.
+  - Destroy active database session in Neon PostgreSQL.
+  - Invalidate and clear all `kiosk_session` and NextAuth session cookies.
 - [x] **`GET /api/auth/me`**:
-  - Return current authenticated session profile DTO.
+  - Return current authenticated session profile DTO (supporting custom session and Auth.js Google OAuth).
+- [x] **`PATCH /api/user/profile`**:
+  - Update user profile details (`name`) in Neon PostgreSQL with Zod validation and live `useAuth()` sync.
 
 ### 5. Checkout Session Protection (Zero Logout During Payment)
 - [ ] **Background Token Auto-Refresh**: Configure NextAuth silent token refresh on `/checkout` entry so JWT access tokens never expire mid-payment.
@@ -116,22 +119,22 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
 
 ## Phase 4: Domain & Site Provisioning Engine
 - [x] Build `SiteTemplateFactory` (Factory pattern) & multi-tenant projects API (`GET/POST /api/projects`) in `src/app/api/projects/route.ts`.
+- [x] Build Site Provisioning & Template Selection page (`src/app/dashboard/projects/new/page.tsx`).
 - [x] Automate wildcard subdomain (`<client>.kiosk.site`) & custom domain edge routing engine in `src/middleware.ts`.
 - [ ] Setup **Inngest** serverless background workers for PDF invoice generation and asset optimization.
 
 ---
 
 ## Phase 5: Observable Event Bus & Email Notifications
-- [ ] Build `ProjectSubject` publish-subscribe event pipeline (Observer pattern).
-- [ ] Integrate **Resend API** with **React Email** templates (`@react-email/components`) for welcome & invoice receipts.
+- [x] Build `ProjectSubject` publish-subscribe event pipeline (Observer pattern) in `src/lib/events/ProjectSubject.ts`.
+- [x] Integrate **Resend API** transactional email system with responsive HTML templates in `src/lib/email.ts`.
 - [ ] Wire **Upstash QStash** event bus for asynchronous decoupled event handling.
 
 ---
 
 ## Phase 6: Multi-Layer Caching Architecture
-- [ ] Setup L1 process LRU memory cache (5-second TTL).
-- [ ] Configure **Upstash Redis** Cache-Aside layer for sub-5ms user session and project metadata lookups.
-- [ ] Attach event-driven cache eviction hooks on database mutations.
+- [x] Setup L1 process LRU memory cache & L2 Upstash Redis Cache-Aside layer (`src/lib/cache/CacheService.ts`).
+- [x] Attach event-driven cache eviction hooks on database mutations in `/api/projects`.
 
 ---
 

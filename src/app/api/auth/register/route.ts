@@ -7,6 +7,7 @@ import { eq } from "drizzle-orm";
 import { hashPassword, registerInputSchema } from "@/lib/auth/password";
 import { createSession } from "@/lib/auth/session";
 import { checkRateLimit } from "@/lib/ratelimit";
+import { sendWelcomeEmail } from "@/lib/email";
 
 export async function POST(request: Request) {
 	try {
@@ -70,6 +71,11 @@ export async function POST(request: Request) {
 
 		// 5. Create Session & Set HTTP-Only Cookie
 		await createSession(newUser.id);
+
+		// 6. Dispatch Welcome Email asynchronously
+		sendWelcomeEmail(newUser.email, newUser.name || "Valued User").catch((err) => {
+			console.error("[REGISTER_WELCOME_EMAIL_ERROR]", err);
+		});
 
 		return NextResponse.json(
 			{

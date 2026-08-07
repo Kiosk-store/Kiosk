@@ -10,6 +10,8 @@ import { auth } from "@/auth";
 import { checkRateLimit } from "@/lib/ratelimit";
 import { SiteTemplateFactory } from "@/lib/factory/SiteTemplateFactory";
 import type { SiteTier } from "@/lib/factory/SiteTemplateFactory";
+import { CacheService } from "@/lib/cache/CacheService";
+import { ProjectSubject } from "@/lib/events/ProjectSubject";
 
 const createProjectSchema = z.object({
 	name: z.string().min(2, "Project name must be at least 2 characters."),
@@ -41,7 +43,7 @@ async function getOrCreateTenantForUser(userId: string, userName: string | null)
 }
 
 /**
- * GET /api/projects - Returns list of projects for current user's tenant
+ * GET /api/projects - Returns list of projects for current user's tenant with Cache-Aside support
  */
 export async function GET(request: Request) {
 	try {
@@ -54,7 +56,7 @@ export async function GET(request: Request) {
 			);
 		}
 
-		// Authenticate User (Auth.js session or custom session)
+		// Authenticate User
 		const authSession = await auth();
 		const customUser = await getAuthenticatedUser();
 		const userId = authSession?.user?.id || customUser?.id;
@@ -65,15 +67,31 @@ export async function GET(request: Request) {
 		}
 
 		const tenant = await getOrCreateTenantForUser(userId, userName);
+		const cacheKey = `tenant:projects:${tenant.id}`;
+
+		// Check Multi-Layer Cache
+		const cachedData = await CacheService.get<{ tenant: any; projects: any[] }>(cacheKey);
+		if (cachedData) {
+			return NextResponse.json(cachedData, {
+				headers: { "X-Cache-Status": "HIT" },
+			});
+		}
 
 		const tenantProjects = await db.query.projects.findMany({
 			where: eq(projects.tenantId, tenant.id),
 			orderBy: (p, { desc }) => [desc(p.createdAt)],
 		});
 
-		return NextResponse.json({
+		const responsePayload = {
 			tenant,
 			projects: tenantProjects,
+		};
+
+		// Store in Cache (5 min TTL)
+		await CacheService.set(cacheKey, responsePayload, 300);
+
+		return NextResponse.json(responsePayload, {
+			headers: { "X-Cache-Status": "MISS" },
 		});
 	} catch (err) {
 		console.error("[GET_PROJECTS_ERROR]", err);
@@ -85,7 +103,7 @@ export async function GET(request: Request) {
 }
 
 /**
- * POST /api/projects - Creates a new project using SiteTemplateFactory
+ * POST /api/projects - Creates a new project and dispatches event to ProjectSubject bus
  */
 export async function POST(request: Request) {
 	try {
@@ -134,6 +152,16 @@ export async function POST(request: Request) {
 				publishedUrl: `https://${tenant.slug}.kiosk.site`,
 			})
 			.returning();
+
+		// Dispatch domain event via Observer pattern
+		const eventBus = ProjectSubject.getInstance();
+		await eventBus.notify({
+			id: crypto.randomUUID(),
+			type: "PROJECT_CREATED",
+			timestamp: new Date().toISOString(),
+			tenantId: tenant.id,
+			payload: newProject,
+		});
 
 		return NextResponse.json(
 			{
