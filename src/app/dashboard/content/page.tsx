@@ -234,19 +234,28 @@ function ContentForm() {
 						<span>Back to Dashboard</span>
 					</Link>
 
-					<PillButton
-						type="button"
-						onClick={() => setIsPreviewOpen(true)}
-						baseColor="#eff6ff"
-						circleColor="#004ac6"
-						textColor="#004ac6"
-						hoverTextColor="#004ac6"
-						className="px-5 py-2 rounded-full border border-blue-200 text-xs font-bold shadow-2xs">
-						<span className="inline-flex items-center gap-2">
-							<Eye className="w-4 h-4" />
-							<span>Live Site Preview</span>
-						</span>
-					</PillButton>
+					{/* Icon-Only Preview Button with Tooltip on Hover */}
+					<div className="relative group/preview">
+						<PillButton
+							type="button"
+							onClick={() => setIsPreviewOpen((prev) => !prev)}
+							onMouseEnter={() => setIsPreviewOpen(true)}
+							baseColor="#eff6ff"
+							circleColor="#004ac6"
+							textColor="#004ac6"
+							hoverTextColor="#004ac6"
+							aria-label="Preview Custom Site"
+							className="p-2.5 rounded-full border border-blue-200 shadow-2xs">
+							<Eye className="w-4 h-4 text-blue-600" />
+						</PillButton>
+
+						{/* Tooltip Badge on Hover */}
+						<div className="absolute right-0 top-11 opacity-0 group-hover/preview:opacity-100 transition-opacity pointer-events-none z-30">
+							<span className="px-2.5 py-1 rounded-lg bg-gray-900 text-white text-[10px] font-bold shadow-md whitespace-nowrap">
+								Preview
+							</span>
+						</div>
+					</div>
 				</div>
 
 				{/* Payment Success Confirmation Alert Banner */}
@@ -263,12 +272,8 @@ function ContentForm() {
 
 				{/* Header Title & Plan Selector */}
 				<div className="pb-6 border-b border-gray-200/80 mb-8 space-y-4">
-					<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+					<div className="flex items-center justify-between gap-4">
 						<div>
-							<div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-extrabold uppercase tracking-wider mb-2">
-								<FileText className="w-3.5 h-3.5" />
-								<span>Custom Plan Content Builder</span>
-							</div>
 							<h1 className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900 tracking-tight mb-1">
 								Submit Your Business Copy & Images
 							</h1>
@@ -283,21 +288,6 @@ function ContentForm() {
 								</span>
 							</p>
 						</div>
-
-						<PillButton
-							type="button"
-							onClick={() => setIsPreviewOpen(true)}
-							baseColor="#004ac6"
-							circleColor="#ffffff"
-							textColor="#ffffff"
-							hoverTextColor="#004ac6"
-							useThunderFont={true}
-							className="px-6 py-2.5 rounded-full font-bold text-xs border border-blue-600 shadow-md self-start sm:self-auto shrink-0">
-							<span className="inline-flex items-center gap-2">
-								<Monitor className="w-4 h-4" />
-								<span>Preview Custom Site</span>
-							</span>
-						</PillButton>
 					</div>
 
 					{/* Interactive Plan Selector Switcher */}
@@ -688,21 +678,7 @@ function ContentForm() {
 						</div>
 
 						{/* Action Buttons */}
-						<div className="pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-							<PillButton
-								type="button"
-								onClick={() => setIsPreviewOpen(true)}
-								baseColor="#f8fafc"
-								circleColor="#004ac6"
-								textColor="#334155"
-								hoverTextColor="#004ac6"
-								className="w-full sm:w-auto px-6 py-3 rounded-full border border-slate-200 text-xs font-bold shadow-2xs">
-								<span className="inline-flex items-center gap-2">
-									<Eye className="w-4 h-4 text-blue-600" />
-									<span>Preview Custom Layout</span>
-								</span>
-							</PillButton>
-
+							<div className="pt-6 border-t border-gray-100 flex items-center justify-end">
 							<PillButton
 								type="submit"
 								disabled={isSubmitting}
@@ -731,7 +707,9 @@ function ContentForm() {
 
 			{/* LIVE INTERACTIVE SITE PREVIEW MODAL */}
 			{isPreviewOpen && (
-				<div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-6 overflow-y-auto">
+				<div
+					onMouseLeave={() => setIsPreviewOpen(false)}
+					className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-6 overflow-y-auto animate-in fade-in duration-200">
 					<div className="w-full max-w-5xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
 						{/* Top Control Bar */}
 						<div className="px-6 py-3.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between gap-4">
@@ -791,7 +769,6 @@ function ContentForm() {
 								className={`transition-all duration-300 bg-white text-slate-900 rounded-2xl overflow-hidden shadow-2xl ${
 									previewDevice === "mobile" ? "w-[375px] min-h-[667px]" : "w-full min-h-[550px]"
 								}`}>
-								
 								{/* RENDER: Site Navbar */}
 								<header className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
 									<div className="flex items-center gap-2.5">
