@@ -34,6 +34,7 @@ export default function ProjectsPage() {
 
 				if (Array.isArray(data.projects)) {
 					const mapped = data.projects.map((p: any) => ({
+						id: p.id,
 						name: p.name,
 						type: p.type,
 						status: p.status,

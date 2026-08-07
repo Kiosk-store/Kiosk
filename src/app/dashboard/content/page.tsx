@@ -108,45 +108,114 @@ function ContentForm() {
 	// Uploaded images state - Starts completely empty
 	const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
 
-	// Load existing user submitted content from backend
+	const projectId = searchParams.get("projectId") || "default";
+	const draftKey = `kiosk_draft_content_${projectId}`;
+	const [hasLoadedDraft, setHasLoadedDraft] = useState(false);
+
+	// Load existing user submitted content from backend + localStorage cache
 	useEffect(() => {
 		async function loadSavedContent() {
 			try {
-				const res = await fetch("/api/projects/content");
+				let backendContent: any = {};
+				const res = await fetch(`/api/projects/content?projectId=${projectId}`);
 				if (res.ok) {
 					const data = await res.json();
 					if (data.content) {
-						if (data.content.businessName) setBusinessName(data.content.businessName);
-						if (data.content.tagline) setTagline(data.content.tagline);
-						if (data.content.aboutText) setAboutText(data.content.aboutText);
-						if (data.content.servicesList) setServicesList(data.content.servicesList);
-						if (data.content.contactEmail) setContactEmail(data.content.contactEmail);
-						if (data.content.contactPhone) setContactPhone(data.content.contactPhone);
-						if (data.content.contactAddress) setContactAddress(data.content.contactAddress);
-
-						// Sales Funnel Fields
-						if (data.content.leadMagnetTitle) setLeadMagnetTitle(data.content.leadMagnetTitle);
-						if (data.content.valueStack) setValueStack(data.content.valueStack);
-						if (data.content.testimonials) setTestimonials(data.content.testimonials);
-
-						// E-commerce Fields
-						if (data.content.productCatalog) setProductCatalog(data.content.productCatalog);
-						if (data.content.currency) setCurrency(data.content.currency);
-						if (data.content.shippingInfo) setShippingInfo(data.content.shippingInfo);
-
-						if (data.content.selectedFont) setSelectedFont(data.content.selectedFont);
-
-						if (Array.isArray(data.content.uploadedImages)) {
-							setUploadedImages(data.content.uploadedImages);
-						}
+						backendContent = data.content;
 					}
+				}
+
+				// Check for local unsubmitted draft in localStorage
+				let draftContent: any = {};
+				try {
+					const localDraft = localStorage.getItem(draftKey);
+					if (localDraft) {
+						draftContent = JSON.parse(localDraft);
+					}
+				} catch (e) {
+					console.error("[LOCALSTORAGE_READ_ERROR]", e);
+				}
+
+				// Merge backend content with local draft (local draft takes precedence for unsaved edits)
+				const merged = { ...backendContent, ...draftContent };
+
+				if (merged.businessName) setBusinessName(merged.businessName);
+				if (merged.tagline) setTagline(merged.tagline);
+				if (merged.aboutText) setAboutText(merged.aboutText);
+				if (merged.servicesList) setServicesList(merged.servicesList);
+				if (merged.contactEmail) setContactEmail(merged.contactEmail);
+				if (merged.contactPhone) setContactPhone(merged.contactPhone);
+				if (merged.contactAddress) setContactAddress(merged.contactAddress);
+
+				// Sales Funnel Fields
+				if (merged.leadMagnetTitle) setLeadMagnetTitle(merged.leadMagnetTitle);
+				if (merged.valueStack) setValueStack(merged.valueStack);
+				if (merged.testimonials) setTestimonials(merged.testimonials);
+
+				// E-commerce Fields
+				if (merged.productCatalog) setProductCatalog(merged.productCatalog);
+				if (merged.currency) setCurrency(merged.currency);
+				if (merged.shippingInfo) setShippingInfo(merged.shippingInfo);
+
+				if (merged.selectedFont) setSelectedFont(merged.selectedFont);
+
+				if (Array.isArray(merged.uploadedImages)) {
+					setUploadedImages(merged.uploadedImages);
 				}
 			} catch (err) {
 				console.error("[LOAD_CONTENT_ERROR]", err);
+			} finally {
+				setHasLoadedDraft(true);
 			}
 		}
 		loadSavedContent();
-	}, []);
+	}, [projectId, draftKey]);
+
+	// Auto-save form progress to localStorage cache on any input change
+	useEffect(() => {
+		if (!hasLoadedDraft) return;
+		try {
+			const draftPayload = {
+				businessName,
+				tagline,
+				aboutText,
+				servicesList,
+				contactEmail,
+				contactPhone,
+				contactAddress,
+				leadMagnetTitle,
+				valueStack,
+				testimonials,
+				productCatalog,
+				currency,
+				shippingInfo,
+				selectedFont,
+				uploadedImages,
+				updatedAt: new Date().toISOString(),
+			};
+			localStorage.setItem(draftKey, JSON.stringify(draftPayload));
+		} catch (e) {
+			console.error("[LOCALSTORAGE_SAVE_ERROR]", e);
+		}
+	}, [
+		hasLoadedDraft,
+		draftKey,
+		businessName,
+		tagline,
+		aboutText,
+		servicesList,
+		contactEmail,
+		contactPhone,
+		contactAddress,
+		leadMagnetTitle,
+		valueStack,
+		testimonials,
+		productCatalog,
+		currency,
+		shippingInfo,
+		selectedFont,
+		uploadedImages,
+	]);
 
 	const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const files = e.target.files;
@@ -186,13 +255,13 @@ function ContentForm() {
 				contactEmail,
 				contactPhone,
 				contactAddress,
-				selectedFont,
 				leadMagnetTitle,
 				valueStack,
 				testimonials,
 				productCatalog,
 				currency,
 				shippingInfo,
+				selectedFont,
 				uploadedImages,
 			};
 
@@ -202,17 +271,26 @@ function ContentForm() {
 				body: JSON.stringify(payload),
 			});
 
-			if (res.ok) {
-				setIsSubmitted(true);
-				setTimeout(() => {
-					router.push("/dashboard");
-				}, 2000);
-			} else {
-				alert("Failed to save content details. Please try again.");
+			const data = await res.json();
+			if (!res.ok) {
+				alert(data.error || "Failed to submit custom content.");
+				return;
 			}
+
+			// Clear local draft from localStorage after successful submission
+			try {
+				localStorage.removeItem(draftKey);
+			} catch (e) {
+				console.error("[LOCALSTORAGE_CLEAR_ERROR]", e);
+			}
+
+			setIsSubmitted(true);
+			setTimeout(() => {
+				router.push("/dashboard");
+			}, 1500);
 		} catch (err) {
 			console.error("[SUBMIT_CONTENT_ERROR]", err);
-			alert("An unexpected error occurred.");
+			alert("An error occurred while saving your details.");
 		} finally {
 			setIsSubmitting(false);
 		}

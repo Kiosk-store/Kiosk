@@ -2,9 +2,11 @@
 
 "use client";
 
-import React from "react";
+import Link from "next/link";
+import { Edit3 } from "lucide-react";
 
 export interface ProjectCardProps {
+	id?: string;
 	name: string;
 	type: "Landing Page" | "Sales Funnel" | "E-commerce Store" | "E-commerce" | string;
 	status: "In Progress" | "In Review" | "Live" | "Draft" | string;
@@ -54,6 +56,7 @@ const typeAccent: Record<string, { bg: string; icon: string }> = {
 };
 
 export default function ProjectCard({
+	id,
 	name,
 	type,
 	status,
@@ -68,7 +71,7 @@ export default function ProjectCard({
 	return (
 		<div className="group relative bg-white border border-gray-200/90 rounded-2xl p-5 sm:p-6 transition-all duration-200 hover:border-blue-500/40 hover:shadow-xs flex flex-col justify-between">
 			<div>
-				{/* Top Row: Icon + Name */}
+				{/* Top Row: Icon + Name + Edit Button */}
 				<div className="flex items-start justify-between gap-3 mb-5">
 					<div className="flex items-center gap-3">
 						<div
@@ -85,9 +88,19 @@ export default function ProjectCard({
 						</div>
 					</div>
 
-					<div className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${sConf.bg} ${sConf.color} flex items-center gap-1.5`}>
-						<span className={`w-1.5 h-1.5 rounded-full ${sConf.dot}`} />
-						<span>{status}</span>
+					<div className="flex items-center gap-2">
+						<Link
+							href={`/dashboard/content?projectId=${id || ""}&plan=${encodeURIComponent(type)}`}
+							title="Edit Project Details & Content"
+							className="p-2 rounded-xl text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors duration-150 cursor-pointer"
+							aria-label="Edit Project Content">
+							<Edit3 className="w-4 h-4" />
+						</Link>
+
+						<div className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${sConf.bg} ${sConf.color} flex items-center gap-1.5`}>
+							<span className={`w-1.5 h-1.5 rounded-full ${sConf.dot}`} />
+							<span>{status}</span>
+						</div>
 					</div>
 				</div>
 
