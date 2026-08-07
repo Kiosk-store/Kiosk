@@ -734,7 +734,15 @@ export default function DashboardPage() {
 
 						{/* Live Interactive Site Render Window */}
 						<div className="flex-1 overflow-y-auto bg-slate-950 p-4 sm:p-8 flex items-center justify-center">
-							<div className="w-full min-h-[550px] bg-white text-slate-900 rounded-2xl overflow-hidden shadow-2xl">
+							{/* Dynamically Load User's Selected Google Font */}
+							<link
+								rel="stylesheet"
+								href={`https://fonts.googleapis.com/css2?family=${(savedContent?.selectedFont || "Outfit").replace(/\s+/g, "+")}:wght@400;600;700;800&display=swap`}
+							/>
+
+							<div
+								style={{ fontFamily: `'${savedContent?.selectedFont || "Outfit"}', sans-serif` }}
+								className="w-full min-h-[550px] bg-white text-slate-900 rounded-2xl overflow-hidden shadow-2xl">
 								{/* RENDER: Site Navbar */}
 								<header className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
 									<div className="flex items-center gap-2.5">

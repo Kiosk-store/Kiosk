@@ -20,6 +20,7 @@ const contentPayloadSchema = z.object({
 	contactEmail: z.string().email("Valid email is required"),
 	contactPhone: z.string().min(3, "Phone is required"),
 	contactAddress: z.string().optional(),
+	selectedFont: z.string().optional(),
 	uploadedImages: z
 		.array(
 			z.object({

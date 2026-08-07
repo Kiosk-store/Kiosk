@@ -134,6 +134,8 @@ function ContentForm() {
 						if (data.content.currency) setCurrency(data.content.currency);
 						if (data.content.shippingInfo) setShippingInfo(data.content.shippingInfo);
 
+						if (data.content.selectedFont) setSelectedFont(data.content.selectedFont);
+
 						if (Array.isArray(data.content.uploadedImages)) {
 							setUploadedImages(data.content.uploadedImages);
 						}
@@ -184,6 +186,7 @@ function ContentForm() {
 				contactEmail,
 				contactPhone,
 				contactAddress,
+				selectedFont,
 				leadMagnetTitle,
 				valueStack,
 				testimonials,
@@ -231,13 +234,19 @@ function ContentForm() {
 						<span>Back to Dashboard</span>
 					</Link>
 
-					<button
+					<PillButton
 						type="button"
 						onClick={() => setIsPreviewOpen(true)}
-						className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-200/80 text-blue-600 hover:bg-blue-100 transition-colors text-xs font-bold shadow-2xs cursor-pointer">
-						<Eye className="w-4 h-4" />
-						<span>Live Site Preview</span>
-					</button>
+						baseColor="#eff6ff"
+						circleColor="#004ac6"
+						textColor="#004ac6"
+						hoverTextColor="#004ac6"
+						className="px-5 py-2 rounded-full border border-blue-200 text-xs font-bold shadow-2xs">
+						<span className="inline-flex items-center gap-2">
+							<Eye className="w-4 h-4" />
+							<span>Live Site Preview</span>
+						</span>
+					</PillButton>
 				</div>
 
 				{/* Payment Success Confirmation Alert Banner */}
@@ -275,13 +284,20 @@ function ContentForm() {
 							</p>
 						</div>
 
-						<button
+						<PillButton
 							type="button"
 							onClick={() => setIsPreviewOpen(true)}
-							className="px-5 py-2.5 rounded-full bg-gray-900 hover:bg-gray-800 text-white text-xs font-bold transition-all flex items-center gap-2 shadow-md cursor-pointer self-start sm:self-auto shrink-0">
-							<Monitor className="w-4 h-4 text-blue-400" />
-							<span>Preview Custom Site</span>
-						</button>
+							baseColor="#004ac6"
+							circleColor="#ffffff"
+							textColor="#ffffff"
+							hoverTextColor="#004ac6"
+							useThunderFont={true}
+							className="px-6 py-2.5 rounded-full font-bold text-xs border border-blue-600 shadow-md self-start sm:self-auto shrink-0">
+							<span className="inline-flex items-center gap-2">
+								<Monitor className="w-4 h-4" />
+								<span>Preview Custom Site</span>
+							</span>
+						</PillButton>
 					</div>
 
 					{/* Interactive Plan Selector Switcher */}
@@ -673,13 +689,19 @@ function ContentForm() {
 
 						{/* Action Buttons */}
 						<div className="pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-							<button
+							<PillButton
 								type="button"
 								onClick={() => setIsPreviewOpen(true)}
-								className="w-full sm:w-auto px-6 py-3 rounded-full border border-gray-200/90 text-gray-700 hover:bg-gray-100 text-xs font-bold transition-colors flex items-center justify-center gap-2 cursor-pointer">
-								<Eye className="w-4 h-4 text-blue-600" />
-								<span>Preview Custom Layout</span>
-							</button>
+								baseColor="#f8fafc"
+								circleColor="#004ac6"
+								textColor="#334155"
+								hoverTextColor="#004ac6"
+								className="w-full sm:w-auto px-6 py-3 rounded-full border border-slate-200 text-xs font-bold shadow-2xs">
+								<span className="inline-flex items-center gap-2">
+									<Eye className="w-4 h-4 text-blue-600" />
+									<span>Preview Custom Layout</span>
+								</span>
+							</PillButton>
 
 							<PillButton
 								type="submit"
