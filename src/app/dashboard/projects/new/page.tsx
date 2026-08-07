@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import PillButton from "@/components/PillButton";
@@ -12,12 +12,11 @@ import {
 	ArrowLeft,
 	CheckCircle2,
 	Loader2,
-	Layers,
 	ShoppingBag,
 	Zap,
 } from "lucide-react";
 
-export default function NewProjectPage() {
+function NewProjectForm() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const templateParam = searchParams.get("template") || "";
@@ -213,5 +212,18 @@ export default function NewProjectPage() {
 				</form>
 			</div>
 		</div>
+	);
+}
+
+export default function NewProjectPage() {
+	return (
+		<Suspense
+			fallback={
+				<div className="min-h-screen w-full flex items-center justify-center bg-[#f8fafc]">
+					<Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+				</div>
+			}>
+			<NewProjectForm />
+		</Suspense>
 	);
 }
