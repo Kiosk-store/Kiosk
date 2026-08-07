@@ -145,7 +145,7 @@ export default function HowItWorks() {
 											maxWidth: 480,
 											margin: 0,
 											textAlign: "left",
-											fontFamily: "var(--font-nohemi)",
+											fontFamily: "var(--font-montserrat), sans-serif",
 											fontSize: "clamp(14px, 1.1vw, 17px)",
 											lineHeight: 1.6,
 											color: bodyColor,

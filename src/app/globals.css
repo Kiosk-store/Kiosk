@@ -108,6 +108,7 @@
 	--color-sage: #d4d9c8;
 
 	--font-nohemi: "Nohemi", system-ui, -apple-system, sans-serif;
+	--font-montserrat: var(--font-montserrat, "Montserrat", system-ui, -apple-system, sans-serif);
 	--font-thunder: "Thunder", system-ui, -apple-system, sans-serif;
 	--font-thunder-lc: var(--font-thunder-lc, "Thunder", system-ui, sans-serif);
 	--font-dirtyline: "Dirtyline", cursive;
@@ -149,6 +150,7 @@
 
 	/* --- Font Family Mapping --- */
 	--font-nohemi: "Nohemi", system-ui, -apple-system, sans-serif;
+	--font-montserrat: "Montserrat", system-ui, -apple-system, sans-serif;
 	--font-thunder: "Thunder", system-ui, -apple-system, sans-serif;
 	--font-dirtyline: "Dirtyline", cursive;
 
@@ -209,7 +211,7 @@
 
 /* Body Large (Intro / Subtitles) */
 .font-body-lead {
-	font-family: var(--font-nohemi);
+	font-family: var(--font-montserrat), sans-serif;
 	font-size: clamp(1.0625rem, 1vw + 0.5rem, 1.25rem);
 	line-height: 1.6;
 	font-weight: 400;
@@ -218,7 +220,7 @@
 
 /* Standard Body Copy */
 .font-body-base {
-	font-family: var(--font-nohemi);
+	font-family: var(--font-montserrat), sans-serif;
 	font-size: 1.125rem;
 	line-height: 1.625;
 	font-weight: 400;
@@ -226,7 +228,7 @@
 
 /* Micro & Labels */
 .font-label-caption {
-	font-family: var(--font-nohemi);
+	font-family: var(--font-nohemi), sans-serif;
 	font-size: 0.875rem;
 	line-height: 1.4;
 	letter-spacing: 0.08em;
@@ -328,7 +330,7 @@ html {
 body {
 	background-color: var(--color-background);
 	color: var(--color-on-surface);
-	font-family: var(--font-nohemi);
+	font-family: var(--font-montserrat), "Montserrat", system-ui, -apple-system, sans-serif;
 	font-size: 1.125rem;
 	line-height: 1.6;
 	overflow-x: hidden;

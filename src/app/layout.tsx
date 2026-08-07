@@ -2,11 +2,18 @@
 
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Montserrat } from "next/font/google";
 import "./globals.css";
 import NavbarWrapper from "@/components/NavbarWrapper";
 import { AuthProvider } from "@/context/AuthContext";
 import { Analytics } from "@vercel/analytics/next";
-// import CookieConsent from "@/components/CookieConsent";
+
+const montserrat = Montserrat({
+	subsets: ["latin"],
+	weight: ["300", "400", "500", "600", "700", "800"],
+	variable: "--font-montserrat",
+	display: "swap",
+});
 
 const thunderLC = localFont({
 	src: [
@@ -145,7 +152,7 @@ export default function RootLayout({
 	return (
 		<html
 			lang="en"
-			className={`scroll-smooth ${thunderLC.variable} ${thunderHC.variable} ${nohemi.variable} ${dirtyline.variable}`}>
+			className={`scroll-smooth ${montserrat.variable} ${thunderLC.variable} ${thunderHC.variable} ${nohemi.variable} ${dirtyline.variable}`}>
 			<head>
 				{/* Material Symbols Outlined */}
 				<link
@@ -153,7 +160,7 @@ export default function RootLayout({
 					rel="stylesheet"
 				/>
 			</head>
-			<body className="font-nohemi antialiased">
+			<body className={`${montserrat.className} font-montserrat antialiased`}>
 				<AuthProvider>
 					<NavbarWrapper />
 					{children}
