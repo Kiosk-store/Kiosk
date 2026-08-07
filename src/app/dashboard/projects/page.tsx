@@ -2,50 +2,61 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import PillButton from "@/components/PillButton";
 import ProjectCard from "@/components/dashboard/ProjectCard";
 import type { ProjectCardProps } from "@/components/dashboard/ProjectCard";
-
-const allProjects: ProjectCardProps[] = [
-	{
-		name: "My Business Page",
-		type: "Landing Page",
-		status: "In Progress",
-		progress: 65,
-		lastUpdated: "2 hours ago",
-	},
-	{
-		name: "Summer Launch Funnel",
-		type: "Sales Funnel",
-		status: "In Review",
-		progress: 90,
-		lastUpdated: "1 day ago",
-	},
-	{
-		name: "Online Store",
-		type: "E-commerce Store",
-		status: "Draft",
-		progress: 10,
-		lastUpdated: "3 days ago",
-	},
-	{
-		name: "Portfolio Showcase",
-		type: "Landing Page",
-		status: "Live",
-		progress: 100,
-		lastUpdated: "1 week ago",
-	},
-];
+import { Loader2, Plus, FolderX } from "lucide-react";
 
 type FilterStatus = "All" | "In Progress" | "In Review" | "Live" | "Draft";
 
 export default function ProjectsPage() {
+	const [projectsList, setProjectsList] = useState<ProjectCardProps[]>([]);
+	const [isLoading, setIsLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
 	const [activeFilter, setActiveFilter] = useState<FilterStatus>("All");
 	const [searchQuery, setSearchQuery] = useState("");
 
-	const filteredProjects = allProjects.filter((project) => {
+	useEffect(() => {
+		async function fetchProjects() {
+			try {
+				setIsLoading(true);
+				setError(null);
+				const res = await fetch("/api/projects");
+				const data = await res.json();
+
+				if (!res.ok) {
+					setError(data.error || "Failed to load projects.");
+					setIsLoading(false);
+					return;
+				}
+
+				if (Array.isArray(data.projects)) {
+					const mapped = data.projects.map((p: any) => ({
+						name: p.name,
+						type: p.type,
+						status: p.status,
+						progress: p.progress,
+						lastUpdated: p.updatedAt
+							? new Date(p.updatedAt).toLocaleDateString()
+							: "Just now",
+						publishedUrl: p.publishedUrl,
+					}));
+					setProjectsList(mapped);
+				}
+			} catch (err) {
+				console.error("[FETCH_PROJECTS_ERROR]", err);
+				setError("Network error loading projects.");
+			} finally {
+				setIsLoading(false);
+			}
+		}
+
+		fetchProjects();
+	}, []);
+
+	const filteredProjects = projectsList.filter((project) => {
 		const matchesFilter =
 			activeFilter === "All" || project.status === activeFilter;
 		const matchesSearch =
@@ -96,8 +107,8 @@ export default function ProjectsPage() {
 						{filters.map((filter) => {
 							const count =
 								filter === "All"
-									? allProjects.length
-									: allProjects.filter((p) => p.status === filter).length;
+									? projectsList.length
+									: projectsList.filter((p) => p.status === filter).length;
 
 							return (
 								<button
@@ -138,36 +149,63 @@ export default function ProjectsPage() {
 					</div>
 				</div>
 
+				{/* Loading State */}
+				{isLoading && (
+					<div className="py-20 text-center flex flex-col items-center justify-center">
+						<Loader2 className="w-8 h-8 text-blue-600 animate-spin mb-3" />
+						<p className="text-xs font-bold text-gray-500">Loading your real-time projects...</p>
+					</div>
+				)}
+
+				{/* Error State */}
+				{!isLoading && error && (
+					<div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center max-w-md mx-auto mb-8">
+						<p className="text-xs font-bold text-red-600">{error}</p>
+					</div>
+				)}
+
 				{/* Projects Grid */}
-				{filteredProjects.length > 0 ? (
+				{!isLoading && !error && filteredProjects.length > 0 && (
 					<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
 						{filteredProjects.map((project) => (
 							<ProjectCard key={project.name} {...project} />
 						))}
 					</div>
-				) : (
-					/* Empty State */
-					<div className="bg-white border border-gray-200/90 rounded-2xl p-12 text-center max-w-md mx-auto">
-						<div className="w-12 h-12 rounded-xl bg-gray-100 text-gray-400 flex items-center justify-center mx-auto mb-4">
-							<span className="material-symbols-outlined text-2xl">
-								folder_off
-							</span>
+				)}
+
+				{/* Empty State */}
+				{!isLoading && !error && filteredProjects.length === 0 && (
+					<div className="bg-white border border-gray-200/90 rounded-3xl p-12 text-center max-w-md mx-auto">
+						<div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-4 border border-blue-100">
+							<FolderX className="w-6 h-6" />
 						</div>
 						<h3 className="text-base font-bold font-nohemi text-gray-900 mb-1">
-							No projects found
+							{projectsList.length === 0 ? "No active projects yet" : "No matching projects"}
 						</h3>
-						<p className="text-xs text-gray-500 mb-6">
-							No projects matched your filter or search criteria.
+						<p className="text-xs text-gray-500 mb-6 font-medium leading-relaxed">
+							{projectsList.length === 0
+								? "You haven't provisioned any website projects for your workspace yet."
+								: "No projects matched your filter or search criteria."}
 						</p>
-						<button
-							type="button"
-							onClick={() => {
-								setActiveFilter("All");
-								setSearchQuery("");
-							}}
-							className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition-colors">
-							Reset Filters
-						</button>
+
+						{projectsList.length === 0 ? (
+							<Link
+								href="/dashboard/projects/new"
+								className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors shadow-md">
+								<Plus className="w-4 h-4" />
+								<span>Create Your First Project</span>
+							</Link>
+						) : (
+							<button
+								type="button"
+								onClick={() => {
+									setActiveFilter("All");
+									setSearchQuery("");
+								}}
+								className="px-5 py-2.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition-colors">
+								Reset Filters
+							</button>
+						)}
 					</div>
 				)}
 			</div>

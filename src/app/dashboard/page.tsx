@@ -346,7 +346,7 @@ export default function DashboardPage() {
 						</h1>
 						<p className="text-gray-500 text-sm font-medium mt-1">
 							{tenantInfo
-								? `Workspace: ${tenantInfo.name} (${tenantInfo.slug}.kiosk.site)`
+								? `Workspace: ${tenantInfo.name} (${tenantInfo.slug}.kioosk.online)`
 								: "Here's what's happening with your website projects today."}
 						</p>
 					</div>
