@@ -13,7 +13,7 @@
  */
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
-const EMAIL_FROM = process.env.EMAIL_FROM || "Kiosk <noreply@kiosk.site>";
+const EMAIL_FROM = process.env.EMAIL_FROM || "Kiosk <noreply@kioosk.online>";
 
 export interface SendEmailPayload {
 	to: string;

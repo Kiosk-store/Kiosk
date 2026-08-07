@@ -66,7 +66,7 @@ export async function initializeFlutterwavePayment(
 				customizations: {
 					title: input.title,
 					description: input.description,
-					logo: "https://kiosk.site/logo.png",
+					logo: "https://kioosk.online/logo.png",
 				},
 				meta: input.meta,
 			}),

@@ -26,6 +26,8 @@ const ROOT_DOMAINS = [
 	"localhost",
 	"127.0.0.1",
 	"0.0.0.0",
+	"kioosk.online",
+	"www.kioosk.online",
 	"kiosk.site",
 	"www.kiosk.site",
 ];
@@ -85,8 +87,12 @@ export async function middleware(request: NextRequest) {
 	const isRootDomain = ROOT_DOMAINS.includes(currentHost);
 
 	if (!isRootDomain) {
-		// Scenario A: Subdomain format (e.g. "bella-bakery.kiosk.site" or "bella-bakery.localhost")
-		if (currentHost.endsWith(".kiosk.site") || currentHost.endsWith(".localhost")) {
+		// Scenario A: Subdomain format (e.g. "bella-bakery.kioosk.online" or "bella-bakery.localhost")
+		if (
+			currentHost.endsWith(".kioosk.online") ||
+			currentHost.endsWith(".kiosk.site") ||
+			currentHost.endsWith(".localhost")
+		) {
 			const subdomain = currentHost.split(".")[0];
 			if (subdomain && subdomain !== "www") {
 				// Rewrite internally to the tenant route handler

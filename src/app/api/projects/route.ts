@@ -149,7 +149,7 @@ export async function POST(request: Request) {
 				type,
 				status: "In Progress",
 				progress: templateConfig.progress,
-				publishedUrl: `https://${tenant.slug}.kiosk.site`,
+				publishedUrl: `https://${tenant.slug}.kioosk.online`,
 			})
 			.returning();
 
