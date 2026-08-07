@@ -5,6 +5,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import NavbarWrapper from "@/components/NavbarWrapper";
 import { AuthProvider } from "@/context/AuthContext";
+import { Analytics } from "@vercel/analytics/next";
 // import CookieConsent from "@/components/CookieConsent";
 
 const thunderLC = localFont({
@@ -158,6 +159,7 @@ export default function RootLayout({
 					{children}
 					{/* <CookieConsent /> */}
 				</AuthProvider>
+				<Analytics />
 			</body>
 		</html>
 	);
