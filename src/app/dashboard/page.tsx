@@ -173,69 +173,124 @@ export default function DashboardPage() {
 
 	return (
 		<div className="w-full min-h-screen bg-[#f8fafc] relative pb-24 select-none overflow-hidden">
-			{/* Subtle Lively Background Lines & Geometric Accent Shapes (Clean Vector, No Gradients) */}
+			{/* Lively Architectural Background Vector Lines & Geometric Shapes */}
 			<div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-
-				{/* Subtle Vector Line Grid & Geometric Paths */}
 				<svg
-					className="absolute inset-0 w-full h-full opacity-40"
+					className="absolute inset-0 w-full h-full"
 					xmlns="http://www.w3.org/2000/svg">
 					<defs>
+						{/* Clean Architectural Blueprint Grid Pattern */}
 						<pattern
 							id="dashboard-grid-pattern"
-							width="60"
-							height="60"
+							width="50"
+							height="50"
 							patternUnits="userSpaceOnUse">
 							<path
-								d="M 60 0 L 0 0 0 60"
+								d="M 50 0 L 0 0 0 50"
 								fill="none"
 								stroke="#cbd5e1"
-								strokeWidth="0.5"
+								strokeWidth="0.75"
 								strokeDasharray="4 4"
-								opacity="0.5"
+								opacity="0.65"
 							/>
 						</pattern>
 					</defs>
 
-					{/* Background Pattern Grid */}
+					{/* Background Grid Pattern */}
 					<rect width="100%" height="100%" fill="url(#dashboard-grid-pattern)" />
 
-					{/* Floating Decorative Diagonal Accent Lines */}
+					{/* Floating Crisp Diagonal Lines */}
 					<path
-						d="M -100 200 L 800 -300"
-						stroke="#2563eb"
+						d="M -100 180 L 900 -200"
+						stroke="#3b82f6"
 						strokeWidth="1.5"
-						strokeDasharray="8 8"
-						opacity="0.12"
+						strokeDasharray="6 6"
+						opacity="0.25"
 					/>
 					<path
-						d="M 400 1200 L 1400 600"
+						d="M 200 900 L 1600 200"
 						stroke="#6366f1"
 						strokeWidth="1.5"
-						strokeDasharray="12 12"
-						opacity="0.1"
+						strokeDasharray="10 10"
+						opacity="0.2"
+					/>
+					<path
+						d="M -50 700 L 1200 1300"
+						stroke="#0284c7"
+						strokeWidth="1.2"
+						strokeDasharray="8 8"
+						opacity="0.2"
 					/>
 
-					{/* Decorative Concentric Ring Outlines */}
+					{/* Geometric Accent Shapes: Concentric Circles & Outlines */}
 					<circle
-						cx="92%"
-						cy="18%"
-						r="120"
+						cx="90%"
+						cy="15%"
+						r="140"
 						fill="none"
 						stroke="#2563eb"
-						strokeWidth="1"
+						strokeWidth="1.5"
 						strokeDasharray="6 6"
-						opacity="0.15"
+						opacity="0.25"
 					/>
 					<circle
-						cx="8%"
-						cy="65%"
-						r="180"
+						cx="90%"
+						cy="15%"
+						r="80"
+						fill="none"
+						stroke="#3b82f6"
+						strokeWidth="1"
+						strokeDasharray="4 4"
+						opacity="0.2"
+					/>
+
+					<circle
+						cx="10%"
+						cy="60%"
+						r="190"
+						fill="none"
+						stroke="#6366f1"
+						strokeWidth="1.5"
+						strokeDasharray="8 8"
+						opacity="0.2"
+					/>
+					<circle
+						cx="10%"
+						cy="60%"
+						r="100"
 						fill="none"
 						stroke="#8b5cf6"
 						strokeWidth="1"
-						strokeDasharray="8 8"
-						opacity="0.12"
+						strokeDasharray="5 5"
+						opacity="0.18"
+					/>
+
+					{/* Geometric Floating Outlines: Diamond & Squares */}
+					<rect
+						x="78%"
+						y="45%"
+						width="48"
+						height="48"
+						rx="12"
+						fill="none"
+						stroke="#0284c7"
+						strokeWidth="1.5"
+						strokeDasharray="4 4"
+						transform="rotate(45 800 400)"
+						opacity="0.25"
+					/>
+					<rect
+						x="15%"
+						y="20%"
+						width="60"
+						height="60"
+						rx="16"
+						fill="none"
+						stroke="#3b82f6"
+						strokeWidth="1.5"
+						strokeDasharray="6 6"
+						transform="rotate(15 200 200)"
+						opacity="0.22"
 					/>
 				</svg>
 			</div>
@@ -423,11 +478,6 @@ export default function DashboardPage() {
 						<h1 className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900 tracking-tight">
 							{greeting}, {displayName}
 						</h1>
-						<p className="text-gray-500 text-sm font-medium mt-1">
-							{tenantInfo
-								? `Workspace: ${tenantInfo.name} (${tenantInfo.slug}.kioosk.online)`
-								: "Here's what's happening with your website projects today."}
-						</p>
 					</div>
 
 					<PillButton
