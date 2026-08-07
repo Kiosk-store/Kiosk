@@ -121,7 +121,7 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
 - [x] Build `SiteTemplateFactory` (Factory pattern) & multi-tenant projects API (`GET/POST /api/projects`) in `src/app/api/projects/route.ts`.
 - [x] Build Site Provisioning & Template Selection page (`src/app/dashboard/projects/new/page.tsx`).
 - [x] Automate wildcard subdomain (`<client>.kiosk.site`) & custom domain edge routing engine in `src/middleware.ts`.
-- [ ] Setup **Inngest** serverless background workers for PDF invoice generation and asset optimization.
+- [x] Setup **Inngest** serverless background workers for PDF invoice generation and asset optimization (`src/inngest/client.ts` & `/api/inngest`).
 
 ---
 
@@ -139,6 +139,6 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
 ---
 
 ## Phase 7: Test-Driven Development (TDD) & CI/CD Pipeline
-- [ ] Write Unit Tests with **Vitest** (`*.spec.ts`).
+- [x] Write Unit Tests for Security, SiteTemplateFactory, CacheService, and ProjectSubject (`src/__tests__/auth.spec.ts`).
 - [ ] Write E2E API tests with **Playwright** (`*.e2e-spec.ts`).
 - [ ] Setup **GitHub Actions** CI/CD pipeline for automated linting, type-checking (`npx tsc --noEmit`), Vitest suite execution, and Vercel deployment.
