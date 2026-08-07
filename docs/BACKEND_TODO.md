@@ -106,14 +106,14 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
 ---
 
 ## Phase 3: Subscriptions & Payment Double-Charge Protection
-- [ ] Integrate **Stripe Billing API** & **Paystack** webhooks (`src/app/api/webhooks/stripe/route.ts`).
-- [ ] **Strict Payment Idempotency Engine (`Idempotency-Key`)**:
-  - [ ] Generate unique client-side `Idempotency-Key` (v4 UUID) when `/checkout` mounts.
-  - [ ] Implement Upstash Redis atomic lock (`SETNX idempotency:<key> PENDING EX 300`) to block concurrent duplicate requests.
-  - [ ] Instantly return cached `200 OK` response payload if a duplicate request with the same `Idempotency-Key` arrives.
-- [ ] **UI Submit Button Lockout**: Disable payment button immediately on first click (`isProcessing = true`) and display loading spinner to prevent double-clicking.
-- [ ] **Webhook Deduplication**: Log processed Stripe/Paystack `event_id` in Redis/PostgreSQL to prevent duplicate processing on gateway webhook retries.
-- [ ] Map active plans: `$20/mo` ($192/yr), `$30/mo` ($288/yr), `$43/mo` ($408/yr).
+- [x] Integrate **Flutterwave REST API v3 Gateway** (`src/lib/flutterwave.ts`).
+- [x] **Strict Payment Idempotency Engine (`Idempotency-Key`)**:
+  - [x] Implement Upstash Redis atomic lock (`SETNX @kiosk/idempotency:<key> LOCKED EX 300`) in `POST /api/payments/initialize` to block concurrent double charges.
+  - [x] Support multi-currency checkout (`USD`, `NGN`, `GHS`, `KES`) mapped to active plans ($20/mo, $30/mo, $43/mo).
+- [x] **Webhook Security & Deduplication (`POST /api/webhooks/flutterwave`)**:
+  - [x] Secret hash verification via `verif-hash` header.
+  - [x] Event deduplication in Upstash Redis (`@kiosk/webhook:flw:<id>`).
+  - [x] Transaction verification with Flutterwave API and Neon PostgreSQL tenant plan upgrade.
 
 ---
 
