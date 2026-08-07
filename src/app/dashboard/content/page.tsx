@@ -93,16 +93,67 @@ export default function ContentSubmissionPage() {
 		setUploadedImages((prev) => prev.filter((img) => img.id !== id));
 	};
 
-	const handleSubmit = (e: React.FormEvent) => {
+	React.useEffect(() => {
+		async function loadSavedContent() {
+			try {
+				const res = await fetch("/api/projects/content");
+				if (res.ok) {
+					const data = await res.json();
+					if (data.content) {
+						if (data.content.businessName) setBusinessName(data.content.businessName);
+						if (data.content.tagline) setTagline(data.content.tagline);
+						if (data.content.aboutText) setAboutText(data.content.aboutText);
+						if (data.content.servicesList) setServicesList(data.content.servicesList);
+						if (data.content.contactEmail) setContactEmail(data.content.contactEmail);
+						if (data.content.contactPhone) setContactPhone(data.content.contactPhone);
+						if (data.content.contactAddress) setContactAddress(data.content.contactAddress);
+						if (Array.isArray(data.content.uploadedImages) && data.content.uploadedImages.length > 0) {
+							setUploadedImages(data.content.uploadedImages);
+						}
+					}
+				}
+			} catch (err) {
+				console.error("[LOAD_CONTENT_ERROR]", err);
+			}
+		}
+		loadSavedContent();
+	}, []);
+
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		setIsSubmitting(true);
-		setTimeout(() => {
+		try {
+			setIsSubmitting(true);
+			const payload = {
+				businessName,
+				tagline,
+				aboutText,
+				servicesList,
+				contactEmail,
+				contactPhone,
+				contactAddress,
+				uploadedImages,
+			};
+
+			const res = await fetch("/api/projects/content", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(payload),
+			});
+
+			if (res.ok) {
+				setIsSubmitted(true);
+				setTimeout(() => {
+					router.push("/dashboard");
+				}, 2000);
+			} else {
+				alert("Failed to save content details.");
+			}
+		} catch (err) {
+			console.error("[SUBMIT_CONTENT_ERROR]", err);
+			alert("An unexpected error occurred.");
+		} finally {
 			setIsSubmitting(false);
-			setIsSubmitted(true);
-			setTimeout(() => {
-				router.push("/dashboard");
-			}, 2500);
-		}, 1200);
+		}
 	};
 
 	const heroImage = uploadedImages.length > 0 ? uploadedImages[0].url : null;

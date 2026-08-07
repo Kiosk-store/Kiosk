@@ -71,26 +71,38 @@ export default function DashboardPage() {
 
 	const unreadCount = notifications.filter((n) => n.unread).length;
 
-	// Fetch real projects from API endpoint
+	// Saved Business Content State
+	const [savedContent, setSavedContent] = useState<any | null>(null);
+
+	// Fetch real projects & content from API endpoints
 	useEffect(() => {
-		async function fetchUserProjects() {
+		async function fetchUserData() {
 			try {
 				setIsLoadingProjects(true);
-				const res = await fetch("/api/projects");
-				if (res.ok) {
-					const data = await res.json();
+				const [projRes, contentRes] = await Promise.all([
+					fetch("/api/projects"),
+					fetch("/api/projects/content"),
+				]);
+
+				if (projRes.ok) {
+					const data = await projRes.json();
 					setProjectsList(data.projects || []);
 					setTenantInfo(data.tenant || null);
 				}
+
+				if (contentRes.ok) {
+					const cData = await contentRes.json();
+					setSavedContent(cData.content || null);
+				}
 			} catch (err) {
-				console.error("[FETCH_PROJECTS_ERROR]", err);
+				console.error("[FETCH_DATA_ERROR]", err);
 			} finally {
 				setIsLoadingProjects(false);
 			}
 		}
 
 		if (user) {
-			fetchUserProjects();
+			fetchUserData();
 		} else {
 			setIsLoadingProjects(false);
 		}
@@ -699,45 +711,112 @@ export default function DashboardPage() {
 
 			{/* Preview Drawer / Modal */}
 			{isPreviewOpen && (
-				<div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-					<div className="w-full max-w-4xl bg-white rounded-3xl overflow-hidden shadow-2xl border border-gray-100 flex flex-col max-h-[90vh]">
-						<div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+				<div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-6 overflow-y-auto">
+					<div className="w-full max-w-5xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+						{/* Top Control Bar */}
+						<div className="px-6 py-3.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between gap-4">
 							<div className="flex items-center gap-3">
-								<Monitor className="w-5 h-5 text-blue-600" />
-								<div>
-									<h3 className="text-sm font-bold text-gray-900">
-										{activeProject?.name || "Website Preview"}
-									</h3>
-									<p className="text-[11px] text-gray-500 font-medium">
-										{activeProject?.publishedUrl || "https://demo.kiosk.site"}
-									</p>
-								</div>
+								<div className="w-3 h-3 rounded-full bg-red-500" />
+								<div className="w-3 h-3 rounded-full bg-amber-500" />
+								<div className="w-3 h-3 rounded-full bg-emerald-500" />
+								<span className="text-xs font-mono font-bold text-slate-400 ml-2 truncate max-w-[200px] sm:max-w-xs">
+									{activeProject?.publishedUrl || "https://preview.kioosk.online"}
+								</span>
 							</div>
+
 							<button
 								type="button"
 								onClick={() => setIsPreviewOpen(false)}
-								className="p-1 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
+								className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer">
 								<X className="w-5 h-5" />
 							</button>
 						</div>
 
-						<div className="flex-1 bg-gray-100 p-8 flex items-center justify-center min-h-[400px]">
-							<div className="bg-white rounded-2xl shadow-lg border border-gray-200 w-full max-w-2xl p-8 text-center">
-								<Globe className="w-12 h-12 text-blue-600 mx-auto mb-3 animate-pulse" />
-								<h4 className="text-lg font-bold font-nohemi text-gray-900 mb-1">
-									Interactive Preview Staging
-								</h4>
-								<p className="text-xs text-gray-500 max-w-md mx-auto mb-6">
-									Staging server is compiling your custom assets for {activeProject?.name || "your site"}.
-								</p>
-								<a
-									href={activeProject?.publishedUrl || "https://demo.kiosk.site"}
-									target="_blank"
-									rel="noreferrer"
-									className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-md">
-									<ExternalLink className="w-4 h-4" />
-									<span>Open Staging URL</span>
-								</a>
+						{/* Live Interactive Site Render Window */}
+						<div className="flex-1 overflow-y-auto bg-slate-950 p-4 sm:p-8 flex items-center justify-center">
+							<div className="w-full min-h-[550px] bg-white text-slate-900 rounded-2xl overflow-hidden shadow-2xl">
+								{/* RENDER: Site Navbar */}
+								<header className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
+									<div className="flex items-center gap-2.5">
+										{savedContent?.uploadedImages && savedContent.uploadedImages.length > 0 ? (
+											<img
+												src={savedContent.uploadedImages[0].url}
+												alt="Logo"
+												className="w-7 h-7 rounded-lg object-cover border border-gray-200"
+											/>
+										) : (
+											<div className="w-7 h-7 rounded-lg bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
+												{(savedContent?.businessName || activeProject?.name || "K")[0]}
+											</div>
+										)}
+										<span className="font-bold text-sm text-gray-900 font-nohemi">
+											{savedContent?.businessName || activeProject?.name || "My Business"}
+										</span>
+									</div>
+
+									<button className="px-4 py-1.5 rounded-full bg-blue-600 text-white text-xs font-bold">
+										Contact Us
+									</button>
+								</header>
+
+								{/* RENDER: Hero Section */}
+								<div className="relative bg-slate-900 text-white py-16 px-6 text-center overflow-hidden">
+									{savedContent?.uploadedImages && savedContent.uploadedImages.length > 0 && (
+										<div className="absolute inset-0 z-0">
+											<img
+												src={savedContent.uploadedImages[0].url}
+												alt="Hero Background"
+												className="w-full h-full object-cover opacity-30 blur-xs"
+											/>
+										</div>
+									)}
+
+									<div className="relative z-10 max-w-xl mx-auto space-y-4">
+										<span className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-[10px] font-extrabold uppercase tracking-wider border border-blue-500/30">
+											Official Website
+										</span>
+										<h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight font-nohemi leading-tight">
+											{savedContent?.tagline || "High-Converting Custom Website"}
+										</h1>
+										<p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed max-w-md mx-auto">
+											{savedContent?.aboutText || "Professional online presence tailored for your business."}
+										</p>
+									</div>
+								</div>
+
+								{/* RENDER: Services Section */}
+								<div className="py-12 px-6 bg-slate-50">
+									<div className="max-w-md mx-auto text-center mb-8">
+										<h2 className="text-lg font-bold font-nohemi text-gray-900 mb-1">
+											Key Offers & Services
+										</h2>
+									</div>
+
+									<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl mx-auto">
+										{(savedContent?.servicesList || "1. Consulting\n2. Solutions\n3. Support")
+											.split("\n")
+											.map((svc: string, i: number) => (
+												<div
+													key={i}
+													className="p-4 rounded-xl bg-white border border-gray-200/80 shadow-2xs">
+													<div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-bold mb-2">
+														{i + 1}
+													</div>
+													<p className="text-xs font-bold text-gray-900">{svc}</p>
+												</div>
+											))}
+									</div>
+								</div>
+
+								{/* RENDER: Contact Footer */}
+								<footer className="py-8 px-6 bg-white border-t border-gray-100 text-center text-xs text-gray-500 space-y-2">
+									<p className="font-bold text-gray-900">
+										{savedContent?.businessName || activeProject?.name}
+									</p>
+									<p className="text-[11px] text-gray-600">
+										Email: {savedContent?.contactEmail || "contact@kioosk.online"} | Phone: {savedContent?.contactPhone || "+1 (555) 019-2834"}
+									</p>
+								</footer>
 							</div>
 						</div>
 					</div>
