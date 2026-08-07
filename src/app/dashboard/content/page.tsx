@@ -239,7 +239,6 @@ function ContentForm() {
 						<PillButton
 							type="button"
 							onClick={() => setIsPreviewOpen((prev) => !prev)}
-							onMouseEnter={() => setIsPreviewOpen(true)}
 							baseColor="#eff6ff"
 							circleColor="#004ac6"
 							textColor="#004ac6"
@@ -707,9 +706,7 @@ function ContentForm() {
 
 			{/* LIVE INTERACTIVE SITE PREVIEW MODAL */}
 			{isPreviewOpen && (
-				<div
-					onMouseLeave={() => setIsPreviewOpen(false)}
-					className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-6 overflow-y-auto animate-in fade-in duration-200">
+				<div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-6 overflow-y-auto animate-in fade-in duration-200">
 					<div className="w-full max-w-5xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
 						{/* Top Control Bar */}
 						<div className="px-6 py-3.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between gap-4">

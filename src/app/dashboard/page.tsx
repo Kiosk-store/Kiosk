@@ -172,7 +172,74 @@ export default function DashboardPage() {
 	const activeProject = projectsList.length > 0 ? projectsList[0] : null;
 
 	return (
-		<div className="w-full min-h-screen bg-[#f8fafc] relative pb-24 select-none">
+		<div className="w-full min-h-screen bg-[#f8fafc] relative pb-24 select-none overflow-hidden">
+			{/* Subtle Lively Background Lines & Geometric Accent Shapes (Clean Vector, No Gradients) */}
+			<div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+
+				{/* Subtle Vector Line Grid & Geometric Paths */}
+				<svg
+					className="absolute inset-0 w-full h-full opacity-40"
+					xmlns="http://www.w3.org/2000/svg">
+					<defs>
+						<pattern
+							id="dashboard-grid-pattern"
+							width="60"
+							height="60"
+							patternUnits="userSpaceOnUse">
+							<path
+								d="M 60 0 L 0 0 0 60"
+								fill="none"
+								stroke="#cbd5e1"
+								strokeWidth="0.5"
+								strokeDasharray="4 4"
+								opacity="0.5"
+							/>
+						</pattern>
+					</defs>
+
+					{/* Background Pattern Grid */}
+					<rect width="100%" height="100%" fill="url(#dashboard-grid-pattern)" />
+
+					{/* Floating Decorative Diagonal Accent Lines */}
+					<path
+						d="M -100 200 L 800 -300"
+						stroke="#2563eb"
+						strokeWidth="1.5"
+						strokeDasharray="8 8"
+						opacity="0.12"
+					/>
+					<path
+						d="M 400 1200 L 1400 600"
+						stroke="#6366f1"
+						strokeWidth="1.5"
+						strokeDasharray="12 12"
+						opacity="0.1"
+					/>
+
+					{/* Decorative Concentric Ring Outlines */}
+					<circle
+						cx="92%"
+						cy="18%"
+						r="120"
+						fill="none"
+						stroke="#2563eb"
+						strokeWidth="1"
+						strokeDasharray="6 6"
+						opacity="0.15"
+					/>
+					<circle
+						cx="8%"
+						cy="65%"
+						r="180"
+						fill="none"
+						stroke="#8b5cf6"
+						strokeWidth="1"
+						strokeDasharray="8 8"
+						opacity="0.12"
+					/>
+				</svg>
+			</div>
+
 			{/* Header with Logo and Profile Dropdown */}
 			<header className="sticky top-0 z-30 bg-[#f8fafc]/90 backdrop-blur-md border-b border-gray-200/80 px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
 				{/* Logo */}
