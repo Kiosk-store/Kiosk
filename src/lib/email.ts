@@ -69,7 +69,7 @@ export async function sendEmail({ to, subject, html }: SendEmailPayload): Promis
  * @param userName - User full name or display handle
  */
 export async function sendWelcomeEmail(toEmail: string, userName: string) {
-	const subject = "Welcome to Kiosk! Your Multi-Tenant Workspace is Live 🚀";
+	const subject = "Welcome to Kiosk! Your Multi-Tenant Workspace is Live";
 	const html = `
 		<!DOCTYPE html>
 		<html>
@@ -83,7 +83,7 @@ export async function sendWelcomeEmail(toEmail: string, userName: string) {
 						<div style="width: 32px; height: 32px; background-color: #2563eb; border-radius: 8px; color: #ffffff; font-weight: bold; text-align: center; line-height: 32px; font-size: 16px; margin-right: 12px;">K</div>
 						<span style="font-size: 20px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px;">KIOSK</span>
 					</div>
-					<h1 style="font-size: 24px; font-weight: 700; color: #0f172a; margin-bottom: 16px;">Welcome aboard, ${userName}! 👋</h1>
+					<h1 style="font-size: 24px; font-weight: 700; color: #0f172a; margin-bottom: 16px;">Welcome aboard, ${userName}!</h1>
 					<p style="font-size: 15px; color: #475569; line-height: 1.6; margin-bottom: 24px;">
 						Your custom multi-tenant workspace is fully provisioned and ready. You can now build, manage, and scale your custom website landing pages, sales funnels, and e-commerce stores.
 					</p>

@@ -2,9 +2,9 @@
 
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
 	ArrowLeft,
 	Upload,
@@ -22,7 +22,13 @@ import {
 	Globe,
 	Phone,
 	Mail,
-	Check,
+	Zap,
+	ShoppingBag,
+	CreditCard,
+	Tag,
+	FileCheck,
+	Shuffle,
+	Truck,
 } from "lucide-react";
 import PillButton from "@/components/PillButton";
 
@@ -33,45 +39,112 @@ interface UploadedImage {
 	url: string;
 }
 
-export default function ContentSubmissionPage() {
+type PlanType = "LANDING_PAGE" | "SALES_FUNNEL" | "E_COMMERCE";
+
+const GOOGLE_FONTS_CATALOG = [
+	{ name: "Outfit", category: "Modern Sans-Serif" },
+	{ name: "Inter", category: "Clean & Universal" },
+	{ name: "Plus Jakarta Sans", category: "Corporate & Tech" },
+	{ name: "Poppins", category: "Geometric Sans" },
+	{ name: "Playfair Display", category: "Luxury Serif" },
+	{ name: "Montserrat", category: "Bold Branding" },
+	{ name: "Lora", category: "Editorial Serif" },
+	{ name: "Space Grotesk", category: "Futuristic Sans" },
+	{ name: "Syne", category: "Artistic & Creative" },
+	{ name: "DM Sans", category: "Minimalist Sans" },
+	{ name: "Cinzel", category: "High Fashion Serif" },
+	{ name: "Roboto", category: "Classic Sans" },
+];
+
+function ContentForm() {
 	const router = useRouter();
+	const searchParams = useSearchParams();
 	const fileInputRef = useRef<HTMLInputElement>(null);
+
+	// Plan Detection
+	const planQuery = (searchParams.get("plan") || "").toUpperCase();
+	const isPaymentSuccess = searchParams.get("payment") === "complete";
+
+	const [activePlan, setActivePlan] = useState<PlanType>(
+		planQuery.includes("FUNNEL")
+			? "SALES_FUNNEL"
+			: planQuery.includes("COMMERCE") || planQuery.includes("STORE")
+			? "E_COMMERCE"
+			: "LANDING_PAGE",
+	);
 
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isSubmitted, setIsSubmitted] = useState(false);
 	const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 	const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
 
-	// Form fields
-	const [businessName, setBusinessName] = useState("Bella Bakery & Cafe");
-	const [tagline, setTagline] = useState(
-		"Artisanal Pastries & Freshly Brewed Coffee Made Daily",
-	);
-	const [aboutText, setAboutText] = useState(
-		"We are a family-owned bakery dedicated to crafting delicious sourdough bread, custom celebration cakes, and organic espresso for our local community.",
-	);
-	const [servicesList, setServicesList] = useState(
-		"1. Custom Birthday & Event Cakes\n2. Artisanal Sourdough Breads\n3. Espresso Bar & Catering Services",
-	);
-	const [contactEmail, setContactEmail] = useState("hello@bellabakery.online");
-	const [contactPhone, setContactPhone] = useState("+1 (555) 019-2834");
-	const [contactAddress, setContactAddress] = useState("123 Main Street, Downtown");
+	// Google Fonts State
+	const [selectedFont, setSelectedFont] = useState("Outfit");
 
-	// Uploaded images state
-	const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([
-		{
-			id: "img-1",
-			name: "bakery-hero-banner.jpg",
-			size: "1.2 MB",
-			url: "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1200&q=80",
-		},
-		{
-			id: "img-2",
-			name: "logo-transparent.png",
-			size: "450 KB",
-			url: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=400&q=80",
-		},
-	]);
+	const handleRandomizeFont = () => {
+		const randomIndex = Math.floor(Math.random() * GOOGLE_FONTS_CATALOG.length);
+		setSelectedFont(GOOGLE_FONTS_CATALOG[randomIndex].name);
+	};
+
+	// ZERO DEMO DATA - Start completely empty for clean user entry
+	const [businessName, setBusinessName] = useState("");
+	const [tagline, setTagline] = useState("");
+	const [aboutText, setAboutText] = useState("");
+	const [servicesList, setServicesList] = useState("");
+	const [contactEmail, setContactEmail] = useState("");
+	const [contactPhone, setContactPhone] = useState("");
+	const [contactAddress, setContactAddress] = useState("");
+
+	// Sales Funnel Specific Fields
+	const [leadMagnetTitle, setLeadMagnetTitle] = useState("");
+	const [valueStack, setValueStack] = useState("");
+	const [testimonials, setTestimonials] = useState("");
+
+	// E-Commerce Specific Fields
+	const [productCatalog, setProductCatalog] = useState("");
+	const [currency, setCurrency] = useState("USD");
+	const [shippingInfo, setShippingInfo] = useState("");
+
+	// Uploaded images state - Starts completely empty
+	const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+
+	// Load existing user submitted content from backend
+	useEffect(() => {
+		async function loadSavedContent() {
+			try {
+				const res = await fetch("/api/projects/content");
+				if (res.ok) {
+					const data = await res.json();
+					if (data.content) {
+						if (data.content.businessName) setBusinessName(data.content.businessName);
+						if (data.content.tagline) setTagline(data.content.tagline);
+						if (data.content.aboutText) setAboutText(data.content.aboutText);
+						if (data.content.servicesList) setServicesList(data.content.servicesList);
+						if (data.content.contactEmail) setContactEmail(data.content.contactEmail);
+						if (data.content.contactPhone) setContactPhone(data.content.contactPhone);
+						if (data.content.contactAddress) setContactAddress(data.content.contactAddress);
+
+						// Sales Funnel Fields
+						if (data.content.leadMagnetTitle) setLeadMagnetTitle(data.content.leadMagnetTitle);
+						if (data.content.valueStack) setValueStack(data.content.valueStack);
+						if (data.content.testimonials) setTestimonials(data.content.testimonials);
+
+						// E-commerce Fields
+						if (data.content.productCatalog) setProductCatalog(data.content.productCatalog);
+						if (data.content.currency) setCurrency(data.content.currency);
+						if (data.content.shippingInfo) setShippingInfo(data.content.shippingInfo);
+
+						if (Array.isArray(data.content.uploadedImages)) {
+							setUploadedImages(data.content.uploadedImages);
+						}
+					}
+				}
+			} catch (err) {
+				console.error("[LOAD_CONTENT_ERROR]", err);
+			}
+		}
+		loadSavedContent();
+	}, []);
 
 	const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const files = e.target.files;
@@ -93,37 +166,17 @@ export default function ContentSubmissionPage() {
 		setUploadedImages((prev) => prev.filter((img) => img.id !== id));
 	};
 
-	React.useEffect(() => {
-		async function loadSavedContent() {
-			try {
-				const res = await fetch("/api/projects/content");
-				if (res.ok) {
-					const data = await res.json();
-					if (data.content) {
-						if (data.content.businessName) setBusinessName(data.content.businessName);
-						if (data.content.tagline) setTagline(data.content.tagline);
-						if (data.content.aboutText) setAboutText(data.content.aboutText);
-						if (data.content.servicesList) setServicesList(data.content.servicesList);
-						if (data.content.contactEmail) setContactEmail(data.content.contactEmail);
-						if (data.content.contactPhone) setContactPhone(data.content.contactPhone);
-						if (data.content.contactAddress) setContactAddress(data.content.contactAddress);
-						if (Array.isArray(data.content.uploadedImages) && data.content.uploadedImages.length > 0) {
-							setUploadedImages(data.content.uploadedImages);
-						}
-					}
-				}
-			} catch (err) {
-				console.error("[LOAD_CONTENT_ERROR]", err);
-			}
-		}
-		loadSavedContent();
-	}, []);
-
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
+		if (!businessName.trim() || !tagline.trim()) {
+			alert("Please fill in your Business Name and Tagline.");
+			return;
+		}
+
 		try {
 			setIsSubmitting(true);
 			const payload = {
+				plan: activePlan,
 				businessName,
 				tagline,
 				aboutText,
@@ -131,6 +184,12 @@ export default function ContentSubmissionPage() {
 				contactEmail,
 				contactPhone,
 				contactAddress,
+				leadMagnetTitle,
+				valueStack,
+				testimonials,
+				productCatalog,
+				currency,
+				shippingInfo,
 				uploadedImages,
 			};
 
@@ -146,7 +205,7 @@ export default function ContentSubmissionPage() {
 					router.push("/dashboard");
 				}, 2000);
 			} else {
-				alert("Failed to save content details.");
+				alert("Failed to save content details. Please try again.");
 			}
 		} catch (err) {
 			console.error("[SUBMIT_CONTENT_ERROR]", err);
@@ -181,28 +240,75 @@ export default function ContentSubmissionPage() {
 					</button>
 				</div>
 
-				{/* Header Title */}
-				<div className="pb-6 border-b border-gray-200/80 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-					<div>
-						<div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-extrabold uppercase tracking-wider mb-3">
-							<FileText className="w-3.5 h-3.5" />
-							<span>Content & Image Submission</span>
+				{/* Payment Success Confirmation Alert Banner */}
+				{isPaymentSuccess && (
+					<div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center justify-between gap-3 animate-in fade-in duration-300">
+						<div className="flex items-center gap-2.5">
+							<CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+							<span>
+								Subscription Confirmed! Welcome to your Kiosk workspace. Fill in your business details below to generate your site.
+							</span>
 						</div>
-						<h1 className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900 tracking-tight mb-1">
-							Submit Business Details & Images
-						</h1>
-						<p className="text-gray-500 text-sm font-medium">
-							Provide your business text, logo, photos, and contact info to build your custom website.
-						</p>
+					</div>
+				)}
+
+				{/* Header Title & Plan Selector */}
+				<div className="pb-6 border-b border-gray-200/80 mb-8 space-y-4">
+					<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+						<div>
+							<div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-extrabold uppercase tracking-wider mb-2">
+								<FileText className="w-3.5 h-3.5" />
+								<span>Custom Plan Content Builder</span>
+							</div>
+							<h1 className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900 tracking-tight mb-1">
+								Submit Your Business Copy & Images
+							</h1>
+							<p className="text-gray-500 text-sm font-medium">
+								Tailored form fields generated for your active plan:{" "}
+								<span className="font-bold text-blue-600">
+									{activePlan === "LANDING_PAGE"
+										? "Landing Page ($20/mo)"
+										: activePlan === "SALES_FUNNEL"
+										? "Sales Funnel ($30/mo)"
+										: "E-commerce Store ($43/mo)"}
+								</span>
+							</p>
+						</div>
+
+						<button
+							type="button"
+							onClick={() => setIsPreviewOpen(true)}
+							className="px-5 py-2.5 rounded-full bg-gray-900 hover:bg-gray-800 text-white text-xs font-bold transition-all flex items-center gap-2 shadow-md cursor-pointer self-start sm:self-auto shrink-0">
+							<Monitor className="w-4 h-4 text-blue-400" />
+							<span>Preview Custom Site</span>
+						</button>
 					</div>
 
-					<button
-						type="button"
-						onClick={() => setIsPreviewOpen(true)}
-						className="px-5 py-2.5 rounded-full bg-gray-900 hover:bg-gray-800 text-white text-xs font-bold transition-all flex items-center gap-2 shadow-md cursor-pointer self-start sm:self-auto">
-						<Monitor className="w-4 h-4 text-blue-400" />
-						<span>Preview Live Layout</span>
-					</button>
+					{/* Interactive Plan Selector Switcher */}
+					<div className="grid grid-cols-3 gap-2 p-1.5 bg-gray-100/80 rounded-2xl border border-gray-200/80">
+						{[
+							{ id: "LANDING_PAGE", label: "Landing Page", icon: Globe },
+							{ id: "SALES_FUNNEL", label: "Sales Funnel", icon: Zap },
+							{ id: "E_COMMERCE", label: "E-Commerce Store", icon: ShoppingBag },
+						].map((tab) => {
+							const Icon = tab.icon;
+							const isActive = activePlan === tab.id;
+							return (
+								<button
+									key={tab.id}
+									type="button"
+									onClick={() => setActivePlan(tab.id as PlanType)}
+									className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+										isActive
+											? "bg-white text-blue-600 shadow-xs border border-gray-200/80"
+											: "text-gray-500 hover:text-gray-900"
+									}`}>
+									<Icon className="w-3.5 h-3.5" />
+									<span className="hidden sm:inline">{tab.label}</span>
+								</button>
+							);
+						})}
+					</div>
 				</div>
 
 				{/* Success State */}
@@ -210,10 +316,10 @@ export default function ContentSubmissionPage() {
 					<div className="bg-white border border-emerald-200 rounded-3xl p-8 sm:p-12 text-center max-w-md mx-auto shadow-xl shadow-emerald-500/10 animate-in fade-in zoom-in-95 duration-300">
 						<CheckCircle2 className="w-14 h-14 text-emerald-600 mx-auto mb-4" />
 						<h2 className="text-2xl font-bold font-nohemi text-gray-900 mb-2">
-							Content Received!
+							Details Received!
 						</h2>
 						<p className="text-xs text-gray-500 font-medium mb-6 leading-relaxed">
-							Our design team has received your business details and {uploadedImages.length} uploaded images. Redirecting to dashboard...
+							Our design team has received your business details and {uploadedImages.length} brand images. Updating your custom website layout...
 						</p>
 						<div className="w-full bg-emerald-100 rounded-full h-1.5 overflow-hidden">
 							<div className="bg-emerald-600 h-full w-full animate-pulse" />
@@ -225,17 +331,16 @@ export default function ContentSubmissionPage() {
 						onSubmit={handleSubmit}
 						className="bg-white border border-gray-200/90 rounded-3xl p-6 sm:p-8 space-y-8 shadow-2xs">
 						
-						{/* SECTION 1: BUSINESS LOGO & BRAND IMAGES */}
+						{/* SECTION 1: BUSINESS LOGO & BRAND ASSETS */}
 						<div className="space-y-4">
 							<div className="flex items-center justify-between border-b border-gray-100 pb-3">
 								<label className="text-xs font-extrabold text-gray-900 uppercase tracking-wider flex items-center gap-2">
 									<ImageIcon className="w-4 h-4 text-blue-600" />
-									<span>1. Business Logo & Brand Images ({uploadedImages.length})</span>
+									<span>1. Upload Logo & Brand Photos ({uploadedImages.length})</span>
 								</label>
 								<span className="text-[11px] text-gray-400 font-medium">PNG, JPG, SVG up to 25MB</span>
 							</div>
 
-							{/* Drag and Drop Zone */}
 							<input
 								ref={fileInputRef}
 								type="file"
@@ -255,11 +360,10 @@ export default function ContentSubmissionPage() {
 									Click to Upload Business Images or Drag & Drop
 								</p>
 								<p className="text-[11px] text-gray-500 font-medium">
-									Upload your company logo, hero background photos, product images, or team pictures.
+									Upload your business logo, hero background photos, product shots, or brand assets.
 								</p>
 							</div>
 
-							{/* Uploaded Thumbnails Grid */}
 							{uploadedImages.length > 0 && (
 								<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 pt-2">
 									{uploadedImages.map((img) => (
@@ -294,78 +398,232 @@ export default function ContentSubmissionPage() {
 							)}
 						</div>
 
-						{/* SECTION 2: BUSINESS DETAILS */}
+						{/* SECTION 2: CORE BUSINESS INFORMATION */}
 						<div className="space-y-6 pt-4 border-t border-gray-100">
 							<div className="border-b border-gray-100 pb-3">
 								<label className="text-xs font-extrabold text-gray-900 uppercase tracking-wider flex items-center gap-2">
 									<Globe className="w-4 h-4 text-blue-600" />
-									<span>2. Business Information & Copy</span>
+									<span>2. Core Business Information & Typography</span>
 								</label>
 							</div>
 
-							{/* Field: Business Name */}
+							{/* Google Fonts Picker & Randomizer */}
+							<div className="p-4 rounded-2xl bg-blue-50/50 border border-blue-100 space-y-3">
+								<div className="flex items-center justify-between gap-2">
+									<div>
+										<label className="text-xs font-bold text-gray-900 block">
+											Select Site Google Font Typography
+										</label>
+										<p className="text-[11px] text-gray-500 font-medium">
+											Choose a Google Font or click Randomize to test different typography styles.
+										</p>
+									</div>
+
+									<button
+										type="button"
+										onClick={handleRandomizeFont}
+										className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 shrink-0 cursor-pointer">
+										<Shuffle className="w-3.5 h-3.5" />
+										<span>Randomize Font</span>
+									</button>
+								</div>
+
+								<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+									<select
+										value={selectedFont}
+										onChange={(e) => setSelectedFont(e.target.value)}
+										className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-blue-200 text-xs font-bold text-gray-900 focus:outline-none focus:border-blue-600 cursor-pointer">
+										{GOOGLE_FONTS_CATALOG.map((font) => (
+											<option key={font.name} value={font.name}>
+												{font.name} ({font.category})
+											</option>
+										))}
+									</select>
+
+									<div className="px-3.5 py-2 rounded-xl bg-white border border-gray-200 flex items-center justify-between text-xs font-bold text-gray-900 truncate">
+										<span className="text-[11px] text-gray-400 font-normal">Active Typography:</span>
+										<span style={{ fontFamily: selectedFont }}>{selectedFont}</span>
+									</div>
+								</div>
+							</div>
+
 							<div>
 								<label className="block text-xs font-bold text-gray-700 mb-1.5">
-									Business / Company Name *
+									Business / Brand Name *
 								</label>
 								<input
 									type="text"
 									required
+									placeholder="e.g. Acme Business Solutions"
 									value={businessName}
 									onChange={(e) => setBusinessName(e.target.value)}
 									className="w-full px-4 py-3 rounded-2xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 transition-colors"
 								/>
 							</div>
 
-							{/* Field: Tagline / Headline */}
 							<div>
 								<label className="block text-xs font-bold text-gray-700 mb-1.5">
-									Main Headline / Tagline *
+									Main Headline / Hero Tagline *
 								</label>
 								<input
 									type="text"
 									required
+									placeholder="e.g. Premium Artisanal Goods Delivered To Your Doorstep"
 									value={tagline}
 									onChange={(e) => setTagline(e.target.value)}
 									className="w-full px-4 py-3 rounded-2xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 transition-colors"
 								/>
 							</div>
 
-							{/* Field: About Text */}
 							<div>
 								<label className="block text-xs font-bold text-gray-700 mb-1.5">
-									About Business & Value Proposition *
+									About Business & Core Value Proposition
 								</label>
 								<textarea
 									rows={3}
-									required
+									placeholder="Describe your story, mission, and why customers choose your business..."
 									value={aboutText}
 									onChange={(e) => setAboutText(e.target.value)}
 									className="w-full px-4 py-3 rounded-2xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 transition-colors leading-relaxed"
 								/>
 							</div>
-
-							{/* Field: Services List */}
-							<div>
-								<label className="block text-xs font-bold text-gray-700 mb-1.5">
-									Primary Services / Key Offers *
-								</label>
-								<textarea
-									rows={3}
-									required
-									value={servicesList}
-									onChange={(e) => setServicesList(e.target.value)}
-									className="w-full px-4 py-3 rounded-2xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 transition-colors leading-relaxed"
-								/>
-							</div>
 						</div>
 
-						{/* SECTION 3: CONTACT INFO */}
+						{/* SECTION 3: PLAN-SPECIFIC DYNAMIC FIELDS */}
+						{activePlan === "LANDING_PAGE" && (
+							<div className="space-y-6 pt-4 border-t border-gray-100">
+								<div className="border-b border-gray-100 pb-3">
+									<label className="text-xs font-extrabold text-blue-600 uppercase tracking-wider flex items-center gap-2">
+										<Globe className="w-4 h-4 text-blue-600" />
+										<span>3. Landing Page Services & Offers</span>
+									</label>
+								</div>
+
+								<div>
+									<label className="block text-xs font-bold text-gray-700 mb-1.5">
+										List Your Core Services / Key Offerings
+									</label>
+									<textarea
+										rows={4}
+										placeholder="1. Strategy Consulting&#10;2. Professional Installation&#10;3. 24/7 Dedicated Support"
+										value={servicesList}
+										onChange={(e) => setServicesList(e.target.value)}
+										className="w-full px-4 py-3 rounded-2xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 transition-colors leading-relaxed"
+									/>
+								</div>
+							</div>
+						)}
+
+						{activePlan === "SALES_FUNNEL" && (
+							<div className="space-y-6 pt-4 border-t border-gray-100">
+								<div className="border-b border-gray-100 pb-3">
+									<label className="text-xs font-extrabold text-purple-600 uppercase tracking-wider flex items-center gap-2">
+										<Zap className="w-4 h-4 text-purple-600" />
+										<span>3. Sales Funnel Lead Magnet & Conversion Stack</span>
+									</label>
+								</div>
+
+								<div>
+									<label className="block text-xs font-bold text-gray-700 mb-1.5">
+										Lead Magnet / Freebie Hook Title
+									</label>
+									<input
+										type="text"
+										placeholder="e.g. Free 5-Step Guide to Scaling Your Revenue in 2026"
+										value={leadMagnetTitle}
+										onChange={(e) => setLeadMagnetTitle(e.target.value)}
+										className="w-full px-4 py-3 rounded-2xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-purple-600 transition-colors"
+									/>
+								</div>
+
+								<div>
+									<label className="block text-xs font-bold text-gray-700 mb-1.5">
+										Offer Value Stack & Core Deliverables
+									</label>
+									<textarea
+										rows={3}
+										placeholder="• Complete Video Training ($299 Value)&#10;• 1-on-1 Strategy Call ($150 Value)&#10;• Bonus Templates Package ($99 Value)"
+										value={valueStack}
+										onChange={(e) => setValueStack(e.target.value)}
+										className="w-full px-4 py-3 rounded-2xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-purple-600 transition-colors leading-relaxed"
+									/>
+								</div>
+
+								<div>
+									<label className="block text-xs font-bold text-gray-700 mb-1.5">
+										Customer Testimonials / Reviews
+									</label>
+									<textarea
+										rows={3}
+										placeholder='"This funnel doubled our leads in 14 days!" — Sarah M., CEO'
+										value={testimonials}
+										onChange={(e) => setTestimonials(e.target.value)}
+										className="w-full px-4 py-3 rounded-2xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-purple-600 transition-colors leading-relaxed"
+									/>
+								</div>
+							</div>
+						)}
+
+						{activePlan === "E_COMMERCE" && (
+							<div className="space-y-6 pt-4 border-t border-gray-100">
+								<div className="border-b border-gray-100 pb-3">
+									<label className="text-xs font-extrabold text-emerald-600 uppercase tracking-wider flex items-center gap-2">
+										<ShoppingBag className="w-4 h-4 text-emerald-600" />
+										<span>3. E-Commerce Product Catalog & Payment Settings</span>
+									</label>
+								</div>
+
+								<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+									<div>
+										<label className="block text-xs font-bold text-gray-700 mb-1.5">
+											Store Currency
+										</label>
+										<select
+											value={currency}
+											onChange={(e) => setCurrency(e.target.value)}
+											className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-xs font-bold text-gray-900 focus:outline-none focus:border-emerald-600">
+											<option value="USD">USD ($)</option>
+											<option value="NGN">NGN (₦)</option>
+											<option value="GHS">GHS (GH₵)</option>
+											<option value="KES">KES (KSh)</option>
+										</select>
+									</div>
+
+									<div>
+										<label className="block text-xs font-bold text-gray-700 mb-1.5">
+											Shipping & Delivery Regions
+										</label>
+										<input
+											type="text"
+											placeholder="e.g. Nationwide Shipping / 24-Hour Express Delivery"
+											value={shippingInfo}
+											onChange={(e) => setShippingInfo(e.target.value)}
+											className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-emerald-600"
+										/>
+									</div>
+								</div>
+
+								<div>
+									<label className="block text-xs font-bold text-gray-700 mb-1.5">
+										Initial Product List (Product Name, Price, Description)
+									</label>
+									<textarea
+										rows={4}
+										placeholder="1. Custom Leather Wallet - $45.00 (Genuine handcrafted leather)&#10;2. Canvas Messenger Bag - $79.00 (Water-resistant travel bag)"
+										value={productCatalog}
+										onChange={(e) => setProductCatalog(e.target.value)}
+										className="w-full px-4 py-3 rounded-2xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-emerald-600 transition-colors leading-relaxed"
+									/>
+								</div>
+							</div>
+						)}
+
+						{/* SECTION 4: CONTACT INFO */}
 						<div className="space-y-4 pt-4 border-t border-gray-100">
 							<div className="border-b border-gray-100 pb-3">
 								<label className="text-xs font-extrabold text-gray-900 uppercase tracking-wider flex items-center gap-2">
 									<Phone className="w-4 h-4 text-blue-600" />
-									<span>3. Contact & Location Information</span>
+									<span>4. Contact & Business Location</span>
 								</label>
 							</div>
 
@@ -377,6 +635,7 @@ export default function ContentSubmissionPage() {
 									<input
 										type="email"
 										required
+										placeholder="contact@mybusiness.com"
 										value={contactEmail}
 										onChange={(e) => setContactEmail(e.target.value)}
 										className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600"
@@ -390,6 +649,7 @@ export default function ContentSubmissionPage() {
 									<input
 										type="text"
 										required
+										placeholder="+1 (555) 019-2834"
 										value={contactPhone}
 										onChange={(e) => setContactPhone(e.target.value)}
 										className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600"
@@ -398,10 +658,11 @@ export default function ContentSubmissionPage() {
 
 								<div>
 									<label className="block text-[11px] font-bold text-gray-700 mb-1">
-										Office / Store Address
+										Address / Location
 									</label>
 									<input
 										type="text"
+										placeholder="Downtown Business Center"
 										value={contactAddress}
 										onChange={(e) => setContactAddress(e.target.value)}
 										className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600"
@@ -417,7 +678,7 @@ export default function ContentSubmissionPage() {
 								onClick={() => setIsPreviewOpen(true)}
 								className="w-full sm:w-auto px-6 py-3 rounded-full border border-gray-200/90 text-gray-700 hover:bg-gray-100 text-xs font-bold transition-colors flex items-center justify-center gap-2 cursor-pointer">
 								<Eye className="w-4 h-4 text-blue-600" />
-								<span>Preview Your Custom Site</span>
+								<span>Preview Custom Layout</span>
 							</button>
 
 							<PillButton
@@ -432,12 +693,12 @@ export default function ContentSubmissionPage() {
 								{isSubmitting ? (
 									<span className="inline-flex items-center gap-2">
 										<Loader2 className="w-4 h-4 animate-spin" />
-										<span>Saving Details...</span>
+										<span>Saving Business Details...</span>
 									</span>
 								) : (
 									<span className="inline-flex items-center gap-2">
 										<Sparkles className="w-4 h-4" />
-										<span>Submit Business Details</span>
+										<span>Submit Custom Content</span>
 									</span>
 								)}
 							</PillButton>
@@ -457,7 +718,7 @@ export default function ContentSubmissionPage() {
 								<div className="w-3 h-3 rounded-full bg-amber-500" />
 								<div className="w-3 h-3 rounded-full bg-emerald-500" />
 								<span className="text-xs font-mono font-bold text-slate-400 ml-2 truncate max-w-[200px] sm:max-w-xs">
-									https://{businessName.toLowerCase().replace(/[^a-z0-9]/g, "")}.kioosk.online
+									https://{businessName ? businessName.toLowerCase().replace(/[^a-z0-9]/g, "") : "site"}.kioosk.online
 								</span>
 							</div>
 
@@ -497,7 +758,14 @@ export default function ContentSubmissionPage() {
 
 						{/* Live Interactive Site Render Window */}
 						<div className="flex-1 overflow-y-auto bg-slate-950 p-4 sm:p-8 flex items-center justify-center">
+							{/* Dynamically Load Selected Google Font */}
+							<link
+								rel="stylesheet"
+								href={`https://fonts.googleapis.com/css2?family=${selectedFont.replace(/\s+/g, "+")}:wght@400;600;700;800&display=swap`}
+							/>
+
 							<div
+								style={{ fontFamily: `'${selectedFont}', sans-serif` }}
 								className={`transition-all duration-300 bg-white text-slate-900 rounded-2xl overflow-hidden shadow-2xl ${
 									previewDevice === "mobile" ? "w-[375px] min-h-[667px]" : "w-full min-h-[550px]"
 								}`}>
@@ -513,18 +781,12 @@ export default function ContentSubmissionPage() {
 											/>
 										) : (
 											<div className="w-7 h-7 rounded-lg bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
-												{businessName[0] || "B"}
+												{businessName ? businessName[0].toUpperCase() : "K"}
 											</div>
 										)}
 										<span className="font-bold text-sm text-gray-900 font-nohemi">
-											{businessName}
+											{businessName || "Your Business Name"}
 										</span>
-									</div>
-
-									<div className="hidden sm:flex items-center gap-5 text-xs font-semibold text-gray-600">
-										<span>About</span>
-										<span>Services</span>
-										<span>Contact</span>
 									</div>
 
 									<button className="px-4 py-1.5 rounded-full bg-blue-600 text-white text-xs font-bold">
@@ -546,60 +808,92 @@ export default function ContentSubmissionPage() {
 
 									<div className="relative z-10 max-w-xl mx-auto space-y-4">
 										<span className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-[10px] font-extrabold uppercase tracking-wider border border-blue-500/30">
-											Welcome to {businessName}
+											{activePlan.replace("_", " ")}
 										</span>
 										<h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight font-nohemi leading-tight">
-											{tagline}
+											{tagline || "Your Custom Business Tagline & Headline"}
 										</h1>
 										<p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed max-w-md mx-auto">
-											{aboutText}
+											{aboutText || "Enter your value proposition and business summary above."}
 										</p>
-										<div className="pt-2 flex items-center justify-center gap-3">
-											<button className="px-6 py-2.5 rounded-full bg-blue-600 text-white text-xs font-bold shadow-md">
-												Get Started Today
-											</button>
+									</div>
+								</div>
+
+								{/* RENDER: Plan Specific Section */}
+								{activePlan === "LANDING_PAGE" && (
+									<div className="py-12 px-6 bg-slate-50">
+										<div className="max-w-md mx-auto text-center mb-8">
+											<h2 className="text-lg font-bold font-nohemi text-gray-900 mb-1">
+												Our Key Offers & Services
+											</h2>
+										</div>
+
+										<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl mx-auto">
+											{(servicesList || "Service 1\nService 2\nService 3")
+												.split("\n")
+												.filter((s) => s.trim())
+												.map((svc, i) => (
+													<div
+														key={i}
+														className="p-4 rounded-xl bg-white border border-gray-200/80 shadow-2xs">
+														<div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-bold mb-2">
+															{i + 1}
+														</div>
+														<p className="text-xs font-bold text-gray-900">{svc}</p>
+													</div>
+												))}
 										</div>
 									</div>
-								</div>
+								)}
 
-								{/* RENDER: Services Section */}
-								<div className="py-12 px-6 bg-slate-50">
-									<div className="max-w-md mx-auto text-center mb-8">
-										<h2 className="text-lg font-bold font-nohemi text-gray-900 mb-1">
-											Our Primary Services
-										</h2>
-										<p className="text-xs text-gray-500">Quality solutions tailored for you.</p>
-									</div>
+								{activePlan === "SALES_FUNNEL" && (
+									<div className="py-12 px-6 bg-purple-50/50">
+										<div className="max-w-md mx-auto text-center mb-6">
+											<span className="px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-[10px] font-bold uppercase">
+												Exclusive Offer
+											</span>
+											<h2 className="text-xl font-bold font-nohemi text-gray-900 mt-2">
+												{leadMagnetTitle || "Special Lead Magnet Offer"}
+											</h2>
+										</div>
 
-									<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl mx-auto">
-										{servicesList.split("\n").map((svc, i) => (
-											<div
-												key={i}
-												className="p-4 rounded-xl bg-white border border-gray-200/80 shadow-2xs">
-												<div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-bold mb-2">
-													{i + 1}
-												</div>
-												<p className="text-xs font-bold text-gray-900">{svc}</p>
+										{valueStack && (
+											<div className="max-w-md mx-auto bg-white p-5 rounded-2xl border border-purple-100 text-xs font-medium text-gray-700 leading-relaxed whitespace-pre-line mb-6">
+												{valueStack}
 											</div>
-										))}
+										)}
 									</div>
-								</div>
+								)}
+
+								{activePlan === "E_COMMERCE" && (
+									<div className="py-12 px-6 bg-emerald-50/50">
+										<div className="max-w-md mx-auto text-center mb-6">
+											<h2 className="text-xl font-bold font-nohemi text-gray-900">
+												Featured Product Catalog ({currency})
+											</h2>
+											{shippingInfo && (
+												<p className="text-xs text-emerald-700 font-semibold mt-1 flex items-center justify-center gap-1">
+													<Truck className="w-3.5 h-3.5" />
+													<span>{shippingInfo}</span>
+												</p>
+											)}
+										</div>
+
+										{productCatalog && (
+											<div className="max-w-md mx-auto bg-white p-5 rounded-2xl border border-emerald-100 text-xs font-medium text-gray-700 leading-relaxed whitespace-pre-line">
+												{productCatalog}
+											</div>
+										)}
+									</div>
+								)}
 
 								{/* RENDER: Contact Footer */}
-								<footer className="py-8 px-6 bg-white border-t border-gray-100 text-center text-xs text-gray-500 space-y-3">
-									<p className="font-bold text-gray-900">{businessName}</p>
-									<div className="flex flex-wrap items-center justify-center gap-4 text-[11px] text-gray-600">
-										<span className="flex items-center gap-1">
-											<Mail className="w-3.5 h-3.5 text-blue-600" />
-											{contactEmail}
-										</span>
-										<span className="flex items-center gap-1">
-											<Phone className="w-3.5 h-3.5 text-blue-600" />
-											{contactPhone}
-										</span>
-									</div>
-									<p className="text-[10px] text-gray-400">
-										© {new Date().getFullYear()} {businessName}. All rights reserved. Powered by Kiosk.
+								<footer className="py-8 px-6 bg-white border-t border-gray-100 text-center text-xs text-gray-500 space-y-2">
+									<p className="font-bold text-gray-900">
+										{businessName || "Your Business Name"}
+									</p>
+									<p className="text-[11px] text-gray-600">
+										Email: {contactEmail || "contact@kioosk.online"} | Phone: {contactPhone || "+1 (555) 019-2834"}
 									</p>
 								</footer>
 							</div>
@@ -608,5 +902,18 @@ export default function ContentSubmissionPage() {
 				</div>
 			)}
 		</div>
+	);
+}
+
+export default function ContentSubmissionPage() {
+	return (
+		<Suspense
+			fallback={
+				<div className="min-h-screen w-full flex items-center justify-center bg-[#f8fafc]">
+					<Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+				</div>
+			}>
+			<ContentForm />
+		</Suspense>
 	);
 }

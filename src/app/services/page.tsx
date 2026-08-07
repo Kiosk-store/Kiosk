@@ -362,7 +362,10 @@ export default function ServicesPage() {
 									Clean hero section, customer social proof, call-to-action button, and instant WhatsApp chat.
 								</p>
 								<div className="pt-2 flex items-center justify-between text-[11px] text-slate-300 font-medium">
-									<span>⚡ Delivery: 3-5 Days</span>
+									<span className="flex items-center gap-1">
+										<Zap className="w-3 h-3 text-amber-400" />
+										<span>Delivery: 3-5 Days</span>
+									</span>
 									<span className="text-emerald-400 font-bold">100% Mobile Ready</span>
 								</div>
 							</div>
@@ -780,7 +783,10 @@ export default function ServicesPage() {
 									{q.question}
 								</p>
 								<div className="flex items-center justify-between text-xs font-bold text-blue-600 pt-2 border-t border-gray-100">
-									<span>➔ {q.recommendation}</span>
+									<span className="flex items-center gap-1">
+										<ArrowRight className="w-3.5 h-3.5 text-blue-600" />
+										<span>{q.recommendation}</span>
+									</span>
 								</div>
 							</button>
 						))}

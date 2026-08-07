@@ -76,7 +76,7 @@ export async function POST(request: Request) {
 			email: userEmail,
 			name: userName,
 			tx_ref,
-			redirect_url: `${appUrl}/dashboard?payment=complete`,
+			redirect_url: `${appUrl}/dashboard/content?payment=complete&plan=${plan}`,
 			title: `Kiosk ${plan.replace("_", " ")} Subscription`,
 			description: `Monthly subscription fee for Kiosk ${plan} tier`,
 			meta: {

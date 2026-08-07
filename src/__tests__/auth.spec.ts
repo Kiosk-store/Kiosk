@@ -17,7 +17,7 @@ import { ProjectSubject } from "../lib/events/ProjectSubject";
 
 async function runTestSuite() {
 	console.log("==========================================");
-	console.log("🧪 RUNNING KIOSK AUTOMATED TEST SUITE");
+	console.log("[RUNNING] KIOSK AUTOMATED TEST SUITE");
 	console.log("==========================================");
 
 	let passedTests = 0;
@@ -26,10 +26,10 @@ async function runTestSuite() {
 	const assert = (condition: boolean, testName: string) => {
 		totalTests++;
 		if (condition) {
-			console.log(`✅ [PASS] ${testName}`);
+			console.log(`[PASS] ${testName}`);
 			passedTests++;
 		} else {
-			console.error(`❌ [FAIL] ${testName}`);
+			console.error(`[FAIL] ${testName}`);
 		}
 	};
 
@@ -118,7 +118,7 @@ async function runTestSuite() {
 	}
 
 	console.log("==========================================");
-	console.log(`📊 TEST SUMMARY: ${passedTests} / ${totalTests} PASSED`);
+	console.log(`[TEST SUMMARY] ${passedTests} / ${totalTests} PASSED`);
 	console.log("==========================================");
 }
 
