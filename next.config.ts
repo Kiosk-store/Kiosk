@@ -6,9 +6,9 @@ const cspHeader = `
     default-src 'self';
     script-src 'self' 'unsafe-eval' 'unsafe-inline' https://fonts.googleapis.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-    img-src 'self' blob: data: https://images.unsplash.com https://lh3.googleusercontent.com;
+    img-src 'self' blob: data: https://images.unsplash.com https://lh3.googleusercontent.com https://kiosk.online;
     font-src 'self' https://fonts.gstatic.com data:;
-    connect-src 'self' https://* wss://*;
+    connect-src 'self' https://* wss://* http://localhost:4000 https://api.kiosk.online;
     frame-src 'self';
     object-src 'none';
     base-uri 'self';
@@ -31,8 +31,14 @@ const nextConfig: NextConfig = {
 			},
 		],
 	},
-	turbopack: {
-		root: __dirname,
+	async rewrites() {
+		const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/v1";
+		return [
+			{
+				source: "/api/v1/:path*",
+				destination: `${backendUrl}/:path*`,
+			},
+		];
 	},
 	async headers() {
 		return [
