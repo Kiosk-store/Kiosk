@@ -30,6 +30,8 @@ Everything is hosted and managed for you. No technical setup. No complicated bui
 - Backend Architecture: [docs/BACKEND_ARCHITECTURE.md](docs/BACKEND_ARCHITECTURE.md)
 - Backend System Design: [docs/BACKEND_SYSTEM_DESIGN.md](docs/BACKEND_SYSTEM_DESIGN.md)
 - Backend TODO Checklist: [docs/BACKEND_TODO.md](docs/BACKEND_TODO.md)
+- Production Deployment Checklist: [docs/PRODUCTION_DEPLOYMENT_TODO.md](docs/PRODUCTION_DEPLOYMENT_TODO.md)
+- Weekly Technical TODO: [docs/WEEKLY_TODO.md](docs/WEEKLY_TODO.md)
 - Design System: [docs/DESIGN_ARCHITECTURE.md](docs/DESIGN_ARCHITECTURE.md)
 - Developer Guidelines: [docs/DEVELOPER_DOCUMENTATION.md](docs/DEVELOPER_DOCUMENTATION.md)
 
