@@ -18,7 +18,6 @@ import {
 	ArrowLeft,
 	Loader2,
 	AlertCircle,
-	Sparkles,
 	CreditCard,
 	Building2,
 	Smartphone,
@@ -34,10 +33,9 @@ interface PlanDetails {
 	features: string[];
 	deliveryTime: string;
 	icon: React.ElementType;
-	badgeColor: string;
 }
 
-const PLAN_CATALOG: Record<string, PlanDetails> = {
+const PLAN_DATA: Record<string, PlanDetails> = {
 	landing: {
 		id: "landing",
 		dbPlan: "LANDING_PAGE",
@@ -47,33 +45,11 @@ const PLAN_CATALOG: Record<string, PlanDetails> = {
 		yearlyPrice: 192,
 		deliveryTime: "3–5 Days",
 		icon: Globe,
-		badgeColor: "bg-blue-50 text-blue-600 border-blue-200",
 		features: [
-			"1 High-converting responsive page",
-			"Custom typography & color branding",
-			"Interactive lead form & WhatsApp chat",
-			"Basic SEO meta tags & XML sitemap",
-			"Free Kiosk subdomain + custom domain wiring",
-			"SSL certificate & cloud hosting included",
-		],
-	},
-	"landing-page": {
-		id: "landing-page",
-		dbPlan: "LANDING_PAGE",
-		name: "Landing Page",
-		subtitle: "High-Converting Single Page Website",
-		monthlyPrice: 20,
-		yearlyPrice: 192,
-		deliveryTime: "3–5 Days",
-		icon: Globe,
-		badgeColor: "bg-blue-50 text-blue-600 border-blue-200",
-		features: [
-			"1 High-converting responsive page",
-			"Custom typography & color branding",
-			"Interactive lead form & WhatsApp chat",
-			"Basic SEO meta tags & XML sitemap",
-			"Free Kiosk subdomain + custom domain wiring",
-			"SSL certificate & cloud hosting included",
+			"1 Responsive high-converting page",
+			"Custom typography & brand styling",
+			"Lead capture & WhatsApp chat",
+			"Free subdomain + custom domain wiring",
 		],
 	},
 	funnel: {
@@ -85,74 +61,37 @@ const PLAN_CATALOG: Record<string, PlanDetails> = {
 		yearlyPrice: 288,
 		deliveryTime: "3–5 Days",
 		icon: Zap,
-		badgeColor: "bg-purple-50 text-purple-600 border-purple-200",
 		features: [
 			"3–5 Connected sales & opt-in pages",
-			"Opt-in, Core Offer & Thank-you flows",
-			"Automated CRM & email marketing integration",
-			"Meta Pixel & Google Analytics conversion tracking",
-			"A/B Ready structure & high-impact copy alignment",
-			"SSL certificate & cloud hosting included",
-		],
-	},
-	"sales-funnel": {
-		id: "sales-funnel",
-		dbPlan: "SALES_FUNNEL",
-		name: "Sales Funnel",
-		subtitle: "Multi-Step Lead & Conversion Engine",
-		monthlyPrice: 30,
-		yearlyPrice: 288,
-		deliveryTime: "3–5 Days",
-		icon: Zap,
-		badgeColor: "bg-purple-50 text-purple-600 border-purple-200",
-		features: [
-			"3–5 Connected sales & opt-in pages",
-			"Opt-in, Core Offer & Thank-you flows",
-			"Automated CRM & email marketing integration",
-			"Meta Pixel & Google Analytics conversion tracking",
-			"A/B Ready structure & high-impact copy alignment",
-			"SSL certificate & cloud hosting included",
+			"Opt-in, core offer & thank-you flows",
+			"Automated CRM & email marketing",
+			"Meta Pixel & Google Analytics tracking",
 		],
 	},
 	store: {
 		id: "store",
 		dbPlan: "E_COMMERCE",
 		name: "E-commerce Store",
-		subtitle: "Full-Featured Digital & Product Shop",
+		subtitle: "Full Digital & Product Shop",
 		monthlyPrice: 43,
 		yearlyPrice: 408,
 		deliveryTime: "5–10 Days",
 		icon: ShoppingBag,
-		badgeColor: "bg-emerald-50 text-emerald-600 border-emerald-200",
 		features: [
-			"Complete product catalog setup & variations",
-			"Slide-out cart drawer & instant checkout flow",
-			"Flutterwave, Stripe & Paystack payment processing",
-			"Automated customer order emails & inventory tracking",
-			"Product search & dynamic category filtering",
-			"SSL certificate & cloud hosting included",
-		],
-	},
-	"ecommerce-store": {
-		id: "ecommerce-store",
-		dbPlan: "E_COMMERCE",
-		name: "E-commerce Store",
-		subtitle: "Full-Featured Digital & Product Shop",
-		monthlyPrice: 43,
-		yearlyPrice: 408,
-		deliveryTime: "5–10 Days",
-		icon: ShoppingBag,
-		badgeColor: "bg-emerald-50 text-emerald-600 border-emerald-200",
-		features: [
-			"Complete product catalog setup & variations",
-			"Slide-out cart drawer & instant checkout flow",
-			"Flutterwave, Stripe & Paystack payment processing",
-			"Automated customer order emails & inventory tracking",
-			"Product search & dynamic category filtering",
-			"SSL certificate & cloud hosting included",
+			"Full catalog setup & product variations",
+			"Cart drawer & instant checkout flow",
+			"Flutterwave, Stripe & Paystack gateways",
+			"Automated order emails & inventory tracking",
 		],
 	},
 };
+
+function getPlan(param: string): PlanDetails {
+	const key = param.toLowerCase();
+	if (key.includes("funnel")) return PLAN_DATA.funnel;
+	if (key.includes("store") || key.includes("commerce")) return PLAN_DATA.store;
+	return PLAN_DATA.landing;
+}
 
 function CheckoutContent() {
 	const router = useRouter();
@@ -161,26 +100,18 @@ function CheckoutContent() {
 	const planParam = searchParams.get("plan") || "landing";
 	const billingParam = searchParams.get("billing") || "monthly";
 
-	const [selectedPlanId] = useState<string>(planParam);
 	const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">(
 		billingParam === "yearly" ? "yearly" : "monthly",
 	);
-
-	// Currency selector
 	const [currency, setCurrency] = useState<"USD" | "NGN" | "GHS" | "KES">("USD");
-
-	// Submission state
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-	const activePlan = PLAN_CATALOG[selectedPlanId] || PLAN_CATALOG.landing;
+	const activePlan = getPlan(planParam);
 	const PlanIcon = activePlan.icon;
+	const total = billingCycle === "yearly" ? activePlan.yearlyPrice : activePlan.monthlyPrice;
 
-	const total =
-		billingCycle === "yearly" ? activePlan.yearlyPrice : activePlan.monthlyPrice;
-
-	// Redirects directly to Flutterwave Hosted Checkout Page
-	const handleFlutterwaveCheckout = async (e: React.FormEvent) => {
+	const handleCheckout = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (isProcessing) return;
 
@@ -209,199 +140,179 @@ function CheckoutContent() {
 					router.push("/get-started?tab=login&redirect=/checkout");
 					return;
 				}
-				setErrorMessage(data.error || "Failed to initialize Flutterwave payment session.");
+				setErrorMessage(data.error || "Failed to initialize payment session.");
 				setIsProcessing(false);
 				return;
 			}
 
-			// Direct Redirect to Flutterwave Secure Hosted Checkout
 			window.location.href = data.link;
 		} catch (err) {
 			console.error("[CHECKOUT_ERROR]", err);
-			setErrorMessage("An unexpected network error occurred.");
+			setErrorMessage("A network error occurred. Please try again.");
 			setIsProcessing(false);
 		}
 	};
 
 	return (
-		<main className="min-h-screen bg-[#f8fafc] w-full overflow-x-hidden text-gray-900 pt-28 pb-20 px-4 sm:px-6 lg:px-8">
-			<div className="max-w-4xl mx-auto">
-				{/* Top Navigation */}
-				<div className="flex items-center justify-between gap-4 mb-8">
-					<Link
-						href="/services"
-						className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-500 hover:text-gray-900 transition-colors">
-						<ArrowLeft className="w-4 h-4" />
-						<span>Back to Services</span>
-					</Link>
+		<div className="max-w-3xl mx-auto pt-24 pb-20 px-4 sm:px-6">
+			{/* Back Link & Security Badge */}
+			<div className="flex items-center justify-between gap-4 mb-6">
+				<Link
+					href="/services"
+					className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-gray-900 transition-colors">
+					<ArrowLeft className="w-4 h-4" />
+					<span>Back to Services</span>
+				</Link>
 
-					<div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold">
-						<Lock className="w-3.5 h-3.5 text-emerald-600" />
-						<span>256-Bit Encrypted Flutterwave Checkout</span>
+				<div className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+					<Lock className="w-3.5 h-3.5 text-emerald-600" />
+					<span>Secure Flutterwave Payment</span>
+				</div>
+			</div>
+
+			{/* Error Alert */}
+			{errorMessage && (
+				<div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center gap-2">
+					<AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+					<span>{errorMessage}</span>
+				</div>
+			)}
+
+			{/* Main Checkout Card */}
+			<div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
+				{/* Plan Summary Header */}
+				<div className="flex items-center justify-between gap-4 pb-6 border-b border-gray-100">
+					<div className="flex items-center gap-3.5">
+						<div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0">
+							<PlanIcon className="w-6 h-6" />
+						</div>
+						<div>
+							<h1 className="text-xl font-bold text-gray-900">{activePlan.name}</h1>
+							<p className="text-xs text-gray-500">{activePlan.subtitle}</p>
+						</div>
+					</div>
+
+					<div className="text-right">
+						<span className="text-xs font-medium text-gray-400 block">Total</span>
+						<span className="text-2xl font-bold text-blue-600">${total}.00</span>
 					</div>
 				</div>
 
-				{errorMessage && (
-					<div className="mb-8 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold flex items-center gap-2 animate-in fade-in duration-200">
-						<AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
-						<span>{errorMessage}</span>
-					</div>
-				)}
-
-				<div className="bg-white border border-gray-200/90 rounded-3xl p-6 sm:p-10 shadow-sm space-y-8">
-					{/* Header Banner */}
-					<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-gray-100">
-						<div className="flex items-center gap-4">
-							<div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-bold border ${activePlan.badgeColor}`}>
-								<PlanIcon className="w-7 h-7" />
-							</div>
-							<div>
-								<div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-600 text-[10px] font-extrabold uppercase tracking-wider mb-1">
-									<Sparkles className="w-3 h-3" />
-									<span>Selected Plan</span>
-								</div>
-								<h1 className="text-2xl font-bold font-nohemi text-gray-900">
-									{activePlan.name}
-								</h1>
-								<p className="text-xs text-gray-500 font-medium">
-									{activePlan.subtitle}
-								</p>
-							</div>
+				{/* Billing Cycle & Currency Switchers */}
+				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+					{/* Billing Toggle */}
+					<div>
+						<label className="text-xs font-semibold text-gray-700 block mb-1.5">
+							Billing Cycle
+						</label>
+						<div className="grid grid-cols-2 gap-1 p-1 bg-gray-100 rounded-xl border border-gray-200 text-xs font-semibold">
+							<button
+								type="button"
+								onClick={() => setBillingCycle("monthly")}
+								className={`py-2 rounded-lg transition-all cursor-pointer text-center ${
+									billingCycle === "monthly"
+										? "bg-white text-blue-600 shadow-xs"
+										: "text-gray-600 hover:text-gray-900"
+								}`}>
+								Monthly (${activePlan.monthlyPrice})
+							</button>
+							<button
+								type="button"
+								onClick={() => setBillingCycle("yearly")}
+								className={`py-2 rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1 ${
+									billingCycle === "yearly"
+										? "bg-white text-blue-600 shadow-xs"
+										: "text-gray-600 hover:text-gray-900"
+								}`}>
+								<span>Yearly</span>
+								<span className="text-[10px] px-1.5 py-0.5 rounded-md bg-emerald-100 text-emerald-700 font-bold">
+									-20%
+								</span>
+							</button>
 						</div>
+					</div>
 
-						<div className="text-left sm:text-right">
-							<span className="text-xs font-semibold text-gray-400 block">Total Due</span>
-							<span className="text-3xl font-bold font-nohemi text-blue-600">
-								${total}.00
+					{/* Currency Selector */}
+					<div>
+						<label className="text-xs font-semibold text-gray-700 block mb-1.5">
+							Currency
+						</label>
+						<select
+							value={currency}
+							onChange={(e) => setCurrency(e.target.value as any)}
+							className="w-full py-2 px-3 bg-white border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-blue-600 cursor-pointer">
+							<option value="USD">USD ($ - US Dollar)</option>
+							<option value="NGN">NGN (₦ - Nigerian Naira)</option>
+							<option value="GHS">GHS (GH₵ - Ghanaian Cedi)</option>
+							<option value="KES">KES (KSh - Kenyan Shilling)</option>
+						</select>
+					</div>
+				</div>
+
+				{/* What's Included List */}
+				<div className="space-y-2 pt-2">
+					<p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+						Included in {activePlan.name}:
+					</p>
+					<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+						{activePlan.features.map((feature) => (
+							<div
+								key={feature}
+								className="flex items-center gap-2 text-xs text-gray-700 font-medium">
+								<CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+								<span>{feature}</span>
+							</div>
+						))}
+					</div>
+				</div>
+
+				{/* Action & Payment Options */}
+				<div className="pt-4 border-t border-gray-100 space-y-4">
+					<form onSubmit={handleCheckout}>
+						<PillButton
+							type="submit"
+							disabled={isProcessing}
+							baseColor="#004ac6"
+							circleColor="#ffffff"
+							textColor="#ffffff"
+							hoverTextColor="#004ac6"
+							className="w-full py-3.5 rounded-xl font-bold text-sm text-center">
+							{isProcessing ? (
+								<span className="inline-flex items-center gap-2 justify-center">
+									<Loader2 className="w-4 h-4 animate-spin" />
+									<span>Connecting to Flutterwave...</span>
+								</span>
+							) : (
+								<span>Pay ${total}.00 with Flutterwave →</span>
+							)}
+						</PillButton>
+					</form>
+
+					{/* Supported payment badges */}
+					<div className="flex flex-wrap items-center justify-between gap-2 text-xs text-gray-500 pt-1">
+						<div className="flex items-center gap-3">
+							<span className="inline-flex items-center gap-1">
+								<CreditCard className="w-3.5 h-3.5 text-blue-600" />
+								<span>Card</span>
+							</span>
+							<span className="inline-flex items-center gap-1">
+								<Building2 className="w-3.5 h-3.5 text-emerald-600" />
+								<span>Bank Transfer</span>
+							</span>
+							<span className="inline-flex items-center gap-1">
+								<Smartphone className="w-3.5 h-3.5 text-purple-600" />
+								<span>USSD / Mobile Money</span>
 							</span>
 						</div>
-					</div>
 
-					{/* Options Bar: Billing Cycle & Currency */}
-					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-gray-50 border border-gray-100">
-						{/* Billing Switcher */}
-						<div className="space-y-1.5">
-							<label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">
-								Billing Cycle
-							</label>
-							<div className="grid grid-cols-2 gap-1.5 p-1 bg-white rounded-xl border border-gray-200">
-								<button
-									type="button"
-									onClick={() => setBillingCycle("monthly")}
-									className={`py-1.5 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-										billingCycle === "monthly"
-											? "bg-blue-600 text-white shadow-xs"
-											: "text-gray-600 hover:text-gray-900"
-									}`}>
-									Monthly (${activePlan.monthlyPrice}/mo)
-								</button>
-								<button
-									type="button"
-									onClick={() => setBillingCycle("yearly")}
-									className={`py-1.5 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
-										billingCycle === "yearly"
-											? "bg-blue-600 text-white shadow-xs"
-											: "text-gray-600 hover:text-gray-900"
-									}`}>
-									<span>Yearly</span>
-									<span className="text-[9px] px-1 py-0.2 rounded-full font-extrabold bg-emerald-100 text-emerald-700">
-										-20%
-									</span>
-								</button>
-							</div>
-						</div>
-
-						{/* Currency Selector */}
-						<div className="space-y-1.5">
-							<label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">
-								Payment Currency
-							</label>
-							<select
-								value={currency}
-								onChange={(e) => setCurrency(e.target.value as any)}
-								className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-900 focus:outline-none focus:border-blue-600 cursor-pointer">
-								<option value="USD">USD ($ - US Dollar)</option>
-								<option value="NGN">NGN (₦ - Nigerian Naira)</option>
-								<option value="GHS">GHS (GH₵ - Ghanaian Cedi)</option>
-								<option value="KES">KES (KSh - Kenyan Shilling)</option>
-							</select>
-						</div>
-					</div>
-
-					{/* Plan Deliverables */}
-					<div className="space-y-3">
-						<h3 className="text-xs font-bold uppercase tracking-wider text-gray-400">
-							Included in this build:
-						</h3>
-						<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-							{activePlan.features.map((feat) => (
-								<div key={feat} className="p-3 rounded-xl bg-gray-50/80 border border-gray-100 flex items-center gap-2.5 text-xs text-gray-700 font-medium">
-									<CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-									<span>{feat}</span>
-								</div>
-							))}
-						</div>
-					</div>
-
-					{/* Flutterwave Express Action Box */}
-					<div className="p-6 sm:p-8 rounded-3xl bg-slate-900 text-white space-y-6">
-						<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
-							<div>
-								<div className="flex items-center gap-2 text-xs font-bold text-blue-400 mb-1">
-									<Zap className="w-4 h-4 fill-current text-blue-400" />
-									<span>Flutterwave Secure Checkout</span>
-								</div>
-								<h3 className="text-lg font-bold font-nohemi">
-									Complete Payment via Flutterwave
-								</h3>
-								<p className="text-xs text-slate-400 font-medium mt-0.5">
-									You will be redirected to Flutterwave&apos;s encrypted payment gateway.
-								</p>
-							</div>
-
-							{/* Supported Logos Pill */}
-							<div className="flex items-center gap-2 text-[10px] font-bold text-slate-300 bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700/80 shrink-0">
-								<CreditCard className="w-3.5 h-3.5 text-blue-400" />
-								<span>Card</span>
-								<span>•</span>
-								<Building2 className="w-3.5 h-3.5 text-emerald-400" />
-								<span>Bank</span>
-								<span>•</span>
-								<Smartphone className="w-3.5 h-3.5 text-amber-400" />
-								<span>USSD</span>
-							</div>
-						</div>
-
-						{/* Action Button */}
-						<form onSubmit={handleFlutterwaveCheckout}>
-							<PillButton
-								type="submit"
-								disabled={isProcessing}
-								baseColor="#004ac6"
-								circleColor="#ffffff"
-								textColor="#ffffff"
-								hoverTextColor="#004ac6"
-								useThunderFont={true}
-								className="w-full py-4 rounded-full font-bold text-sm shadow-xl cursor-pointer text-center">
-								{isProcessing ? (
-									<span className="inline-flex items-center gap-2">
-										<Loader2 className="w-4 h-4 animate-spin" />
-										<span>Redirecting to Flutterwave...</span>
-									</span>
-								) : (
-									<span>Proceed to Flutterwave Checkout (${total}.00) →</span>
-								)}
-							</PillButton>
-						</form>
-
-						<div className="flex items-center justify-center gap-2 text-[11px] text-slate-400 font-medium pt-2">
-							<ShieldCheck className="w-4 h-4 text-emerald-400" />
-							<span>Protected by 14-Day Money-Back Guarantee & SSL Encryption</span>
+						<div className="flex items-center gap-1 text-emerald-600 font-medium">
+							<ShieldCheck className="w-4 h-4" />
+							<span>14-Day Guarantee</span>
 						</div>
 					</div>
 				</div>
 			</div>
-		</main>
+		</div>
 	);
 }
 
@@ -411,7 +322,7 @@ export default function CheckoutPage() {
 			<Navbar />
 			<Suspense
 				fallback={
-					<div className="min-h-screen flex items-center justify-center text-xs font-bold text-gray-500">
+					<div className="min-h-screen flex items-center justify-center text-xs font-semibold text-gray-500">
 						Loading checkout...
 					</div>
 				}>
