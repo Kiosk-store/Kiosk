@@ -22,6 +22,8 @@ import {
 	Building2,
 	Smartphone,
 } from "lucide-react";
+import { useCurrency } from "@/context/CurrencyContext";
+import { CURRENCIES, BASE_PRICES_USD, formatPrice, PlanKey } from "@/lib/currency";
 
 interface PlanDetails {
 	id: string;
@@ -100,16 +102,30 @@ function CheckoutContent() {
 	const planParam = searchParams.get("plan") || "landing";
 	const billingParam = searchParams.get("billing") || "monthly";
 
+	const { currency: detectedCurrency, isLoading: isCurrencyLoading } = useCurrency();
+
 	const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">(
 		billingParam === "yearly" ? "yearly" : "monthly",
 	);
-	const [currency, setCurrency] = useState<"USD" | "NGN" | "GHS" | "KES">("USD");
+	const [selectedCurrencyCode, setSelectedCurrencyCode] = useState<string>("");
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 	const activePlan = getPlan(planParam);
 	const PlanIcon = activePlan.icon;
-	const total = billingCycle === "yearly" ? activePlan.yearlyPrice : activePlan.monthlyPrice;
+	const planKey: PlanKey = (activePlan.id as PlanKey) || "landing";
+
+	const currentCurrencyCode = selectedCurrencyCode || detectedCurrency.code;
+	const activeCurrency = CURRENCIES[currentCurrencyCode] || CURRENCIES.USD;
+
+	const totalPriceFormatted = formatPrice(
+		BASE_PRICES_USD[planKey][billingCycle],
+		activeCurrency,
+	);
+	const monthlyPriceFormatted = formatPrice(
+		BASE_PRICES_USD[planKey].monthly,
+		activeCurrency,
+	);
 
 	const handleCheckout = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -129,7 +145,8 @@ function CheckoutContent() {
 				},
 				body: JSON.stringify({
 					plan: activePlan.dbPlan,
-					currency,
+					billingCycle,
+					currency: activeCurrency.code,
 				}),
 			});
 
@@ -194,7 +211,13 @@ function CheckoutContent() {
 
 					<div className="text-right">
 						<span className="text-xs font-medium text-gray-400 block">Total</span>
-						<span className="text-2xl font-bold text-blue-600">${total}.00</span>
+						<span className="text-2xl font-bold text-blue-600">
+							{isCurrencyLoading ? (
+								<span className="inline-block w-24 h-7 rounded-lg bg-gray-200 animate-pulse" />
+							) : (
+								totalPriceFormatted
+							)}
+						</span>
 					</div>
 				</div>
 
@@ -214,7 +237,7 @@ function CheckoutContent() {
 										? "bg-white text-blue-600 shadow-xs"
 										: "text-gray-600 hover:text-gray-900"
 								}`}>
-								Monthly (${activePlan.monthlyPrice})
+								Monthly ({isCurrencyLoading ? "…" : monthlyPriceFormatted})
 							</button>
 							<button
 								type="button"
@@ -238,13 +261,14 @@ function CheckoutContent() {
 							Currency
 						</label>
 						<select
-							value={currency}
-							onChange={(e) => setCurrency(e.target.value as any)}
+							value={currentCurrencyCode}
+							onChange={(e) => setSelectedCurrencyCode(e.target.value)}
 							className="w-full py-2 px-3 bg-white border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-blue-600 cursor-pointer">
-							<option value="USD">USD ($ - US Dollar)</option>
-							<option value="NGN">NGN (₦ - Nigerian Naira)</option>
-							<option value="GHS">GHS (GH₵ - Ghanaian Cedi)</option>
-							<option value="KES">KES (KSh - Kenyan Shilling)</option>
+							{Object.values(CURRENCIES).map((c) => (
+								<option key={c.code} value={c.code}>
+									{c.code} ({c.symbol} - {c.label})
+								</option>
+							))}
 						</select>
 					</div>
 				</div>
@@ -271,7 +295,7 @@ function CheckoutContent() {
 					<form onSubmit={handleCheckout}>
 						<PillButton
 							type="submit"
-							disabled={isProcessing}
+							disabled={isProcessing || isCurrencyLoading}
 							baseColor="#004ac6"
 							circleColor="#ffffff"
 							textColor="#ffffff"
@@ -283,7 +307,7 @@ function CheckoutContent() {
 									<span>Connecting to Bachs.io...</span>
 								</span>
 							) : (
-								<span>Pay ${total}.00 with Bachs.io →</span>
+								<span>Pay {totalPriceFormatted} with Bachs.io →</span>
 							)}
 						</PillButton>
 					</form>

@@ -6,16 +6,18 @@ import { getAuthenticatedUser } from "@/lib/auth/session";
 import { auth } from "@/auth";
 import { checkRateLimit, redis } from "@/lib/ratelimit";
 import { initializeBachsPayment } from "@/lib/payments/bachs";
+import { BASE_PRICES_USD, CURRENCIES, PlanKey } from "@/lib/currency";
 
 const initializeSchema = z.object({
 	plan: z.enum(["LANDING_PAGE", "SALES_FUNNEL", "E_COMMERCE"]),
-	currency: z.enum(["USD", "NGN", "GHS", "KES"]).default("USD"),
+	billingCycle: z.enum(["monthly", "yearly"]).default("monthly"),
+	currency: z.string().default("USD"),
 });
 
-const PLAN_PRICES: Record<string, number> = {
-	LANDING_PAGE: 20,
-	SALES_FUNNEL: 30,
-	E_COMMERCE: 43,
+const PLAN_MAP: Record<string, PlanKey> = {
+	LANDING_PAGE: "landing",
+	SALES_FUNNEL: "funnel",
+	E_COMMERCE: "store",
 };
 
 /**
@@ -65,14 +67,21 @@ export async function POST(request: Request) {
 			);
 		}
 
-		const { plan, currency } = validation.data;
-		const amount = PLAN_PRICES[plan];
+		const { plan, billingCycle, currency } = validation.data;
+		const planKey = PLAN_MAP[plan] || "landing";
+		const baseUsdAmount = BASE_PRICES_USD[planKey][billingCycle];
+
+		const currencyCode = currency.toUpperCase();
+		const targetCurrency = CURRENCIES[currencyCode] || CURRENCIES.USD;
+
+		// Convert USD base price to user's currency
+		const amount = baseUsdAmount * targetCurrency.rateFromUSD;
 		const tx_ref = `kiosk_tx_${crypto.randomUUID()}`;
 		const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 		const paymentResult = await initializeBachsPayment({
 			amount,
-			currency,
+			currency: targetCurrency.code,
 			email: userEmail,
 			name: userName,
 			tx_ref,
