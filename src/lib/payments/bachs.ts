@@ -20,10 +20,12 @@ import crypto from "crypto";
 
 const BACHS_SECRET_KEY = process.env.BACHS_SECRET_KEY || "";
 const BACHS_WEBHOOK_SECRET = process.env.BACHS_WEBHOOK_SECRET || "";
-const IS_PRODUCTION = process.env.NODE_ENV === "production";
-const BACHS_BASE_URL = IS_PRODUCTION
-	? "https://api.bachs.io"
-	: "https://sandbox-api.bachs.io";
+// Detect environment from the key prefix — sk_live_ = production, sk_sandbox_ = sandbox
+const IS_SANDBOX = BACHS_SECRET_KEY.startsWith("sk_sandbox_");
+const BACHS_BASE_URL = IS_SANDBOX
+	? "https://sandbox-api.bachs.io"
+	: "https://api.bachs.io";
+
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                               */
