@@ -6,11 +6,13 @@ import React, { useState } from "react";
 import ScrollReveal from "@/components/ScrollReveal";
 import PillButton from "@/components/PillButton";
 import { Globe, Zap, ShoppingBag, CheckCircle2 } from "lucide-react";
+import { useCurrency } from "@/context/CurrencyContext";
 
 export default function ServiceTiers() {
 	const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">(
 		"monthly",
 	);
+	const { formatPlanPrice, currency, isLoading } = useCurrency();
 
 	return (
 		<section
@@ -122,17 +124,29 @@ export default function ServiceTiers() {
 							<div>
 								<div className="flex items-baseline gap-1.5">
 									<span className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900">
-										{billingCycle === "yearly" ? "$192" : "$20"}
+										{isLoading ? (
+											<span className="inline-block w-24 h-7 rounded-lg bg-gray-200 animate-pulse" />
+										) : (
+											formatPlanPrice("landing", billingCycle)
+										)}
 									</span>
 									<span className="text-xs font-semibold text-gray-500">
 										{billingCycle === "yearly" ? "/ year" : "/ month"}
 									</span>
 								</div>
-								<span className="text-[11px] text-gray-400 font-medium">
-									{billingCycle === "yearly"
-										? "Billed annually ($16/mo equivalent)"
-										: "Cancel or upgrade anytime"}
-								</span>
+								<div>
+									<span className="text-[11px] text-gray-400 font-medium">
+										{billingCycle === "yearly"
+											? `Billed annually (${formatPlanPrice("landing", "monthly")} eq./mo)`
+											: "Cancel or upgrade anytime"}
+									</span>
+									{!isLoading && currency.code !== "USD" && (
+										<span className="ml-2 inline-flex items-center gap-1 text-[10px] font-semibold text-blue-600 uppercase tracking-wider">
+											<span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block" />
+											{currency.code}
+										</span>
+									)}
+								</div>
 							</div>
 
 							<PillButton
@@ -246,17 +260,29 @@ export default function ServiceTiers() {
 							<div>
 								<div className="flex items-baseline gap-1.5">
 									<span className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900">
-										{billingCycle === "yearly" ? "$288" : "$30"}
+										{isLoading ? (
+											<span className="inline-block w-24 h-7 rounded-lg bg-gray-200 animate-pulse" />
+										) : (
+											formatPlanPrice("funnel", billingCycle)
+										)}
 									</span>
 									<span className="text-xs font-semibold text-gray-500">
 										{billingCycle === "yearly" ? "/ year" : "/ month"}
 									</span>
 								</div>
-								<span className="text-[11px] text-gray-400 font-medium">
-									{billingCycle === "yearly"
-										? "Billed annually ($24/mo equivalent)"
-										: "Cancel or upgrade anytime"}
-								</span>
+								<div>
+									<span className="text-[11px] text-gray-400 font-medium">
+										{billingCycle === "yearly"
+											? `Billed annually (${formatPlanPrice("funnel", "monthly")} eq./mo)`
+											: "Cancel or upgrade anytime"}
+									</span>
+									{!isLoading && currency.code !== "USD" && (
+										<span className="ml-2 inline-flex items-center gap-1 text-[10px] font-semibold text-blue-600 uppercase tracking-wider">
+											<span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block" />
+											{currency.code}
+										</span>
+									)}
+								</div>
 							</div>
 
 							<PillButton
@@ -361,17 +387,29 @@ export default function ServiceTiers() {
 							<div>
 								<div className="flex items-baseline gap-1.5">
 									<span className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900">
-										{billingCycle === "yearly" ? "$408" : "$43"}
+										{isLoading ? (
+											<span className="inline-block w-24 h-7 rounded-lg bg-gray-200 animate-pulse" />
+										) : (
+											formatPlanPrice("store", billingCycle)
+										)}
 									</span>
 									<span className="text-xs font-semibold text-gray-500">
 										{billingCycle === "yearly" ? "/ year" : "/ month"}
 									</span>
 								</div>
-								<span className="text-[11px] text-gray-400 font-medium">
-									{billingCycle === "yearly"
-										? "Billed annually ($34/mo equivalent)"
-										: "Cancel or upgrade anytime"}
-								</span>
+								<div>
+									<span className="text-[11px] text-gray-400 font-medium">
+										{billingCycle === "yearly"
+											? `Billed annually (${formatPlanPrice("store", "monthly")} eq./mo)`
+											: "Cancel or upgrade anytime"}
+									</span>
+									{!isLoading && currency.code !== "USD" && (
+										<span className="ml-2 inline-flex items-center gap-1 text-[10px] font-semibold text-blue-600 uppercase tracking-wider">
+											<span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block" />
+											{currency.code}
+										</span>
+									)}
+								</div>
 							</div>
 
 							<PillButton

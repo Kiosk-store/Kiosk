@@ -22,13 +22,14 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Check } from "lucide-react";
 import PillButton from "./PillButton";
 import LottiePlayer from "./LottiePlayer";
+import { useCurrency } from "@/context/CurrencyContext";
 
 export interface PricingTier {
 	id: string;
+	/** plan key matching BASE_PRICES_USD */
+	planKey: "landing" | "funnel" | "store";
 	name: string;
 	subtitle: string;
-	priceYearly: string;
-	priceMonthly: string;
 	description: string;
 	features: string[];
 	cta: string;
@@ -39,10 +40,9 @@ export interface PricingTier {
 const tiers: PricingTier[] = [
 	{
 		id: "landing-page",
+		planKey: "landing",
 		name: "Landing Page",
 		subtitle: "High-Converting Single Page",
-		priceYearly: "$192",
-		priceMonthly: "$20",
 		description: "Custom single-page website engineered for rapid lead generation and immediate launch.",
 		features: [
 			"Custom responsive single page design",
@@ -56,10 +56,9 @@ const tiers: PricingTier[] = [
 	},
 	{
 		id: "sales-funnel",
+		planKey: "funnel",
 		name: "Sales Funnel",
 		subtitle: "Multi-Step Conversion Engine",
-		priceYearly: "$288",
-		priceMonthly: "$30",
 		description: "Strategic multi-page funnel engineered to qualify prospects and convert them into clients.",
 		features: [
 			"Up to 5 custom high-impact conversion pages",
@@ -73,10 +72,9 @@ const tiers: PricingTier[] = [
 	},
 	{
 		id: "ecommerce-store",
+		planKey: "store",
 		name: "E-commerce Store",
 		subtitle: "Full-Featured Digital Shop",
-		priceYearly: "$408",
-		priceMonthly: "$43",
 		description: "Complete online storefront with seamless checkout, payment processing, and inventory management.",
 		features: [
 			"Full product catalog & variation management",
@@ -95,6 +93,7 @@ export default function Pricing() {
 		"monthly",
 	);
 	const [activeIndex, setActiveIndex] = useState(0);
+	const { formatPlanPrice, currency, isLoading } = useCurrency();
 
 	const sectionRef = useRef<HTMLElement | null>(null);
 	const pinContainerRef = useRef<HTMLDivElement | null>(null);
@@ -206,10 +205,7 @@ export default function Pricing() {
 				<div className="w-full flex-1 relative flex items-center justify-center my-3 sm:my-6 min-h-[480px] sm:min-h-[520px]">
 					{tiers.map((tier, idx) => {
 						const isVisible = idx === activeIndex;
-						const price =
-							billingCycle === "yearly"
-								? tier.priceYearly
-								: tier.priceMonthly;
+						const price = formatPlanPrice(tier.planKey, billingCycle);
 						const period =
 							billingCycle === "yearly" ? "/ year" : "/ month";
 
@@ -269,13 +265,25 @@ export default function Pricing() {
 											</p>
 
 											{/* Price Display */}
-											<div className="mb-4 sm:mb-6 flex items-baseline gap-2 sm:gap-2.5">
-												<span className="text-2xl sm:text-3xl md:text-4xl font-medium text-white tracking-tight font-nohemi">
-													{price}
-												</span>
-												<span className="text-[10px] sm:text-xs text-slate-400 font-normal uppercase tracking-wider">
-													{period}
-												</span>
+											<div className="mb-4 sm:mb-6">
+												<div className="flex items-baseline gap-2 sm:gap-2.5">
+													<span className="text-2xl sm:text-3xl md:text-4xl font-medium text-white tracking-tight font-nohemi">
+														{isLoading ? (
+															<span className="inline-block w-28 h-8 rounded-lg bg-white/10 animate-pulse" />
+														) : (
+															price
+														)}
+													</span>
+													<span className="text-[10px] sm:text-xs text-slate-400 font-normal uppercase tracking-wider">
+														{period}
+													</span>
+												</div>
+												{!isLoading && currency.code !== "USD" && (
+													<span className="inline-flex items-center gap-1 mt-1 text-[10px] font-semibold text-blue-400/80 uppercase tracking-wider">
+														<span className="w-1.5 h-1.5 rounded-full bg-blue-400 inline-block" />
+														Showing {currency.label} prices
+													</span>
+												)}
 											</div>
 
 											{/* Feature Checklist */}

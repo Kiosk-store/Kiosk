@@ -4,30 +4,38 @@
 
 import React, { useState } from "react";
 import { ArrowRight, HelpCircle } from "lucide-react";
+import { useCurrency } from "@/context/CurrencyContext";
 
 const DECISION_OPTIONS = [
 	{
 		id: "presence",
+		planKey: "landing" as const,
 		question: "Just need a simple, professional online presence?",
-		recommendation: "Landing Page ($20/mo)",
 		href: "/checkout?plan=landing",
 	},
 	{
 		id: "ads",
+		planKey: "funnel" as const,
 		question: "Running paid ads & email campaigns to convert leads?",
-		recommendation: "Sales Funnel ($30/mo)",
 		href: "/checkout?plan=funnel",
 	},
 	{
 		id: "store",
+		planKey: "store" as const,
 		question: "Selling physical products or digital downloads online?",
-		recommendation: "E-commerce Store ($43/mo)",
 		href: "/checkout?plan=store",
 	},
 ];
 
+const PLAN_LABELS: Record<string, string> = {
+	landing: "Landing Page",
+	funnel: "Sales Funnel",
+	store: "E-commerce Store",
+};
+
 export default function ServicesDecisionHelper() {
 	const [activeQuizChoice, setActiveQuizChoice] = useState<string | null>(null);
+	const { formatPlanPrice, isLoading } = useCurrency();
 
 	return (
 		<section className="py-16 md:py-24 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
@@ -59,7 +67,9 @@ export default function ServicesDecisionHelper() {
 							<div className="flex items-center justify-between text-xs font-bold text-blue-600 pt-2 border-t border-gray-100">
 								<span className="flex items-center gap-1">
 									<ArrowRight className="w-3.5 h-3.5 text-blue-600" />
-									<span>{q.recommendation}</span>
+									<span>
+										{PLAN_LABELS[q.planKey]} ({isLoading ? "…" : formatPlanPrice(q.planKey, "monthly")}/mo)
+									</span>
 								</span>
 							</div>
 						</button>
