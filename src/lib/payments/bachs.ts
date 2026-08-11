@@ -18,13 +18,16 @@
 
 import crypto from "crypto";
 
-const BACHS_SECRET_KEY = process.env.BACHS_SECRET_KEY || "";
 const BACHS_WEBHOOK_SECRET = process.env.BACHS_WEBHOOK_SECRET || "";
-// Detect environment from the key prefix — sk_live_ = production, sk_sandbox_ = sandbox
-const IS_SANDBOX = BACHS_SECRET_KEY.startsWith("sk_sandbox_");
-const BACHS_BASE_URL = IS_SANDBOX
-	? "https://sandbox-api.bachs.io"
-	: "https://api.bachs.io";
+
+function getBachsConfig() {
+	const key = process.env.BACHS_SECRET_KEY || "";
+	const isSandbox = key.startsWith("sk_sandbox_");
+	const baseUrl = isSandbox
+		? "https://sandbox-api.bachs.io"
+		: "https://api.bachs.io";
+	return { key, isSandbox, baseUrl };
+}
 
 
 /* ------------------------------------------------------------------ */
@@ -64,64 +67,72 @@ export interface InitializePaymentResponse {
 export async function initializeBachsPayment(
 	input: InitializePaymentInput,
 ): Promise<InitializePaymentResponse> {
-	// Dev/test mock — no secret key configured
+	const { key: BACHS_SECRET_KEY, baseUrl: BACHS_BASE_URL } = getBachsConfig();
+
+	console.log(`[BACHS] Key check: ${BACHS_SECRET_KEY ? "PRESENT (" + BACHS_SECRET_KEY.slice(0, 10) + "...)" : "MISSING"} | API URL: ${BACHS_BASE_URL}`);
+
 	if (!BACHS_SECRET_KEY) {
-		console.log(
-			`[BACHS_DEV_MOCK] Payment initialized for ${input.email} | Amount: ${input.currency} ${input.amount}`,
-		);
+		console.error("[BACHS_ERROR] BACHS_SECRET_KEY is not loaded in process.env. Did you restart `npm run dev` after editing .env.local?");
 		return {
-			success: true,
-			checkoutId: `chk_dev_${crypto.randomUUID().slice(0, 10)}`,
-			link: `${input.redirect_url}?checkout_id=dev_chk_${crypto.randomUUID().slice(0, 8)}&status=successful`,
+			success: false,
+			error: "Bachs API Key (BACHS_SECRET_KEY) is missing. Please restart your dev server (npm run dev) after updating .env.local.",
 		};
 	}
 
 	try {
+		const requestBody = {
+			pricing: {
+				currency: input.currency.toUpperCase(),
+				amount: input.amount.toFixed(2),
+			},
+			customer: {
+				email: input.email,
+				name: input.name,
+			},
+			success_url: input.redirect_url,
+			cancel_url: input.redirect_url.split("?")[0],
+			reference: input.tx_ref,
+			metadata: input.meta ?? {},
+		};
+
+		console.log(`[BACHS_REQUEST] POST ${BACHS_BASE_URL}/v1/checkout-sessions`, JSON.stringify(requestBody, null, 2));
+
 		const response = await fetch(`${BACHS_BASE_URL}/v1/checkout-sessions`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
 				Authorization: `Bearer ${BACHS_SECRET_KEY}`,
 			},
-			body: JSON.stringify({
-				pricing: {
-					currency: input.currency.toUpperCase(),
-					amount: input.amount.toFixed(2),
-				},
-				customer: {
-					email: input.email,
-					name: input.name,
-				},
-				success_url: input.redirect_url,
-				cancel_url: input.redirect_url.split("?")[0], // fallback to base URL on cancel
-				reference: input.tx_ref,
-				metadata: input.meta ?? {},
-			}),
+			body: JSON.stringify(requestBody),
 		});
 
 		const result = await response.json();
+		console.log(`[BACHS_RESPONSE] Status: ${response.status}`, JSON.stringify(result, null, 2));
 
 		if (!response.ok || !result.checkout_url) {
-			console.error("[BACHS_INIT_ERROR]", result);
+			const errorMsg = result.message || result.error || result.detail || `Bachs API error (HTTP ${response.status})`;
+			console.error("[BACHS_INIT_ERROR]", errorMsg, result);
 			return {
 				success: false,
-				error: result.message || result.error || "Failed to initialize Bachs checkout session",
+				error: errorMsg,
 			};
 		}
 
+		console.log(`[BACHS_SUCCESS] Redirecting customer to: ${result.checkout_url}`);
 		return {
 			success: true,
 			link: result.checkout_url,
 			checkoutId: result.checkout_id,
 		};
-	} catch (err) {
+	} catch (err: any) {
 		console.error("[BACHS_INIT_EXCEPTION]", err);
 		return {
 			success: false,
-			error: "Unexpected network error during Bachs payment initialization",
+			error: err?.message || "Unexpected network error during Bachs payment initialization",
 		};
 	}
 }
+
 
 /* ------------------------------------------------------------------ */
 /*  Webhook signature verification                                      */

@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/db";
 import { tenants, projects } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { getAuthenticatedUser } from "@/lib/auth/session";
 import { auth } from "@/auth";
 import { CacheService } from "@/lib/cache/CacheService";
@@ -13,13 +13,20 @@ import { Logger } from "@/lib/logger";
 
 const contentPayloadSchema = z.object({
 	projectId: z.string().optional(),
+	plan: z.string().optional(),
 	businessName: z.string().min(2, "Business name is required"),
 	tagline: z.string().min(2, "Tagline is required"),
-	aboutText: z.string().min(5, "About text is required"),
-	servicesList: z.string().min(5, "Services list is required"),
-	contactEmail: z.string().email("Valid email is required"),
-	contactPhone: z.string().min(3, "Phone is required"),
+	aboutText: z.string().optional().default(""),
+	servicesList: z.string().optional().default(""),
+	contactEmail: z.string().optional().default(""),
+	contactPhone: z.string().optional().default(""),
 	contactAddress: z.string().optional(),
+	leadMagnetTitle: z.string().optional(),
+	valueStack: z.string().optional(),
+	testimonials: z.string().optional(),
+	productCatalog: z.string().optional(),
+	currency: z.string().optional(),
+	shippingInfo: z.string().optional(),
 	selectedFont: z.string().optional(),
 	uploadedImages: z
 		.array(
@@ -34,9 +41,9 @@ const contentPayloadSchema = z.object({
 });
 
 /**
- * GET /api/projects/content - Retrieves saved business content and brand assets
+ * GET /api/projects/content - Retrieves saved business content and brand assets for a specific project
  */
-export async function GET() {
+export async function GET(request: Request) {
 	try {
 		const authSession = await auth();
 		const customUser = await getAuthenticatedUser();
@@ -54,7 +61,13 @@ export async function GET() {
 			return NextResponse.json({ content: null });
 		}
 
-		const cacheKey = `tenant:content:${tenant.id}`;
+		const { searchParams } = new URL(request.url);
+		const projectId = searchParams.get("projectId");
+
+		const cacheKey = projectId
+			? `tenant:content:${tenant.id}:${projectId}`
+			: `tenant:content:${tenant.id}`;
+
 		const savedContent = await CacheService.get(cacheKey);
 
 		return NextResponse.json({ content: savedContent || null });
@@ -65,7 +78,7 @@ export async function GET() {
 }
 
 /**
- * POST /api/projects/content - Saves business content & brand assets and updates build progress
+ * POST /api/projects/content - Saves business content & brand assets for a specific project
  */
 export async function POST(request: Request) {
 	try {
@@ -96,18 +109,17 @@ export async function POST(request: Request) {
 		}
 
 		const contentData = validation.data;
-		const cacheKey = `tenant:content:${tenant.id}`;
+		const projectId = contentData.projectId;
+
+		const cacheKey = projectId
+			? `tenant:content:${tenant.id}:${projectId}`
+			: `tenant:content:${tenant.id}`;
 
 		// Store in Cache (Persistent 30 days)
 		await CacheService.set(cacheKey, contentData, 2592000);
 
-		// Update Project Progress to 85% & Status to "In Review"
-		const userProjects = await db.query.projects.findMany({
-			where: eq(projects.tenantId, tenant.id),
-		});
-
-		if (userProjects.length > 0) {
-			const activeProject = userProjects[0];
+		// Update specific Project Progress to 85% & Status to "In Review"
+		if (projectId) {
 			await db
 				.update(projects)
 				.set({
@@ -115,7 +127,21 @@ export async function POST(request: Request) {
 					status: "In Review",
 					updatedAt: new Date(),
 				})
-				.where(eq(projects.id, activeProject.id));
+				.where(and(eq(projects.id, projectId), eq(projects.tenantId, tenant.id)));
+		} else {
+			const userProjects = await db.query.projects.findMany({
+				where: eq(projects.tenantId, tenant.id),
+			});
+			if (userProjects.length > 0) {
+				await db
+					.update(projects)
+					.set({
+						progress: 85,
+						status: "In Review",
+						updatedAt: new Date(),
+					})
+					.where(eq(projects.id, userProjects[0].id));
+			}
 		}
 
 		// Invalidate projects list cache

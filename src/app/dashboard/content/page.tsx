@@ -116,6 +116,24 @@ function ContentForm() {
 	useEffect(() => {
 		async function loadSavedContent() {
 			try {
+				// Reset state to empty defaults for new/switched project
+				setBusinessName("");
+				setTagline("");
+				setAboutText("");
+				setServicesList("");
+				setContactEmail("");
+				setContactPhone("");
+				setContactAddress("");
+				setLeadMagnetTitle("");
+				setValueStack("");
+				setTestimonials("");
+				setProductCatalog("");
+				setCurrency("USD");
+				setShippingInfo("");
+				setSelectedFont("Outfit");
+				setUploadedImages([]);
+				setHasLoadedDraft(false);
+
 				let backendContent: any = {};
 				const res = await fetch(`/api/projects/content?projectId=${projectId}`);
 				if (res.ok) {
@@ -247,6 +265,7 @@ function ContentForm() {
 		try {
 			setIsSubmitting(true);
 			const payload = {
+				projectId,
 				plan: activePlan,
 				businessName,
 				tagline,

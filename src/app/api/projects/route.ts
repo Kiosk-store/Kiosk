@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/db";
 import { tenants, projects } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { getAuthenticatedUser } from "@/lib/auth/session";
 import { auth } from "@/auth";
 import { checkRateLimit } from "@/lib/ratelimit";
@@ -182,3 +182,53 @@ export async function POST(request: Request) {
 		);
 	}
 }
+
+/**
+ * DELETE /api/projects - Deletes a project by projectId
+ */
+export async function DELETE(request: Request) {
+	try {
+		const authSession = await auth();
+		const customUser = await getAuthenticatedUser();
+		const userId = authSession?.user?.id || customUser?.id;
+
+		if (!userId) {
+			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+		}
+
+		const { searchParams } = new URL(request.url);
+		const projectId = searchParams.get("projectId");
+
+		if (!projectId) {
+			return NextResponse.json({ error: "projectId is required" }, { status: 400 });
+		}
+
+		const tenant = await db.query.tenants.findFirst({
+			where: eq(tenants.ownerId, userId),
+		});
+
+		if (!tenant) {
+			return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
+		}
+
+		// Delete project matching both ID and tenant ownership
+		const deleted = await db
+			.delete(projects)
+			.where(and(eq(projects.id, projectId), eq(projects.tenantId, tenant.id)))
+			.returning();
+
+		if (deleted.length === 0) {
+			return NextResponse.json({ error: "Project not found or unauthorized" }, { status: 404 });
+		}
+
+		// Invalidate cache
+		await CacheService.invalidate(`tenant:projects:${tenant.id}`);
+		await CacheService.invalidate(`tenant:content:${tenant.id}:${projectId}`);
+
+		return NextResponse.json({ success: true, message: "Project deleted successfully" });
+	} catch (err) {
+		console.error("[DELETE_PROJECT_ERROR]", err);
+		return NextResponse.json({ error: "Failed to delete project" }, { status: 500 });
+	}
+}
+

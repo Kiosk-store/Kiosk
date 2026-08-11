@@ -57,6 +57,33 @@ export default function ProjectsPage() {
 		fetchProjects();
 	}, []);
 
+	const handleDeleteProject = async (projectId: string) => {
+		const target = projectsList.find((p) => p.id === projectId);
+		const confirmMsg = target
+			? `Are you sure you want to delete "${target.name}"? This action cannot be undone.`
+			: "Are you sure you want to delete this project?";
+
+		if (!window.confirm(confirmMsg)) return;
+
+		try {
+			const res = await fetch(`/api/projects?projectId=${projectId}`, {
+				method: "DELETE",
+			});
+
+			const data = await res.json();
+
+			if (!res.ok) {
+				alert(data.error || "Failed to delete project");
+				return;
+			}
+
+			setProjectsList((prev) => prev.filter((p) => p.id !== projectId));
+		} catch (err) {
+			console.error("[DELETE_PROJECT_ERROR]", err);
+			alert("A network error occurred while deleting the project.");
+		}
+	};
+
 	const filteredProjects = projectsList.filter((project) => {
 		const matchesFilter =
 			activeFilter === "All" || project.status === activeFilter;
@@ -169,7 +196,11 @@ export default function ProjectsPage() {
 				{!isLoading && !error && filteredProjects.length > 0 && (
 					<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
 						{filteredProjects.map((project) => (
-							<ProjectCard key={project.name} {...project} />
+							<ProjectCard
+								key={project.id || project.name}
+								{...project}
+								onDelete={handleDeleteProject}
+							/>
 						))}
 					</div>
 				)}
