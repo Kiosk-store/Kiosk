@@ -62,13 +62,13 @@ export default function ScrollReveal({
 	const getDirectionStyles = () => {
 		switch (direction) {
 			case "up":
-				return isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-16";
+				return isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4";
 			case "down":
-				return isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-16";
+				return isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4";
 			case "left":
-				return isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-16";
+				return isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4";
 			case "right":
-				return isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-16";
+				return isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4";
 			case "fade":
 				return isVisible ? "opacity-100" : "opacity-0";
 			default:

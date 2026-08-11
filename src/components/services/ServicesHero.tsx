@@ -6,6 +6,7 @@ import React, { useState } from "react";
 import ScrollReveal from "@/components/ScrollReveal";
 import PillButton from "@/components/PillButton";
 import LottiePlayer from "@/components/LottiePlayer";
+import { motion } from "framer-motion";
 import { Clock, ShieldCheck, Smartphone, CheckCircle2, ArrowRight } from "lucide-react";
 
 interface Tab {
@@ -121,18 +122,25 @@ export default function ServicesHero() {
 						<div className="bg-white border border-gray-200/90 rounded-3xl p-5 sm:p-7 text-gray-900 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[360px] sm:min-h-[440px]">
 							{/* Lottie Tabs */}
 							<div className="flex items-center justify-between gap-2 border-b border-gray-100 pb-3.5 mb-3.5">
-								<div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none max-w-[80vw] sm:max-w-none">
+								<div className="flex items-center gap-1.5 p-1 bg-gray-100/80 rounded-2xl border border-gray-200/60 max-w-[80vw] sm:max-w-none">
 									{HERO_LOTTIE_TABS.map((tab) => (
 										<button
 											key={tab.id}
 											type="button"
 											onClick={() => setActiveHeroLottie(tab.src)}
-											className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap ${
+											className={`relative px-3 py-1.5 rounded-xl text-[11px] font-bold transition-colors cursor-pointer whitespace-nowrap ${
 												activeHeroLottie === tab.src
-													? "bg-blue-600 text-white shadow-2xs"
-													: "bg-gray-100 text-gray-600 hover:text-gray-900 hover:bg-gray-200/70"
+													? "text-white"
+													: "text-gray-600 hover:text-gray-900"
 											}`}>
-											{tab.label}
+											{activeHeroLottie === tab.src && (
+												<motion.span
+													layoutId="activeHeroTab"
+													className="absolute inset-0 bg-blue-600 rounded-xl -z-0 shadow-2xs"
+													transition={{ type: "spring", stiffness: 400, damping: 30 }}
+												/>
+											)}
+											<span className="relative z-10">{tab.label}</span>
 										</button>
 									))}
 								</div>
