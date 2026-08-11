@@ -1,3 +1,3 @@
 /** @format */
 
-export * from "./payments/flutterwave";
+export * from "./payments/bachs";

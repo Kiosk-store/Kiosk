@@ -12,7 +12,7 @@ export * from "./auth/session";
 export * from "./cache/CacheService";
 export * from "./events/ProjectSubject";
 export * from "./factory/SiteTemplateFactory";
-export * from "./payments/flutterwave";
+export * from "./payments/bachs";
 export * from "./email";
 export * from "./logger";
 export * from "./ratelimit";

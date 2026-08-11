@@ -5,7 +5,7 @@ import { z } from "zod";
 import { getAuthenticatedUser } from "@/lib/auth/session";
 import { auth } from "@/auth";
 import { checkRateLimit, redis } from "@/lib/ratelimit";
-import { initializeFlutterwavePayment } from "@/lib/flutterwave";
+import { initializeBachsPayment } from "@/lib/payments/bachs";
 
 const initializeSchema = z.object({
 	plan: z.enum(["LANDING_PAGE", "SALES_FUNNEL", "E_COMMERCE"]),
@@ -19,7 +19,7 @@ const PLAN_PRICES: Record<string, number> = {
 };
 
 /**
- * POST /api/payments/initialize - Initializes a Flutterwave payment with Idempotency Double-Charge Protection
+ * POST /api/payments/initialize - Initializes a Bachs.io checkout session with Idempotency Double-Charge Protection
  */
 export async function POST(request: Request) {
 	try {
@@ -70,15 +70,13 @@ export async function POST(request: Request) {
 		const tx_ref = `kiosk_tx_${crypto.randomUUID()}`;
 		const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
-		const paymentResult = await initializeFlutterwavePayment({
+		const paymentResult = await initializeBachsPayment({
 			amount,
 			currency,
 			email: userEmail,
 			name: userName,
 			tx_ref,
 			redirect_url: `${appUrl}/dashboard/content?payment=complete&plan=${plan}`,
-			title: `Kiosk ${plan.replace("_", " ")} Subscription`,
-			description: `Monthly subscription fee for Kiosk ${plan} tier`,
 			meta: {
 				userId,
 				plan,
@@ -98,7 +96,7 @@ export async function POST(request: Request) {
 			tx_ref,
 		});
 	} catch (err) {
-		console.error("[INITIALIZE_PAYMENT_ERROR]", err);
+		console.error("[INITIALIZE_BACHS_PAYMENT_ERROR]", err);
 		return NextResponse.json(
 			{ error: "Failed to initialize payment process" },
 			{ status: 500 },
