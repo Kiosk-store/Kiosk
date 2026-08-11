@@ -35,9 +35,11 @@ function getBachsConfig() {
 /* ------------------------------------------------------------------ */
 
 export interface InitializePaymentInput {
-	/** Amount in USD (decimal string, e.g. "20.00") */
+	/** Amount in target currency */
 	amount: number;
-	/** ISO 4217 currency code — Bachs auto-converts if USD is used */
+	/** USD base price amount */
+	usdAmount?: number;
+	/** ISO 4217 currency code */
 	currency: string;
 	email: string;
 	name: string;
@@ -80,11 +82,24 @@ export async function initializeBachsPayment(
 	}
 
 	try {
+		const targetCurrencyCode = input.currency.toUpperCase();
+		const baseUsdPrice = input.usdAmount || (targetCurrencyCode === "USD" ? input.amount : input.amount / 1620);
+
+		// Per Bachs docs: organization base currency is USD.
+		// Use USD as primary pricing.currency and currency_options for local currency overrides (e.g. NGN).
+		const pricing: Record<string, any> = {
+			currency: "USD",
+			amount: baseUsdPrice.toFixed(2),
+		};
+
+		if (targetCurrencyCode !== "USD") {
+			pricing.currency_options = {
+				[targetCurrencyCode]: input.amount.toFixed(2),
+			};
+		}
+
 		const requestBody = {
-			pricing: {
-				currency: input.currency.toUpperCase(),
-				amount: input.amount.toFixed(2),
-			},
+			pricing,
 			customer: {
 				email: input.email,
 				name: input.name,

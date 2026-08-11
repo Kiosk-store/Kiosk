@@ -81,6 +81,7 @@ export async function POST(request: Request) {
 
 		const paymentResult = await initializeBachsPayment({
 			amount,
+			usdAmount: baseUsdAmount,
 			currency: targetCurrency.code,
 			email: userEmail,
 			name: userName,
