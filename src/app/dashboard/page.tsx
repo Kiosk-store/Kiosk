@@ -615,7 +615,13 @@ export default function DashboardPage() {
 								</div>
 								<div>
 									<p className="text-xl sm:text-2xl font-bold font-nohemi text-gray-900">
-										{tenantInfo?.plan || "NONE"}
+										{tenantInfo?.plan === "LANDING_PAGE"
+											? "Landing Page"
+											: tenantInfo?.plan === "SALES_FUNNEL"
+											? "Sales Funnel"
+											: tenantInfo?.plan === "E_COMMERCE"
+											? "E-Commerce"
+											: "NONE"}
 									</p>
 									<p className="text-xs text-gray-500 font-medium">Active Plan</p>
 								</div>

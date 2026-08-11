@@ -95,7 +95,7 @@ export const tenants = pgTable("tenants", {
 	name: text("name").notNull(),
 	slug: text("slug").notNull().unique(), // e.g. "bella-bakery" -> bella-bakery.kiosk.site
 	customDomain: text("customDomain").unique(), // e.g. "bellabakery.com"
-	plan: text("plan").default("LANDING_PAGE").notNull(), // LANDING_PAGE | SALES_FUNNEL | E_COMMERCE
+	plan: text("plan").default("NONE").notNull(), // NONE | LANDING_PAGE | SALES_FUNNEL | E_COMMERCE
 	isCustomDomainVerified: boolean("isCustomDomainVerified").default(false).notNull(),
 	createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
 	updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),

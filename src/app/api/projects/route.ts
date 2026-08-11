@@ -34,6 +34,7 @@ async function getOrCreateTenantForUser(userId: string, userName: string | null)
 				ownerId: userId,
 				name: `${userName || "User"}'s Workspace`,
 				slug,
+				plan: "NONE",
 			})
 			.returning();
 		tenant = newTenant;

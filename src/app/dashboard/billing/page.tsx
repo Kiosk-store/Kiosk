@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import PillButton from "@/components/PillButton";
 
@@ -67,20 +67,55 @@ interface Invoice {
 	plan: string;
 }
 
-const mockInvoices: Invoice[] = [
-	{
-		id: "INV-2026-001",
-		date: "Aug 01, 2026",
-		amount: "$20.00",
-		status: "Paid",
-		plan: "Landing Page Plan",
+const PLAN_INFO_MAP: Record<string, { title: string; price: string; desc: string }> = {
+	NONE: {
+		title: "No Active Subscription",
+		price: "$0",
+		desc: "You do not have an active paid subscription. Select a plan below to activate your workspace and order your site.",
 	},
-];
+	LANDING_PAGE: {
+		title: "Landing Page Plan",
+		price: "$20/mo",
+		desc: "You are currently on the Landing Page subscription ($20/mo). Add a Sales Funnel or E-commerce Store to your account anytime.",
+	},
+	SALES_FUNNEL: {
+		title: "Sales Funnel Plan",
+		price: "$30/mo",
+		desc: "You are currently on the Sales Funnel subscription ($30/mo). Expand your brand with additional pages anytime.",
+	},
+	E_COMMERCE: {
+		title: "E-commerce Store Plan",
+		price: "$43/mo",
+		desc: "You are currently on the E-commerce Store subscription ($43/mo). Enjoy full online store and product catalog features.",
+	},
+};
 
 export default function BillingPage() {
-	const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">(
-		"monthly",
-	);
+	const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
+	const [tenantPlan, setTenantPlan] = useState<string>("NONE");
+	const [isLoading, setIsLoading] = useState(true);
+
+	useEffect(() => {
+		async function fetchBillingInfo() {
+			try {
+				const res = await fetch("/api/projects");
+				if (res.ok) {
+					const data = await res.json();
+					if (data.tenant?.plan) {
+						setTenantPlan(data.tenant.plan);
+					}
+				}
+			} catch (err) {
+				console.error("[FETCH_BILLING_ERROR]", err);
+			} finally {
+				setIsLoading(false);
+			}
+		}
+		fetchBillingInfo();
+	}, []);
+
+	const currentPlanInfo = PLAN_INFO_MAP[tenantPlan] || PLAN_INFO_MAP.NONE;
+	const isPaid = tenantPlan !== "NONE";
 
 	return (
 		<div className="min-h-screen bg-[#f8fafc] text-gray-900 pb-20">
@@ -102,15 +137,20 @@ export default function BillingPage() {
 							<span className="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full uppercase tracking-wider">
 								Current Plan
 							</span>
-							<span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full uppercase tracking-wider">
-								Active
+							<span
+								className={`text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider ${
+									isPaid
+										? "text-emerald-600 bg-emerald-50"
+										: "text-gray-500 bg-gray-100"
+								}`}>
+								{isPaid ? "Active" : "No Plan"}
 							</span>
 						</div>
 						<h2 className="text-2xl font-bold font-nohemi text-gray-900 mb-1">
-							Landing Page Plan
+							{isLoading ? "Loading plan..." : currentPlanInfo.title}
 						</h2>
 						<p className="text-xs text-gray-500 max-w-lg">
-							You are currently on the Landing Page subscription ($20/mo). Add a Sales Funnel or E-commerce Store to your account anytime.
+							{currentPlanInfo.desc}
 						</p>
 					</div>
 

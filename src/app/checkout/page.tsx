@@ -307,7 +307,7 @@ function CheckoutContent() {
 									<span>Connecting to Bachs.io...</span>
 								</span>
 							) : (
-								<span>Pay {totalPriceFormatted} with Bachs.io →</span>
+								<span>Proceed to Payment →</span>
 							)}
 						</PillButton>
 					</form>
