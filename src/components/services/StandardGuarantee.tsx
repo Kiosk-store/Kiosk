@@ -23,27 +23,27 @@ const GUARANTEE_FEATURES: GuaranteeFeature[] = [
 		badgeText: "SUBDOMAIN",
 		desc: "Launch immediately on your custom subdomain (yourname.kiosk.com) with zero setup friction.",
 		renderVisual: () => (
-			<div className="relative w-full h-24 rounded-2xl bg-slate-900 border border-slate-800 p-3 flex flex-col justify-between overflow-hidden shadow-inner group-hover:border-blue-500/40 transition-colors">
+			<div className="relative w-full h-24 rounded-xl bg-gray-50 border border-gray-200 p-3 flex flex-col justify-between overflow-hidden group-hover:border-blue-200 transition-colors">
 				{/* Top Window Bar */}
 				<div className="flex items-center justify-between z-10">
 					<div className="flex items-center gap-1.5">
-						<span className="w-2 h-2 rounded-full bg-slate-700" />
-						<span className="w-2 h-2 rounded-full bg-slate-700" />
-						<span className="w-2 h-2 rounded-full bg-slate-700" />
+						<span className="w-2 h-2 rounded-full bg-gray-300" />
+						<span className="w-2 h-2 rounded-full bg-gray-300" />
+						<span className="w-2 h-2 rounded-full bg-gray-300" />
 					</div>
-					<div className="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full">
-						<span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-						<span className="text-[9px] font-mono font-bold text-emerald-300">SSL ACTIVE</span>
+					<div className="flex items-center gap-1 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+						<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+						<span className="text-[9px] font-mono font-bold text-emerald-700">SSL ACTIVE</span>
 					</div>
 				</div>
-				{/* Domain Bar Illustration */}
-				<div className="z-10 bg-slate-800/90 border border-blue-500/30 rounded-xl px-3 py-1.5 flex items-center justify-between shadow-md">
-					<div className="flex items-center gap-1.5 text-xs font-mono truncate">
-						<span className="text-blue-400 font-bold">https://</span>
-						<span className="text-white font-bold tracking-tight">yourname</span>
-						<span className="text-blue-400 font-bold">.kiosk.com</span>
+				{/* Domain Bar */}
+				<div className="z-10 bg-white border border-blue-200 rounded-lg px-3 py-1.5 flex items-center justify-between shadow-sm">
+					<div className="flex items-center gap-1 text-xs font-mono truncate">
+						<span className="text-blue-500 font-bold">https://</span>
+						<span className="text-gray-900 font-bold">yourname</span>
+						<span className="text-blue-500 font-bold">.kiosk.com</span>
 					</div>
-					<div className="w-2 h-2 rounded-full bg-blue-400 animate-ping shrink-0" />
+					<span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse shrink-0" />
 				</div>
 			</div>
 		),
@@ -55,22 +55,20 @@ const GUARANTEE_FEATURES: GuaranteeFeature[] = [
 		badgeText: "ENTERPRISE SECURITY",
 		desc: "Enterprise 256-bit SSL security certificate & ultra-fast edge cloud hosting built right in.",
 		renderVisual: () => (
-			<div className="relative w-full h-24 rounded-2xl bg-slate-900 border border-slate-800 p-3.5 flex items-center justify-between overflow-hidden shadow-inner group-hover:border-blue-500/40 transition-colors">
-				{/* Shield Visual Badge */}
+			<div className="relative w-full h-24 rounded-xl bg-gray-50 border border-gray-200 p-3.5 flex items-center justify-between overflow-hidden group-hover:border-blue-200 transition-colors">
 				<div className="flex items-center gap-3 z-10">
-					<div className="w-12 h-12 rounded-2xl bg-blue-600/20 border border-blue-500/40 p-0.5 shadow-md flex items-center justify-center">
-						<svg className="w-6 h-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0">
+						<svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
 						</svg>
 					</div>
 					<div>
-						<div className="text-[11px] font-mono font-bold text-white tracking-wide uppercase">256-Bit SSL</div>
-						<div className="text-[10px] text-slate-400 font-mono">99.99% Uptime SLA</div>
+						<div className="text-[11px] font-mono font-bold text-gray-900 tracking-wide uppercase">256-Bit SSL</div>
+						<div className="text-[10px] text-gray-500 font-mono">99.99% Uptime SLA</div>
 					</div>
 				</div>
-				{/* Security Chip */}
-				<div className="z-10 bg-emerald-500/10 border border-emerald-500/30 px-2 py-1 rounded-lg text-[9px] font-mono font-bold text-emerald-300 flex items-center gap-1">
-					<span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+				<div className="z-10 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-lg text-[9px] font-mono font-bold text-emerald-700 flex items-center gap-1">
+					<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
 					<span>PROTECTED</span>
 				</div>
 			</div>
@@ -83,26 +81,25 @@ const GUARANTEE_FEATURES: GuaranteeFeature[] = [
 		badgeText: "AUTO-ADAPTIVE",
 		desc: "Looks stunning and functions flawlessly across all smartphones, tablets, and laptops.",
 		renderVisual: () => (
-			<div className="relative w-full h-24 rounded-2xl bg-slate-900 border border-slate-800 p-3.5 flex items-center justify-around overflow-hidden shadow-inner group-hover:border-blue-500/40 transition-colors">
+			<div className="relative w-full h-24 rounded-xl bg-gray-50 border border-gray-200 p-3.5 flex items-center justify-around overflow-hidden group-hover:border-blue-200 transition-colors">
 				{/* Desktop Frame */}
-				<div className="z-10 w-24 h-15 rounded-lg border border-slate-700 bg-slate-800 p-1.5 flex flex-col justify-between shadow-md group-hover:border-blue-500/50 transition-colors">
+				<div className="z-10 w-24 rounded-lg border border-gray-300 bg-white p-1.5 flex flex-col gap-1 shadow-sm group-hover:border-blue-300 transition-colors">
 					<div className="w-full h-1 bg-blue-500/60 rounded-full" />
 					<div className="space-y-1">
-						<div className="w-3/4 h-1 bg-slate-600 rounded" />
-						<div className="w-1/2 h-1 bg-blue-400/50 rounded" />
+						<div className="w-3/4 h-1 bg-gray-200 rounded" />
+						<div className="w-1/2 h-1 bg-blue-300/60 rounded" />
 					</div>
 					<div className="w-full flex justify-end">
-						<div className="w-2.5 h-1 bg-blue-500 rounded-xs" />
+						<div className="w-2.5 h-1 bg-blue-500 rounded" />
 					</div>
 				</div>
-				{/* Sync Node Indicator */}
-				<div className="z-10 text-blue-400 font-mono text-xs font-bold">::</div>
+				<div className="z-10 text-gray-400 font-mono text-xs font-bold">::</div>
 				{/* Mobile Frame */}
-				<div className="z-10 w-9 h-16 rounded-lg border border-slate-700 bg-slate-800 p-1 flex flex-col justify-between shadow-md group-hover:border-blue-500/50 transition-colors">
-					<div className="w-3 h-0.5 bg-slate-600 mx-auto rounded-full" />
+				<div className="z-10 w-9 h-16 rounded-lg border border-gray-300 bg-white p-1 flex flex-col justify-between shadow-sm group-hover:border-blue-300 transition-colors">
+					<div className="w-3 h-0.5 bg-gray-300 mx-auto rounded-full" />
 					<div className="space-y-1">
-						<div className="w-full h-1 bg-blue-400/70 rounded" />
-						<div className="w-2/3 h-1 bg-slate-600 rounded" />
+						<div className="w-full h-1 bg-blue-400/60 rounded" />
+						<div className="w-2/3 h-1 bg-gray-200 rounded" />
 					</div>
 					<div className="w-1 h-1 rounded-full bg-blue-500 mx-auto" />
 				</div>
@@ -116,23 +113,21 @@ const GUARANTEE_FEATURES: GuaranteeFeature[] = [
 		badgeText: "SEARCH READY",
 		desc: "Meta titles, Open Graph social share tags, and XML sitemaps automatically generated.",
 		renderVisual: () => (
-			<div className="relative w-full h-24 rounded-2xl bg-slate-900 border border-slate-800 p-3 flex flex-col justify-between overflow-hidden shadow-inner group-hover:border-blue-500/40 transition-colors">
-				{/* Meta Pill Header */}
+			<div className="relative w-full h-24 rounded-xl bg-gray-50 border border-gray-200 p-3 flex flex-col justify-between overflow-hidden group-hover:border-blue-200 transition-colors">
 				<div className="flex items-center justify-between z-10">
-					<span className="text-[10px] font-mono font-bold text-blue-400 bg-blue-500/10 border border-blue-500/30 px-2 py-0.5 rounded-md">
+					<span className="text-[10px] font-mono font-bold text-blue-600 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-md">
 						&lt;meta name=&quot;og:title&quot;&gt;
 					</span>
-					<span className="text-[9px] font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-1.5 py-0.5 rounded-md">
+					<span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-md">
 						INDEXED
 					</span>
 				</div>
-				{/* Search Result Visual */}
-				<div className="z-10 bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 flex items-center justify-between shadow-md">
+				<div className="z-10 bg-white border border-gray-200 rounded-lg px-3 py-1.5 flex items-center justify-between shadow-sm">
 					<div className="space-y-0.5">
-						<div className="text-[11px] font-bold text-white truncate">Your Business | Kiosk</div>
-						<div className="text-[9px] font-mono text-slate-400">sitemap.xml • Google Verified</div>
+						<div className="text-[11px] font-bold text-gray-900 truncate">Your Business | Kiosk</div>
+						<div className="text-[9px] font-mono text-gray-400">sitemap.xml · Google Verified</div>
 					</div>
-					<div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+					<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
 				</div>
 			</div>
 		),
@@ -144,21 +139,19 @@ const GUARANTEE_FEATURES: GuaranteeFeature[] = [
 		badgeText: "REVISION GUARANTEE",
 		desc: "Review your draft, request adjustments, and refine details before your site officially goes live.",
 		renderVisual: () => (
-			<div className="relative w-full h-24 rounded-2xl bg-slate-900 border border-slate-800 p-3.5 flex items-center justify-between overflow-hidden shadow-inner group-hover:border-blue-500/40 transition-colors">
-				{/* Sync Icon Badge */}
+			<div className="relative w-full h-24 rounded-xl bg-gray-50 border border-gray-200 p-3.5 flex items-center justify-between overflow-hidden group-hover:border-blue-200 transition-colors">
 				<div className="flex items-center gap-3 z-10">
-					<div className="w-12 h-12 rounded-2xl bg-blue-600/20 border border-blue-500/40 p-0.5 shadow-md flex items-center justify-center">
-						<svg className="w-6 h-6 text-blue-400 group-hover:rotate-180 transition-transform duration-700 ease-in-out" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0">
+						<svg className="w-5 h-5 text-blue-600 group-hover:rotate-180 transition-transform duration-700 ease-in-out" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
 						</svg>
 					</div>
 					<div>
-						<div className="text-[11px] font-mono font-bold text-white tracking-wide uppercase">Draft & Tweaks</div>
-						<div className="text-[10px] text-slate-400 font-mono">100% Sync Guarantee</div>
+						<div className="text-[11px] font-mono font-bold text-gray-900 tracking-wide uppercase">Draft & Tweaks</div>
+						<div className="text-[10px] text-gray-500 font-mono">100% Sync Guarantee</div>
 					</div>
 				</div>
-				{/* Approved Chip */}
-				<div className="z-10 bg-blue-500/10 border border-blue-500/30 px-2 py-1 rounded-lg text-[9px] font-mono font-bold text-blue-300">
+				<div className="z-10 bg-blue-50 border border-blue-200 px-2 py-1 rounded-lg text-[9px] font-mono font-bold text-blue-700">
 					APPROVED
 				</div>
 			</div>
@@ -171,18 +164,16 @@ const GUARANTEE_FEATURES: GuaranteeFeature[] = [
 		badgeText: "CUSTOM DOMAIN",
 		desc: "Connect your own primary domain name (yourname.com) anytime with easy 1-click DNS routing.",
 		renderVisual: () => (
-			<div className="relative w-full h-24 rounded-2xl bg-slate-900 border border-slate-800 p-3 flex flex-col justify-between overflow-hidden shadow-inner group-hover:border-blue-500/40 transition-colors">
-				{/* Routing Header */}
+			<div className="relative w-full h-24 rounded-xl bg-gray-50 border border-gray-200 p-3 flex flex-col justify-between overflow-hidden group-hover:border-blue-200 transition-colors">
 				<div className="flex items-center justify-between z-10">
-					<span className="text-[10px] font-mono font-bold text-slate-300 uppercase tracking-wider">DNS ROUTING</span>
-					<span className="text-[9px] font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full">CONNECTED</span>
+					<span className="text-[10px] font-mono font-bold text-gray-600 uppercase tracking-wider">DNS ROUTING</span>
+					<span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">CONNECTED</span>
 				</div>
-				{/* Domain Connection Mapping */}
-				<div className="z-10 bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 flex items-center justify-between shadow-md">
-					<span className="text-xs font-mono font-bold text-white truncate">yourdomain.com</span>
-					<div className="flex items-center gap-1 text-blue-400 font-mono text-xs">
-						<span>--&gt;</span>
-						<span className="text-emerald-400 font-bold">✓</span>
+				<div className="z-10 bg-white border border-gray-200 rounded-lg px-3 py-1.5 flex items-center justify-between shadow-sm">
+					<span className="text-xs font-mono font-bold text-gray-900 truncate">yourdomain.com</span>
+					<div className="flex items-center gap-1 font-mono text-xs text-gray-400">
+						<span>→</span>
+						<span className="text-emerald-600 font-bold">✓</span>
 					</div>
 				</div>
 			</div>
@@ -192,99 +183,93 @@ const GUARANTEE_FEATURES: GuaranteeFeature[] = [
 
 export default function StandardGuarantee() {
 	return (
-		<section className="relative py-20 md:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-white">
+		<section className="relative py-20 md:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
 			{/* Section Header */}
-			<div className="text-center max-w-3xl mx-auto mb-16">
+			<div className="max-w-2xl mb-14">
 				<ScrollReveal direction="up">
-					<div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-700 text-[11px] font-mono tracking-wider font-bold shadow-2xs mb-3">
-						<span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-						<span>STANDARD GUARANTEE</span>
-						<span className="text-emerald-300">|</span>
-						<span>100% INCLUDED</span>
-					</div>
+					<p className="text-[11px] font-mono font-bold text-gray-400 uppercase tracking-widest mb-3">
+						Standard Guarantee · 100% Included
+					</p>
 				</ScrollReveal>
 
-				<ScrollReveal direction="up" delay={100}>
-					<h2 className="text-3xl sm:text-4xl md:text-5xl font-bold font-nohemi text-gray-900 tracking-tight mt-1 mb-4 leading-tight">
-						Included in Every Single Kiosk Tier
+				<ScrollReveal direction="up" delay={80}>
+					<h2 className="text-3xl sm:text-4xl md:text-[2.75rem] font-bold font-nohemi text-gray-900 tracking-tight leading-tight mb-4">
+						Included in every<br className="hidden sm:inline" /> Kiosk tier
 					</h2>
 				</ScrollReveal>
 
-				<ScrollReveal direction="up" delay={200}>
-					<p className="text-sm sm:text-base text-gray-500 font-medium leading-relaxed max-w-2xl mx-auto">
-						No hidden hosting fees or technical surprises. Everything you need to launch safely, securely, and professionally is built in.
+				<ScrollReveal direction="up" delay={160}>
+					<p className="text-sm sm:text-base text-gray-500 font-medium leading-relaxed">
+						No hidden hosting fees or technical surprises. Everything you need to launch safely, securely, and professionally is built in from day one.
 					</p>
 				</ScrollReveal>
 			</div>
 
-			{/* Staggered Scroll Reveal Grid */}
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+			{/* Grid */}
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
 				{GUARANTEE_FEATURES.map((feat, index) => (
-					<ScrollReveal key={feat.id} direction="up" delay={index * 90}>
+					<ScrollReveal key={feat.id} direction="up" delay={index * 80}>
 						<motion.div
-							whileHover={{ y: -8, scale: 1.015 }}
-							transition={{ type: "spring", stiffness: 300, damping: 20 }}
-							className="group h-full p-6 sm:p-7 rounded-2xl bg-white border border-gray-200/90 shadow-2xs hover:shadow-xl hover:border-blue-500/40 transition-all duration-300 flex flex-col justify-between">
+							whileHover={{ y: -6, scale: 1.012 }}
+							transition={{ type: "spring", stiffness: 320, damping: 22 }}
+							className="group h-full p-6 rounded-2xl bg-white border border-gray-200/90 shadow-sm hover:shadow-lg hover:border-blue-200 transition-all duration-300 flex flex-col justify-between">
 							<div className="space-y-4">
-								{/* Header Row */}
+								{/* Header */}
 								<div className="flex items-center justify-between">
-									<span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-gray-100 text-gray-600 border border-gray-200/60">
+									<span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-gray-100 text-gray-500 border border-gray-200/60">
 										{feat.badgeText}
 									</span>
-									<span className="font-mono text-xs font-bold text-gray-400 group-hover:text-blue-600 transition-colors">
-										[ {feat.number} ]
+									<span className="font-mono text-xs font-bold text-gray-300 group-hover:text-blue-500 transition-colors">
+										{feat.number}
 									</span>
 								</div>
 
-								{/* Custom Brand Micro-UI Illustration */}
-								<div className="pt-1">
+								{/* Micro-UI Visual */}
+								<div>
 									{feat.renderVisual()}
 								</div>
 
-								{/* Title & Description */}
-								<div className="space-y-1.5 pt-1">
-									<h3 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+								{/* Text */}
+								<div className="space-y-1">
+									<h3 className="text-base font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
 										{feat.title}
 									</h3>
-									<p className="text-xs sm:text-sm text-gray-500 font-medium leading-relaxed">
+									<p className="text-sm text-gray-500 font-medium leading-relaxed">
 										{feat.desc}
 									</p>
 								</div>
 							</div>
 
-							{/* Footer Item Indicator */}
-							<div className="pt-5 mt-5 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400">
+							{/* Footer */}
+							<div className="pt-4 mt-5 border-t border-gray-100 flex items-center justify-between">
 								<div className="flex items-center gap-1.5 text-emerald-600 font-semibold text-[11px]">
 									<span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-									<span>Zero Extra Cost</span>
+									<span>Zero extra cost</span>
 								</div>
-								<span className="font-mono text-[10px] text-gray-400 uppercase">STANDARD</span>
+								<span className="font-mono text-[10px] text-gray-300 uppercase">STANDARD</span>
 							</div>
 						</motion.div>
 					</ScrollReveal>
 				))}
 			</div>
 
-			{/* Bottom Trust Card */}
-			<ScrollReveal direction="up" delay={450}>
-				<div className="mt-14 max-w-4xl mx-auto rounded-2xl bg-white border border-gray-200/90 p-5 sm:p-6 text-gray-900 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+			{/* Bottom Banner */}
+			<ScrollReveal direction="up" delay={400}>
+				<div className="mt-12 rounded-2xl bg-white border border-gray-200/90 p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
 					<div className="flex items-center gap-3.5">
-						<div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0 font-bold font-mono text-sm">
+						<div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-700 flex items-center justify-center shrink-0 font-bold font-mono text-sm">
 							100%
 						</div>
 						<div>
-							<h4 className="text-sm font-bold text-gray-900">All features included across all service tiers</h4>
-							<p className="text-xs text-gray-500 font-medium">No surprise setup add-ons or hidden recurring platform costs.</p>
+							<h4 className="text-sm font-bold text-gray-900">All features included across every tier</h4>
+							<p className="text-xs text-gray-500 font-medium">No surprise platform add-ons or hidden recurring fees.</p>
 						</div>
 					</div>
-					<div className="shrink-0 bg-blue-600 text-white text-xs font-bold font-mono px-4 py-2 rounded-xl">
-						100% INCLUDED
+					<div className="shrink-0 bg-gray-900 text-white text-xs font-bold font-mono px-4 py-2 rounded-xl tracking-wider">
+						INCLUDED · ALWAYS
 					</div>
 				</div>
 			</ScrollReveal>
 		</section>
 	);
 }
-
-
-
