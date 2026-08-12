@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ScrollReveal from "@/components/ScrollReveal";
 import PillButton from "@/components/PillButton";
 import LottiePlayer from "@/components/LottiePlayer";
@@ -26,9 +26,21 @@ const LINE_ONE = ["Professional", "websites,"];
 const LINE_TWO = ["built", "for", "you."];
 
 export default function ServicesHero() {
-	const [activeHeroLottie, setActiveHeroLottie] = useState<string>(
-		"/lotties/funnel.json",
-	);
+	const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
+	const [isHovered, setIsHovered] = useState<boolean>(false);
+
+	// Auto-slide every 3.2 seconds unless user hovers over showcase
+	useEffect(() => {
+		if (isHovered) return;
+
+		const timer = setInterval(() => {
+			setActiveTabIndex((prevIndex) => (prevIndex + 1) % HERO_LOTTIE_TABS.length);
+		}, 3200);
+
+		return () => clearInterval(timer);
+	}, [isHovered]);
+
+	const currentTab = HERO_LOTTIE_TABS[activeTabIndex];
 
 	return (
 		<section className="relative pt-32 pb-20 md:pt-40 md:pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden bg-white">
@@ -156,21 +168,24 @@ export default function ServicesHero() {
 				{/* Right Column: Clean Interactive Showcase */}
 				<div className="lg:col-span-5 relative">
 					<ScrollReveal direction="up" delay={200}>
-						<div className="bg-white border border-gray-200/90 rounded-3xl p-5 sm:p-7 text-gray-900 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[360px] sm:min-h-[440px]">
+						<div
+							onMouseEnter={() => setIsHovered(true)}
+							onMouseLeave={() => setIsHovered(false)}
+							className="bg-white border border-gray-200/90 rounded-3xl p-5 sm:p-7 text-gray-900 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[360px] sm:min-h-[440px]">
 							{/* Lottie Tabs */}
 							<div className="flex items-center justify-between gap-2 border-b border-gray-100 pb-3.5 mb-3.5">
 								<div className="flex items-center gap-1.5 p-1 bg-gray-100/80 rounded-2xl border border-gray-200/60 max-w-[80vw] sm:max-w-none">
-									{HERO_LOTTIE_TABS.map((tab) => (
+									{HERO_LOTTIE_TABS.map((tab, index) => (
 										<button
 											key={tab.id}
 											type="button"
-											onClick={() => setActiveHeroLottie(tab.src)}
+											onClick={() => setActiveTabIndex(index)}
 											className={`relative px-3 py-1.5 rounded-xl text-[11px] font-bold transition-colors cursor-pointer whitespace-nowrap ${
-												activeHeroLottie === tab.src
+												activeTabIndex === index
 													? "text-white"
 													: "text-gray-600 hover:text-gray-900"
 											}`}>
-											{activeHeroLottie === tab.src && (
+											{activeTabIndex === index && (
 												<motion.span
 													layoutId="activeHeroTab"
 													className="absolute inset-0 bg-blue-600 rounded-xl -z-0 shadow-2xs"
@@ -183,7 +198,8 @@ export default function ServicesHero() {
 								</div>
 
 								<div className="flex items-center gap-1 shrink-0 font-mono text-[10px] text-gray-400">
-									<span>+</span>
+									<span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-ping" />
+									<span>AUTO</span>
 								</div>
 							</div>
 
@@ -191,14 +207,14 @@ export default function ServicesHero() {
 							<div className="relative flex-1 flex items-center justify-center py-4 bg-gray-50/60 border border-gray-100 rounded-2xl overflow-hidden min-h-[240px]">
 								<AnimatePresence mode="wait">
 									<motion.div
-										key={activeHeroLottie}
-										initial={{ opacity: 0, x: 25, scale: 0.98 }}
+										key={currentTab.src}
+										initial={{ opacity: 0, x: 30, scale: 0.96 }}
 										animate={{ opacity: 1, x: 0, scale: 1 }}
-										exit={{ opacity: 0, x: -25, scale: 0.98 }}
-										transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+										exit={{ opacity: 0, x: -30, scale: 0.96 }}
+										transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
 										className="w-full h-full flex items-center justify-center">
 										<LottiePlayer
-											src={activeHeroLottie}
+											src={currentTab.src}
 											className="w-full h-56 sm:h-64 object-contain"
 											loop={true}
 											autoplay={true}
@@ -209,7 +225,7 @@ export default function ServicesHero() {
 								<div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md border border-gray-200/90 rounded-xl px-3 py-1.5 flex items-center gap-2 shadow-xs z-10">
 									<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
 									<span className="text-[11px] font-bold text-gray-700">
-										Done-For-You Build
+										{currentTab.label} Build
 									</span>
 								</div>
 							</div>
@@ -220,7 +236,7 @@ export default function ServicesHero() {
 									<CheckCircle2 className="w-4 h-4 text-blue-600" />
 									<span className="font-bold text-gray-900 text-[11px]">Verified Build Service</span>
 								</div>
-								<span className="text-[11px] font-mono text-gray-400 uppercase">LIVE PREVIEW</span>
+								<span className="text-[11px] font-mono text-gray-400 uppercase">AUTO-SLIDE LIVE</span>
 							</div>
 						</div>
 					</ScrollReveal>
@@ -229,3 +245,4 @@ export default function ServicesHero() {
 		</section>
 	);
 }
+
