@@ -43,19 +43,19 @@ export default function ServicesHero() {
 	const currentTab = HERO_LOTTIE_TABS[activeTabIndex];
 
 	return (
-		<section className="relative pt-32 pb-20 md:pt-40 md:pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden bg-white">
+		<section className="relative pt-24 pb-14 sm:pt-32 sm:pb-20 md:pt-40 md:pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden bg-white">
 			{/* Architectural Grid Lines */}
-			<div className="absolute inset-0 bg-[linear-gradient(to_right,#f1f5f9_1px,transparent_1px),linear-gradient(to_bottom,#f1f5f9_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-80 pointer-events-none" />
+			<div className="absolute inset-0 bg-[linear-gradient(to_right,#f1f5f9_1px,transparent_1px),linear-gradient(to_bottom,#f1f5f9_1px,transparent_1px)] bg-[size:3rem_3rem] sm:bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-80 pointer-events-none" />
 
-			<div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center relative z-10">
+			<div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 lg:gap-8 items-center relative z-10">
 				{/* Left Column: Text & CTAs */}
-				<div className="lg:col-span-7 space-y-6 text-left">
+				<div className="lg:col-span-7 space-y-5 sm:space-y-6 text-left">
 					<ScrollReveal direction="up" delay={0}>
-						<div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-[11px] font-mono tracking-wider font-semibold shadow-2xs">
-							<span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
-							<span className="font-bold text-blue-600">[ 01 ]</span>
-							<span className="text-blue-200">|</span>
-							<span>TURNKEY WEBSITE PACKAGES</span>
+						<div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-[10px] sm:text-[11px] font-mono tracking-wider font-semibold shadow-2xs max-w-full">
+							<span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse shrink-0" />
+							<span className="font-bold text-blue-600 shrink-0">[ 01 ]</span>
+							<span className="text-blue-200 shrink-0">|</span>
+							<span className="truncate">TURNKEY WEBSITE PACKAGES</span>
 						</div>
 					</ScrollReveal>
 
@@ -74,7 +74,7 @@ export default function ServicesHero() {
 								},
 							},
 						}}
-						className="text-3xl sm:text-5xl md:text-6xl font-bold font-nohemi tracking-tight text-gray-900 leading-[1.12]">
+						className="text-2.75xl xs:text-3xl sm:text-5xl md:text-6xl font-bold font-nohemi tracking-tight text-gray-900 leading-[1.14] sm:leading-[1.12]">
 						{/* Line one — dark words */}
 						<span className="block">
 							{LINE_ONE.map((word) => (
@@ -88,7 +88,7 @@ export default function ServicesHero() {
 											transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] },
 										},
 									}}
-									className="inline-block mr-[0.25em]">
+									className="inline-block mr-[0.22em] sm:mr-[0.25em]">
 									{word}
 								</motion.span>
 							))}
@@ -114,7 +114,7 @@ export default function ServicesHero() {
 					</motion.h1>
 
 					<ScrollReveal direction="up" delay={200}>
-						<p className="text-sm sm:text-base md:text-lg text-gray-600 font-medium leading-relaxed max-w-2xl">
+						<p className="text-xs sm:text-base md:text-lg text-gray-600 font-medium leading-relaxed max-w-2xl">
 							Kiosk doesn&apos;t hand you a complicated editor and wish you luck.
 							We take your business details, pick the right pre-built design,
 							personalize it with your content and branding, and hand you a live site,{" "}
@@ -133,8 +133,8 @@ export default function ServicesHero() {
 								return (
 									<div
 										key={item.text}
-										className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 rounded-xl bg-gray-50 border border-gray-200/80 text-[11px] sm:text-xs font-semibold text-gray-700 shadow-2xs">
-										<Icon className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+										className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 sm:px-3 rounded-xl bg-gray-50 border border-gray-200/80 text-[10px] sm:text-xs font-semibold text-gray-700 shadow-2xs">
+										<Icon className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-blue-600 shrink-0" />
 										<span>{item.text}</span>
 									</div>
 								);
@@ -143,7 +143,7 @@ export default function ServicesHero() {
 					</ScrollReveal>
 
 					<ScrollReveal direction="up" delay={400}>
-						<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-4 max-w-md sm:max-w-none">
+						<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2 sm:pt-4 max-w-md sm:max-w-none">
 							<PillButton
 								href="/checkout?plan=landing"
 								baseColor="#004ac6"
@@ -151,13 +151,13 @@ export default function ServicesHero() {
 								textColor="#ffffff"
 								hoverTextColor="#004ac6"
 								useThunderFont={true}
-								className="w-full sm:w-auto px-7 py-3.5 text-xs font-bold border border-blue-600 shadow-sm text-center">
+								className="w-full sm:w-auto px-6 sm:px-7 py-3 sm:py-3.5 text-xs font-bold border border-blue-600 shadow-sm text-center">
 								Start Your Project Now
 							</PillButton>
 
 							<a
 								href="#services-tiers"
-								className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-white hover:bg-gray-50 border border-gray-200/90 text-xs font-semibold text-gray-700 transition-colors text-center inline-flex items-center justify-center gap-1.5">
+								className="w-full sm:w-auto px-5 sm:px-6 py-3 sm:py-3.5 rounded-full bg-white hover:bg-gray-50 border border-gray-200/90 text-xs font-semibold text-gray-700 transition-colors text-center inline-flex items-center justify-center gap-1.5">
 								<span>Explore Service Tiers</span>
 								<ArrowRight className="w-3.5 h-3.5 text-gray-400" />
 							</a>
@@ -166,21 +166,21 @@ export default function ServicesHero() {
 				</div>
 
 				{/* Right Column: Clean Interactive Showcase */}
-				<div className="lg:col-span-5 relative">
+				<div className="lg:col-span-5 relative w-full">
 					<ScrollReveal direction="up" delay={200}>
 						<div
 							onMouseEnter={() => setIsHovered(true)}
 							onMouseLeave={() => setIsHovered(false)}
-							className="bg-white border border-gray-200/90 rounded-3xl p-5 sm:p-7 text-gray-900 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[360px] sm:min-h-[440px]">
+							className="bg-white border border-gray-200/90 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-7 text-gray-900 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[320px] sm:min-h-[400px] md:min-h-[440px]">
 							{/* Lottie Tabs */}
-							<div className="flex items-center justify-between gap-2 border-b border-gray-100 pb-3.5 mb-3.5">
-								<div className="flex items-center gap-1.5 p-1 bg-gray-100/80 rounded-2xl border border-gray-200/60 max-w-[80vw] sm:max-w-none">
+							<div className="flex items-center justify-between gap-2 border-b border-gray-100 pb-3 mb-3">
+								<div className="flex items-center gap-1 p-1 bg-gray-100/80 rounded-2xl border border-gray-200/60 overflow-x-auto scrollbar-none w-full sm:w-auto">
 									{HERO_LOTTIE_TABS.map((tab, index) => (
 										<button
 											key={tab.id}
 											type="button"
 											onClick={() => setActiveTabIndex(index)}
-											className={`relative px-3 py-1.5 rounded-xl text-[11px] font-bold transition-colors cursor-pointer whitespace-nowrap ${
+											className={`relative px-2.5 sm:px-3 py-1.5 rounded-xl text-[10px] sm:text-[11px] font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
 												activeTabIndex === index
 													? "text-white"
 													: "text-gray-600 hover:text-gray-900"
@@ -197,14 +197,14 @@ export default function ServicesHero() {
 									))}
 								</div>
 
-								<div className="flex items-center gap-1 shrink-0 font-mono text-[10px] text-gray-400">
+								<div className="hidden sm:flex items-center gap-1 shrink-0 font-mono text-[10px] text-gray-400">
 									<span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-ping" />
 									<span>AUTO</span>
 								</div>
 							</div>
 
 							{/* Lottie Canvas Container with Slide Transition */}
-							<div className="relative flex-1 flex items-center justify-center py-4 bg-gray-50/60 border border-gray-100 rounded-2xl overflow-hidden min-h-[240px]">
+							<div className="relative flex-1 flex items-center justify-center py-3 sm:py-4 bg-gray-50/60 border border-gray-100 rounded-2xl overflow-hidden min-h-[200px] sm:min-h-[240px]">
 								<AnimatePresence mode="wait">
 									<motion.div
 										key={currentTab.src}
@@ -215,28 +215,28 @@ export default function ServicesHero() {
 										className="w-full h-full flex items-center justify-center">
 										<LottiePlayer
 											src={currentTab.src}
-											className="w-full h-56 sm:h-64 object-contain"
+											className="w-full h-44 sm:h-56 md:h-64 object-contain"
 											loop={true}
 											autoplay={true}
 										/>
 									</motion.div>
 								</AnimatePresence>
 
-								<div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md border border-gray-200/90 rounded-xl px-3 py-1.5 flex items-center gap-2 shadow-xs z-10">
+								<div className="absolute bottom-2.5 left-2.5 sm:bottom-3 sm:left-3 bg-white/95 backdrop-blur-md border border-gray-200/90 rounded-xl px-2.5 py-1 sm:px-3 sm:py-1.5 flex items-center gap-1.5 sm:gap-2 shadow-xs z-10">
 									<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-									<span className="text-[11px] font-bold text-gray-700">
+									<span className="text-[10px] sm:text-[11px] font-bold text-gray-700">
 										{currentTab.label} Build
 									</span>
 								</div>
 							</div>
 
 							{/* Footer status bar */}
-							<div className="pt-4 mt-2 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500 font-medium">
+							<div className="pt-3 sm:pt-4 mt-2 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500 font-medium">
 								<div className="flex items-center gap-1.5 text-blue-600">
-									<CheckCircle2 className="w-4 h-4 text-blue-600" />
-									<span className="font-bold text-gray-900 text-[11px]">Verified Build Service</span>
+									<CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
+									<span className="font-bold text-gray-900 text-[10px] sm:text-[11px]">Verified Build Service</span>
 								</div>
-								<span className="text-[11px] font-mono text-gray-400 uppercase">AUTO-SLIDE LIVE</span>
+								<span className="text-[9px] sm:text-[11px] font-mono text-gray-400 uppercase">LIVE PREVIEW</span>
 							</div>
 						</div>
 					</ScrollReveal>

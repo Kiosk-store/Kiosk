@@ -206,14 +206,14 @@ export default function StandardGuarantee() {
 			</div>
 
 			{/* Grid */}
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
 				{GUARANTEE_FEATURES.map((feat, index) => (
 					<ScrollReveal key={feat.id} direction="up" delay={index * 80}>
 						<motion.div
 							whileHover={{ y: -6, scale: 1.012 }}
 							transition={{ type: "spring", stiffness: 320, damping: 22 }}
-							className="group h-full p-6 rounded-2xl bg-white border border-gray-200/90 shadow-sm hover:shadow-lg hover:border-blue-200 transition-all duration-300 flex flex-col justify-between">
-							<div className="space-y-4">
+							className="group h-full p-5 sm:p-6 rounded-2xl bg-white border border-gray-200/90 shadow-sm hover:shadow-lg hover:border-blue-200 transition-all duration-300 flex flex-col justify-between">
+							<div className="space-y-3.5 sm:space-y-4">
 								{/* Header */}
 								<div className="flex items-center justify-between">
 									<span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-gray-100 text-gray-500 border border-gray-200/60">
@@ -234,19 +234,19 @@ export default function StandardGuarantee() {
 									<h3 className="text-base font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
 										{feat.title}
 									</h3>
-									<p className="text-sm text-gray-500 font-medium leading-relaxed">
+									<p className="text-xs sm:text-sm text-gray-500 font-medium leading-relaxed">
 										{feat.desc}
 									</p>
 								</div>
 							</div>
 
 							{/* Footer */}
-							<div className="pt-4 mt-5 border-t border-gray-100 flex items-center justify-between">
-								<div className="flex items-center gap-1.5 text-emerald-600 font-semibold text-[11px]">
+							<div className="pt-3.5 sm:pt-4 mt-4 sm:mt-5 border-t border-gray-100 flex items-center justify-between">
+								<div className="flex items-center gap-1.5 text-emerald-600 font-semibold text-[10px] sm:text-[11px]">
 									<span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
 									<span>Zero extra cost</span>
 								</div>
-								<span className="font-mono text-[10px] text-gray-300 uppercase">STANDARD</span>
+								<span className="font-mono text-[9px] sm:text-[10px] text-gray-300 uppercase">STANDARD</span>
 							</div>
 						</motion.div>
 					</ScrollReveal>
@@ -255,17 +255,17 @@ export default function StandardGuarantee() {
 
 			{/* Bottom Banner */}
 			<ScrollReveal direction="up" delay={400}>
-				<div className="mt-12 rounded-2xl bg-white border border-gray-200/90 p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
-					<div className="flex items-center gap-3.5">
+				<div className="mt-10 sm:mt-12 rounded-2xl bg-white border border-gray-200/90 p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm text-center sm:text-left">
+					<div className="flex flex-col sm:flex-row items-center gap-3.5">
 						<div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-700 flex items-center justify-center shrink-0 font-bold font-mono text-sm">
 							100%
 						</div>
 						<div>
-							<h4 className="text-sm font-bold text-gray-900">All features included across every tier</h4>
-							<p className="text-xs text-gray-500 font-medium">No surprise platform add-ons or hidden recurring fees.</p>
+							<h4 className="text-xs sm:text-sm font-bold text-gray-900">All features included across every tier</h4>
+							<p className="text-[11px] sm:text-xs text-gray-500 font-medium mt-0.5">No surprise platform add-ons or hidden recurring fees.</p>
 						</div>
 					</div>
-					<div className="shrink-0 bg-gray-900 text-white text-xs font-bold font-mono px-4 py-2 rounded-xl tracking-wider">
+					<div className="shrink-0 w-full sm:w-auto bg-gray-900 text-white text-xs font-bold font-mono px-4 py-2.5 rounded-xl tracking-wider text-center">
 						INCLUDED · ALWAYS
 					</div>
 				</div>

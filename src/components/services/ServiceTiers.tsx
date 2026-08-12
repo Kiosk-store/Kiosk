@@ -152,19 +152,19 @@ export default function ServiceTiers() {
 			{/* Tier Cards */}
 			{TIERS.map((tier, tierIndex) => (
 				<ScrollReveal key={tier.id} direction="up" delay={0}>
-					<div className="bg-white border border-gray-200/90 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-2xs grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch relative overflow-hidden">
+					<div className="bg-white border border-gray-200/90 rounded-2xl sm:rounded-3xl p-5 sm:p-8 lg:p-12 shadow-2xs grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 items-stretch relative overflow-hidden">
 
 						{/* Left: Content */}
-						<div className="lg:col-span-7 space-y-6">
+						<div className="lg:col-span-7 space-y-5 sm:space-y-6">
 
 							{/* Tier Header */}
 							<ScrollReveal direction="up" delay={80}>
 								<div className="flex items-start gap-4">
 									<div>
-										<p className="text-[11px] font-mono font-bold text-gray-400 uppercase tracking-widest mb-1">
+										<p className="text-[10px] sm:text-[11px] font-mono font-bold text-gray-400 uppercase tracking-widest mb-1">
 											Tier {tier.index}
 										</p>
-										<h2 className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900 leading-tight">
+										<h2 className="text-xl sm:text-3xl font-bold font-nohemi text-gray-900 leading-tight">
 											{tier.title}
 										</h2>
 									</div>
@@ -173,11 +173,11 @@ export default function ServiceTiers() {
 
 							{/* Who it's for */}
 							<ScrollReveal direction="up" delay={160}>
-								<div className="p-4 rounded-2xl bg-gray-50 border border-gray-100">
-									<p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">
+								<div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-gray-50 border border-gray-100">
+									<p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">
 										Who it&apos;s for
 									</p>
-									<p className="text-sm text-gray-600 font-medium leading-relaxed">
+									<p className="text-xs sm:text-sm text-gray-600 font-medium leading-relaxed">
 										{tier.target}
 									</p>
 								</div>
@@ -186,7 +186,7 @@ export default function ServiceTiers() {
 							{/* Features */}
 							<ScrollReveal direction="up" delay={240}>
 								<div>
-									<p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">
+									<p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2.5">
 										What&apos;s included
 									</p>
 									<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -197,8 +197,8 @@ export default function ServiceTiers() {
 												whileInView={{ opacity: 1, x: 0 }}
 												viewport={{ once: true }}
 												transition={{ delay: i * 0.05, duration: 0.4, ease: "easeOut" }}
-												className="flex items-center gap-2 text-sm font-medium text-gray-700">
-												<CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
+												className="flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-700">
+												<CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 shrink-0" />
 												<span>{item}</span>
 											</motion.div>
 										))}
@@ -209,10 +209,10 @@ export default function ServiceTiers() {
 							{/* Process */}
 							<ScrollReveal direction="up" delay={320}>
 								<div>
-									<p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">
+									<p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">
 										The turnkey process
 									</p>
-									<p className="text-sm text-gray-500 font-medium leading-relaxed">
+									<p className="text-xs sm:text-sm text-gray-500 font-medium leading-relaxed">
 										{tier.process}
 									</p>
 								</div>
@@ -220,7 +220,7 @@ export default function ServiceTiers() {
 
 							{/* Price + CTA */}
 							<ScrollReveal direction="up" delay={400}>
-								<div className="pt-5 border-t border-gray-100 flex flex-wrap items-center justify-between gap-4">
+								<div className="pt-4 sm:pt-5 border-t border-gray-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
 									<div>
 										<div className="flex items-baseline gap-1.5">
 											<span className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900">
@@ -235,7 +235,7 @@ export default function ServiceTiers() {
 											</span>
 										</div>
 										<div className="flex items-center gap-2 mt-0.5 flex-wrap">
-											<span className="text-[11px] text-gray-400 font-medium">
+											<span className="text-[10px] sm:text-[11px] text-gray-400 font-medium">
 												{billingCycle === "yearly"
 													? `Billed annually (${formatPlanPrice(tier.planKey, "monthly")} eq./mo)`
 													: "Cancel or upgrade anytime"}
@@ -256,7 +256,7 @@ export default function ServiceTiers() {
 										textColor="#ffffff"
 										hoverTextColor="#004ac6"
 										useThunderFont={true}
-										className="px-6 py-2.5 text-xs font-bold border border-blue-600 shadow-xs">
+										className="w-full sm:w-auto px-6 py-3 sm:py-2.5 text-xs font-bold border border-blue-600 shadow-xs text-center">
 										{tier.ctaLabel}
 									</PillButton>
 								</div>

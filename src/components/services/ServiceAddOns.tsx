@@ -148,19 +148,19 @@ export default function ServiceAddOns() {
 					</ScrollReveal>
 				</div>
 
-				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
 					{ADDONS.map((addon, index) => (
 						<ScrollReveal key={addon.id} direction="up" delay={index * 90}>
 							<motion.div
 								whileHover={{ y: -6, scale: 1.015 }}
 								transition={{ type: "spring", stiffness: 300, damping: 20 }}
-								className="h-full p-6 rounded-2xl bg-white border border-gray-200/90 shadow-2xs hover:shadow-xl hover:border-blue-500/40 transition-all duration-300 flex flex-col justify-between group">
-								<div className="space-y-3.5">
+								className="h-full p-5 sm:p-6 rounded-2xl bg-white border border-gray-200/90 shadow-2xs hover:shadow-xl hover:border-blue-500/40 transition-all duration-300 flex flex-col justify-between group">
+								<div className="space-y-3 sm:space-y-3.5">
 									<div className="flex items-center justify-between">
 										<span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-gray-100 text-gray-600 border border-gray-200/60">
 											{addon.badge}
 										</span>
-										<span className="text-xs font-mono font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">
+										<span className="text-[11px] sm:text-xs font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg border border-blue-100">
 											{addon.price}
 										</span>
 									</div>
@@ -180,9 +180,9 @@ export default function ServiceAddOns() {
 									</div>
 								</div>
 
-								<div className="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400 font-medium">
-									<span className="text-blue-600 font-semibold text-[11px]">Available on all tiers</span>
-									<span className="font-mono text-[10px] uppercase">BOLT-ON</span>
+								<div className="pt-3.5 sm:pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400 font-medium">
+									<span className="text-blue-600 font-semibold text-[10px] sm:text-[11px]">Available on all tiers</span>
+									<span className="font-mono text-[9px] sm:text-[10px] uppercase">BOLT-ON</span>
 								</div>
 							</motion.div>
 						</ScrollReveal>
