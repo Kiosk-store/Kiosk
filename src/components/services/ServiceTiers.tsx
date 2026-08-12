@@ -294,11 +294,12 @@ export default function ServiceTiers() {
 													<motion.div
 														initial={{ opacity: 0, y: 8 }}
 														whileInView={{ opacity: 1, y: 0 }}
+														whileHover={{ y: -2, x: 4, borderColor: "rgba(59, 130, 246, 0.4)", backgroundColor: "rgba(255,255,255,0.08)" }}
 														viewport={{ once: true }}
-														transition={{ delay: 0.2 + i * 0.1, duration: 0.4, ease: "easeOut" }}
-														className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between text-xs font-medium">
-														<span className="text-white/80">{step.label}</span>
-														<span className="text-white/40 font-mono text-[10px] shrink-0 ml-3 bg-white/5 px-2 py-0.5 rounded-md">{step.tag}</span>
+														transition={{ delay: 0.2 + i * 0.1, duration: 0.35, ease: "easeOut" }}
+														className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between text-xs font-medium cursor-pointer transition-colors">
+														<span className="text-white/90">{step.label}</span>
+														<span className="text-blue-400 font-mono text-[10px] shrink-0 ml-3 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-md font-bold">{step.tag}</span>
 													</motion.div>
 													{i < tier.panel.steps.length - 1 && (
 														<div className="w-px h-4 bg-white/10 mx-auto" />
@@ -316,15 +317,16 @@ export default function ServiceTiers() {
 													key={p.name}
 													initial={{ opacity: 0, y: 12 }}
 													whileInView={{ opacity: 1, y: 0 }}
+													whileHover={{ y: -4, scale: 1.02, borderColor: "rgba(59, 130, 246, 0.4)" }}
 													viewport={{ once: true }}
-													transition={{ delay: 0.15 + i * 0.1, duration: 0.4, ease: "easeOut" }}
-													className="bg-white/5 border border-white/10 rounded-xl p-3 text-center">
-													<div className="w-full h-20 bg-white/5 border border-white/10 rounded-lg mb-2.5 flex items-center justify-center">
-														<span className="text-[10px] text-white/20 font-mono tracking-wider">PHOTO</span>
+													transition={{ delay: 0.15 + i * 0.1, duration: 0.35, ease: "easeOut" }}
+													className="bg-white/5 border border-white/10 rounded-xl p-3 text-center cursor-pointer group/card transition-colors">
+													<div className="w-full h-20 bg-white/5 border border-white/10 rounded-lg mb-2.5 flex items-center justify-center group-hover/card:border-blue-500/30 transition-colors">
+														<span className="text-[10px] text-white/30 font-mono tracking-wider group-hover/card:text-blue-400 transition-colors">PHOTO</span>
 													</div>
-													<p className="text-xs font-bold text-white/80 mb-0.5">{p.name}</p>
-													<p className="text-[11px] text-blue-400/70 font-mono">{p.price}</p>
-													<button className="mt-2 w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg py-1 text-[10px] font-bold text-white/50 transition-colors">
+													<p className="text-xs font-bold text-white/90 mb-0.5">{p.name}</p>
+													<p className="text-[11px] text-blue-400 font-mono font-bold">{p.price}</p>
+													<button className="mt-2 w-full bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 rounded-lg py-1 text-[10px] font-bold text-blue-300 transition-colors">
 														Add to cart
 													</button>
 												</motion.div>

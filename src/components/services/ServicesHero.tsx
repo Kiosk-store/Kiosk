@@ -6,7 +6,7 @@ import React, { useState } from "react";
 import ScrollReveal from "@/components/ScrollReveal";
 import PillButton from "@/components/PillButton";
 import LottiePlayer from "@/components/LottiePlayer";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Clock, ShieldCheck, Smartphone, CheckCircle2, ArrowRight } from "lucide-react";
 
 interface Tab {
@@ -187,16 +187,26 @@ export default function ServicesHero() {
 								</div>
 							</div>
 
-							{/* Lottie Canvas Container */}
-							<div className="relative flex-1 flex items-center justify-center py-4 bg-gray-50/60 border border-gray-100 rounded-2xl overflow-hidden">
-								<LottiePlayer
-									src={activeHeroLottie}
-									className="w-full h-56 sm:h-64 object-contain"
-									loop={true}
-									autoplay={true}
-								/>
+							{/* Lottie Canvas Container with Slide Transition */}
+							<div className="relative flex-1 flex items-center justify-center py-4 bg-gray-50/60 border border-gray-100 rounded-2xl overflow-hidden min-h-[240px]">
+								<AnimatePresence mode="wait">
+									<motion.div
+										key={activeHeroLottie}
+										initial={{ opacity: 0, x: 25, scale: 0.98 }}
+										animate={{ opacity: 1, x: 0, scale: 1 }}
+										exit={{ opacity: 0, x: -25, scale: 0.98 }}
+										transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+										className="w-full h-full flex items-center justify-center">
+										<LottiePlayer
+											src={activeHeroLottie}
+											className="w-full h-56 sm:h-64 object-contain"
+											loop={true}
+											autoplay={true}
+										/>
+									</motion.div>
+								</AnimatePresence>
 
-								<div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md border border-gray-200/90 rounded-xl px-3 py-1.5 flex items-center gap-2 shadow-xs">
+								<div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-md border border-gray-200/90 rounded-xl px-3 py-1.5 flex items-center gap-2 shadow-xs z-10">
 									<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
 									<span className="text-[11px] font-bold text-gray-700">
 										Done-For-You Build
