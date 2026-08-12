@@ -6,7 +6,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import ScrollReveal from "@/components/ScrollReveal";
 import PillButton from "@/components/PillButton";
-import { CheckCircle2, Zap } from "lucide-react";
+import { CheckCircle2, Zap, Globe, ShoppingBag } from "lucide-react";
 import { useCurrency } from "@/context/CurrencyContext";
 
 const TIERS = [
@@ -14,12 +14,15 @@ const TIERS = [
 		id: "landing",
 		index: "01",
 		title: "Landing Page",
+		icon: Globe,
 		planKey: "landing" as const,
 		checkoutPlan: "landing",
 		ctaLabel: "Start Landing Page",
 		target: "New businesses, local service providers, freelancers, and consultants who need an immediate, highly polished online presence to build credibility and land inquiries.",
 		process: "Intake Form → Template Selection → Branding & Copy Personalisation → Client Review → Live in 3–5 days.",
 		deliveryLabel: "3–5 Days",
+		badgeColor: "bg-blue-50 text-blue-600 border-blue-100",
+		checkColor: "text-blue-600",
 		features: [
 			"1 High-converting responsive page",
 			"Hero, About, Services & Reviews",
@@ -29,9 +32,10 @@ const TIERS = [
 			"Free Kiosk subdomain hosting",
 		],
 		panel: {
-			label: "LIVE OUTPUT",
+			bg: "bg-[#0f172a] border-white/5",
+			label: "LIVE OUTPUT PREVIEW",
 			title: "Modern Service Business",
-			body: "Clean hero, customer social proof, call-to-action button, and instant WhatsApp chat.",
+			body: "Clean hero section, customer social proof, call-to-action button, and instant WhatsApp chat integration.",
 			stat: "100% Mobile Ready",
 		},
 	},
@@ -39,12 +43,15 @@ const TIERS = [
 		id: "funnel",
 		index: "02",
 		title: "Sales Funnel",
+		icon: Zap,
 		planKey: "funnel" as const,
 		checkoutPlan: "funnel",
 		ctaLabel: "Start Sales Funnel",
 		target: "Businesses actively running Google/Meta ads or social traffic campaigns that need a multi-step conversion funnel to turn visitors into leads and customers.",
 		process: "Offer Intake → Funnel Flow Mapping → Copy Integration → Analytics & Email Setup → Live in 3–5 days.",
 		deliveryLabel: "3–5 Days",
+		badgeColor: "bg-purple-50 text-purple-600 border-purple-100",
+		checkColor: "text-purple-600",
 		features: [
 			"3–5 Connected sales pages",
 			"Opt-in, Offer & Thank-you pages",
@@ -54,7 +61,8 @@ const TIERS = [
 			"A/B Ready funnel structure",
 		],
 		panel: {
-			label: "FUNNEL FLOW",
+			bg: "bg-[#18112c] border-purple-900/40",
+			label: "MULTI-STEP FUNNEL FLOW",
 			title: null,
 			body: null,
 			stat: null,
@@ -69,12 +77,15 @@ const TIERS = [
 		id: "store",
 		index: "03",
 		title: "E-commerce Store",
+		icon: ShoppingBag,
 		planKey: "store" as const,
 		checkoutPlan: "store",
 		ctaLabel: "Start E-commerce Store",
 		target: "Brands selling physical or digital products online that need an effortless, secure checkout system with payment gateway processing.",
 		process: "Product Intake → Storefront Design → Payment Gateway Wiring → Test Purchase Validation → Live in 5–10 days.",
 		deliveryLabel: "5–10 Days",
+		badgeColor: "bg-emerald-50 text-emerald-600 border-emerald-100",
+		checkColor: "text-emerald-600",
 		features: [
 			"Complete product catalogue setup",
 			"Slide-out cart drawer & checkout",
@@ -84,7 +95,8 @@ const TIERS = [
 			"Product search & category tags",
 		],
 		panel: {
-			label: "STOREFRONT PREVIEW",
+			bg: "bg-[#062016] border-emerald-900/40",
+			label: "E-COMMERCE STOREFRONT",
 			title: null,
 			body: null,
 			stat: null,
@@ -97,17 +109,15 @@ const TIERS = [
 ];
 
 export default function ServiceTiers() {
-	const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">(
-		"monthly",
-	);
+	const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
 	const { formatPlanPrice, currency, isLoading } = useCurrency();
 
 	return (
 		<section
 			id="services-tiers"
-			className="py-12 md:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-16 md:space-y-24">
-
-			{/* Billing Toggle */}
+			className="py-12 md:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-12 md:space-y-16 overflow-hidden">
+			
+			{/* Top Control Banner: Billing Switcher */}
 			<ScrollReveal direction="up">
 				<div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white border border-gray-200/90 rounded-2xl p-4 sm:p-6 shadow-2xs">
 					<div>
@@ -119,61 +129,82 @@ export default function ServiceTiers() {
 						</p>
 					</div>
 
+					{/* Billing Switcher */}
 					<div className="relative inline-flex items-center p-1 rounded-xl bg-gray-100 border border-gray-200 shrink-0">
 						<motion.span
 							layoutId="billingPill"
 							className={`absolute top-1 bottom-1 rounded-lg bg-white shadow-xs transition-all ${
-								billingCycle === "monthly" ? "left-1 right-[calc(50%+2px)]" : "left-[calc(50%+2px)] right-1"
+								billingCycle === "monthly"
+									? "left-1 right-[calc(50%+2px)]"
+									: "left-[calc(50%+2px)] right-1"
 							}`}
 						/>
 						<button
 							type="button"
 							onClick={() => setBillingCycle("monthly")}
-							className={`relative z-10 px-5 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-								billingCycle === "monthly" ? "text-gray-900" : "text-gray-500 hover:text-gray-900"
+							className={`relative z-10 px-4 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+								billingCycle === "monthly"
+									? "text-gray-900"
+									: "text-gray-500 hover:text-gray-900"
 							}`}>
 							Monthly
 						</button>
 						<button
 							type="button"
 							onClick={() => setBillingCycle("yearly")}
-							className={`relative z-10 px-5 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 ${
-								billingCycle === "yearly" ? "text-gray-900" : "text-gray-500 hover:text-gray-900"
+							className={`relative z-10 px-4 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 ${
+								billingCycle === "yearly"
+									? "text-gray-900"
+									: "text-gray-500 hover:text-gray-900"
 							}`}>
 							<span>Yearly</span>
-							<span className="text-[10px] px-1.5 py-0.5 rounded-full font-extrabold uppercase bg-blue-50 text-blue-600 border border-blue-100">
-								−20%
+							<span className="text-[10px] px-1.5 py-0.5 rounded-full font-extrabold uppercase bg-emerald-100 text-emerald-700">
+								Save 20%
 							</span>
 						</button>
 					</div>
 				</div>
 			</ScrollReveal>
 
-			{/* Tier Cards */}
-			{TIERS.map((tier, tierIndex) => (
-				<ScrollReveal key={tier.id} direction="up" delay={0}>
-					<div className="bg-white border border-gray-200/90 rounded-2xl sm:rounded-3xl p-5 sm:p-8 lg:p-12 shadow-2xs grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 items-stretch relative overflow-hidden">
+			{/* 3 Separate Tier Cards with Horizontal Scroll Reveal */}
+			{TIERS.map((tier, index) => {
+				const Icon = tier.icon;
+				const isEven = index % 2 === 0;
 
-						{/* Left: Content */}
-						<div className="lg:col-span-7 space-y-5 sm:space-y-6">
-
-							{/* Tier Header */}
-							<ScrollReveal direction="up" delay={80}>
-								<div className="flex items-start gap-4">
+				return (
+					<motion.div
+						key={tier.id}
+						initial={{ opacity: 0, x: isEven ? -80 : 80 }}
+						whileInView={{ opacity: 1, x: 0 }}
+						viewport={{ once: true, amount: 0.15 }}
+						transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+						className="bg-white border border-gray-200/90 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-2xs grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch relative overflow-hidden group">
+						
+						{/* Left Column: Details & Features */}
+						<motion.div
+							initial={{ opacity: 0, x: isEven ? -40 : 40 }}
+							whileInView={{ opacity: 1, x: 0 }}
+							viewport={{ once: true }}
+							transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
+							className="lg:col-span-7 flex flex-col justify-between space-y-6">
+							<div>
+								{/* Tier Title Header */}
+								<div className="flex items-center gap-3 mb-4">
+									<div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold border shadow-2xs shrink-0 ${tier.badgeColor}`}>
+										<Icon className="w-6 h-6" />
+									</div>
 									<div>
-										<p className="text-[10px] sm:text-[11px] font-mono font-bold text-gray-400 uppercase tracking-widest mb-1">
-											Tier {tier.index}
-										</p>
-										<h2 className="text-xl sm:text-3xl font-bold font-nohemi text-gray-900 leading-tight">
+										<span className={`text-[10px] font-mono font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full border ${tier.badgeColor}`}>
+											Tier {tier.index} • Delivery: {tier.deliveryLabel}
+										</span>
+										<h2 className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900 mt-1">
 											{tier.title}
 										</h2>
 									</div>
 								</div>
-							</ScrollReveal>
 
-							{/* Who it's for */}
-							<ScrollReveal direction="up" delay={160}>
-								<div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-gray-50 border border-gray-100">
+								{/* Who it's for */}
+								<div className="p-4 rounded-2xl bg-gray-50 border border-gray-100 mb-5">
 									<p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">
 										Who it&apos;s for
 									</p>
@@ -181,33 +212,29 @@ export default function ServiceTiers() {
 										{tier.target}
 									</p>
 								</div>
-							</ScrollReveal>
 
-							{/* Features */}
-							<ScrollReveal direction="up" delay={240}>
-								<div>
-									<p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2.5">
-										What&apos;s included
+								{/* Included Features */}
+								<div className="mb-5">
+									<p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">
+										What&apos;s included in this tier
 									</p>
-									<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-										{tier.features.map((item, i) => (
+									<div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+										{tier.features.map((item, featureIdx) => (
 											<motion.div
 												key={item}
-												initial={{ opacity: 0, x: -8 }}
+												initial={{ opacity: 0, x: -15 }}
 												whileInView={{ opacity: 1, x: 0 }}
 												viewport={{ once: true }}
-												transition={{ delay: i * 0.05, duration: 0.4, ease: "easeOut" }}
-												className="flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-700">
-												<CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 shrink-0" />
+												transition={{ delay: 0.2 + featureIdx * 0.05, duration: 0.4 }}
+												className="flex items-center gap-2.5 text-xs sm:text-sm font-medium text-gray-700">
+												<CheckCircle2 className={`w-4 h-4 shrink-0 ${tier.checkColor}`} />
 												<span>{item}</span>
 											</motion.div>
 										))}
 									</div>
 								</div>
-							</ScrollReveal>
 
-							{/* Process */}
-							<ScrollReveal direction="up" delay={320}>
+								{/* Process */}
 								<div>
 									<p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">
 										The turnkey process
@@ -216,93 +243,91 @@ export default function ServiceTiers() {
 										{tier.process}
 									</p>
 								</div>
-							</ScrollReveal>
+							</div>
 
-							{/* Price + CTA */}
-							<ScrollReveal direction="up" delay={400}>
-								<div className="pt-4 sm:pt-5 border-t border-gray-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-									<div>
-										<div className="flex items-baseline gap-1.5">
-											<span className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900">
-												{isLoading ? (
-													<span className="inline-block w-24 h-7 rounded-lg bg-gray-100 animate-pulse" />
-												) : (
-													formatPlanPrice(tier.planKey, billingCycle)
-												)}
-											</span>
-											<span className="text-xs font-semibold text-gray-400">
-												{billingCycle === "yearly" ? "/ year" : "/ month"}
-											</span>
-										</div>
-										<div className="flex items-center gap-2 mt-0.5 flex-wrap">
-											<span className="text-[10px] sm:text-[11px] text-gray-400 font-medium">
-												{billingCycle === "yearly"
-													? `Billed annually (${formatPlanPrice(tier.planKey, "monthly")} eq./mo)`
-													: "Cancel or upgrade anytime"}
-											</span>
-											{!isLoading && currency.code !== "USD" && (
-												<span className="inline-flex items-center gap-1 text-[10px] font-semibold text-blue-600 uppercase tracking-wider">
-													<span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block" />
-													{currency.code}
-												</span>
+							{/* Price + CTA Button */}
+							<div className="pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+								<div>
+									<div className="flex items-baseline gap-1.5">
+										<span className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900">
+											{isLoading ? (
+												<span className="inline-block w-28 h-8 rounded-lg bg-gray-100 animate-pulse" />
+											) : (
+												formatPlanPrice(tier.planKey, billingCycle)
 											)}
-										</div>
+										</span>
+										<span className="text-xs font-semibold text-gray-400">
+											{billingCycle === "yearly" ? "/ year" : "/ month"}
+										</span>
 									</div>
-
-									<PillButton
-										href={`/checkout?plan=${tier.checkoutPlan}&billing=${billingCycle}`}
-										baseColor="#004ac6"
-										circleColor="#ffffff"
-										textColor="#ffffff"
-										hoverTextColor="#004ac6"
-										useThunderFont={true}
-										className="w-full sm:w-auto px-6 py-3 sm:py-2.5 text-xs font-bold border border-blue-600 shadow-xs text-center">
-										{tier.ctaLabel}
-									</PillButton>
+									<div className="flex items-center gap-2 mt-0.5 flex-wrap">
+										<span className="text-[11px] text-gray-400 font-medium">
+											{billingCycle === "yearly"
+												? `Billed annually (${formatPlanPrice(tier.planKey, "monthly")} eq./mo)`
+												: "Cancel or upgrade anytime"}
+										</span>
+										{!isLoading && currency.code !== "USD" && (
+											<span className="inline-flex items-center gap-1 text-[10px] font-semibold text-blue-600 uppercase tracking-wider">
+												<span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block" />
+												{currency.code}
+											</span>
+										)}
+									</div>
 								</div>
-							</ScrollReveal>
-						</div>
 
-						{/* Right: Panel — full height flex column */}
+								<PillButton
+									href={`/checkout?plan=${tier.checkoutPlan}&billing=${billingCycle}`}
+									baseColor="#004ac6"
+									circleColor="#ffffff"
+									textColor="#ffffff"
+									hoverTextColor="#004ac6"
+									useThunderFont={true}
+									className="w-full sm:w-auto px-7 py-3 text-xs font-bold border border-blue-600 shadow-md text-center">
+									{tier.ctaLabel}
+								</PillButton>
+							</div>
+						</motion.div>
+
+						{/* Right Column: Dark Preview Panel */}
 						<motion.div
-							className="lg:col-span-5"
-							initial={{ opacity: 0, x: 20 }}
+							initial={{ opacity: 0, x: isEven ? 40 : -40 }}
 							whileInView={{ opacity: 1, x: 0 }}
 							viewport={{ once: true }}
-							transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}>
-							<div className="bg-[#0f172a] rounded-2xl p-6 text-white flex flex-col h-full min-h-[340px] shadow-xl border border-white/5">
+							transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+							className="lg:col-span-5 flex flex-col">
+							<div className={`rounded-2xl p-6 sm:p-7 text-white flex flex-col h-full min-h-[320px] shadow-xl border justify-between transition-transform duration-300 group-hover:scale-[1.01] ${tier.panel.bg}`}>
 								{/* Panel Header */}
-								<div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4 shrink-0">
+								<div className="flex items-center justify-between border-b border-white/10 pb-3.5 mb-4 shrink-0">
 									<div className="flex items-center gap-1.5">
-										<span className="w-2 h-2 rounded-full bg-white/20" />
-										<span className="w-2 h-2 rounded-full bg-white/20" />
-										<span className="w-2 h-2 rounded-full bg-white/20" />
+										<span className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
+										<span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
+										<span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
 									</div>
-									<span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">
+									<span className="text-[10px] font-mono text-white/40 uppercase tracking-wider font-bold">
 										{tier.panel.label}
 									</span>
 								</div>
 
-								{/* Panel Body — grows to fill */}
+								{/* Panel Body */}
 								<div className="flex-1 flex flex-col justify-center gap-3">
-
 									{/* Funnel Steps */}
 									{"steps" in tier.panel && tier.panel.steps && (
-										<div className="space-y-2">
-											{tier.panel.steps.map((step, i) => (
+										<div className="space-y-2.5">
+											{tier.panel.steps?.map((step, i) => (
 												<React.Fragment key={step.label}>
 													<motion.div
-														initial={{ opacity: 0, y: 8 }}
-														whileInView={{ opacity: 1, y: 0 }}
-														whileHover={{ y: -2, x: 4, borderColor: "rgba(59, 130, 246, 0.4)", backgroundColor: "rgba(255,255,255,0.08)" }}
+														initial={{ opacity: 0, x: 20 }}
+														whileInView={{ opacity: 1, x: 0 }}
 														viewport={{ once: true }}
-														transition={{ delay: 0.2 + i * 0.1, duration: 0.35, ease: "easeOut" }}
-														className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between text-xs font-medium cursor-pointer transition-colors">
+														transition={{ delay: 0.3 + i * 0.08, duration: 0.4 }}
+														className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between text-xs font-medium">
 														<span className="text-white/90">{step.label}</span>
-														<span className="text-blue-400 font-mono text-[10px] shrink-0 ml-3 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-md font-bold">{step.tag}</span>
+														<span className="text-purple-300 font-mono text-[10px] shrink-0 ml-3 bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 rounded-md font-bold">
+															{step.tag}
+														</span>
 													</motion.div>
-													{i < tier.panel.steps.length - 1 && (
-														<div className="w-px h-4 bg-white/10 mx-auto" />
+													{tier.panel.steps && i < tier.panel.steps.length - 1 && (
+														<div className="w-px h-3 bg-white/10 mx-auto" />
 													)}
 												</React.Fragment>
 											))}
@@ -312,23 +337,21 @@ export default function ServiceTiers() {
 									{/* Product Grid */}
 									{"products" in tier.panel && tier.panel.products && (
 										<div className="grid grid-cols-2 gap-3">
-											{tier.panel.products.map((p, i) => (
+											{tier.panel.products?.map((p, i) => (
 												<motion.div
 													key={p.name}
-													initial={{ opacity: 0, y: 12 }}
+													initial={{ opacity: 0, y: 15 }}
 													whileInView={{ opacity: 1, y: 0 }}
-													whileHover={{ y: -4, scale: 1.02, borderColor: "rgba(59, 130, 246, 0.4)" }}
 													viewport={{ once: true }}
-													transition={{ delay: 0.15 + i * 0.1, duration: 0.35, ease: "easeOut" }}
-													className="bg-white/5 border border-white/10 rounded-xl p-3 text-center cursor-pointer group/card transition-colors">
-													<div className="w-full h-20 bg-white/5 border border-white/10 rounded-lg mb-2.5 flex items-center justify-center group-hover/card:border-blue-500/30 transition-colors">
-														<span className="text-[10px] text-white/30 font-mono tracking-wider group-hover/card:text-blue-400 transition-colors">PHOTO</span>
+													transition={{ delay: 0.25 + i * 0.08, duration: 0.4 }}
+													className="bg-white/5 border border-white/10 rounded-xl p-3.5 text-center">
+													<div className="w-full h-20 bg-white/5 border border-white/10 rounded-lg mb-2.5 flex items-center justify-center">
+														<span className="text-[10px] text-white/30 font-mono tracking-wider font-bold">
+															PHOTO
+														</span>
 													</div>
 													<p className="text-xs font-bold text-white/90 mb-0.5">{p.name}</p>
-													<p className="text-[11px] text-blue-400 font-mono font-bold">{p.price}</p>
-													<button className="mt-2 w-full bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 rounded-lg py-1 text-[10px] font-bold text-blue-300 transition-colors">
-														Add to cart
-													</button>
+													<p className="text-[11px] text-emerald-400 font-mono font-bold">{p.price}</p>
 												</motion.div>
 											))}
 										</div>
@@ -337,31 +360,32 @@ export default function ServiceTiers() {
 									{/* Simple Card — Landing Page */}
 									{"title" in tier.panel && tier.panel.title && (
 										<motion.div
-											initial={{ opacity: 0, y: 10 }}
-											whileInView={{ opacity: 1, y: 0 }}
+											initial={{ opacity: 0, scale: 0.95 }}
+											whileInView={{ opacity: 1, scale: 1 }}
 											viewport={{ once: true }}
-											transition={{ delay: 0.2, duration: 0.45, ease: "easeOut" }}
+											transition={{ delay: 0.25, duration: 0.45 }}
 											className="bg-white/5 border border-white/10 rounded-xl p-5 space-y-3">
-											{/* Fake browser toolbar */}
-											<div className="flex items-center gap-1.5 pb-3 border-b border-white/10">
-												<span className="w-2 h-2 rounded-full bg-white/15" />
-												<span className="w-2 h-2 rounded-full bg-white/15" />
-												<span className="w-2 h-2 rounded-full bg-white/15" />
-												<div className="ml-2 flex-1 bg-white/5 border border-white/10 rounded-md px-2 py-0.5">
-													<span className="text-[9px] font-mono text-white/20">mybusiness.kiosk.com</span>
+											<div className="flex items-center gap-1.5 pb-2.5 border-b border-white/10">
+												<span className="w-2 h-2 rounded-full bg-white/20" />
+												<span className="w-2 h-2 rounded-full bg-white/20" />
+												<span className="w-2 h-2 rounded-full bg-white/20" />
+												<div className="ml-2 flex-1 bg-white/5 border border-white/10 rounded-md px-2.5 py-0.5">
+													<span className="text-[9px] font-mono text-white/30">mybusiness.kioosk.online</span>
 												</div>
 											</div>
 											<p className="text-sm font-bold text-white/90">{tier.panel.title}</p>
-											<p className="text-xs text-white/40 leading-relaxed">
+											<p className="text-xs text-white/50 leading-relaxed">
 												{tier.panel.body}
 											</p>
 											<div className="pt-1 flex items-center justify-between text-[11px] font-medium">
-												<span className="flex items-center gap-1.5 text-white/30">
-													<Zap className="w-3 h-3" />
+												<span className="flex items-center gap-1.5 text-white/40">
+													<Zap className="w-3.5 h-3.5 text-amber-400" />
 													<span>Delivery: {tier.deliveryLabel}</span>
 												</span>
 												{tier.panel.stat && (
-													<span className="text-blue-400/70 font-semibold text-[10px]">{tier.panel.stat}</span>
+													<span className="text-blue-400 font-semibold text-[10px]">
+														{tier.panel.stat}
+													</span>
 												)}
 											</div>
 										</motion.div>
@@ -369,17 +393,18 @@ export default function ServiceTiers() {
 								</div>
 
 								{/* Panel Footer */}
-								<div className="pt-3 mt-4 border-t border-white/10 flex items-center gap-2 shrink-0">
-									<span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse shrink-0" />
-									<span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">
-										Delivered in {tier.deliveryLabel}
+								<div className="pt-3 mt-4 border-t border-white/10 flex items-center justify-between text-[10px] font-mono text-white/40 uppercase tracking-wider shrink-0">
+									<span className="flex items-center gap-2">
+										<span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+										<span>Ready for Onboarding</span>
 									</span>
+									<span>Turnkey Delivery</span>
 								</div>
 							</div>
 						</motion.div>
-					</div>
-				</ScrollReveal>
-			))}
+					</motion.div>
+				);
+			})}
 		</section>
 	);
 }

@@ -83,9 +83,9 @@ export default function Footer() {
 					<ul className="space-y-4 text-[15px]">
 						<li>
 							<a
-								href="mailto:hello@kiosk.com"
+								href="mailto:hello@kioosk.online"
 								className="text-white/70 hover:text-white transition-colors duration-300">
-								hello@kiosk.com
+								hello@kioosk.online
 							</a>
 						</li>
 						<li className="flex gap-3 mt-6">

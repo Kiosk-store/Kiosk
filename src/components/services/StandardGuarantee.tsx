@@ -21,7 +21,7 @@ const GUARANTEE_FEATURES: GuaranteeFeature[] = [
 		number: "01",
 		title: "Free Kiosk Subdomain",
 		badgeText: "SUBDOMAIN",
-		desc: "Launch immediately on your custom subdomain (yourname.kiosk.com) with zero setup friction.",
+		desc: "Launch immediately on your custom subdomain (yourname.kioosk.online) with zero setup friction.",
 		renderVisual: () => (
 			<div className="relative w-full h-24 rounded-xl bg-gray-50 border border-gray-200 p-3 flex flex-col justify-between overflow-hidden group-hover:border-blue-200 transition-colors">
 				{/* Top Window Bar */}
@@ -41,7 +41,7 @@ const GUARANTEE_FEATURES: GuaranteeFeature[] = [
 					<div className="flex items-center gap-1 text-xs font-mono truncate">
 						<span className="text-blue-500 font-bold">https://</span>
 						<span className="text-gray-900 font-bold">yourname</span>
-						<span className="text-blue-500 font-bold">.kiosk.com</span>
+						<span className="text-blue-500 font-bold">.kioosk.online</span>
 					</div>
 					<span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse shrink-0" />
 				</div>

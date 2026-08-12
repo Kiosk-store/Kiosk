@@ -67,6 +67,16 @@ interface Invoice {
 	plan: string;
 }
 
+const mockInvoices: Invoice[] = [
+	{
+		id: "INV-2026-001",
+		date: "Aug 10, 2026",
+		amount: "$20.00",
+		status: "Paid",
+		plan: "Landing Page",
+	},
+];
+
 const PLAN_INFO_MAP: Record<string, { title: string; price: string; desc: string }> = {
 	NONE: {
 		title: "No Active Subscription",

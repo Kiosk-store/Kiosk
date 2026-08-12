@@ -33,7 +33,7 @@ const faqItems = [
 		icon: "language",
 		question: "Can I use my existing custom domain?",
 		answer:
-			"Absolutely. Every site launches on a free Kiosk subdomain (yourbusiness.kiosk.com) so you're live immediately, and you can connect your own custom domain any time as your business grows - from GoDaddy, Namecheap, Google, or another registrar. We'll walk you through the setup.",
+			"Absolutely. Every site launches on a free Kiosk subdomain (yourbusiness.kioosk.online) so you're live immediately, and you can connect your own custom domain any time as your business grows - from GoDaddy, Namecheap, Google, or another registrar. We'll walk you through the setup.",
 	},
 	{
 		icon: "compare_arrows",
