@@ -229,7 +229,7 @@ export default function Pricing() {
 								}`}>
 								{/* Left: Extra Large Borderless Lottie Animation Showcase */}
 								<div className="w-full lg:w-1/2 flex items-center justify-center shrink-0">
-									<div className="w-full max-w-[340px] sm:max-w-[480px] md:max-w-[580px] lg:max-w-[680px] xl:max-w-[760px] h-[220px] sm:h-[300px] md:h-[400px] lg:h-[520px] xl:h-[580px] flex items-center justify-center p-1 sm:p-2">
+									<div className="w-full max-w-[280px] sm:max-w-[480px] md:max-w-[580px] lg:max-w-[680px] xl:max-w-[760px] h-[220px] sm:h-[300px] md:h-[400px] lg:h-[520px] xl:h-[580px] flex items-center justify-center p-1 sm:p-2">
 										<LottiePlayer
 											src={tier.lottieSrc}
 											className="w-full h-full object-contain flex items-center justify-center [&>svg]:w-full [&>svg]:h-full [&>svg]:max-h-full"
@@ -242,7 +242,7 @@ export default function Pricing() {
 								{/* Right: Prominent Pricing Card */}
 								<div className="w-full lg:w-1/2 flex items-center justify-center">
 									<div
-										className={`w-full max-w-[360px] sm:max-w-[440px] lg:max-w-[500px] rounded-2xl sm:rounded-3xl p-5 sm:p-7 md:p-8 flex flex-col justify-between transition-all duration-300 ${
+										className={`w-full max-w-[290px] sm:max-w-[440px] lg:max-w-[500px] rounded-2xl sm:rounded-3xl p-5 sm:p-7 md:p-8 flex flex-col justify-between transition-all duration-300 ${
 											tier.featured
 												? "bg-[#141824] border-2 border-blue-600 shadow-2xl shadow-blue-600/10"
 												: "bg-[#11131a] border border-white/15 shadow-2xl shadow-black/60"

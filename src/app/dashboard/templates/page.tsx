@@ -434,13 +434,18 @@ export default function TemplatesPage() {
 
 								{/* Bottom Action Footer */}
 								<div className="p-6 pt-0 flex items-center gap-2 border-t border-gray-100/80 pt-4 mt-2">
-									<button
-										type="button"
-										onClick={() => setSelectedTemplate(tpl)}
-										className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 text-xs font-semibold transition-colors cursor-pointer flex items-center justify-center gap-2">
+									<Link
+										href={
+											tpl.category === "Landing Page"
+												? "/templates/landing-page"
+												: tpl.category === "Sales Funnel"
+												? "/templates/sales-funnel"
+												: "/templates/ecommerce"
+										}
+										className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 text-xs font-semibold transition-colors cursor-pointer flex items-center justify-center gap-2 text-center">
 										<Eye className="w-3.5 h-3.5 text-gray-500" />
-										<span>Preview</span>
-									</button>
+										<span>Live Code Preview</span>
+									</Link>
 
 									<button
 										type="button"

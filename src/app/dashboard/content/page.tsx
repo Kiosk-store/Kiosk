@@ -2,6 +2,8 @@
 
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import React, { useState, useRef, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -331,25 +333,35 @@ function ContentForm() {
 						<span>Back to Dashboard</span>
 					</Link>
 
-					{/* Icon-Only Preview Button with Tooltip on Hover */}
-					<div className="relative group/preview">
-						<PillButton
-							type="button"
-							onClick={() => setIsPreviewOpen((prev) => !prev)}
-							baseColor="#eff6ff"
-							circleColor="#004ac6"
-							textColor="#004ac6"
-							hoverTextColor="#004ac6"
-							aria-label="Preview Custom Site"
-							className="p-2.5 rounded-full border border-blue-200 shadow-2xs">
-							<Eye className="w-4 h-4 text-blue-600" />
-						</PillButton>
+					<div className="flex items-center gap-3">
+						<Link
+							href="/templates"
+							target="_blank"
+							className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-bold border border-blue-200 transition-colors">
+							<Globe className="w-3.5 h-3.5" />
+							<span>Browse Templates</span>
+						</Link>
 
-						{/* Tooltip Badge on Hover */}
-						<div className="absolute right-0 top-11 opacity-0 group-hover/preview:opacity-100 transition-opacity pointer-events-none z-30">
-							<span className="px-2.5 py-1 rounded-lg bg-gray-900 text-white text-[10px] font-bold shadow-md whitespace-nowrap">
-								Preview
-							</span>
+						{/* Icon-Only Preview Button with Tooltip on Hover */}
+						<div className="relative group/preview">
+							<PillButton
+								type="button"
+								onClick={() => setIsPreviewOpen((prev) => !prev)}
+								baseColor="#eff6ff"
+								circleColor="#004ac6"
+								textColor="#004ac6"
+								hoverTextColor="#004ac6"
+								aria-label="Preview Custom Site"
+								className="p-2.5 rounded-full border border-blue-200 shadow-2xs">
+								<Eye className="w-4 h-4 text-blue-600" />
+							</PillButton>
+
+							{/* Tooltip Badge on Hover */}
+							<div className="absolute right-0 top-11 opacity-0 group-hover/preview:opacity-100 transition-opacity pointer-events-none z-30">
+								<span className="px-2.5 py-1 rounded-lg bg-gray-900 text-white text-[10px] font-bold shadow-md whitespace-nowrap">
+									Live Preview
+								</span>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -861,7 +873,7 @@ function ContentForm() {
 							<div
 								style={{ fontFamily: `'${selectedFont}', sans-serif` }}
 								className={`transition-all duration-300 bg-white text-slate-900 rounded-2xl overflow-hidden shadow-2xl ${
-									previewDevice === "mobile" ? "w-[375px] min-h-[667px]" : "w-full min-h-[550px]"
+									previewDevice === "mobile" ? "w-[375px] max-w-full min-h-[667px]" : "w-full min-h-[550px]"
 								}`}>
 								{/* RENDER: Site Navbar */}
 								<header className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">

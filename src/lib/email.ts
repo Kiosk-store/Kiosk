@@ -88,7 +88,7 @@ export async function sendWelcomeEmail(toEmail: string, userName: string) {
 						Your custom multi-tenant workspace is fully provisioned and ready. You can now build, manage, and scale your custom website landing pages, sales funnels, and e-commerce stores.
 					</p>
 					<div style="margin-bottom: 32px;">
-						<a href="${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/dashboard" style="display: inline-block; background-color: #2563eb; color: #ffffff; font-weight: 700; font-size: 14px; padding: 12px 28px; border-radius: 9999px; text-decoration: none;">Go to Your Dashboard →</a>
+						<a href="${process.env.NEXT_PUBLIC_APP_URL || "https://kioosk.online"}/dashboard" style="display: inline-block; background-color: #2563eb; color: #ffffff; font-weight: 700; font-size: 14px; padding: 12px 28px; border-radius: 9999px; text-decoration: none;">Go to Your Dashboard →</a>
 					</div>
 					<hr style="border: none; border-top: 1px solid #f1f5f9; margin-bottom: 24px;" />
 					<p style="font-size: 12px; color: #94a3b8; line-height: 1.5;">
@@ -133,7 +133,7 @@ export async function sendProjectStatusEmail(
 							? `<p style="font-size: 14px; color: #475569; margin-bottom: 24px;">Preview URL: <a href="${publishedUrl}" style="color: #2563eb; font-weight: 600;">${publishedUrl}</a></p>`
 							: ""
 					}
-					<a href="${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/dashboard" style="display: inline-block; background-color: #0f172a; color: #ffffff; font-weight: 700; font-size: 14px; padding: 12px 24px; border-radius: 9999px; text-decoration: none;">View Project Details</a>
+					<a href="${process.env.NEXT_PUBLIC_APP_URL || "https://kioosk.online"}/dashboard" style="display: inline-block; background-color: #0f172a; color: #ffffff; font-weight: 700; font-size: 14px; padding: 12px 24px; border-radius: 9999px; text-decoration: none;">View Project Details</a>
 				</div>
 			</body>
 		</html>

@@ -54,7 +54,7 @@ function ProjectCard({
 	project: (typeof projects)[number];
 }) {
 	return (
-		<div className="shrink-0 w-[340px] sm:w-[400px] group">
+		<div className="shrink-0 w-[280px] sm:w-[400px] max-w-full group">
 			{/* Browser chrome frame */}
 			<div className="rounded-2xl bg-white overflow-hidden border border-outline-variant/30 shadow-sm transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
 				<div className="px-3 py-2 flex items-center gap-1.5 border-b border-outline-variant/30 bg-surface-container-high">
