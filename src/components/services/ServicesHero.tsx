@@ -2,8 +2,7 @@
 
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import gsap from "gsap";
+import React, { useState } from "react";
 import ScrollReveal from "@/components/ScrollReveal";
 import PillButton from "@/components/PillButton";
 import LottiePlayer from "@/components/LottiePlayer";
@@ -31,27 +30,6 @@ export default function ServicesHero() {
 		"/lotties/funnel.json",
 	);
 
-	const headingRef = useRef<HTMLHeadingElement>(null);
-
-	useEffect(() => {
-		if (!headingRef.current) return;
-
-		const words = headingRef.current.querySelectorAll(".hero-word");
-
-		// Set starting state immediately — invisible and slightly below
-		gsap.set(words, { opacity: 0, y: 22 });
-
-		// Animate all words in with stagger — fast, clean, power3 ease
-		gsap.to(words, {
-			opacity: 1,
-			y: 0,
-			duration: 0.65,
-			ease: "power3.out",
-			stagger: 0.075,  // 75ms between each word
-			delay: 0.15,     // slight pause before starting so page has rendered
-		});
-	}, []);
-
 	return (
 		<section className="relative pt-32 pb-20 md:pt-40 md:pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden bg-white">
 			{/* Architectural Grid Lines */}
@@ -69,31 +47,59 @@ export default function ServicesHero() {
 						</div>
 					</ScrollReveal>
 
-					{/* GSAP word-by-word headline — no ScrollReveal wrapper needed */}
-					<h1
-						ref={headingRef}
+					{/* Headline word-by-word stagger animation */}
+					<motion.h1
+						initial="hidden"
+						whileInView="visible"
+						viewport={{ once: true }}
+						variants={{
+							hidden: { opacity: 0 },
+							visible: {
+								opacity: 1,
+								transition: {
+									staggerChildren: 0.1,
+									delayChildren: 0.05,
+								},
+							},
+						}}
 						className="text-3xl sm:text-5xl md:text-6xl font-bold font-nohemi tracking-tight text-gray-900 leading-[1.12]">
 						{/* Line one — dark words */}
 						<span className="block">
 							{LINE_ONE.map((word) => (
-								<span
+								<motion.span
 									key={word}
-									className="hero-word inline-block mr-[0.25em] will-change-transform">
+									variants={{
+										hidden: { opacity: 0, y: 24 },
+										visible: {
+											opacity: 1,
+											y: 0,
+											transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] },
+										},
+									}}
+									className="inline-block mr-[0.25em]">
 									{word}
-								</span>
+								</motion.span>
 							))}
 						</span>
 						{/* Line two — blue accent */}
 						<span className="block text-blue-600">
 							{LINE_TWO.map((word) => (
-								<span
+								<motion.span
 									key={word}
-									className="hero-word inline-block mr-[0.2em] will-change-transform">
+									variants={{
+										hidden: { opacity: 0, y: 24 },
+										visible: {
+											opacity: 1,
+											y: 0,
+											transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] },
+										},
+									}}
+									className="inline-block mr-[0.2em]">
 									{word}
-								</span>
+								</motion.span>
 							))}
 						</span>
-					</h1>
+					</motion.h1>
 
 					<ScrollReveal direction="up" delay={200}>
 						<p className="text-sm sm:text-base md:text-lg text-gray-600 font-medium leading-relaxed max-w-2xl">
