@@ -152,7 +152,7 @@ export default function ServiceTiers() {
 			{/* Tier Cards */}
 			{TIERS.map((tier, tierIndex) => (
 				<ScrollReveal key={tier.id} direction="up" delay={0}>
-					<div className="bg-white border border-gray-200/90 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-2xs grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start relative overflow-hidden">
+					<div className="bg-white border border-gray-200/90 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-2xs grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch relative overflow-hidden">
 
 						{/* Left: Content */}
 						<div className="lg:col-span-7 space-y-6">
@@ -263,11 +263,16 @@ export default function ServiceTiers() {
 							</ScrollReveal>
 						</div>
 
-						{/* Right: Panel */}
-						<ScrollReveal direction="up" delay={120} className="lg:col-span-5">
-							<div className="bg-[#0f172a] rounded-2xl p-6 text-white space-y-4 shadow-xl border border-white/5 h-full">
+						{/* Right: Panel — full height flex column */}
+						<motion.div
+							className="lg:col-span-5"
+							initial={{ opacity: 0, x: 20 }}
+							whileInView={{ opacity: 1, x: 0 }}
+							viewport={{ once: true }}
+							transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}>
+							<div className="bg-[#0f172a] rounded-2xl p-6 text-white flex flex-col h-full min-h-[340px] shadow-xl border border-white/5">
 								{/* Panel Header */}
-								<div className="flex items-center justify-between border-b border-white/10 pb-3">
+								<div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4 shrink-0">
 									<div className="flex items-center gap-1.5">
 										<span className="w-2 h-2 rounded-full bg-white/20" />
 										<span className="w-2 h-2 rounded-full bg-white/20" />
@@ -278,68 +283,98 @@ export default function ServiceTiers() {
 									</span>
 								</div>
 
-								{/* Panel Body — Funnel Steps */}
-								{"steps" in tier.panel && tier.panel.steps && (
-									<div className="space-y-2 pt-1">
-										{tier.panel.steps.map((step, i) => (
-											<React.Fragment key={step.label}>
-												<div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between text-xs font-medium">
-													<span className="text-white/80">{step.label}</span>
-													<span className="text-white/40 font-mono text-[10px] shrink-0 ml-2">{step.tag}</span>
-												</div>
-												{i < tier.panel.steps.length - 1 && (
-													<div className="w-px h-3 bg-white/10 mx-auto" />
-												)}
-											</React.Fragment>
-										))}
-									</div>
-								)}
+								{/* Panel Body — grows to fill */}
+								<div className="flex-1 flex flex-col justify-center gap-3">
 
-								{/* Panel Body — Product Grid */}
-								{"products" in tier.panel && tier.panel.products && (
-									<div className="grid grid-cols-2 gap-3 pt-1">
-										{tier.panel.products.map((p) => (
-											<div
-												key={p.name}
-												className="bg-white/5 border border-white/10 rounded-xl p-3 text-center">
-												<div className="w-full h-16 bg-white/5 border border-white/10 rounded-lg mb-2 flex items-center justify-center">
-													<span className="text-[10px] text-white/30 font-mono">IMG</span>
-												</div>
-												<p className="text-xs font-bold text-white/80">{p.name}</p>
-												<p className="text-[11px] text-white/40 font-mono mt-0.5">{p.price}</p>
-											</div>
-										))}
-									</div>
-								)}
-
-								{/* Panel Body — Simple Card */}
-								{"title" in tier.panel && tier.panel.title && (
-									<div className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-2.5">
-										<p className="text-sm font-bold text-white/90">{tier.panel.title}</p>
-										<p className="text-xs text-white/50 leading-relaxed">
-											{tier.panel.body}
-										</p>
-										<div className="pt-1 flex items-center justify-between text-[11px] text-white/50 font-medium">
-											<span className="flex items-center gap-1.5">
-												<Zap className="w-3 h-3 text-white/30" />
-												<span>Delivery: {tier.deliveryLabel}</span>
-											</span>
-											{tier.panel.stat && (
-												<span className="text-white/70 font-semibold">{tier.panel.stat}</span>
-											)}
+									{/* Funnel Steps */}
+									{"steps" in tier.panel && tier.panel.steps && (
+										<div className="space-y-2">
+											{tier.panel.steps.map((step, i) => (
+												<React.Fragment key={step.label}>
+													<motion.div
+														initial={{ opacity: 0, y: 8 }}
+														whileInView={{ opacity: 1, y: 0 }}
+														viewport={{ once: true }}
+														transition={{ delay: 0.2 + i * 0.1, duration: 0.4, ease: "easeOut" }}
+														className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between text-xs font-medium">
+														<span className="text-white/80">{step.label}</span>
+														<span className="text-white/40 font-mono text-[10px] shrink-0 ml-3 bg-white/5 px-2 py-0.5 rounded-md">{step.tag}</span>
+													</motion.div>
+													{i < tier.panel.steps.length - 1 && (
+														<div className="w-px h-4 bg-white/10 mx-auto" />
+													)}
+												</React.Fragment>
+											))}
 										</div>
-									</div>
-								)}
+									)}
+
+									{/* Product Grid */}
+									{"products" in tier.panel && tier.panel.products && (
+										<div className="grid grid-cols-2 gap-3">
+											{tier.panel.products.map((p, i) => (
+												<motion.div
+													key={p.name}
+													initial={{ opacity: 0, y: 12 }}
+													whileInView={{ opacity: 1, y: 0 }}
+													viewport={{ once: true }}
+													transition={{ delay: 0.15 + i * 0.1, duration: 0.4, ease: "easeOut" }}
+													className="bg-white/5 border border-white/10 rounded-xl p-3 text-center">
+													<div className="w-full h-20 bg-white/5 border border-white/10 rounded-lg mb-2.5 flex items-center justify-center">
+														<span className="text-[10px] text-white/20 font-mono tracking-wider">PHOTO</span>
+													</div>
+													<p className="text-xs font-bold text-white/80 mb-0.5">{p.name}</p>
+													<p className="text-[11px] text-blue-400/70 font-mono">{p.price}</p>
+													<button className="mt-2 w-full bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg py-1 text-[10px] font-bold text-white/50 transition-colors">
+														Add to cart
+													</button>
+												</motion.div>
+											))}
+										</div>
+									)}
+
+									{/* Simple Card — Landing Page */}
+									{"title" in tier.panel && tier.panel.title && (
+										<motion.div
+											initial={{ opacity: 0, y: 10 }}
+											whileInView={{ opacity: 1, y: 0 }}
+											viewport={{ once: true }}
+											transition={{ delay: 0.2, duration: 0.45, ease: "easeOut" }}
+											className="bg-white/5 border border-white/10 rounded-xl p-5 space-y-3">
+											{/* Fake browser toolbar */}
+											<div className="flex items-center gap-1.5 pb-3 border-b border-white/10">
+												<span className="w-2 h-2 rounded-full bg-white/15" />
+												<span className="w-2 h-2 rounded-full bg-white/15" />
+												<span className="w-2 h-2 rounded-full bg-white/15" />
+												<div className="ml-2 flex-1 bg-white/5 border border-white/10 rounded-md px-2 py-0.5">
+													<span className="text-[9px] font-mono text-white/20">mybusiness.kiosk.com</span>
+												</div>
+											</div>
+											<p className="text-sm font-bold text-white/90">{tier.panel.title}</p>
+											<p className="text-xs text-white/40 leading-relaxed">
+												{tier.panel.body}
+											</p>
+											<div className="pt-1 flex items-center justify-between text-[11px] font-medium">
+												<span className="flex items-center gap-1.5 text-white/30">
+													<Zap className="w-3 h-3" />
+													<span>Delivery: {tier.deliveryLabel}</span>
+												</span>
+												{tier.panel.stat && (
+													<span className="text-blue-400/70 font-semibold text-[10px]">{tier.panel.stat}</span>
+												)}
+											</div>
+										</motion.div>
+									)}
+								</div>
 
 								{/* Panel Footer */}
-								<div className="pt-2 border-t border-white/10 flex items-center gap-2">
+								<div className="pt-3 mt-4 border-t border-white/10 flex items-center gap-2 shrink-0">
 									<span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse shrink-0" />
 									<span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">
 										Delivered in {tier.deliveryLabel}
 									</span>
 								</div>
 							</div>
-						</ScrollReveal>
+						</motion.div>
 					</div>
 				</ScrollReveal>
 			))}
