@@ -2,7 +2,8 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import gsap from "gsap";
 import ScrollReveal from "@/components/ScrollReveal";
 import PillButton from "@/components/PillButton";
 import LottiePlayer from "@/components/LottiePlayer";
@@ -21,17 +22,40 @@ const HERO_LOTTIE_TABS: Tab[] = [
 	{ id: "store", label: "E-commerce", src: "/lotties/shopping Ecommerce.json" },
 ];
 
+// Heading broken into two lines — each word is its own span
+const LINE_ONE = ["Professional", "websites,"];
+const LINE_TWO = ["built", "for", "you."];
+
 export default function ServicesHero() {
 	const [activeHeroLottie, setActiveHeroLottie] = useState<string>(
 		"/lotties/funnel.json",
 	);
 
+	const headingRef = useRef<HTMLHeadingElement>(null);
+
+	useEffect(() => {
+		if (!headingRef.current) return;
+
+		const words = headingRef.current.querySelectorAll(".hero-word");
+
+		// Set starting state immediately — invisible and slightly below
+		gsap.set(words, { opacity: 0, y: 22 });
+
+		// Animate all words in with stagger — fast, clean, power3 ease
+		gsap.to(words, {
+			opacity: 1,
+			y: 0,
+			duration: 0.65,
+			ease: "power3.out",
+			stagger: 0.075,  // 75ms between each word
+			delay: 0.15,     // slight pause before starting so page has rendered
+		});
+	}, []);
+
 	return (
 		<section className="relative pt-32 pb-20 md:pt-40 md:pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden bg-white">
 			{/* Architectural Grid Lines */}
 			<div className="absolute inset-0 bg-[linear-gradient(to_right,#f1f5f9_1px,transparent_1px),linear-gradient(to_bottom,#f1f5f9_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-80 pointer-events-none" />
-
-
 
 			<div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center relative z-10">
 				{/* Left Column: Text & CTAs */}
@@ -45,13 +69,31 @@ export default function ServicesHero() {
 						</div>
 					</ScrollReveal>
 
-					<ScrollReveal direction="up" delay={100}>
-						<h1 className="text-3xl sm:text-5xl md:text-6xl font-bold font-nohemi tracking-tight text-gray-900 leading-[1.12]">
-							Professional websites,
-							<br className="hidden sm:inline" />{" "}
-							<span className="text-blue-600">built for you.</span>
-						</h1>
-					</ScrollReveal>
+					{/* GSAP word-by-word headline — no ScrollReveal wrapper needed */}
+					<h1
+						ref={headingRef}
+						className="text-3xl sm:text-5xl md:text-6xl font-bold font-nohemi tracking-tight text-gray-900 leading-[1.12]">
+						{/* Line one — dark words */}
+						<span className="block">
+							{LINE_ONE.map((word) => (
+								<span
+									key={word}
+									className="hero-word inline-block mr-[0.25em] will-change-transform">
+									{word}
+								</span>
+							))}
+						</span>
+						{/* Line two — blue accent */}
+						<span className="block text-blue-600">
+							{LINE_TWO.map((word) => (
+								<span
+									key={word}
+									className="hero-word inline-block mr-[0.2em] will-change-transform">
+									{word}
+								</span>
+							))}
+						</span>
+					</h1>
 
 					<ScrollReveal direction="up" delay={200}>
 						<p className="text-sm sm:text-base md:text-lg text-gray-600 font-medium leading-relaxed max-w-2xl">
@@ -171,4 +213,3 @@ export default function ServicesHero() {
 		</section>
 	);
 }
-
