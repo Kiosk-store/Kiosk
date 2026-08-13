@@ -56,7 +56,7 @@ export async function POST(request: Request) {
 		// 4. Process Charge Completion
 		if (event === "collection.succeeded" && data.status === "SUCCEEDED") {
 			const checkoutId: string = data.checkout_id ?? "";
-			const userId: string = data.metadata?.userId || data.metadata?.userId;
+			const userId: string = data.metadata?.userId || data.metadata?.tenantId;
 			const plan: string = data.metadata?.plan || "LANDING_PAGE";
 
 			if (userId) {

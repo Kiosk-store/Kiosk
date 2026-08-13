@@ -102,34 +102,25 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
 	const itemEntranceTweenRef = useRef<gsap.core.Tween | null>(null);
 
-	const [navVisible, setNavVisible] = useState(true);
-	const [scrolled, setScrolled] = useState(false);
-	const lastScrollY = useRef(0);
+	const [atTop, setAtTop] = useState(true);
 
 	React.useEffect(() => {
 		const handleScroll = () => {
 			const currentScrollY = window.scrollY;
-
-			// Add frosted backdrop blur header bar when scrolled past 40px
-			if (currentScrollY > 40) {
-				setScrolled(true);
+			// Only show staggered menu header when at the very top of the hero page
+			if (currentScrollY <= 20) {
+				setAtTop(true);
 			} else {
-				setScrolled(false);
+				setAtTop(false);
 			}
-
-			// Auto-hide when scrolling down past 80px, show when scrolling up
-			if (currentScrollY > 80 && currentScrollY > lastScrollY.current) {
-				setNavVisible(false);
-			} else {
-				setNavVisible(true);
-			}
-
-			lastScrollY.current = currentScrollY;
 		};
 
+		handleScroll();
 		window.addEventListener("scroll", handleScroll, { passive: true });
 		return () => window.removeEventListener("scroll", handleScroll);
 	}, []);
+
+
 
 	useLayoutEffect(() => {
 		setIsMounted(true);
@@ -508,7 +499,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
 	return (
 		<div
-			className={`sm-scope z-40 ${open ? "pointer-events-auto" : "pointer-events-none"} ${isFixed ? "fixed top-0 left-0 w-screen h-screen overflow-hidden" : "w-full h-full"}`}>
+			className={`sm-scope z-40 ${open ? "pointer-events-auto fixed top-0 left-0 w-screen h-screen overflow-hidden" : "pointer-events-none absolute top-0 left-0 w-full"}`}>
 			<div
 				className={
 					(className ? className + " " : "") +
@@ -546,14 +537,10 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 				</div>
 
 				<header
-					className={`staggered-menu-header fixed top-0 left-0 w-full flex items-center justify-between px-4 sm:px-10 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none z-30 ${
-						open || navVisible
-							? "translate-y-0 opacity-100"
-							: "-translate-y-full opacity-0"
-					} ${
-						scrolled && !open
-							? "bg-white/90 backdrop-blur-md border-b border-gray-200/60 shadow-2xs py-2.5 sm:py-3.5"
-							: "bg-transparent py-3.5 sm:py-5"
+					className={`staggered-menu-header fixed top-0 left-0 w-full flex items-center justify-between px-4 sm:px-10 py-3.5 sm:py-5 bg-transparent transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] z-30 ${
+						open || atTop
+							? "translate-y-0 opacity-100 pointer-events-auto"
+							: "-translate-y-full opacity-0 pointer-events-none"
 					}`}
 					aria-label="Main navigation header">
 					<Link

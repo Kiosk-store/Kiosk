@@ -2,7 +2,7 @@
  * Navbar (Dynamic Auth Context Integration)
  *
  * Renders StaggeredMenu navigation.
- * When logged in, displays the user's name and Google profile picture / avatar linking to /dashboard.
+ * When logged in, displays the user's name and avatar linking to /dashboard.
  * When logged out, displays "Get Started".
  *
  * @format
@@ -15,10 +15,9 @@ import StaggeredMenu from "./StaggeredMenu";
 import { useAuth } from "@/context/AuthContext";
 
 const navItems = [
-	{ label: "Services", href: "/services" },
+	{ label: "Services", href: "/#services-tiers" },
 	{ label: "Pricing", href: "/#pricing" },
 	{ label: "Portfolio", href: "/#portfolio" },
-	{ label: "About", href: "/#about" },
 	{ label: "FAQ", href: "/#faq" },
 ];
 
