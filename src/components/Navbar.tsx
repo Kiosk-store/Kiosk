@@ -12,6 +12,7 @@
 
 import React from "react";
 import StaggeredMenu from "./StaggeredMenu";
+import BackToTop from "./BackToTop";
 import { useAuth } from "@/context/AuthContext";
 
 const navItems = [
@@ -60,6 +61,7 @@ export default function Navbar() {
 				isFixed={true}
 				showMenuText={false}
 			/>
+			<BackToTop />
 		</div>
 	);
 }
