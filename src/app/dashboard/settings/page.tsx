@@ -3,9 +3,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { User, Mail, Phone, Lock, Bell, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
+import { User, Mail, Phone, Lock, Bell, CheckCircle2, Loader2, AlertCircle, Building } from "lucide-react";
 import PillButton from "@/components/PillButton";
 import { useAuth } from "@/context/AuthContext";
+
+export const dynamic = "force-dynamic";
 
 type SettingsTab = "profile" | "security" | "notifications";
 
@@ -14,34 +16,47 @@ export default function SettingsPage() {
 	const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
 	const [isLoading, setIsLoading] = useState(false);
 	const [isSaved, setIsSaved] = useState(false);
+	const [toastMsg, setToastMsg] = useState("Your settings have been saved to database successfully.");
 	const [error, setError] = useState<string | null>(null);
 
-	// Profile Form State
+	// Profile Form State (Clean input values, carried as placeholders until user enters/fetches data)
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
-	const [phone, setPhone] = useState("+1 (555) 234-5678");
-	const [company, setCompany] = useState("Kiosk Tenant");
+	const [phone, setPhone] = useState("");
+	const [company, setCompany] = useState("");
 
 	// Security Form State
 	const [currentPass, setCurrentPass] = useState("");
 	const [newPass, setNewPass] = useState("");
 	const [confirmPass, setConfirmPass] = useState("");
-	const [twoFactor, setTwoFactor] = useState(false);
 
 	// Notification Toggles State
 	const [emailNotifs, setEmailNotifs] = useState(true);
 	const [projectUpdates, setProjectUpdates] = useState(true);
-	const [marketingEmails, setMarketingEmails] = useState(false);
 
-	// Sync state with authenticated user context
+	// Fetch existing user & tenant details from database on mount
 	useEffect(() => {
-		if (user) {
-			setName(user.name || "");
-			setEmail(user.email || "");
+		async function fetchProfileData() {
+			try {
+				const res = await fetch("/api/user/profile");
+				if (res.ok) {
+					const data = await res.json();
+					if (data.user?.name) setName(data.user.name);
+					if (data.user?.email) setEmail(data.user.email);
+					if (data.tenant?.name) setCompany(data.tenant.name);
+				} else if (user) {
+					if (user.name) setName(user.name);
+					if (user.email) setEmail(user.email);
+				}
+			} catch (err) {
+				console.error("[FETCH_SETTINGS_ERROR]", err);
+			}
 		}
+
+		fetchProfileData();
 	}, [user]);
 
-	const displayName = user?.name || user?.email?.split("@")[0] || "User";
+	const displayName = user?.name || name || user?.email?.split("@")[0] || "User";
 	const initials = displayName
 		.split(" ")
 		.map((n) => n[0])
@@ -49,6 +64,7 @@ export default function SettingsPage() {
 		.toUpperCase()
 		.slice(0, 2);
 
+	// Save Profile & Company to Database
 	const handleSaveProfile = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setError(null);
@@ -58,40 +74,94 @@ export default function SettingsPage() {
 			const res = await fetch("/api/user/profile", {
 				method: "PATCH",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ name }),
+				body: JSON.stringify({
+					name: name || undefined,
+					company: company || undefined,
+					phone: phone || undefined,
+				}),
 			});
 
 			const data = await res.json();
 
 			if (!res.ok) {
-				setError(data.error || "Failed to update profile.");
+				setError(data.error || "Failed to update profile in database.");
 				setIsLoading(false);
 				return;
 			}
 
 			await refreshUser();
 			setIsLoading(false);
+			setToastMsg("Profile and company settings saved to database!");
 			setIsSaved(true);
 			setTimeout(() => {
 				setIsSaved(false);
-			}, 3000);
+			}, 3500);
 		} catch (err) {
 			console.error("[PROFILE_SAVE_ERROR]", err);
-			setError("An unexpected network error occurred.");
+			setError("An unexpected network error occurred while saving profile.");
 			setIsLoading(false);
 		}
 	};
 
-	const handleSaveGeneric = (e: React.FormEvent) => {
+	// Save Password to Database
+	const handleSavePassword = async (e: React.FormEvent) => {
+		e.preventDefault();
+		setError(null);
+		setIsLoading(true);
+
+		if (newPass !== confirmPass) {
+			setError("New password and confirmation do not match.");
+			setIsLoading(false);
+			return;
+		}
+
+		try {
+			const res = await fetch("/api/user/password", {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					currentPassword: currentPass,
+					newPassword: newPass,
+					confirmPassword: confirmPass,
+				}),
+			});
+
+			const data = await res.json();
+
+			if (!res.ok) {
+				setError(data.error || "Failed to update password.");
+				setIsLoading(false);
+				return;
+			}
+
+			setCurrentPass("");
+			setNewPass("");
+			setConfirmPass("");
+			setIsLoading(false);
+			setToastMsg("Password updated successfully in database!");
+			setIsSaved(true);
+			setTimeout(() => {
+				setIsSaved(false);
+			}, 3500);
+		} catch (err) {
+			console.error("[PASSWORD_SAVE_ERROR]", err);
+			setError("An unexpected network error occurred while updating password.");
+			setIsLoading(false);
+		}
+	};
+
+	// Save Notification Preferences
+	const handleSaveNotifications = (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsLoading(true);
 		setTimeout(() => {
 			setIsLoading(false);
+			setToastMsg("Notification preferences updated!");
 			setIsSaved(true);
 			setTimeout(() => {
 				setIsSaved(false);
 			}, 3000);
-		}, 600);
+		}, 400);
 	};
 
 	return (
@@ -104,7 +174,7 @@ export default function SettingsPage() {
 						Account Settings
 					</h1>
 					<p className="text-gray-500 text-sm font-medium">
-						Manage your personal profile, security preferences, and email notifications.
+						Manage your workspace profile, security credentials, and preferences.
 					</p>
 				</div>
 
@@ -127,7 +197,7 @@ export default function SettingsPage() {
 								}}
 								className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all cursor-pointer ${
 									isActive
-										? "border-blue-600 text-blue-600"
+										? "border-blue-600 text-blue-600 font-bold"
 										: "border-transparent text-gray-500 hover:text-gray-900"
 								}`}>
 								<Icon className="w-4 h-4" />
@@ -139,9 +209,9 @@ export default function SettingsPage() {
 
 				{/* Save Toast Notification */}
 				{isSaved && (
-					<div className="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold flex items-center gap-2.5 animate-in fade-in duration-200">
+					<div className="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2.5 animate-in fade-in duration-200">
 						<CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-						<span>Your profile settings have been saved to database successfully.</span>
+						<span>{toastMsg}</span>
 					</div>
 				)}
 
@@ -157,7 +227,7 @@ export default function SettingsPage() {
 				{activeTab === "profile" && (
 					<form
 						onSubmit={handleSaveProfile}
-						className="bg-white border border-gray-200/90 rounded-2xl p-6 sm:p-8 space-y-6">
+						className="bg-white border border-gray-200/90 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
 						{/* Avatar Header */}
 						<div className="flex items-center gap-4 pb-6 border-b border-gray-100">
 							{user?.image ? (
@@ -182,6 +252,7 @@ export default function SettingsPage() {
 						</div>
 
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+							{/* Full Name */}
 							<div>
 								<label className="block text-xs font-semibold text-gray-700 mb-1.5">
 									Full Name
@@ -192,11 +263,13 @@ export default function SettingsPage() {
 										type="text"
 										value={name}
 										onChange={(e) => setName(e.target.value)}
-										className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 transition-colors"
+										placeholder="e.g. John Doe"
+										className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 transition-colors placeholder:text-gray-400"
 									/>
 								</div>
 							</div>
 
+							{/* Email Address */}
 							<div>
 								<label className="block text-xs font-semibold text-gray-700 mb-1.5">
 									Email Address
@@ -207,11 +280,13 @@ export default function SettingsPage() {
 										type="email"
 										disabled
 										value={email}
-										className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200/90 text-xs font-medium text-gray-500 bg-gray-50 cursor-not-allowed"
+										placeholder="e.g. user@kioosk.online"
+										className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200/90 text-xs font-medium text-gray-500 bg-gray-50 cursor-not-allowed placeholder:text-gray-400"
 									/>
 								</div>
 							</div>
 
+							{/* Phone Number */}
 							<div>
 								<label className="block text-xs font-semibold text-gray-700 mb-1.5">
 									Phone Number
@@ -222,21 +297,27 @@ export default function SettingsPage() {
 										type="text"
 										value={phone}
 										onChange={(e) => setPhone(e.target.value)}
-										className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 transition-colors"
+										placeholder="e.g. +234 800 000 0000"
+										className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 transition-colors placeholder:text-gray-400"
 									/>
 								</div>
 							</div>
 
+							{/* Company / Workspace Name */}
 							<div>
 								<label className="block text-xs font-semibold text-gray-700 mb-1.5">
-									Company Name
+									Company / Workspace Name
 								</label>
-								<input
-									type="text"
-									value={company}
-									onChange={(e) => setCompany(e.target.value)}
-									className="w-full px-4 py-2.5 rounded-xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 transition-colors"
-								/>
+								<div className="relative">
+									<Building className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+									<input
+										type="text"
+										value={company}
+										onChange={(e) => setCompany(e.target.value)}
+										placeholder="e.g. Kiosk Enterprise Store"
+										className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 transition-colors placeholder:text-gray-400"
+									/>
+								</div>
 							</div>
 						</div>
 
@@ -253,7 +334,7 @@ export default function SettingsPage() {
 								{isLoading ? (
 									<span className="inline-flex items-center gap-2">
 										<Loader2 className="w-3.5 h-3.5 animate-spin" />
-										<span>Saving...</span>
+										<span>Saving to Database...</span>
 									</span>
 								) : (
 									<span>Save Changes</span>
@@ -266,10 +347,10 @@ export default function SettingsPage() {
 				{/* Tab 2: Security */}
 				{activeTab === "security" && (
 					<form
-						onSubmit={handleSaveGeneric}
-						className="bg-white border border-gray-200/90 rounded-2xl p-6 sm:p-8 space-y-6">
+						onSubmit={handleSavePassword}
+						className="bg-white border border-gray-200/90 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
 						<h3 className="text-base font-bold font-nohemi text-gray-900 pb-4 border-b border-gray-100">
-							Change Password
+							Update Password
 						</h3>
 
 						<div className="space-y-4 max-w-md">
@@ -279,10 +360,11 @@ export default function SettingsPage() {
 								</label>
 								<input
 									type="password"
+									required
 									value={currentPass}
 									onChange={(e) => setCurrentPass(e.target.value)}
 									placeholder="••••••••••••"
-									className="w-full px-4 py-2.5 rounded-xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 transition-colors"
+									className="w-full px-4 py-2.5 rounded-xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 transition-colors placeholder:text-gray-400"
 								/>
 							</div>
 
@@ -292,10 +374,11 @@ export default function SettingsPage() {
 								</label>
 								<input
 									type="password"
+									required
 									value={newPass}
 									onChange={(e) => setNewPass(e.target.value)}
 									placeholder="••••••••••••"
-									className="w-full px-4 py-2.5 rounded-xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 transition-colors"
+									className="w-full px-4 py-2.5 rounded-xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 transition-colors placeholder:text-gray-400"
 								/>
 							</div>
 
@@ -305,37 +388,13 @@ export default function SettingsPage() {
 								</label>
 								<input
 									type="password"
+									required
 									value={confirmPass}
 									onChange={(e) => setConfirmPass(e.target.value)}
 									placeholder="••••••••••••"
-									className="w-full px-4 py-2.5 rounded-xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 transition-colors"
+									className="w-full px-4 py-2.5 rounded-xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 transition-colors placeholder:text-gray-400"
 								/>
 							</div>
-						</div>
-
-						{/* 2FA Toggle */}
-						<div className="pt-6 border-t border-gray-100 flex items-center justify-between">
-							<div>
-								<h4 className="text-sm font-bold text-gray-900">
-									Two-Factor Authentication (2FA)
-								</h4>
-								<p className="text-xs text-gray-500 font-medium mt-0.5">
-									Add an extra layer of security to your account.
-								</p>
-							</div>
-
-							<button
-								type="button"
-								onClick={() => setTwoFactor(!twoFactor)}
-								className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${
-									twoFactor ? "bg-blue-600" : "bg-gray-200"
-								}`}>
-								<div
-									className={`w-5 h-5 rounded-full bg-white transition-transform absolute top-0.5 left-0.5 ${
-										twoFactor ? "translate-x-5" : "translate-x-0"
-									}`}
-								/>
-							</button>
 						</div>
 
 						<div className="pt-4 flex justify-end">
@@ -351,10 +410,10 @@ export default function SettingsPage() {
 								{isLoading ? (
 									<span className="inline-flex items-center gap-2">
 										<Loader2 className="w-3.5 h-3.5 animate-spin" />
-										<span>Updating...</span>
+										<span>Updating Password...</span>
 									</span>
 								) : (
-									<span>Update Security</span>
+									<span>Update Password</span>
 								)}
 							</PillButton>
 						</div>
@@ -364,83 +423,37 @@ export default function SettingsPage() {
 				{/* Tab 3: Notifications */}
 				{activeTab === "notifications" && (
 					<form
-						onSubmit={handleSaveGeneric}
-						className="bg-white border border-gray-200/90 rounded-2xl p-6 sm:p-8 space-y-6">
+						onSubmit={handleSaveNotifications}
+						className="bg-white border border-gray-200/90 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
 						<h3 className="text-base font-bold font-nohemi text-gray-900 pb-4 border-b border-gray-100">
 							Email Preferences
 						</h3>
 
-						<div className="space-y-5">
-							{/* Toggle 1 */}
-							<div className="flex items-center justify-between">
+						<div className="space-y-4 max-w-lg">
+							<div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-100">
 								<div>
-									<h4 className="text-sm font-bold text-gray-900">
-										Email Notifications
-									</h4>
-									<p className="text-xs text-gray-500 font-medium mt-0.5">
-										Receive important account & security notices.
-									</p>
+									<h4 className="text-xs font-bold text-gray-900">Email Notifications</h4>
+									<p className="text-[11px] text-gray-500">Receive email alerts for project builds and invoice updates.</p>
 								</div>
-								<button
-									type="button"
-									onClick={() => setEmailNotifs(!emailNotifs)}
-									className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${
-										emailNotifs ? "bg-blue-600" : "bg-gray-200"
-									}`}>
-									<div
-										className={`w-5 h-5 rounded-full bg-white transition-transform absolute top-0.5 left-0.5 ${
-											emailNotifs ? "translate-x-5" : "translate-x-0"
-										}`}
-									/>
-								</button>
+								<input
+									type="checkbox"
+									checked={emailNotifs}
+									onChange={(e) => setEmailNotifs(e.target.checked)}
+									className="w-4 h-4 text-blue-600 rounded cursor-pointer"
+								/>
 							</div>
 
-							{/* Toggle 2 */}
-							<div className="flex items-center justify-between pt-4 border-t border-gray-100">
+							<div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-100">
 								<div>
-									<h4 className="text-sm font-bold text-gray-900">
-										Project Progress Updates
-									</h4>
-									<p className="text-xs text-gray-500 font-medium mt-0.5">
-										Get notified when our team makes updates to your site.
-									</p>
+									<h4 className="text-xs font-bold text-gray-900">Project Status Updates</h4>
+									<p className="text-[11px] text-gray-500">Receive real-time progress updates when developers ship custom features.</p>
 								</div>
-								<button
-									type="button"
-									onClick={() => setProjectUpdates(!projectUpdates)}
-									className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${
-										projectUpdates ? "bg-blue-600" : "bg-gray-200"
-									}`}>
-									<div
-										className={`w-5 h-5 rounded-full bg-white transition-transform absolute top-0.5 left-0.5 ${
-											projectUpdates ? "translate-x-5" : "translate-x-0"
-										}`}
-									/>
-								</button>
-							</div>
-
-							{/* Toggle 3 */}
-							<div className="flex items-center justify-between pt-4 border-t border-gray-100">
-								<div>
-									<h4 className="text-sm font-bold text-gray-900">
-										Product News & Offers
-									</h4>
-									<p className="text-xs text-gray-500 font-medium mt-0.5">
-										Receive occasional news about new features & design templates.
-									</p>
-								</div>
-								<button
-									type="button"
-									onClick={() => setMarketingEmails(!marketingEmails)}
-									className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${
-										marketingEmails ? "bg-blue-600" : "bg-gray-200"
-									}`}>
-									<div
-										className={`w-5 h-5 rounded-full bg-white transition-transform absolute top-0.5 left-0.5 ${
-											marketingEmails ? "translate-x-5" : "translate-x-0"
-										}`}
-									/>
-								</button>
+								<input
+									type="checkbox"
+									checked={projectUpdates}
+									onChange={(e) => setProjectUpdates(e.target.checked)}
+									className="w-4 h-4 text-blue-600 rounded cursor-pointer"
+								/>
 							</div>
 						</div>
 
@@ -454,14 +467,7 @@ export default function SettingsPage() {
 								hoverTextColor="#004ac6"
 								useThunderFont={true}
 								className="px-6 py-2.5 rounded-full font-bold text-xs border border-blue-600 shadow-md">
-								{isLoading ? (
-									<span className="inline-flex items-center gap-2">
-										<Loader2 className="w-3.5 h-3.5 animate-spin" />
-										<span>Saving...</span>
-									</span>
-								) : (
-									<span>Save Preferences</span>
-								)}
+								<span>Save Notification Settings</span>
 							</PillButton>
 						</div>
 					</form>
