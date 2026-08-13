@@ -102,6 +102,35 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
 	const itemEntranceTweenRef = useRef<gsap.core.Tween | null>(null);
 
+	const [navVisible, setNavVisible] = useState(true);
+	const [scrolled, setScrolled] = useState(false);
+	const lastScrollY = useRef(0);
+
+	React.useEffect(() => {
+		const handleScroll = () => {
+			const currentScrollY = window.scrollY;
+
+			// Add frosted backdrop blur header bar when scrolled past 40px
+			if (currentScrollY > 40) {
+				setScrolled(true);
+			} else {
+				setScrolled(false);
+			}
+
+			// Auto-hide when scrolling down past 80px, show when scrolling up
+			if (currentScrollY > 80 && currentScrollY > lastScrollY.current) {
+				setNavVisible(false);
+			} else {
+				setNavVisible(true);
+			}
+
+			lastScrollY.current = currentScrollY;
+		};
+
+		window.addEventListener("scroll", handleScroll, { passive: true });
+		return () => window.removeEventListener("scroll", handleScroll);
+	}, []);
+
 	useLayoutEffect(() => {
 		setIsMounted(true);
 		const ctx = gsap.context(() => {
@@ -517,7 +546,15 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 				</div>
 
 				<header
-					className="staggered-menu-header absolute top-0 left-0 w-full flex items-center justify-between p-[2em] bg-transparent pointer-events-none z-20"
+					className={`staggered-menu-header fixed top-0 left-0 w-full flex items-center justify-between px-6 sm:px-10 py-4 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none z-30 ${
+						open || navVisible
+							? "translate-y-0 opacity-100"
+							: "-translate-y-full opacity-0"
+					} ${
+						scrolled && !open
+							? "bg-white/85 backdrop-blur-md border-b border-gray-200/60 shadow-2xs py-3.5"
+							: "bg-transparent py-5"
+					}`}
 					aria-label="Main navigation header">
 					<Link
 						href="/"
@@ -679,7 +716,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
 			<style>{`
 .sm-scope .staggered-menu-wrapper { position: relative; width: 100%; height: 100%; z-index: 40; pointer-events: none; }
-.sm-scope .staggered-menu-header { position: absolute; top: 0; left: 0; width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 2em; background: transparent; pointer-events: none; z-index: 20; }
+.sm-scope .staggered-menu-header { position: fixed; top: 0; left: 0; width: 100%; display: flex; align-items: center; justify-content: space-between; pointer-events: none; z-index: 30; }
 .sm-scope .staggered-menu-header > * { pointer-events: auto; }
 .sm-scope .sm-logo { display: flex; align-items: center; user-select: none; }
 .sm-scope .sm-logo-img { display: block; height: 32px; width: auto; object-fit: contain; }
