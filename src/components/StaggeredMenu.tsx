@@ -546,14 +546,14 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 				</div>
 
 				<header
-					className={`staggered-menu-header fixed top-0 left-0 w-full flex items-center justify-between px-6 sm:px-10 py-4 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none z-30 ${
+					className={`staggered-menu-header fixed top-0 left-0 w-full flex items-center justify-between px-4 sm:px-10 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none z-30 ${
 						open || navVisible
 							? "translate-y-0 opacity-100"
 							: "-translate-y-full opacity-0"
 					} ${
 						scrolled && !open
-							? "bg-white/85 backdrop-blur-md border-b border-gray-200/60 shadow-2xs py-3.5"
-							: "bg-transparent py-5"
+							? "bg-white/90 backdrop-blur-md border-b border-gray-200/60 shadow-2xs py-2.5 sm:py-3.5"
+							: "bg-transparent py-3.5 sm:py-5"
 					}`}
 					aria-label="Main navigation header">
 					<Link
@@ -767,7 +767,6 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 @media (max-width: 1024px) { .sm-scope .staggered-menu-panel { width: 100%; } .sm-scope .sm-prelayers { width: 100%; } .sm-scope .staggered-menu-wrapper[data-open] .sm-logo-img { filter: invert(100%); } }
 @media (max-width: 640px) { 
   .sm-scope .staggered-menu-panel { width: 100%; padding: 5em 1.5em 1.5em 1.5em; } 
-  .sm-scope .staggered-menu-header { padding: 1.5em; }
   .sm-scope .sm-prelayers { width: 100%; } 
   .sm-scope .staggered-menu-wrapper[data-open] .sm-logo-img { filter: invert(100%); } 
   .sm-scope .sm-panel-item { font-size: 2.5rem; }
