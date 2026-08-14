@@ -107,8 +107,8 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 	React.useEffect(() => {
 		const handleScroll = () => {
 			const currentScrollY = window.scrollY;
-			// Only show staggered menu header when at the very top of the hero page
-			if (currentScrollY <= 20) {
+			// Only show staggered menu header when at the hero section top
+			if (currentScrollY <= 80) {
 				setAtTop(true);
 			} else {
 				setAtTop(false);
@@ -537,7 +537,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 				</div>
 
 				<header
-					className={`staggered-menu-header fixed top-0 left-0 w-full flex items-center justify-between px-4 sm:px-10 py-3.5 sm:py-5 bg-transparent transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] z-30 ${
+					className={`staggered-menu-header fixed top-0 left-0 w-full flex items-center justify-between px-4 sm:px-10 py-3.5 sm:py-5 bg-transparent transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] z-[1001] ${
 						open || atTop
 							? "translate-y-0 opacity-100 pointer-events-auto"
 							: "-translate-y-full opacity-0 pointer-events-none"
@@ -548,15 +548,15 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 						className="sm-logo flex items-center gap-2 select-none pointer-events-auto group"
 						aria-label="Kiosk Home">
 						<span className="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block transition-transform group-hover:scale-125" />
-						<span className="sm-logo-text block h-8 align-middle font-nohemi font-bold text-xl tracking-tight text-[#0a0a0a]">
+						<span className="sm-logo-text block h-8 align-middle font-nohemi font-bold text-xl tracking-tight text-slate-900">
 							Kiosk
 						</span>
 					</Link>
 
 					<button
 						ref={toggleBtnRef}
-						className={`sm-toggle relative inline-flex items-center gap-[0.3rem] bg-transparent border-0 cursor-pointer font-medium leading-none overflow-visible pointer-events-auto ${
-							open ? "text-black" : "text-[#e9e9ef]"
+						className={`sm-toggle relative inline-flex items-center gap-2 bg-transparent border-0 cursor-pointer font-bold text-slate-900 leading-none overflow-visible pointer-events-auto transition-colors ${
+							open ? "text-slate-900" : "text-slate-900"
 						}`}
 						aria-label={open ? "Close menu" : "Open menu"}
 						aria-expanded={open}
@@ -566,11 +566,11 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 						{showMenuText && (
 							<span
 								ref={textWrapRef}
-								className="sm-toggle-textWrap relative inline-block h-[1em] overflow-hidden whitespace-nowrap w-[var(--sm-toggle-width,auto)] min-w-[var(--sm-toggle-width,auto)]"
+								className="sm-toggle-textWrap relative inline-block h-[1em] overflow-hidden whitespace-nowrap w-[var(--sm-toggle-width,auto)] min-w-[var(--sm-toggle-width,auto)] text-slate-900"
 								aria-hidden="true">
 								<span
 									ref={textInnerRef}
-									className="sm-toggle-textInner flex flex-col leading-none">
+									className="sm-toggle-textInner flex flex-col leading-none text-slate-900 font-bold">
 									{textLines.map((l, i) => (
 										<span
 											className="sm-toggle-line block h-[1em] leading-none"
@@ -584,18 +584,20 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
 						<span
 							ref={iconRef}
-							className="sm-icon relative w-[40px] h-[40px] shrink-0 inline-flex items-center justify-center [will-change:transform]"
+							className="sm-icon relative w-10 h-10 shrink-0 inline-flex items-center justify-center text-slate-900 [will-change:transform]"
 							aria-hidden="true">
 							{/* React icon glyph (menu / close) from lucide-react */}
-							<span className="sm-icon-glyph inline-flex items-center justify-center">
+							<span className="sm-icon-glyph inline-flex items-center justify-center text-slate-900">
 								{open ? (
 									<IconX
-										size={40}
+										size={28}
+										className="text-slate-900"
 										aria-hidden
 									/>
 								) : (
 									<IconMenu
-										size={40}
+										size={28}
+										className="text-slate-900"
 										aria-hidden
 									/>
 								)}
@@ -607,7 +609,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 				<aside
 					id="staggered-menu-panel"
 					ref={panelRef}
-					className={`staggered-menu-panel absolute top-0 right-0 h-full bg-white flex flex-col p-[6em_2em_2em_2em] overflow-y-auto z-10 backdrop-blur-[12px] pointer-events-auto ${!isMounted ? "invisible" : ""}`}
+					className={`staggered-menu-panel absolute top-0 right-0 h-full w-full sm:w-[480px] max-w-full bg-white flex flex-col p-16 sm:p-[6em_2em_2em_2em] overflow-y-auto z-10 backdrop-blur-[12px] pointer-events-auto ${!isMounted ? "invisible" : ""}`}
 					style={{ WebkitBackdropFilter: "blur(12px)" }}
 					aria-hidden={!open}>
 					<div className="sm-panel-inner flex-1 flex flex-col gap-5">
@@ -621,7 +623,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 										className="sm-panel-itemWrap relative overflow-hidden leading-none"
 										key={it.label + idx}>
 										<a
-											className="sm-panel-item relative text-black font-semibold text-[4rem] cursor-pointer leading-none tracking-[-2px] uppercase transition-[background,color] duration-150 ease-linear inline-block no-underline pr-[1.4em]"
+											className="sm-panel-item relative text-black font-semibold text-[2.2rem] xs:text-[2.8rem] sm:text-[3.6rem] md:text-[4rem] cursor-pointer leading-none tracking-[-2px] uppercase transition-[background,color] duration-150 ease-linear inline-block no-underline pr-[1em] max-w-full"
 											href={it.link}
 											onClick={closeMenu}
 											aria-label={it.ariaLabel}
@@ -636,7 +638,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 								<li
 									className="sm-panel-itemWrap relative overflow-hidden leading-none"
 									aria-hidden="true">
-									<span className="sm-panel-item relative text-black font-semibold text-[4rem] cursor-pointer leading-none tracking-[-2px] uppercase transition-[background,color] duration-150 ease-linear inline-block no-underline pr-[1.4em]">
+									<span className="sm-panel-item relative text-black font-semibold text-[2.2rem] xs:text-[2.8rem] sm:text-[3.6rem] md:text-[4rem] cursor-pointer leading-none tracking-[-2px] uppercase transition-[background,color] duration-150 ease-linear inline-block no-underline pr-[1em]">
 										<span className="sm-panel-itemLabel inline-block [transform-origin:50%_100%] will-change-transform">
 											No items
 										</span>
