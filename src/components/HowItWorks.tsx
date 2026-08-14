@@ -84,8 +84,9 @@ export default function HowItWorks() {
 				color: "var(--paper)",
 				position: "relative",
 				padding: "0",
+				overflow: "hidden",
 			}}>
-			<div style={{ position: "relative", margin: "0 -10px" }}>
+			<div style={{ position: "relative", margin: "0" }}>
 				<ScrollStack
 					useWindowScroll={true}
 					itemDistance={80}

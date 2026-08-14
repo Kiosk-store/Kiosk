@@ -89,7 +89,7 @@ export default function SalesFunnelTemplate() {
 								<span>Access Blueprint & Watch Video →</span>
 							</button>
 						</div>
-					</div>7
+					</div>
 				)}
 
 				{step === "vsl" && (

@@ -112,12 +112,12 @@ export default function Hero() {
 					</div>
 
 					{/* Metrics */}
-					<div className="pt-8 border-t-2 border-gray-200 flex flex-wrap justify-center lg:justify-start items-center gap-8 text-gray-600">
+					<div className="pt-8 border-t-2 border-gray-200 flex flex-wrap justify-center lg:justify-start items-center gap-6 sm:gap-8 text-gray-600">
 						<div className="flex items-center gap-3">
 							<div
-								className="w-10 h-10 border-2 border-blue-600 flex items-center justify-center text-blue-600 font-bold shrink-0 rounded-full"
-								aria-hidden="true"
-							/>
+								className="w-10 h-10 border-2 border-blue-600 bg-blue-50 flex items-center justify-center text-blue-600 font-bold shrink-0 rounded-full shadow-xs">
+								<Clock className="w-5 h-5" />
+							</div>
 							<div className="text-left">
 								<p className="text-sm font-bold text-gray-900">3-5 Days</p>
 								<p className="text-xs text-gray-500 font-medium">
@@ -128,9 +128,9 @@ export default function Hero() {
 
 						<div className="flex items-center gap-3">
 							<div
-								className="w-10 h-10 border-2 border-blue-600 flex items-center justify-center text-blue-600 font-bold shrink-0 rounded-full"
-								aria-hidden="true"
-							/>
+								className="w-10 h-10 border-2 border-blue-600 bg-blue-50 flex items-center justify-center text-blue-600 font-bold shrink-0 rounded-full shadow-xs">
+								<ShieldCheck className="w-5 h-5" />
+							</div>
 							<div className="text-left">
 								<p className="text-sm font-bold text-gray-900">100% Yours</p>
 								<p className="text-xs text-gray-500 font-medium">
@@ -142,22 +142,22 @@ export default function Hero() {
 				</div>
 
 				{/* Right Column - Preview Card */}
-				<div className="lg:col-span-5 relative">
-					<div className="absolute -top-4 -right-4 w-24 h-24 border-2 border-blue-200 bg-blue-50 rounded-full" />
-					<div className="absolute -bottom-4 -left-4 w-16 h-16 border-2 border-blue-100 bg-white rounded-full" />
+				<div className="lg:col-span-5 relative mt-8 lg:mt-0">
+					<div className="absolute -top-4 -right-4 w-20 sm:w-24 h-20 sm:h-24 border-2 border-blue-200 bg-blue-50 rounded-full" />
+					<div className="absolute -bottom-4 -left-4 w-14 sm:w-16 h-14 sm:h-16 border-2 border-blue-100 bg-white rounded-full" />
 
-					<div className="relative border-2 border-gray-200 bg-white rounded-2xl overflow-hidden">
-						<div className="bg-gray-50 px-4 py-3 flex items-center justify-between border-b-2 border-gray-200">
-							<div className="flex items-center gap-2">
-								<div className="w-3 h-3 border border-red-400 bg-red-400 rounded-full" />
-								<div className="w-3 h-3 border border-yellow-400 bg-yellow-400 rounded-full" />
-								<div className="w-3 h-3 border border-green-400 bg-green-400 rounded-full" />
+					<div className="relative border-2 border-gray-200 bg-white rounded-2xl overflow-hidden shadow-xl">
+						<div className="bg-gray-50 px-3 sm:px-4 py-3 flex items-center justify-between border-b-2 border-gray-200 gap-2">
+							<div className="flex items-center gap-1.5 shrink-0">
+								<div className="w-2.5 h-2.5 border border-red-400 bg-red-400 rounded-full" />
+								<div className="w-2.5 h-2.5 border border-yellow-400 bg-yellow-400 rounded-full" />
+								<div className="w-2.5 h-2.5 border border-green-400 bg-green-400 rounded-full" />
 							</div>
-							<div className="bg-white px-3.5 py-1 border border-gray-300 text-[11px] text-gray-600 font-mono flex items-center gap-1.5 rounded-full">
-								<span className="w-2 h-2 border border-emerald-500 bg-emerald-500 rounded-full" />
-								<span>kiosk.design/bakery-preview</span>
+							<div className="bg-white px-2.5 sm:px-3.5 py-1 border border-gray-300 text-[10px] sm:text-[11px] text-gray-600 font-mono flex items-center gap-1.5 rounded-full truncate max-w-[200px] sm:max-w-none">
+								<span className="w-2 h-2 border border-emerald-500 bg-emerald-500 rounded-full shrink-0" />
+								<span className="truncate">mybusiness.kioosk.online</span>
 							</div>
-							<span className="text-sm text-gray-400">Secure</span>
+							<span className="text-xs text-gray-400 hidden sm:inline">Secure</span>
 						</div>
 
 						<div className="aspect-[4/3] relative bg-gray-100">
@@ -171,16 +171,18 @@ export default function Hero() {
 							/>
 						</div>
 
-						<div className="absolute -bottom-5 -left-5 bg-white p-4 border-2 border-gray-200 flex items-center gap-3 rounded-2xl">
+						<div className="absolute bottom-3 left-3 sm:-bottom-5 sm:-left-5 bg-white/95 backdrop-blur-xs p-3 sm:p-4 border-2 border-gray-200 flex items-center gap-3 rounded-2xl shadow-lg max-w-[calc(100%-1.5rem)]">
 							<div
-								className="w-10 h-10 border-2 border-emerald-500 bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0 rounded-full"
-								aria-hidden="true"
-							/>
+								className="w-8 sm:w-10 h-8 sm:h-10 border-2 border-emerald-500 bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0 rounded-full">
+								<CheckCircle2 className="w-4 sm:w-5 h-4 sm:h-5" />
+							</div>
 							<div>
 								<p className="text-xs text-gray-500 font-medium">
-									Conversion Boost
+									Status: <span className="font-bold text-gray-900">Live & Published</span>
 								</p>
-								<p className="text-sm font-bold text-gray-900">+310% Leads</p>
+								<p className="text-[10px] sm:text-xs font-bold text-blue-600">
+									Turnkey Website Ready
+								</p>
 							</div>
 						</div>
 					</div>
