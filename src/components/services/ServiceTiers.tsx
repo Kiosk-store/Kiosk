@@ -89,7 +89,7 @@ const TIERS = [
 		features: [
 			"Complete product catalogue setup",
 			"Slide-out cart drawer & checkout",
-			"Stripe & Paystack payment integration",
+			"Card, bank transfer & mobile money integration",
 			"Order email notifications",
 			"Basic inventory tracking",
 			"Product search & category tags",

@@ -63,7 +63,7 @@ export class SiteTemplateFactory {
 					features: [
 						"Product Inventory Management",
 						"Shopping Cart",
-						"Stripe / Paystack Payment Gateway",
+						"Card & Bank Transfer Payment Gateway",
 						"Order Confirmation System",
 					],
 					deliveryWindow: "7-10 days",

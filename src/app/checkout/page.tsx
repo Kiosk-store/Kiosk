@@ -84,7 +84,7 @@ const PLAN_DATA: Record<string, PlanDetails> = {
 		features: [
 			"Full catalog setup & product variations",
 			"Cart drawer & instant checkout flow",
-			"Bachs, Stripe & Paystack gateways",
+			"Card, bank transfer & mobile money gateways",
 			"Automated order emails & inventory tracking",
 		],
 	},
@@ -185,7 +185,7 @@ function CheckoutContent() {
 
 				<div className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
 					<Lock className="w-3.5 h-3.5 text-emerald-600" />
-					<span>Secure Bachs.io Payment</span>
+					<span>Secure Flutterwave Payment</span>
 				</div>
 			</div>
 
@@ -306,7 +306,7 @@ function CheckoutContent() {
 							{isProcessing ? (
 								<span className="inline-flex items-center gap-2 justify-center">
 									<Loader2 className="w-4 h-4 animate-spin" />
-									<span>Connecting to Bachs.io...</span>
+									<span>Connecting to Flutterwave...</span>
 								</span>
 							) : (
 								<span>Proceed to Payment →</span>

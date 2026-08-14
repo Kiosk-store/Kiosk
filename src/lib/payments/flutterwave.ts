@@ -11,17 +11,19 @@
  */
 
 const FLUTTERWAVE_SECRET_KEY = process.env.FLUTTERWAVE_SECRET_KEY || "";
+const FLUTTERWAVE_SECRET_HASH = process.env.FLUTTERWAVE_SECRET_HASH || "";
 const FLUTTERWAVE_BASE_URL = "https://api.flutterwave.com/v3";
 
 export interface InitializePaymentInput {
 	amount: number;
-	currency: "USD" | "NGN" | "GHS" | "KES";
+	currency: string;
 	email: string;
 	name: string;
 	tx_ref: string;
 	redirect_url: string;
-	title: string;
-	description: string;
+	payment_plan?: string;
+	title?: string;
+	description?: string;
 	meta?: Record<string, any>;
 }
 
@@ -31,6 +33,18 @@ export interface InitializePaymentResponse {
 	data?: {
 		link: string;
 	};
+}
+
+/**
+ * Verifies the incoming Flutterwave webhook signature hash header (`verif-hash`).
+ */
+export function verifyFlutterwaveWebhookHash(verifHashHeader: string): boolean {
+	const secretHash = FLUTTERWAVE_SECRET_HASH || FLUTTERWAVE_SECRET_KEY;
+	if (!secretHash) {
+		console.warn("[FLUTTERWAVE_WEBHOOK] No FLUTTERWAVE_SECRET_HASH set — skipping signature check");
+		return true;
+	}
+	return verifHashHeader === secretHash;
 }
 
 /**
@@ -48,28 +62,34 @@ export async function initializeFlutterwavePayment(
 	}
 
 	try {
+		const payload: Record<string, any> = {
+			tx_ref: input.tx_ref,
+			amount: input.amount,
+			currency: input.currency.toUpperCase(),
+			redirect_url: input.redirect_url,
+			customer: {
+				email: input.email,
+				name: input.name,
+			},
+			customizations: {
+				title: input.title || "Kiosk Plan Subscription",
+				description: input.description || "Subscription payment for Kiosk service plan",
+				logo: "https://kioosk.online/logo.png",
+			},
+			meta: input.meta,
+		};
+
+		if (input.payment_plan) {
+			payload.payment_plan = input.payment_plan;
+		}
+
 		const response = await fetch(`${FLUTTERWAVE_BASE_URL}/payments`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
 				Authorization: `Bearer ${FLUTTERWAVE_SECRET_KEY}`,
 			},
-			body: JSON.stringify({
-				tx_ref: input.tx_ref,
-				amount: input.amount,
-				currency: input.currency,
-				redirect_url: input.redirect_url,
-				customer: {
-					email: input.email,
-					name: input.name,
-				},
-				customizations: {
-					title: input.title,
-					description: input.description,
-					logo: "https://kioosk.online/logo.png",
-				},
-				meta: input.meta,
-			}),
+			body: JSON.stringify(payload),
 		});
 
 		const result: InitializePaymentResponse = await response.json();
@@ -101,7 +121,7 @@ export async function initializeFlutterwavePayment(
 export async function verifyFlutterwaveTransaction(transactionId: string) {
 	if (!FLUTTERWAVE_SECRET_KEY) {
 		return {
-			status: "success",
+			status: "successful",
 			amount: 30,
 			currency: "USD",
 			tx_ref: `dev_tx_${transactionId}`,
@@ -126,3 +146,4 @@ export async function verifyFlutterwaveTransaction(transactionId: string) {
 		return null;
 	}
 }
+

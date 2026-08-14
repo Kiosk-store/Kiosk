@@ -98,7 +98,7 @@ export default function TermsOfServicePage() {
 					</h2>
 					<ul className="list-disc pl-6 space-y-2 text-slate-700">
 						<li>
-							<strong className="text-slate-900">Recurring Billing:</strong> Subscriptions are billed automatically on a monthly or annual recurring basis via our payment processors (Stripe / Paystack).
+							<strong className="text-slate-900">Recurring Billing:</strong> Subscriptions are billed automatically on a monthly or annual recurring basis via our payment processors (Paystack / Flutterwave).
 						</li>
 						<li>
 							<strong className="text-slate-900">30-Day Money-Back Guarantee:</strong> If you are dissatisfied with your site build during the first 30 days of subscription, you may request a 100% full refund with no cancellation fees.

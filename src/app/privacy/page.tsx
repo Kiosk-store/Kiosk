@@ -80,7 +80,7 @@ export default function PrivacyPolicyPage() {
 							<strong className="text-slate-900">Business Assets & Content:</strong> Business logos, product catalogues, WhatsApp contact numbers, images, copy, and custom domain names submitted for website construction.
 						</li>
 						<li>
-							<strong className="text-slate-900">Payment & Billing Data:</strong> Payment card details and transaction history processed through secure PCI-compliant third-party gateways (Stripe and Paystack). Kiosk does not store raw credit card numbers on our servers.
+							<strong className="text-slate-900">Payment & Billing Data:</strong> Payment card details and transaction history processed through secure PCI-compliant third-party gateways (Paystack and Flutterwave). Kiosk does not store raw credit card numbers on our servers.
 						</li>
 						<li>
 							<strong className="text-slate-900">Technical & Usage Logs:</strong> IP address, browser type, device descriptors, operating system, and page usage telemetry collected automatically via essential cookies and analytics tools.
@@ -143,7 +143,7 @@ export default function PrivacyPolicyPage() {
 							<strong className="text-slate-900">Cloud Infrastructure & Hosting:</strong> Vercel Inc. and Neon PostgreSQL Database for serverless hosting and data storage.
 						</li>
 						<li>
-							<strong className="text-slate-900">Payment Processing:</strong> Stripe and Paystack for processing recurring subscription billing.
+							<strong className="text-slate-900">Payment Processing:</strong> Paystack and Flutterwave for processing subscription billing and transactions.
 						</li>
 						<li>
 							<strong className="text-slate-900">Transactional Email Delivery:</strong> Resend for automated transactional system emails.

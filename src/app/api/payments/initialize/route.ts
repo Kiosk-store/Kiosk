@@ -5,7 +5,7 @@ import { z } from "zod";
 import { getAuthenticatedUser } from "@/lib/auth/session";
 import { auth } from "@/auth";
 import { checkRateLimit, redis } from "@/lib/ratelimit";
-import { initializeBachsPayment } from "@/lib/payments/bachs";
+import { initializeFlutterwavePayment } from "@/lib/payments/flutterwave";
 import { BASE_PRICES_USD, CURRENCIES, PlanKey } from "@/lib/currency";
 
 const initializeSchema = z.object({
@@ -21,7 +21,7 @@ const PLAN_MAP: Record<string, PlanKey> = {
 };
 
 /**
- * POST /api/payments/initialize - Initializes a Bachs.io checkout session with Idempotency Double-Charge Protection
+ * POST /api/payments/initialize - Initializes a Flutterwave checkout session with Idempotency Double-Charge Protection
  */
 export async function POST(request: Request) {
 	try {
@@ -79,17 +79,31 @@ export async function POST(request: Request) {
 		const tx_ref = `kiosk_tx_${crypto.randomUUID()}`;
 		const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
-		const paymentResult = await initializeBachsPayment({
+		const planIdKey = `${plan}_${billingCycle.toUpperCase()}`;
+		const planIdMap: Record<string, string | undefined> = {
+			LANDING_PAGE_MONTHLY: process.env.FLUTTERWAVE_PLAN_ID_LANDING_MONTHLY,
+			LANDING_PAGE_YEARLY: process.env.FLUTTERWAVE_PLAN_ID_LANDING_YEARLY,
+			SALES_FUNNEL_MONTHLY: process.env.FLUTTERWAVE_PLAN_ID_FUNNEL_MONTHLY,
+			SALES_FUNNEL_YEARLY: process.env.FLUTTERWAVE_PLAN_ID_FUNNEL_YEARLY,
+			E_COMMERCE_MONTHLY: process.env.FLUTTERWAVE_PLAN_ID_STORE_MONTHLY,
+			E_COMMERCE_YEARLY: process.env.FLUTTERWAVE_PLAN_ID_STORE_YEARLY,
+		};
+		const payment_plan = planIdMap[planIdKey];
+
+		const paymentResult = await initializeFlutterwavePayment({
 			amount,
-			usdAmount: baseUsdAmount,
 			currency: targetCurrency.code,
 			email: userEmail,
 			name: userName,
 			tx_ref,
 			redirect_url: `${appUrl}/dashboard/content?payment=complete&plan=${plan}`,
+			payment_plan,
+			title: `Kiosk ${planKey.toUpperCase()} Plan`,
+			description: `Subscription payment for Kiosk ${planKey} plan (${billingCycle})`,
 			meta: {
 				userId,
 				plan,
+				billingCycle,
 			},
 		});
 
@@ -106,7 +120,7 @@ export async function POST(request: Request) {
 			tx_ref,
 		});
 	} catch (err) {
-		console.error("[INITIALIZE_BACHS_PAYMENT_ERROR]", err);
+		console.error("[INITIALIZE_FLUTTERWAVE_PAYMENT_ERROR]", err);
 		return NextResponse.json(
 			{ error: "Failed to initialize payment process" },
 			{ status: 500 },

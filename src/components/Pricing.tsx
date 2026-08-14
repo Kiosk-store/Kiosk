@@ -78,7 +78,7 @@ const tiers: PricingTier[] = [
 		description: "Complete online storefront with seamless checkout, payment processing, and inventory management.",
 		features: [
 			"Full product catalog & variation management",
-			"Stripe, Apple Pay & PayPal payment gateways",
+			"Card, bank transfer & mobile money payments",
 			"Automated customer order confirmation emails",
 			"Dedicated store launch & owner onboarding",
 		],
