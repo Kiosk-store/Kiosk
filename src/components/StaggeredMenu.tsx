@@ -537,7 +537,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 				</div>
 
 				<header
-					className={`staggered-menu-header fixed top-0 left-0 w-full flex items-center justify-between px-4 sm:px-10 py-3.5 sm:py-5 bg-transparent transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] z-[1001] ${
+					className={`staggered-menu-header fixed top-0 left-0 right-0 max-w-[100vw] box-border flex items-center justify-between px-4 sm:px-10 py-3.5 sm:py-5 bg-transparent transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] z-[1001] ${
 						open || atTop
 							? "translate-y-0 opacity-100 pointer-events-auto"
 							: "-translate-y-full opacity-0 pointer-events-none"

@@ -45,34 +45,9 @@ const steps = [
 ];
 
 export default function HowItWorks() {
-	// Setup per-card scroll-triggered reveal animations
+	// Component mount effect
 	useEffect(() => {
-		if (typeof window === "undefined") return;
-		gsap.registerPlugin(ScrollTrigger);
-
-		const els = document.querySelectorAll(".howit-card");
-		els.forEach((el) => {
-			gsap.fromTo(
-				el,
-				{ y: 40, opacity: 0 },
-				{
-					y: 0,
-					opacity: 1,
-					duration: 0.8,
-					ease: "power3.out",
-					scrollTrigger: {
-						trigger: el,
-						start: "top 85%",
-						toggleActions: "play none none reverse",
-					},
-				},
-			);
-		});
-
-		return () => {
-			// cleanup ScrollTrigger instances when unmounting
-			ScrollTrigger.getAll().forEach((t) => t.kill());
-		};
+		// Ensures clean card rendering
 	}, []);
 
 	return (
