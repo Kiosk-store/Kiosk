@@ -2,9 +2,10 @@
 
 const footerLinks = {
 	company: [
-		{ label: "About Us", href: "#about" },
-		{ label: "Portfolio", href: "#portfolio" },
-		{ label: "Pricing", href: "#pricing" },
+		{ label: "Services", href: "/services" },
+		{ label: "About Us", href: "/#about" },
+		{ label: "Portfolio", href: "/#portfolio" },
+		{ label: "Pricing", href: "/#pricing" },
 	],
 	legal: [
 		{ label: "Privacy Policy", href: "/privacy" },

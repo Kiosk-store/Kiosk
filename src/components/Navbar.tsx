@@ -16,7 +16,7 @@ import BackToTop from "./BackToTop";
 import { useAuth } from "@/context/AuthContext";
 
 const navItems = [
-	{ label: "Services", href: "/#services-tiers" },
+	{ label: "Services", href: "/services" },
 	{ label: "Pricing", href: "/#pricing" },
 	{ label: "Portfolio", href: "/#portfolio" },
 	{ label: "FAQ", href: "/#faq" },
