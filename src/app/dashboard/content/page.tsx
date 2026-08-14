@@ -389,10 +389,10 @@ function ContentForm() {
 								Tailored form fields generated for your active plan:{" "}
 								<span className="font-bold text-blue-600">
 									{activePlan === "LANDING_PAGE"
-										? "Landing Page ($20/mo)"
+										? "Landing Page ($15/mo)"
 										: activePlan === "SALES_FUNNEL"
 										? "Sales Funnel ($30/mo)"
-										: "E-commerce Store ($43/mo)"}
+										: "E-commerce Store ($50/mo)"}
 								</span>
 							</p>
 						</div>

@@ -138,9 +138,9 @@ export const COUNTRY_TO_CURRENCY: Record<string, string> = {
  * Yearly is monthly × 12 × 0.8 (20% discount).
  */
 export const BASE_PRICES_USD = {
-	landing: { monthly: 20, yearly: 192 },
+	landing: { monthly: 15, yearly: 144 },
 	funnel: { monthly: 30, yearly: 288 },
-	store: { monthly: 43, yearly: 408 },
+	store: { monthly: 50, yearly: 480 },
 } as const;
 
 export type PlanKey = keyof typeof BASE_PRICES_USD;

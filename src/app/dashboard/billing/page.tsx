@@ -23,8 +23,8 @@ const plans: Plan[] = [
 		id: "landing-page",
 		name: "Landing Page",
 		description: "Custom single-page website engineered for rapid lead generation.",
-		monthlyPrice: "$20",
-		yearlyPrice: "$192",
+		monthlyPrice: "$15",
+		yearlyPrice: "$144",
 		features: [
 			"Single page custom website",
 			"Delivered in 3-5 days",
@@ -41,7 +41,7 @@ const plans: Plan[] = [
 		popular: true,
 		features: [
 			"Up to 5 custom conversion pages",
-			"Delivered in 5-7 days",
+			"Delivered in 3-5 days",
 			"CRM & lead capture integration",
 			"Priority support & analytics",
 		],
@@ -50,12 +50,12 @@ const plans: Plan[] = [
 		id: "ecommerce-store",
 		name: "E-commerce Store",
 		description: "Complete online storefront with checkout & inventory management.",
-		monthlyPrice: "$43",
-		yearlyPrice: "$408",
+		monthlyPrice: "$50",
+		yearlyPrice: "$480",
 		features: [
 			"Full product catalog setup",
-			"Delivered in 7-10 days",
-			"Stripe & PayPal payment gateway",
+			"Delivered in 3-5 days",
+			"Stripe & Paystack payment gateway",
 			"Dedicated onboarding walkthrough",
 		],
 	},
@@ -73,7 +73,7 @@ const mockInvoices: Invoice[] = [
 	{
 		id: "INV-2026-001",
 		date: "Aug 10, 2026",
-		amount: "$20.00",
+		amount: "$15.00",
 		status: "Paid",
 		plan: "Landing Page",
 	},
@@ -87,8 +87,8 @@ const PLAN_INFO_MAP: Record<string, { title: string; price: string; desc: string
 	},
 	LANDING_PAGE: {
 		title: "Landing Page Plan",
-		price: "$20/mo",
-		desc: "You are currently on the Landing Page subscription ($20/mo). Add a Sales Funnel or E-commerce Store to your account anytime.",
+		price: "$15/mo",
+		desc: "You are currently on the Landing Page subscription ($15/mo). Add a Sales Funnel or E-commerce Store to your account anytime.",
 	},
 	SALES_FUNNEL: {
 		title: "Sales Funnel Plan",
@@ -97,8 +97,8 @@ const PLAN_INFO_MAP: Record<string, { title: string; price: string; desc: string
 	},
 	E_COMMERCE: {
 		title: "E-commerce Store Plan",
-		price: "$43/mo",
-		desc: "You are currently on the E-commerce Store subscription ($43/mo). Enjoy full online store and product catalog features.",
+		price: "$50/mo",
+		desc: "You are currently on the E-commerce Store subscription ($50/mo). Enjoy full online store and product catalog features.",
 	},
 };
 

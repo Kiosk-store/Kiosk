@@ -121,7 +121,7 @@ function NewProjectForm() {
 								{
 									id: "Landing Page",
 									title: "Landing Page",
-									price: "$20/mo",
+									price: "$15/mo",
 									desc: "Single page lead generation & hero presentation.",
 									icon: Globe,
 								},
@@ -135,7 +135,7 @@ function NewProjectForm() {
 								{
 									id: "E-commerce",
 									title: "E-commerce Store",
-									price: "$43/mo",
+									price: "$50/mo",
 									desc: "Full product catalog & payment gateway integration.",
 									icon: ShoppingBag,
 								},

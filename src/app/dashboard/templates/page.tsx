@@ -43,7 +43,7 @@ const templates: Template[] = [
 		name: "Neo-SaaS Minimalist",
 		category: "Landing Page",
 		style: "Minimalist",
-		price: "$20",
+		price: "$15",
 		delivery: "3-5 Days",
 		description:
 			"Engineered for modern software tools, featuring crisp hero sections and feature grids.",
@@ -87,7 +87,7 @@ const templates: Template[] = [
 		name: "Cyberpunk Apparel & Gear",
 		category: "E-commerce Store",
 		style: "Bold",
-		price: "$43",
+		price: "$50",
 		delivery: "7-10 Days",
 		description:
 			"High-contrast dark aesthetic tailored for streetwear brands and gaming merchandise.",
@@ -109,7 +109,7 @@ const templates: Template[] = [
 		name: "Artisan Roastery & Bakery",
 		category: "Landing Page",
 		style: "Minimalist",
-		price: "$20",
+		price: "$15",
 		delivery: "3-5 Days",
 		description:
 			"Warm organic tones showcasing craft coffee, daily menus, and store locator.",
@@ -153,7 +153,7 @@ const templates: Template[] = [
 		name: "Apex Venture Capital",
 		category: "Landing Page",
 		style: "Corporate",
-		price: "$20",
+		price: "$15",
 		delivery: "3-5 Days",
 		description:
 			"Trustworthy corporate layout tailored for financial advisors, funds, and consultants.",
@@ -197,7 +197,7 @@ const templates: Template[] = [
 		name: "Minimalist Design Studio",
 		category: "Landing Page",
 		style: "Minimalist",
-		price: "$20",
+		price: "$15",
 		delivery: "3-5 Days",
 		description:
 			"Editorial grid layout for creative agencies, interior designers, and architects.",
@@ -219,7 +219,7 @@ const templates: Template[] = [
 		name: "Velvet Beauty & Skincare",
 		category: "E-commerce Store",
 		style: "Luxury",
-		price: "$43",
+		price: "$50",
 		delivery: "7-10 Days",
 		description:
 			"Soft pastel elegance designed for skincare products, cosmetics, and wellness stores.",
