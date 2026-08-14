@@ -4,6 +4,7 @@
 
 import Image from "next/image";
 import PillButton from "./PillButton";
+import { Clock, ShieldCheck, CheckCircle2 } from "lucide-react";
 
 export default function Hero() {
 	return (
