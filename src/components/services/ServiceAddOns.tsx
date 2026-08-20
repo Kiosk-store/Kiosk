@@ -5,11 +5,14 @@
 import React from "react";
 import { motion } from "framer-motion";
 import ScrollReveal from "@/components/ScrollReveal";
+import { useCurrency } from "@/context/CurrencyContext";
+import { formatPrice } from "@/lib/currency";
 
 interface AddOn {
 	id: string;
 	title: string;
-	price: string;
+	usdPrice: number;
+	suffix: string;
 	desc: string;
 	badge: string;
 	renderVisual: () => React.ReactNode;
@@ -19,7 +22,8 @@ const ADDONS: AddOn[] = [
 	{
 		id: "pages",
 		title: "Extra Pages",
-		price: "$49 / page",
+		usdPrice: 49,
+		suffix: "/ page",
 		desc: "Add extra custom subpages (e.g. Portfolio, Terms, Gallery) beyond tier limits.",
 		badge: "ADDITIONAL PAGE",
 		renderVisual: () => (
@@ -40,7 +44,8 @@ const ADDONS: AddOn[] = [
 	{
 		id: "domain",
 		title: "Custom Domain Setup",
-		price: "$29 one-off",
+		usdPrice: 29,
+		suffix: "one-off",
 		desc: "We register your custom domain (.com) and configure DNS records for you.",
 		badge: "DOMAINS & DNS",
 		renderVisual: () => (
@@ -61,7 +66,8 @@ const ADDONS: AddOn[] = [
 	{
 		id: "copywriting",
 		title: "Copywriting Support",
-		price: "$149 one-off",
+		usdPrice: 149,
+		suffix: "one-off",
 		desc: "Our copywriters draft high-converting headlines and sales copy for your offer.",
 		badge: "SALES COPYWRITING",
 		renderVisual: () => (
@@ -82,7 +88,8 @@ const ADDONS: AddOn[] = [
 	{
 		id: "updates",
 		title: "Managed Updates",
-		price: "$35 / month",
+		usdPrice: 35,
+		suffix: "/ month",
 		desc: "Post-launch content edits, text changes, and image updates handled by our team.",
 		badge: "MANAGED SERVICE",
 		renderVisual: () => (
@@ -104,7 +111,8 @@ const ADDONS: AddOn[] = [
 		id: "rush",
 		title: "Rush 48-Hour Delivery",
 		badge: "EXPRESS BUILD",
-		price: "$199 one-off",
+		usdPrice: 199,
+		suffix: "one-off",
 		desc: "Fast-track your project into our top priority 48-hour build queue.",
 		renderVisual: () => (
 			<div className="relative w-full h-20 rounded-xl bg-slate-900 border border-slate-800 p-3 flex flex-col justify-between overflow-hidden shadow-inner group-hover:border-blue-500/40 transition-colors">
@@ -125,6 +133,8 @@ const ADDONS: AddOn[] = [
 ];
 
 export default function ServiceAddOns() {
+	const { currency, isLoading } = useCurrency();
+
 	return (
 		<section className="py-20 md:py-28 bg-white border-t border-gray-100">
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -149,44 +159,50 @@ export default function ServiceAddOns() {
 				</div>
 
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-					{ADDONS.map((addon, index) => (
-						<ScrollReveal key={addon.id} direction="up" delay={index * 90}>
-							<motion.div
-								whileHover={{ y: -6, scale: 1.015 }}
-								transition={{ type: "spring", stiffness: 300, damping: 20 }}
-								className="h-full p-5 sm:p-6 rounded-2xl bg-white border border-gray-200/90 shadow-2xs hover:shadow-xl hover:border-blue-500/40 transition-all duration-300 flex flex-col justify-between group">
-								<div className="space-y-3 sm:space-y-3.5">
-									<div className="flex items-center justify-between">
-										<span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-gray-100 text-gray-600 border border-gray-200/60">
-											{addon.badge}
-										</span>
-										<span className="text-[11px] sm:text-xs font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg border border-blue-100">
-											{addon.price}
-										</span>
+					{ADDONS.map((addon, index) => {
+						const formattedPrice = isLoading
+							? "…"
+							: `${formatPrice(addon.usdPrice, currency)} ${addon.suffix}`;
+
+						return (
+							<ScrollReveal key={addon.id} direction="up" delay={index * 90}>
+								<motion.div
+									whileHover={{ y: -6, scale: 1.015 }}
+									transition={{ type: "spring", stiffness: 300, damping: 20 }}
+									className="h-full p-5 sm:p-6 rounded-2xl bg-white border border-gray-200/90 shadow-2xs hover:shadow-xl hover:border-blue-500/40 transition-all duration-300 flex flex-col justify-between group">
+									<div className="space-y-3 sm:space-y-3.5">
+										<div className="flex items-center justify-between">
+											<span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-gray-100 text-gray-600 border border-gray-200/60">
+												{addon.badge}
+											</span>
+											<span className="text-[11px] sm:text-xs font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg border border-blue-100">
+												{formattedPrice}
+											</span>
+										</div>
+
+										{/* Custom Micro-UI Visual Illustration */}
+										<div className="pt-1">
+											{addon.renderVisual()}
+										</div>
+
+										<div className="space-y-1 pt-1">
+											<h3 className="text-base font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+												{addon.title}
+											</h3>
+											<p className="text-xs sm:text-sm text-gray-500 font-medium leading-relaxed">
+												{addon.desc}
+											</p>
+										</div>
 									</div>
 
-									{/* Custom Micro-UI Visual Illustration */}
-									<div className="pt-1">
-										{addon.renderVisual()}
+									<div className="pt-3.5 sm:pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400 font-medium">
+										<span className="text-blue-600 font-semibold text-[10px] sm:text-[11px]">Available on all tiers</span>
+										<span className="font-mono text-[9px] sm:text-[10px] uppercase">BOLT-ON</span>
 									</div>
-
-									<div className="space-y-1 pt-1">
-										<h3 className="text-base font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-											{addon.title}
-										</h3>
-										<p className="text-xs sm:text-sm text-gray-500 font-medium leading-relaxed">
-											{addon.desc}
-										</p>
-									</div>
-								</div>
-
-								<div className="pt-3.5 sm:pt-4 mt-4 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400 font-medium">
-									<span className="text-blue-600 font-semibold text-[10px] sm:text-[11px]">Available on all tiers</span>
-									<span className="font-mono text-[9px] sm:text-[10px] uppercase">BOLT-ON</span>
-								</div>
-							</motion.div>
-						</ScrollReveal>
-					))}
+								</motion.div>
+							</ScrollReveal>
+						);
+					})}
 				</div>
 			</div>
 		</section>

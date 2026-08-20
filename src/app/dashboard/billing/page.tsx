@@ -23,12 +23,14 @@ import {
 	ArrowRight,
 } from "lucide-react";
 
+import { useCurrency } from "@/context/CurrencyContext";
+import { PlanKey } from "@/lib/currency";
+
 interface Plan {
 	id: string;
+	planKey: PlanKey;
 	name: string;
 	description: string;
-	monthlyPrice: string;
-	yearlyPrice: string;
 	features: string[];
 	popular?: boolean;
 }
@@ -36,10 +38,9 @@ interface Plan {
 const plans: Plan[] = [
 	{
 		id: "landing-page",
+		planKey: "landing",
 		name: "Landing Page",
 		description: "Custom single-page website engineered for rapid lead generation.",
-		monthlyPrice: "$20",
-		yearlyPrice: "$192",
 		features: [
 			"Single page custom website",
 			"Delivered in 3-5 days",
@@ -49,10 +50,9 @@ const plans: Plan[] = [
 	},
 	{
 		id: "sales-funnel",
+		planKey: "funnel",
 		name: "Sales Funnel",
 		description: "Strategic multi-step funnel engineered to convert prospects.",
-		monthlyPrice: "$30",
-		yearlyPrice: "$288",
 		popular: true,
 		features: [
 			"Up to 5 custom conversion pages",
@@ -63,10 +63,9 @@ const plans: Plan[] = [
 	},
 	{
 		id: "ecommerce-store",
+		planKey: "store",
 		name: "E-commerce Store",
 		description: "Complete online storefront with checkout & inventory management.",
-		monthlyPrice: "$43",
-		yearlyPrice: "$408",
 		features: [
 			"Full product catalog setup",
 			"Delivered in 5-10 days",
@@ -93,31 +92,9 @@ interface DBInvoice {
 	createdAt: string;
 }
 
-const PLAN_INFO_MAP: Record<string, { title: string; price: string; desc: string }> = {
-	NONE: {
-		title: "No Active Subscription",
-		price: "$0",
-		desc: "You do not have an active paid subscription. Select a plan below to activate your workspace and order your site.",
-	},
-	LANDING_PAGE: {
-		title: "Landing Page Plan",
-		price: "$20/mo",
-		desc: "You are currently on the Landing Page subscription ($20/mo). Add a Sales Funnel or E-commerce Store to your account anytime.",
-	},
-	SALES_FUNNEL: {
-		title: "Sales Funnel Plan",
-		price: "$30/mo",
-		desc: "You are currently on the Sales Funnel subscription ($30/mo). Expand your brand with additional pages anytime.",
-	},
-	E_COMMERCE: {
-		title: "E-commerce Store Plan",
-		price: "$43/mo",
-		desc: "You are currently on the E-commerce Store subscription ($43/mo). Enjoy full online store and product catalog features.",
-	},
-};
-
 export function BillingPageContent() {
 	const searchParams = useSearchParams();
+	const { formatPlanPrice, currency, isLoading: isCurrencyLoading } = useCurrency();
 	const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
 	const [tenantPlan, setTenantPlan] = useState<string>("NONE");
 	const [billingStatus, setBillingStatus] = useState<string>("ACTIVE");
@@ -157,7 +134,32 @@ export function BillingPageContent() {
 		fetchBillingInfo();
 	}, []);
 
-	const currentPlanInfo = PLAN_INFO_MAP[tenantPlan] || PLAN_INFO_MAP.NONE;
+	const getCurrentPlanTitle = () => {
+		switch (tenantPlan) {
+			case "LANDING_PAGE":
+				return "Landing Page Plan";
+			case "SALES_FUNNEL":
+				return "Sales Funnel Plan";
+			case "E_COMMERCE":
+				return "E-commerce Store Plan";
+			default:
+				return "No Active Subscription";
+		}
+	};
+
+	const getCurrentPlanDesc = () => {
+		switch (tenantPlan) {
+			case "LANDING_PAGE":
+				return `You are currently on the Landing Page subscription (${formatPlanPrice("landing", "monthly")}/mo). Add a Sales Funnel or E-commerce Store to your account anytime.`;
+			case "SALES_FUNNEL":
+				return `You are currently on the Sales Funnel subscription (${formatPlanPrice("funnel", "monthly")}/mo). Expand your brand with additional pages anytime.`;
+			case "E_COMMERCE":
+				return `You are currently on the E-commerce Store subscription (${formatPlanPrice("store", "monthly")}/mo). Enjoy full online store and product catalog features.`;
+			default:
+				return "You do not have an active paid subscription. Select a plan below to activate your workspace and order your site.";
+		}
+	};
+
 	const isPaid = tenantPlan !== "NONE";
 
 	// Calculate remaining grace period days
@@ -307,10 +309,10 @@ export function BillingPageContent() {
 							</span>
 						</div>
 						<h2 className="text-2xl font-bold font-nohemi text-gray-900 mb-1">
-							{isLoading ? "Loading plan..." : currentPlanInfo.title}
+							{isLoading ? "Loading plan..." : getCurrentPlanTitle()}
 						</h2>
 						<p className="text-xs text-gray-500 max-w-lg">
-							{currentPlanInfo.desc}
+							{isCurrencyLoading ? "Loading pricing..." : getCurrentPlanDesc()}
 						</p>
 					</div>
 
@@ -350,10 +352,7 @@ export function BillingPageContent() {
 
 					<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 						{plans.map((plan) => {
-							const price =
-								billingCycle === "yearly"
-									? plan.yearlyPrice
-									: plan.monthlyPrice;
+							const price = formatPlanPrice(plan.planKey, billingCycle);
 							const period =
 								billingCycle === "yearly" ? "/ year" : "/ month";
 

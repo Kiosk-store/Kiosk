@@ -6,6 +6,8 @@ import React, { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import PillButton from "@/components/PillButton";
+import { useCurrency } from "@/context/CurrencyContext";
+import { PlanKey } from "@/lib/currency";
 import {
 	Globe,
 	Sparkles,
@@ -19,6 +21,7 @@ import {
 function NewProjectForm() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
+	const { formatPlanPrice, isLoading: isCurrencyLoading } = useCurrency();
 	const templateParam = searchParams.get("template") || "";
 
 	const [name, setName] = useState("");
@@ -120,28 +123,32 @@ function NewProjectForm() {
 							{[
 								{
 									id: "Landing Page",
+									planKey: "landing" as PlanKey,
 									title: "Landing Page",
-									price: "$15/mo",
 									desc: "Single page lead generation & hero presentation.",
 									icon: Globe,
 								},
 								{
 									id: "Sales Funnel",
+									planKey: "funnel" as PlanKey,
 									title: "Sales Funnel",
-									price: "$30/mo",
 									desc: "5-step conversion pipeline & lead capture.",
 									icon: Zap,
 								},
 								{
 									id: "E-commerce",
+									planKey: "store" as PlanKey,
 									title: "E-commerce Store",
-									price: "$50/mo",
 									desc: "Full product catalog & payment gateway integration.",
 									icon: ShoppingBag,
 								},
 							].map((item) => {
 								const Icon = item.icon;
 								const isSelected = type === item.id;
+								const formattedPrice = isCurrencyLoading
+									? "…"
+									: `${formatPlanPrice(item.planKey, "monthly")}/mo`;
+
 								return (
 									<button
 										key={item.id}
@@ -170,7 +177,7 @@ function NewProjectForm() {
 												{item.title}
 											</h3>
 											<p className="text-xs font-extrabold text-blue-600 mb-2">
-												{item.price}
+												{formattedPrice}
 											</p>
 											<p className="text-[11px] text-gray-500 leading-relaxed font-medium">
 												{item.desc}

@@ -32,8 +32,6 @@ interface PlanDetails {
 	dbPlan: "LANDING_PAGE" | "SALES_FUNNEL" | "E_COMMERCE";
 	name: string;
 	subtitle: string;
-	monthlyPrice: number;
-	yearlyPrice: number;
 	features: string[];
 	deliveryTime: string;
 	icon: React.ElementType;
@@ -45,8 +43,6 @@ const PLAN_DATA: Record<string, PlanDetails> = {
 		dbPlan: "LANDING_PAGE",
 		name: "Landing Page",
 		subtitle: "High-Converting Single Page Website",
-		monthlyPrice: 20,
-		yearlyPrice: 192,
 		deliveryTime: "3–5 Days",
 		icon: Globe,
 		features: [
@@ -61,8 +57,6 @@ const PLAN_DATA: Record<string, PlanDetails> = {
 		dbPlan: "SALES_FUNNEL",
 		name: "Sales Funnel",
 		subtitle: "Multi-Step Lead & Conversion Engine",
-		monthlyPrice: 30,
-		yearlyPrice: 288,
 		deliveryTime: "3–5 Days",
 		icon: Zap,
 		features: [
@@ -77,8 +71,6 @@ const PLAN_DATA: Record<string, PlanDetails> = {
 		dbPlan: "E_COMMERCE",
 		name: "E-commerce Store",
 		subtitle: "Full Digital & Product Shop",
-		monthlyPrice: 43,
-		yearlyPrice: 408,
 		deliveryTime: "5–10 Days",
 		icon: ShoppingBag,
 		features: [

@@ -31,8 +31,10 @@ import {
 	FileCheck,
 	Shuffle,
 	Truck,
+	AlertCircle,
 } from "lucide-react";
 import PillButton from "@/components/PillButton";
+import { useCurrency } from "@/context/CurrencyContext";
 
 interface UploadedImage {
 	id: string;
@@ -62,6 +64,7 @@ function ContentForm() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const fileInputRef = useRef<HTMLInputElement>(null);
+	const { formatPlanPrice, isLoading: isCurrencyLoading } = useCurrency();
 
 	// Plan & Payment Status Detection
 	const planQuery = (searchParams.get("plan") || "").toUpperCase();
@@ -414,10 +417,10 @@ function ContentForm() {
 								Tailored form fields generated for your active plan:{" "}
 								<span className="font-bold text-blue-600">
 									{activePlan === "LANDING_PAGE"
-										? "Landing Page ($15/mo)"
+										? `Landing Page (${isCurrencyLoading ? "…" : formatPlanPrice("landing", "monthly")}/mo)`
 										: activePlan === "SALES_FUNNEL"
-										? "Sales Funnel ($30/mo)"
-										: "E-commerce Store ($50/mo)"}
+										? `Sales Funnel (${isCurrencyLoading ? "…" : formatPlanPrice("funnel", "monthly")}/mo)`
+										: `E-commerce Store (${isCurrencyLoading ? "…" : formatPlanPrice("store", "monthly")}/mo)`}
 								</span>
 							</p>
 						</div>
