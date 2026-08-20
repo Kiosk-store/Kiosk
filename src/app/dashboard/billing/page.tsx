@@ -4,8 +4,9 @@
 
 export const dynamic = "force-dynamic";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import PillButton from "@/components/PillButton";
 import {
 	CreditCard,
@@ -115,13 +116,24 @@ const PLAN_INFO_MAP: Record<string, { title: string; price: string; desc: string
 	},
 };
 
-export default function BillingPage() {
+export function BillingPageContent() {
+	const searchParams = useSearchParams();
 	const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
 	const [tenantPlan, setTenantPlan] = useState<string>("NONE");
 	const [billingStatus, setBillingStatus] = useState<string>("ACTIVE");
 	const [pendingInvoice, setPendingInvoice] = useState<DBInvoice | null>(null);
 	const [invoicesList, setInvoicesList] = useState<DBInvoice[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
+
+	const statusParam = (searchParams.get("status") || "").toLowerCase();
+	const isReturnSuccess =
+		statusParam === "successful" ||
+		statusParam === "success" ||
+		searchParams.get("payment") === "success";
+	const isReturnCancelled =
+		statusParam === "cancelled" ||
+		statusParam === "failed" ||
+		searchParams.get("cancelled") === "true";
 
 	useEffect(() => {
 		async function fetchBillingInfo() {
@@ -166,6 +178,25 @@ export default function BillingPage() {
 						Manage your subscription plan, pending invoices, and flexible payment methods (Card, Bank Transfer, USSD, Mobile Money).
 					</p>
 				</div>
+
+				{/* Return Status Alerts */}
+				{isReturnSuccess && (
+					<div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2.5 animate-in fade-in duration-300">
+						<CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+						<span>
+							Payment Confirmed! Your invoice has been settled and your workspace is fully active.
+						</span>
+					</div>
+				)}
+
+				{isReturnCancelled && (
+					<div className="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold flex items-center gap-2.5 animate-in fade-in duration-300">
+						<AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
+						<span>
+							Payment was cancelled or was not completed. You can pay your invoice whenever you are ready using Card, Transfer, USSD, or Mobile Money.
+						</span>
+					</div>
+				)}
 
 				{/* PENDING INVOICE / GRACE PERIOD ALERT BANNER */}
 				{pendingInvoice && (
@@ -516,6 +547,22 @@ export default function BillingPage() {
 				</div>
 			</div>
 		</div>
+	);
+}
+
+export default function BillingPage() {
+	return (
+		<Suspense
+			fallback={
+				<div className="min-h-screen flex items-center justify-center text-xs font-semibold text-gray-500 bg-[#f8fafc]">
+					<div className="inline-flex items-center gap-2">
+						<Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+						<span>Loading billing information...</span>
+					</div>
+				</div>
+			}>
+			<BillingPageContent />
+		</Suspense>
 	);
 }
 

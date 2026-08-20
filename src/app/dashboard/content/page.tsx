@@ -63,9 +63,18 @@ function ContentForm() {
 	const searchParams = useSearchParams();
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
-	// Plan Detection
+	// Plan & Payment Status Detection
 	const planQuery = (searchParams.get("plan") || "").toUpperCase();
-	const isPaymentSuccess = searchParams.get("payment") === "complete";
+	const statusParam = (searchParams.get("status") || "").toLowerCase();
+	const isCancelled =
+		statusParam === "cancelled" ||
+		statusParam === "failed" ||
+		searchParams.get("cancelled") === "true";
+	const isPaymentSuccess =
+		(statusParam === "successful" ||
+			statusParam === "success" ||
+			searchParams.get("payment") === "complete") &&
+		!isCancelled;
 
 	const [activePlan, setActivePlan] = useState<PlanType>(
 		planQuery.includes("FUNNEL")
@@ -366,15 +375,31 @@ function ContentForm() {
 					</div>
 				</div>
 
-				{/* Payment Success Confirmation Alert Banner */}
+				{/* Payment Status Banners */}
 				{isPaymentSuccess && (
 					<div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center justify-between gap-3 animate-in fade-in duration-300">
 						<div className="flex items-center gap-2.5">
 							<CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
 							<span>
-								Subscription Confirmed! Welcome to your Kiosk workspace. Fill in your business details below to generate your site.
+								Payment Confirmed! Welcome to your Kiosk workspace. Fill in your business details below to generate your site.
 							</span>
 						</div>
+					</div>
+				)}
+
+				{isCancelled && (
+					<div className="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold flex items-center justify-between gap-3 animate-in fade-in duration-300">
+						<div className="flex items-center gap-2.5">
+							<AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
+							<span>
+								Payment was cancelled or was not completed. You can retry your invoice payment or choose another payment method anytime.
+							</span>
+						</div>
+						<Link
+							href="/dashboard/billing"
+							className="shrink-0 px-3 py-1.5 rounded-full bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold shadow-2xs transition-colors">
+							View Invoices →
+						</Link>
 					</div>
 				)}
 

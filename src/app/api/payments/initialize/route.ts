@@ -115,7 +115,7 @@ export async function POST(request: Request) {
 			email: userEmail,
 			name: userName,
 			tx_ref,
-			redirect_url: `${appUrl}/dashboard/content?payment=complete&plan=${plan}`,
+			redirect_url: `${appUrl}/dashboard/content?plan=${plan}`,
 			payment_options: "card,banktransfer,ussd,mobilemoney",
 			title: `Kiosk ${planKey.toUpperCase()} Invoice (${invoiceNumber})`,
 			description: `Setup fee & hosting payment for Kiosk ${planKey} plan (${billingCycle})`,
