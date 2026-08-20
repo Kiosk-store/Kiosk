@@ -74,9 +74,9 @@ export async function initializeFlutterwavePayment(
 				name: input.name,
 			},
 			customizations: {
-				title: input.title || "Kiosk Invoice Payment",
-				description: input.description || "Payment for Kiosk website hosting & maintenance request",
-				logo: "https://kioosk.online/logo.png",
+				title: "Kiosk",
+				description: input.description || "Kiosk Turnkey Websites & Cloud Hosting",
+				logo: `${process.env.NEXT_PUBLIC_APP_URL || "https://kioosk.online"}/kiosk.png`,
 			},
 			meta: input.meta,
 		};

@@ -117,8 +117,8 @@ export async function POST(request: Request) {
 			tx_ref,
 			redirect_url: `${appUrl}/dashboard/content?plan=${plan}`,
 			payment_options: "card,banktransfer,ussd,mobilemoney",
-			title: `Kiosk ${planKey.toUpperCase()} Invoice (${invoiceNumber})`,
-			description: `Setup fee & hosting payment for Kiosk ${planKey} plan (${billingCycle})`,
+			title: "Kiosk",
+			description: `Kiosk ${planKey.toUpperCase()} - Setup & ${billingCycle} Hosting`,
 			meta: {
 				userId,
 				tenantId: tenant.id,

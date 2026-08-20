@@ -98,8 +98,8 @@ export async function processScheduledBillingJob() {
 				tx_ref,
 				redirect_url: `${appUrl}/dashboard/billing?payment=success&invoice=${invoiceNumber}`,
 				payment_options: "card,banktransfer,ussd,mobilemoney",
-				title: `Hosting Renewal Invoice #${invoiceNumber}`,
-				description: `Renewal hosting & maintenance for Kiosk ${planKey} plan (${billingCycle})`,
+				title: "Kiosk",
+				description: `Kiosk ${planKey.toUpperCase()} - Hosting Renewal (${billingCycle})`,
 				meta: {
 					userId: owner.id,
 					tenantId: tenant.id,
