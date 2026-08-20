@@ -6,8 +6,7 @@ import React from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import PillButton from "@/components/PillButton";
-import { Globe, Zap, ShoppingBag, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Globe, Zap, ShoppingBag, Briefcase, Utensils, UserCheck, ArrowRight, CheckCircle2 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -60,6 +59,54 @@ const TEMPLATE_CATEGORIES = [
 		],
 		badgeColor: "bg-emerald-50 text-emerald-600 border-emerald-100",
 	},
+	{
+		id: "agency",
+		title: "Creative Agency Showcase",
+		folderName: "agency",
+		icon: Briefcase,
+		tag: "Preset 04",
+		desc: "Visual portfolio showcase with case study filters, interactive scope calculator, and client intake brief form.",
+		href: "/templates/agency",
+		features: [
+			"Filterable Portfolio Case Studies",
+			"Interactive Scope & Cost Estimator",
+			"Client Intake Brief Form",
+			"Services & Authority Badges",
+		],
+		badgeColor: "bg-indigo-50 text-indigo-600 border-indigo-100",
+	},
+	{
+		id: "restaurant",
+		title: "Local Restaurant & Bistro",
+		folderName: "restaurant",
+		icon: Utensils,
+		tag: "Preset 05",
+		desc: "Culinary dining template with categorized food menu tab switcher, table reservation modal, and WhatsApp ordering.",
+		href: "/templates/restaurant",
+		features: [
+			"Categorized Food Menu Tabs",
+			"Table Reservation Widget",
+			"Direct WhatsApp Order Trigger",
+			"Operating Hours & Location Card",
+		],
+		badgeColor: "bg-amber-50 text-amber-600 border-amber-100",
+	},
+	{
+		id: "consulting",
+		title: "Professional Services & Consulting",
+		folderName: "consulting",
+		icon: UserCheck,
+		tag: "Preset 06",
+		desc: "Executive advisory profile with transparent service retainer packages, calendar scheduling simulator, and proof stack.",
+		href: "/templates/consulting",
+		features: [
+			"Consultant Authority Profile",
+			"Transparent Retainer Packages",
+			"Interactive Booking Calendar",
+			"Verified Client Rating Stack",
+		],
+		badgeColor: "bg-teal-50 text-teal-600 border-teal-100",
+	},
 ];
 
 export default function TemplatesDirectoryPage() {
@@ -78,12 +125,12 @@ export default function TemplatesDirectoryPage() {
 						Master Template Library
 					</h1>
 					<p className="text-slate-600 text-sm sm:text-base font-medium leading-relaxed">
-						Explore our core production website templates stored inside <code className="text-blue-600 font-mono bg-blue-50 px-2 py-0.5 rounded">src/app/templates</code>.
+						Explore our 6 production website templates stored inside <code className="text-blue-600 font-mono bg-blue-50 px-2 py-0.5 rounded">src/app/templates</code>.
 					</p>
 				</div>
 
 				{/* Template Cards Grid */}
-				<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 					{TEMPLATE_CATEGORIES.map((cat) => {
 						const Icon = cat.icon;
 

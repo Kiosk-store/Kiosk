@@ -30,12 +30,12 @@ export default function SalesFunnelTemplate() {
 			</div>
 
 			{/* Funnel Flow Header Steps */}
-			<div className="pt-24 pb-6 px-4 max-w-4xl mx-auto w-full">
-				<div className="grid grid-cols-3 gap-2 bg-slate-800/80 border border-slate-700 p-2 rounded-2xl text-center text-xs font-bold">
+			<div className="pt-20 sm:pt-24 pb-4 sm:pb-6 px-4 max-w-4xl mx-auto w-full">
+				<div className="grid grid-cols-3 gap-1.5 sm:gap-2 bg-slate-800/80 border border-slate-700 p-1.5 sm:p-2 rounded-2xl text-center text-[10px] sm:text-xs font-bold">
 					<button
 						type="button"
 						onClick={() => setStep("optin")}
-						className={`py-2 rounded-xl transition-all ${
+						className={`py-2 px-1 rounded-xl transition-all ${
 							step === "optin" ? "bg-purple-600 text-white shadow-md" : "text-slate-400 hover:text-white"
 						}`}>
 						Step 1: Lead Magnet
@@ -43,7 +43,7 @@ export default function SalesFunnelTemplate() {
 					<button
 						type="button"
 						onClick={() => setStep("vsl")}
-						className={`py-2 rounded-xl transition-all ${
+						className={`py-2 px-1 rounded-xl transition-all ${
 							step === "vsl" ? "bg-purple-600 text-white shadow-md" : "text-slate-400 hover:text-white"
 						}`}>
 						Step 2: VSL Offer
@@ -51,7 +51,7 @@ export default function SalesFunnelTemplate() {
 					<button
 						type="button"
 						onClick={() => setStep("checkout")}
-						className={`py-2 rounded-xl transition-all ${
+						className={`py-2 px-1 rounded-xl transition-all ${
 							step === "checkout" ? "bg-purple-600 text-white shadow-md" : "text-slate-400 hover:text-white"
 						}`}>
 						Step 3: Conversion
