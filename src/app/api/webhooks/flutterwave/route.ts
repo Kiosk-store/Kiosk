@@ -2,18 +2,20 @@
 
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { tenants, subscriptions } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { tenants, subscriptions, invoices, users } from "@/db/schema";
+import { eq, or } from "drizzle-orm";
 import { redis } from "@/lib/ratelimit";
 import {
 	verifyFlutterwaveWebhookHash,
 	verifyFlutterwaveTransaction,
 } from "@/lib/payments/flutterwave";
+import { processPdfInvoiceJob } from "@/inngest/functions/pdfInvoice";
 
 /**
  * POST /api/webhooks/flutterwave
  *
  * Processes asynchronous Flutterwave webhook events safely.
+ * Reconciles multi-channel invoice payments (Card, Bank Transfer, USSD, Mobile Money).
  *
  * Security:
  *  - Verifies verif-hash header against FLUTTERWAVE_SECRET_HASH
@@ -54,7 +56,7 @@ export async function POST(request: Request) {
 			await redis.set(eventKey, "PROCESSED", { ex: 86400 }); // 24 hours
 		}
 
-		// 3. Process Successful Charge
+		// 3. Process Successful Multi-Channel Charge (Card, Transfer, USSD, Mobile Money)
 		if (event === "charge.completed" && data.status === "successful") {
 			// Direct Server Verification with Flutterwave API
 			const verifiedTx = await verifyFlutterwaveTransaction(String(data.id));
@@ -64,41 +66,103 @@ export async function POST(request: Request) {
 				return NextResponse.json({ error: "Transaction verification failed" }, { status: 400 });
 			}
 
+			const txRef: string = data.tx_ref || verifiedTx.tx_ref;
 			const userId: string = data.meta?.userId || verifiedTx.meta?.userId;
 			const plan: string = data.meta?.plan || verifiedTx.meta?.plan || "LANDING_PAGE";
 			const billingCycle: string = data.meta?.billingCycle || verifiedTx.meta?.billingCycle || "monthly";
+			const invoiceNumber: string | undefined = data.meta?.invoiceNumber || verifiedTx.meta?.invoiceNumber;
+			const paymentMethod: string = (data.payment_type || verifiedTx.payment_type || "card").toLowerCase();
 
-			if (userId) {
-				// Find user's tenant
-				const tenant = await db.query.tenants.findFirst({
+			// 1. Reconcile matching invoice in database
+			let matchedInvoice = null;
+			if (txRef) {
+				matchedInvoice = await db.query.invoices.findFirst({
+					where: eq(invoices.txRef, txRef),
+				});
+			}
+
+			if (!matchedInvoice && invoiceNumber) {
+				matchedInvoice = await db.query.invoices.findFirst({
+					where: eq(invoices.invoiceNumber, invoiceNumber),
+				});
+			}
+
+			const now = new Date();
+			const days = billingCycle === "yearly" ? 365 : 30;
+			const newPeriodEnd = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
+			const newGraceEnd = new Date(newPeriodEnd.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+			if (matchedInvoice) {
+				await db
+					.update(invoices)
+					.set({
+						status: "PAID",
+						paidAt: now,
+						paymentMethod,
+						updatedAt: now,
+					})
+					.where(eq(invoices.id, matchedInvoice.id));
+			}
+
+			// 2. Locate tenant and update billing status
+			const tenantId = matchedInvoice?.tenantId || data.meta?.tenantId || verifiedTx.meta?.tenantId;
+			let tenant = null;
+
+			if (tenantId) {
+				tenant = await db.query.tenants.findFirst({
+					where: eq(tenants.id, tenantId),
+				});
+			} else if (userId) {
+				tenant = await db.query.tenants.findFirst({
 					where: eq(tenants.ownerId, userId),
 				});
+			}
 
-				if (tenant) {
-					// Update tenant active plan in Neon PostgreSQL
-					await db
-						.update(tenants)
-						.set({ plan, updatedAt: new Date() })
-						.where(eq(tenants.id, tenant.id));
+			if (tenant) {
+				await db
+					.update(tenants)
+					.set({
+						plan,
+						billingStatus: "ACTIVE",
+						currentPeriodEnd: newPeriodEnd,
+						gracePeriodEnd: newGraceEnd,
+						updatedAt: now,
+					})
+					.where(eq(tenants.id, tenant.id));
 
-					const days = billingCycle === "yearly" ? 365 : 30;
+				// Record Subscription history
+				await db.insert(subscriptions).values({
+					tenantId: tenant.id,
+					gateway: "flutterwave",
+					customerId: String(data.customer?.id || userId || tenant.ownerId),
+					subscriptionId: `flw_${data.id || txRef}`,
+					planId: plan.toLowerCase().replace(/_/g, "-"),
+					billingCycle,
+					status: "active",
+					currentPeriodStart: now,
+					currentPeriodEnd: newPeriodEnd,
+				});
 
-					// Record Subscription
-					await db.insert(subscriptions).values({
+				console.log(
+					`[FLUTTERWAVE_WEBHOOK_SUCCESS] Reconciled invoice payment for tenant ${tenant.id} (${plan}, ${paymentMethod}) via tx ${data.id}`,
+				);
+
+				// 3. Dispatch Async PDF Receipt Email Job
+				const recipientEmail = data.customer?.email || verifiedTx.customer?.email;
+				const recipientName = data.customer?.name || verifiedTx.customer?.name || "Kiosk Subscriber";
+
+				if (recipientEmail) {
+					processPdfInvoiceJob({
+						transactionId: String(data.id),
 						tenantId: tenant.id,
-						gateway: "flutterwave",
-						customerId: String(data.customer?.id || userId),
-						subscriptionId: `flw_${data.id || data.tx_ref}`,
-						planId: plan.toLowerCase().replace(/_/g, "-"),
-						billingCycle,
-						status: "active",
-						currentPeriodStart: new Date(),
-						currentPeriodEnd: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
+						userEmail: recipientEmail,
+						userName: recipientName,
+						amount: data.amount || verifiedTx.amount || 0,
+						currency: data.currency || verifiedTx.currency || "USD",
+						plan,
+					}).catch((err) => {
+						console.error("[RECEIPT_JOB_ERROR]", err);
 					});
-
-					console.log(
-						`[FLUTTERWAVE_WEBHOOK_SUCCESS] Upgraded tenant ${tenant.id} to plan: ${plan} via tx ${data.id}`,
-					);
 				}
 			}
 		}

@@ -8,6 +8,10 @@ import { checkRateLimit, redis } from "@/lib/ratelimit";
 import { initializeFlutterwavePayment } from "@/lib/payments/flutterwave";
 import { BASE_PRICES_USD, CURRENCIES, PlanKey } from "@/lib/currency";
 
+import { db } from "@/db";
+import { tenants, invoices } from "@/db/schema";
+import { eq } from "drizzle-orm";
+
 const initializeSchema = z.object({
 	plan: z.enum(["LANDING_PAGE", "SALES_FUNNEL", "E_COMMERCE"]),
 	billingCycle: z.enum(["monthly", "yearly"]).default("monthly"),
@@ -21,7 +25,7 @@ const PLAN_MAP: Record<string, PlanKey> = {
 };
 
 /**
- * POST /api/payments/initialize - Initializes a Flutterwave checkout session with Idempotency Double-Charge Protection
+ * POST /api/payments/initialize - Initializes a Multi-Method Payment Request (Card, Transfer, USSD, Mobile Money)
  */
 export async function POST(request: Request) {
 	try {
@@ -45,7 +49,7 @@ export async function POST(request: Request) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
 
-		// 2. Strict Idempotency Lock Check (Prevents Double Charging)
+		// 2. Strict Idempotency Lock Check (Prevents Double Invoicing)
 		const idempotencyKey = request.headers.get("Idempotency-Key");
 		if (idempotencyKey && redis) {
 			const lockKey = `@kiosk/idempotency:${idempotencyKey}`;
@@ -75,21 +79,36 @@ export async function POST(request: Request) {
 		const targetCurrency = CURRENCIES[currencyCode] || CURRENCIES.USD;
 
 		// Convert USD base price to user's currency
-		const amount = baseUsdAmount * targetCurrency.rateFromUSD;
+		const amount = Math.round(baseUsdAmount * targetCurrency.rateFromUSD);
 		const tx_ref = `kiosk_tx_${crypto.randomUUID()}`;
 		const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
-		const planIdKey = `${plan}_${billingCycle.toUpperCase()}`;
-		const planIdMap: Record<string, string | undefined> = {
-			LANDING_PAGE_MONTHLY: process.env.FLUTTERWAVE_PLAN_ID_LANDING_MONTHLY,
-			LANDING_PAGE_YEARLY: process.env.FLUTTERWAVE_PLAN_ID_LANDING_YEARLY,
-			SALES_FUNNEL_MONTHLY: process.env.FLUTTERWAVE_PLAN_ID_FUNNEL_MONTHLY,
-			SALES_FUNNEL_YEARLY: process.env.FLUTTERWAVE_PLAN_ID_FUNNEL_YEARLY,
-			E_COMMERCE_MONTHLY: process.env.FLUTTERWAVE_PLAN_ID_STORE_MONTHLY,
-			E_COMMERCE_YEARLY: process.env.FLUTTERWAVE_PLAN_ID_STORE_YEARLY,
-		};
-		const payment_plan = planIdMap[planIdKey];
+		// 3. Ensure Tenant Record Exists
+		let tenant = await db.query.tenants.findFirst({
+			where: eq(tenants.ownerId, userId),
+		});
 
+		if (!tenant) {
+			const slug = `workspace-${crypto.randomUUID().slice(0, 8)}`;
+			const [newTenant] = await db
+				.insert(tenants)
+				.values({
+					ownerId: userId,
+					name: `${userName}'s Workspace`,
+					slug,
+					plan: "NONE",
+					billingStatus: "PENDING",
+				})
+				.returning();
+			tenant = newTenant;
+		}
+
+		// 4. Generate Invoice Number & Due Dates
+		const invoiceNumber = `INV-${new Date().getFullYear()}-${Math.floor(10000 + Math.random() * 90000)}`;
+		const dueDate = new Date();
+		const gracePeriodEnd = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7-day grace period
+
+		// 5. Initialize Multi-Method Flutterwave Payment Link (Card, Transfer, USSD, Mobile Money)
 		const paymentResult = await initializeFlutterwavePayment({
 			amount,
 			currency: targetCurrency.code,
@@ -97,13 +116,16 @@ export async function POST(request: Request) {
 			name: userName,
 			tx_ref,
 			redirect_url: `${appUrl}/dashboard/content?payment=complete&plan=${plan}`,
-			payment_plan,
-			title: `Kiosk ${planKey.toUpperCase()} Plan`,
-			description: `Subscription payment for Kiosk ${planKey} plan (${billingCycle})`,
+			payment_options: "card,banktransfer,ussd,mobilemoney",
+			title: `Kiosk ${planKey.toUpperCase()} Invoice (${invoiceNumber})`,
+			description: `Setup fee & hosting payment for Kiosk ${planKey} plan (${billingCycle})`,
 			meta: {
 				userId,
+				tenantId: tenant.id,
+				invoiceNumber,
 				plan,
 				billingCycle,
+				type: "INITIAL_SETUP",
 			},
 		});
 
@@ -114,13 +136,31 @@ export async function POST(request: Request) {
 			);
 		}
 
+		// 6. Record Initial Invoice in Database
+		await db.insert(invoices).values({
+			invoiceNumber,
+			tenantId: tenant.id,
+			userId,
+			plan,
+			billingCycle,
+			type: "INITIAL_SETUP",
+			amount,
+			currency: targetCurrency.code,
+			status: "PENDING",
+			paymentLink: paymentResult.link,
+			txRef: tx_ref,
+			dueDate,
+			gracePeriodEnd,
+		});
+
 		return NextResponse.json({
 			status: "success",
 			link: paymentResult.link,
+			invoiceNumber,
 			tx_ref,
 		});
 	} catch (err) {
-		console.error("[INITIALIZE_FLUTTERWAVE_PAYMENT_ERROR]", err);
+		console.error("[INITIALIZE_PAYMENT_ERROR]", err);
 		return NextResponse.json(
 			{ error: "Failed to initialize payment process" },
 			{ status: 500 },

@@ -34,34 +34,37 @@ export default function SettingsPage() {
 	const [emailNotifs, setEmailNotifs] = useState(true);
 	const [projectUpdates, setProjectUpdates] = useState(true);
 
-	// Fetch existing user & tenant details from localStorage and API on mount
+	// Fetch existing user & tenant details from DB on mount
 	useEffect(() => {
 		async function loadSettings() {
-			// 1. Check local persistent storage first
-			try {
-				const localSettings = localStorage.getItem("@kiosk/user_settings");
-				if (localSettings) {
-					const parsed = JSON.parse(localSettings);
-					if (parsed.name) setName(parsed.name);
-					if (parsed.phone) setPhone(parsed.phone);
-					if (parsed.company) setCompany(parsed.company);
-					if (parsed.email) setEmail(parsed.email);
-				}
-			} catch (e) {
-				console.error("[LOCAL_STORAGE_READ_ERROR]", e);
-			}
-
-			// 2. Fetch from backend API
 			try {
 				const res = await fetch("/api/user/profile");
 				if (res.ok) {
 					const data = await res.json();
-					if (data.user?.name) setName((prev) => prev || data.user.name);
-					if (data.user?.email) setEmail((prev) => prev || data.user.email);
-					if (data.tenant?.name) setCompany((prev) => prev || data.tenant.name);
+					if (data.user) {
+						if (data.user.name) setName(data.user.name);
+						if (data.user.email) setEmail(data.user.email);
+						if (data.user.phone) setPhone(data.user.phone);
+						if (data.user.emailNotifications !== undefined) {
+							setEmailNotifs(data.user.emailNotifications);
+						}
+						if (data.user.projectUpdates !== undefined) {
+							setProjectUpdates(data.user.projectUpdates);
+						}
+					}
+					if (data.tenant?.name || data.tenant?.company) {
+						setCompany(data.tenant.name || data.tenant.company);
+					}
 				} else if (user) {
-					if (user.name) setName((prev) => prev || user.name || "");
-					if (user.email) setEmail((prev) => prev || user.email || "");
+					if (user.name) setName(user.name || "");
+					if (user.email) setEmail(user.email || "");
+					if (user.phone) setPhone(user.phone || "");
+					if (user.emailNotifications !== undefined) {
+						setEmailNotifs(user.emailNotifications);
+					}
+					if (user.projectUpdates !== undefined) {
+						setProjectUpdates(user.projectUpdates);
+					}
 				}
 			} catch (err) {
 				console.error("[FETCH_SETTINGS_ERROR]", err);
@@ -79,19 +82,11 @@ export default function SettingsPage() {
 		.toUpperCase()
 		.slice(0, 2);
 
-	// Save Profile & Company Settings (Persists to local storage & backend)
+	// Save Profile & Company Settings to Database
 	const handleSaveProfile = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setError(null);
 		setIsLoading(true);
-
-		// Persist immediately to localStorage so page refresh retains input values
-		try {
-			const settingsPayload = { name, phone, company, email };
-			localStorage.setItem("@kiosk/user_settings", JSON.stringify(settingsPayload));
-		} catch (err) {
-			console.error("[LOCAL_STORAGE_WRITE_ERROR]", err);
-		}
 
 		try {
 			const res = await fetch("/api/user/profile", {
@@ -100,7 +95,7 @@ export default function SettingsPage() {
 				body: JSON.stringify({
 					name: name || undefined,
 					company: company || undefined,
-					phone: phone || undefined,
+					phone: phone ?? "",
 				}),
 			});
 
@@ -112,26 +107,31 @@ export default function SettingsPage() {
 				return;
 			}
 
+			// Update persistent cache
+			try {
+				localStorage.setItem(
+					"@kiosk/user_settings",
+					JSON.stringify({ name, phone, company, email }),
+				);
+			} catch (err) {
+				console.error("[LOCAL_STORAGE_WRITE_ERROR]", err);
+			}
+
 			await refreshUser();
 			setIsLoading(false);
-			setToastMsg("Profile settings saved successfully!");
+			setToastMsg("Profile settings saved successfully in database!");
 			setIsSaved(true);
 			setTimeout(() => {
 				setIsSaved(false);
 			}, 3500);
 		} catch (err) {
 			console.error("[PROFILE_SAVE_ERROR]", err);
-			// Even if offline, local save succeeded
+			setError("Failed to save profile settings to database.");
 			setIsLoading(false);
-			setToastMsg("Profile settings saved successfully!");
-			setIsSaved(true);
-			setTimeout(() => {
-				setIsSaved(false);
-			}, 3500);
 		}
 	};
 
-	// Save Password
+	// Save Password to Database
 	const handleSavePassword = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setError(null);
@@ -166,7 +166,7 @@ export default function SettingsPage() {
 			setNewPass("");
 			setConfirmPass("");
 			setIsLoading(false);
-			setToastMsg("Password updated successfully!");
+			setToastMsg("Password updated successfully in database!");
 			setIsSaved(true);
 			setTimeout(() => {
 				setIsSaved(false);
@@ -178,18 +178,42 @@ export default function SettingsPage() {
 		}
 	};
 
-	// Save Notification Preferences
-	const handleSaveNotifications = (e: React.FormEvent) => {
+	// Save Notification Preferences to Database
+	const handleSaveNotifications = async (e: React.FormEvent) => {
 		e.preventDefault();
+		setError(null);
 		setIsLoading(true);
-		setTimeout(() => {
+
+		try {
+			const res = await fetch("/api/user/profile", {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					emailNotifications: emailNotifs,
+					projectUpdates: projectUpdates,
+				}),
+			});
+
+			const data = await res.json();
+
+			if (!res.ok) {
+				setError(data.error || "Failed to save notification preferences.");
+				setIsLoading(false);
+				return;
+			}
+
+			await refreshUser();
 			setIsLoading(false);
-			setToastMsg("Notification preferences saved successfully!");
+			setToastMsg("Notification preferences saved successfully in database!");
 			setIsSaved(true);
 			setTimeout(() => {
 				setIsSaved(false);
-			}, 3000);
-		}, 300);
+			}, 3500);
+		} catch (err) {
+			console.error("[NOTIFICATIONS_SAVE_ERROR]", err);
+			setError("Failed to save notification preferences to database.");
+			setIsLoading(false);
+		}
 	};
 
 	return (
@@ -495,7 +519,14 @@ export default function SettingsPage() {
 								hoverTextColor="#004ac6"
 								useThunderFont={true}
 								className="px-6 py-2.5 rounded-full font-bold text-xs border border-blue-600 shadow-md">
-								<span>Save Notification Settings</span>
+								{isLoading ? (
+									<span className="inline-flex items-center gap-2">
+										<Loader2 className="w-3.5 h-3.5 animate-spin" />
+										<span>Saving...</span>
+									</span>
+								) : (
+									<span>Save Notification Settings</span>
+								)}
 							</PillButton>
 						</div>
 					</form>

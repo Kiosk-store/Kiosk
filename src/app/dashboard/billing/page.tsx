@@ -7,6 +7,20 @@ export const dynamic = "force-dynamic";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import PillButton from "@/components/PillButton";
+import {
+	CreditCard,
+	Building2,
+	Smartphone,
+	CheckCircle2,
+	AlertCircle,
+	AlertTriangle,
+	Clock,
+	ExternalLink,
+	ShieldAlert,
+	Loader2,
+	Receipt,
+	ArrowRight,
+} from "lucide-react";
 
 interface Plan {
 	id: string;
@@ -23,8 +37,8 @@ const plans: Plan[] = [
 		id: "landing-page",
 		name: "Landing Page",
 		description: "Custom single-page website engineered for rapid lead generation.",
-		monthlyPrice: "$15",
-		yearlyPrice: "$144",
+		monthlyPrice: "$20",
+		yearlyPrice: "$192",
 		features: [
 			"Single page custom website",
 			"Delivered in 3-5 days",
@@ -50,34 +64,33 @@ const plans: Plan[] = [
 		id: "ecommerce-store",
 		name: "E-commerce Store",
 		description: "Complete online storefront with checkout & inventory management.",
-		monthlyPrice: "$50",
-		yearlyPrice: "$480",
+		monthlyPrice: "$43",
+		yearlyPrice: "$408",
 		features: [
 			"Full product catalog setup",
-			"Delivered in 3-5 days",
-			"Stripe & Paystack payment gateway",
+			"Delivered in 5-10 days",
+			"Card, Transfer, USSD & Mobile Money",
 			"Dedicated onboarding walkthrough",
 		],
 	},
 ];
 
-interface Invoice {
+interface DBInvoice {
 	id: string;
-	date: string;
-	amount: string;
-	status: "Paid" | "Pending";
+	invoiceNumber: string;
 	plan: string;
+	billingCycle: string;
+	type: string;
+	amount: number;
+	currency: string;
+	status: "PENDING" | "PAID" | "GRACE_PERIOD" | "PAST_DUE" | "CANCELED";
+	paymentLink?: string | null;
+	paymentMethod?: string | null;
+	dueDate: string;
+	gracePeriodEnd: string;
+	paidAt?: string | null;
+	createdAt: string;
 }
-
-const mockInvoices: Invoice[] = [
-	{
-		id: "INV-2026-001",
-		date: "Aug 10, 2026",
-		amount: "$15.00",
-		status: "Paid",
-		plan: "Landing Page",
-	},
-];
 
 const PLAN_INFO_MAP: Record<string, { title: string; price: string; desc: string }> = {
 	NONE: {
@@ -87,8 +100,8 @@ const PLAN_INFO_MAP: Record<string, { title: string; price: string; desc: string
 	},
 	LANDING_PAGE: {
 		title: "Landing Page Plan",
-		price: "$15/mo",
-		desc: "You are currently on the Landing Page subscription ($15/mo). Add a Sales Funnel or E-commerce Store to your account anytime.",
+		price: "$20/mo",
+		desc: "You are currently on the Landing Page subscription ($20/mo). Add a Sales Funnel or E-commerce Store to your account anytime.",
 	},
 	SALES_FUNNEL: {
 		title: "Sales Funnel Plan",
@@ -97,25 +110,31 @@ const PLAN_INFO_MAP: Record<string, { title: string; price: string; desc: string
 	},
 	E_COMMERCE: {
 		title: "E-commerce Store Plan",
-		price: "$50/mo",
-		desc: "You are currently on the E-commerce Store subscription ($50/mo). Enjoy full online store and product catalog features.",
+		price: "$43/mo",
+		desc: "You are currently on the E-commerce Store subscription ($43/mo). Enjoy full online store and product catalog features.",
 	},
 };
 
 export default function BillingPage() {
 	const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
 	const [tenantPlan, setTenantPlan] = useState<string>("NONE");
+	const [billingStatus, setBillingStatus] = useState<string>("ACTIVE");
+	const [pendingInvoice, setPendingInvoice] = useState<DBInvoice | null>(null);
+	const [invoicesList, setInvoicesList] = useState<DBInvoice[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
 		async function fetchBillingInfo() {
 			try {
-				const res = await fetch("/api/projects");
+				const res = await fetch("/api/billing/invoices");
 				if (res.ok) {
 					const data = await res.json();
-					if (data.tenant?.plan) {
-						setTenantPlan(data.tenant.plan);
+					if (data.tenant) {
+						setTenantPlan(data.tenant.plan || "NONE");
+						setBillingStatus(data.tenant.billingStatus || "ACTIVE");
 					}
+					setPendingInvoice(data.pendingInvoice || null);
+					setInvoicesList(data.invoices || []);
 				}
 			} catch (err) {
 				console.error("[FETCH_BILLING_ERROR]", err);
@@ -129,33 +148,131 @@ export default function BillingPage() {
 	const currentPlanInfo = PLAN_INFO_MAP[tenantPlan] || PLAN_INFO_MAP.NONE;
 	const isPaid = tenantPlan !== "NONE";
 
+	// Calculate remaining grace period days
+	const getGraceDaysRemaining = (graceEndStr: string) => {
+		const diff = new Date(graceEndStr).getTime() - Date.now();
+		return Math.max(1, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+	};
+
 	return (
 		<div className="min-h-screen bg-[#f8fafc] text-gray-900 pb-20">
 			<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
 				{/* Page Header */}
 				<div className="pb-6 border-b border-gray-200/80 mb-8">
 					<h1 className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900 tracking-tight mb-1">
-						Billing & Subscription
+						Billing & Invoicing
 					</h1>
 					<p className="text-gray-500 text-sm font-medium">
-						Manage your subscription plan, payment methods, and invoice history.
+						Manage your subscription plan, pending invoices, and flexible payment methods (Card, Bank Transfer, USSD, Mobile Money).
 					</p>
 				</div>
+
+				{/* PENDING INVOICE / GRACE PERIOD ALERT BANNER */}
+				{pendingInvoice && (
+					<div
+						className={`mb-8 p-6 rounded-2xl border ${
+							pendingInvoice.status === "PAST_DUE"
+								? "bg-red-50 border-red-200 text-red-900"
+								: pendingInvoice.status === "GRACE_PERIOD"
+								? "bg-amber-50 border-amber-200 text-amber-900"
+								: "bg-blue-50 border-blue-200 text-blue-900"
+						}`}>
+						<div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+							<div className="space-y-1.5">
+								<div className="flex items-center gap-2">
+									{pendingInvoice.status === "PAST_DUE" ? (
+										<span className="inline-flex items-center gap-1 text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-red-600 text-white tracking-wider">
+											<ShieldAlert className="w-3.5 h-3.5" />
+											Site Flagged / Action Required
+										</span>
+									) : pendingInvoice.status === "GRACE_PERIOD" ? (
+										<span className="inline-flex items-center gap-1 text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-amber-600 text-white tracking-wider">
+											<Clock className="w-3.5 h-3.5" />
+											Grace Period Active ({getGraceDaysRemaining(pendingInvoice.gracePeriodEnd)} Days Remaining)
+										</span>
+									) : (
+										<span className="inline-flex items-center gap-1 text-[11px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-blue-600 text-white tracking-wider">
+											<Receipt className="w-3.5 h-3.5" />
+											Pending Renewal Invoice
+										</span>
+									)}
+								</div>
+
+								<h3 className="text-lg font-bold">
+									Invoice #{pendingInvoice.invoiceNumber} — {pendingInvoice.currency} {pendingInvoice.amount}.00 Due
+								</h3>
+								<p className="text-xs opacity-90 max-w-xl">
+									{pendingInvoice.status === "PAST_DUE"
+										? "Your website has been temporarily paused because the 7-day grace period ended. Complete the renewal payment to instantly restore your live site."
+										: pendingInvoice.status === "GRACE_PERIOD"
+										? `Your hosting invoice is overdue, but your site is currently protected by our 7-day grace period. Settle this invoice before the countdown expires.`
+										: "Your upcoming hosting renewal is ready. Click below to pay via Card, Bank Transfer, USSD, or Mobile Money."}
+								</p>
+							</div>
+
+							{pendingInvoice.paymentLink && (
+								<div className="shrink-0">
+									<a
+										href={pendingInvoice.paymentLink}
+										target="_blank"
+										rel="noopener noreferrer"
+										className={`inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-xs shadow-md transition-all ${
+											pendingInvoice.status === "PAST_DUE"
+												? "bg-red-600 hover:bg-red-700 text-white"
+												: pendingInvoice.status === "GRACE_PERIOD"
+												? "bg-amber-600 hover:bg-amber-700 text-white"
+												: "bg-blue-600 hover:bg-blue-700 text-white"
+										}`}>
+										<span>Pay Invoice ({pendingInvoice.currency} {pendingInvoice.amount}.00)</span>
+										<ExternalLink className="w-3.5 h-3.5" />
+									</a>
+								</div>
+							)}
+						</div>
+
+						{/* Payment Channels Notice */}
+						<div className="mt-4 pt-4 border-t border-black/10 flex flex-wrap items-center gap-4 text-xs font-semibold">
+							<span className="text-[11px] uppercase tracking-wider opacity-75">Supported Payment Channels:</span>
+							<span className="inline-flex items-center gap-1">
+								<CreditCard className="w-3.5 h-3.5 text-blue-600" />
+								<span>Card (Visa, Master, Verve)</span>
+							</span>
+							<span className="inline-flex items-center gap-1">
+								<Building2 className="w-3.5 h-3.5 text-emerald-600" />
+								<span>Bank Transfer</span>
+							</span>
+							<span className="inline-flex items-center gap-1">
+								<Smartphone className="w-3.5 h-3.5 text-purple-600" />
+								<span>USSD & Mobile Money</span>
+							</span>
+						</div>
+					</div>
+				)}
 
 				{/* Active Plan Card */}
 				<div className="bg-white border border-gray-200/90 rounded-2xl p-6 sm:p-8 mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
 					<div>
 						<div className="flex items-center gap-2.5 mb-2">
 							<span className="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full uppercase tracking-wider">
-								Current Plan
+								Current Workspace
 							</span>
 							<span
-								className={`text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider ${
-									isPaid
-										? "text-emerald-600 bg-emerald-50"
+								className={`text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${
+									billingStatus === "PAST_DUE"
+										? "text-red-700 bg-red-100"
+										: billingStatus === "GRACE_PERIOD"
+										? "text-amber-700 bg-amber-100"
+										: isPaid
+										? "text-emerald-700 bg-emerald-50"
 										: "text-gray-500 bg-gray-100"
 								}`}>
-								{isPaid ? "Active" : "No Plan"}
+								{billingStatus === "PAST_DUE"
+									? "Site Flagged"
+									: billingStatus === "GRACE_PERIOD"
+									? "Grace Period"
+									: isPaid
+									? "Active"
+									: "No Plan"}
 							</span>
 						</div>
 						<h2 className="text-2xl font-bold font-nohemi text-gray-900 mb-1">
@@ -247,9 +364,7 @@ export default function BillingPage() {
 												<li
 													key={feat}
 													className="flex items-center gap-2.5 text-xs text-gray-700 font-medium">
-													<span className="material-symbols-outlined text-emerald-600 text-[18px]">
-														check_circle
-													</span>
+													<CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
 													<span>{feat}</span>
 												</li>
 											))}
@@ -278,53 +393,129 @@ export default function BillingPage() {
 
 				{/* Invoice History Table */}
 				<div>
-					<h2 className="text-xl font-bold font-nohemi text-gray-900 mb-6">
-						Billing History
-					</h2>
+					<div className="flex items-center justify-between mb-6">
+						<h2 className="text-xl font-bold font-nohemi text-gray-900">
+							Invoice History
+						</h2>
+						<span className="text-xs text-gray-500 font-medium">
+							Supports Card, Bank Transfer, USSD & Mobile Money
+						</span>
+					</div>
 
-					<div className="bg-white border border-gray-200/90 rounded-2xl overflow-hidden">
-						<div className="overflow-x-auto">
-							<table className="w-full text-left border-collapse">
-								<thead>
-									<tr className="border-b border-gray-100 bg-gray-50/50 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
-										<th className="py-3.5 px-5">Invoice ID</th>
-										<th className="py-3.5 px-5">Date</th>
-										<th className="py-3.5 px-5">Plan</th>
-										<th className="py-3.5 px-5">Amount</th>
-										<th className="py-3.5 px-5">Status</th>
-									</tr>
-								</thead>
-								<tbody className="divide-y divide-gray-100 text-xs">
-									{mockInvoices.map((inv) => (
-										<tr
-											key={inv.id}
-											className="hover:bg-gray-50/50 transition-colors">
-											<td className="py-4 px-5 font-mono font-semibold text-gray-900">
-												{inv.id}
-											</td>
-											<td className="py-4 px-5 text-gray-600 font-medium">
-												{inv.date}
-											</td>
-											<td className="py-4 px-5 text-gray-800 font-semibold">
-												{inv.plan}
-											</td>
-											<td className="py-4 px-5 text-gray-900 font-bold">
-												{inv.amount}
-											</td>
-											<td className="py-4 px-5">
-												<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-bold">
-													<span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-													{inv.status}
-												</span>
-											</td>
+					<div className="bg-white border border-gray-200/90 rounded-2xl overflow-hidden shadow-xs">
+						{isLoading ? (
+							<div className="p-8 text-center text-xs text-gray-500 flex items-center justify-center gap-2">
+								<Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+								<span>Loading invoice records...</span>
+							</div>
+						) : invoicesList.length === 0 ? (
+							<div className="p-8 text-center text-xs text-gray-500">
+								No invoice history yet. When your setup or renewal invoices are generated, they will appear here.
+							</div>
+						) : (
+							<div className="overflow-x-auto">
+								<table className="w-full text-left border-collapse">
+									<thead>
+										<tr className="border-b border-gray-100 bg-gray-50/50 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+											<th className="py-3.5 px-5">Invoice ID</th>
+											<th className="py-3.5 px-5">Type / Plan</th>
+											<th className="py-3.5 px-5">Date Due</th>
+											<th className="py-3.5 px-5">Amount</th>
+											<th className="py-3.5 px-5">Method</th>
+											<th className="py-3.5 px-5">Status</th>
+											<th className="py-3.5 px-5 text-right">Action</th>
 										</tr>
-									))}
-								</tbody>
-							</table>
-						</div>
+									</thead>
+									<tbody className="divide-y divide-gray-100 text-xs">
+										{invoicesList.map((inv) => (
+											<tr
+												key={inv.id}
+												className="hover:bg-gray-50/50 transition-colors">
+												<td className="py-4 px-5 font-mono font-semibold text-gray-900">
+													#{inv.invoiceNumber}
+												</td>
+												<td className="py-4 px-5">
+													<p className="font-semibold text-gray-900">
+														{inv.plan.replace(/_/g, " ")}
+													</p>
+													<span className="text-[10px] text-gray-400 font-medium">
+														{inv.type === "INITIAL_SETUP" ? "Setup & Initial" : "Monthly Renewal"}
+													</span>
+												</td>
+												<td className="py-4 px-5 text-gray-600 font-medium">
+													{new Date(inv.dueDate).toLocaleDateString()}
+												</td>
+												<td className="py-4 px-5 text-gray-900 font-bold">
+													{inv.currency} {inv.amount}.00
+												</td>
+												<td className="py-4 px-5 capitalize text-gray-600 font-medium">
+													{inv.paymentMethod ? (
+														<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 text-gray-700 text-[10px] font-semibold">
+															{inv.paymentMethod === "card" && <CreditCard className="w-3 h-3 text-blue-600" />}
+															{inv.paymentMethod === "banktransfer" && <Building2 className="w-3 h-3 text-emerald-600" />}
+															{(inv.paymentMethod === "ussd" || inv.paymentMethod === "mobilemoney") && (
+																<Smartphone className="w-3 h-3 text-purple-600" />
+															)}
+															<span>{inv.paymentMethod.replace(/_/g, " ")}</span>
+														</span>
+													) : (
+														<span className="text-gray-400 text-[11px]">Multi-Method</span>
+													)}
+												</td>
+												<td className="py-4 px-5">
+													<span
+														className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+															inv.status === "PAID"
+																? "bg-emerald-50 text-emerald-700"
+																: inv.status === "GRACE_PERIOD"
+																? "bg-amber-50 text-amber-700"
+																: inv.status === "PAST_DUE"
+																? "bg-red-50 text-red-700"
+																: "bg-blue-50 text-blue-700"
+														}`}>
+														<span
+															className={`w-1.5 h-1.5 rounded-full ${
+																inv.status === "PAID"
+																	? "bg-emerald-600"
+																	: inv.status === "GRACE_PERIOD"
+																	? "bg-amber-600"
+																	: inv.status === "PAST_DUE"
+																	? "bg-red-600"
+																	: "bg-blue-600"
+															}`}
+														/>
+														{inv.status}
+													</span>
+												</td>
+												<td className="py-4 px-5 text-right">
+													{inv.status === "PAID" ? (
+														<span className="text-emerald-600 font-bold text-[11px] inline-flex items-center gap-1">
+															<CheckCircle2 className="w-3.5 h-3.5" />
+															<span>Receipt Emailed</span>
+														</span>
+													) : inv.paymentLink ? (
+														<a
+															href={inv.paymentLink}
+															target="_blank"
+															rel="noopener noreferrer"
+															className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] shadow-xs transition-colors">
+															<span>Pay Now</span>
+															<ExternalLink className="w-3 h-3" />
+														</a>
+													) : (
+														<span className="text-gray-400 text-[11px]">Pending Link</span>
+													)}
+												</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+							</div>
+						)}
 					</div>
 				</div>
 			</div>
 		</div>
 	);
 }
+

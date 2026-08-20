@@ -21,6 +21,9 @@ export const users = pgTable("users", {
 	emailVerified: timestamp("emailVerified", { mode: "date" }),
 	passwordHash: text("passwordHash"),
 	image: text("image"),
+	phone: text("phone"),
+	emailNotifications: boolean("emailNotifications").default(true).notNull(),
+	projectUpdates: boolean("projectUpdates").default(true).notNull(),
 	role: text("role").default("USER").notNull(),
 	createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
 	updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
@@ -96,6 +99,9 @@ export const tenants = pgTable("tenants", {
 	slug: text("slug").notNull().unique(), // e.g. "bella-bakery" -> bella-bakery.kiosk.site
 	customDomain: text("customDomain").unique(), // e.g. "bellabakery.com"
 	plan: text("plan").default("NONE").notNull(), // NONE | LANDING_PAGE | SALES_FUNNEL | E_COMMERCE
+	billingStatus: text("billingStatus").default("ACTIVE").notNull(), // ACTIVE | PENDING | GRACE_PERIOD | PAST_DUE | SUSPENDED
+	currentPeriodEnd: timestamp("currentPeriodEnd", { mode: "date" }),
+	gracePeriodEnd: timestamp("gracePeriodEnd", { mode: "date" }),
 	isCustomDomainVerified: boolean("isCustomDomainVerified").default(false).notNull(),
 	createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
 	updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
@@ -121,7 +127,7 @@ export const projects = pgTable("projects", {
 });
 
 /**
- * 7. Subscriptions Table (Stripe / Paystack Billing per Tenant)
+ * 7. Subscriptions Table (Billing per Tenant)
  */
 export const subscriptions = pgTable("subscriptions", {
 	id: text("id")
@@ -130,12 +136,12 @@ export const subscriptions = pgTable("subscriptions", {
 	tenantId: text("tenantId")
 		.notNull()
 		.references(() => tenants.id, { onDelete: "cascade" }),
-	gateway: text("gateway").notNull(), // "stripe" | "paystack"
+	gateway: text("gateway").notNull(), // "flutterwave" | "stripe" | "paystack"
 	customerId: text("customerId").notNull(),
 	subscriptionId: text("subscriptionId").notNull().unique(),
 	planId: text("planId").notNull(), // "landing-page" | "sales-funnel" | "ecommerce"
 	billingCycle: text("billingCycle").notNull(), // "monthly" | "yearly"
-	status: text("status").notNull(), // "active" | "canceled" | "past_due"
+	status: text("status").notNull(), // "active" | "grace_period" | "past_due" | "canceled"
 	currentPeriodStart: timestamp("currentPeriodStart", { mode: "date" }).notNull(),
 	currentPeriodEnd: timestamp("currentPeriodEnd", { mode: "date" }).notNull(),
 	createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
@@ -154,4 +160,35 @@ export const idempotencyKeys = pgTable("idempotency_keys", {
 	statusCode: integer("statusCode"),
 	createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
 	expiresAt: timestamp("expiresAt", { mode: "date" }).notNull(),
+});
+
+/**
+ * 9. Invoices Table (Scheduled Payment Requests / Recurring Multi-Method Invoicing)
+ */
+export const invoices = pgTable("invoices", {
+	id: text("id")
+		.primaryKey()
+		.$defaultFn(() => crypto.randomUUID()),
+	invoiceNumber: text("invoiceNumber").notNull().unique(), // e.g. "INV-2026-0042"
+	tenantId: text("tenantId")
+		.notNull()
+		.references(() => tenants.id, { onDelete: "cascade" }),
+	userId: text("userId")
+		.notNull()
+		.references(() => users.id, { onDelete: "cascade" }),
+	plan: text("plan").notNull(), // LANDING_PAGE | SALES_FUNNEL | E_COMMERCE
+	billingCycle: text("billingCycle").default("monthly").notNull(), // monthly | yearly
+	type: text("type").default("RECURRING_HOSTING").notNull(), // INITIAL_SETUP | RECURRING_HOSTING
+	amount: integer("amount").notNull(),
+	currency: text("currency").default("USD").notNull(),
+	status: text("status").default("PENDING").notNull(), // PENDING | PAID | GRACE_PERIOD | PAST_DUE | CANCELED
+	paymentLink: text("paymentLink"),
+	txRef: text("txRef").unique(),
+	paymentMethod: text("paymentMethod"), // card | banktransfer | ussd | mobilemoney
+	dueDate: timestamp("dueDate", { mode: "date" }).notNull(),
+	gracePeriodEnd: timestamp("gracePeriodEnd", { mode: "date" }).notNull(),
+	paidAt: timestamp("paidAt", { mode: "date" }),
+	remindersSent: integer("remindersSent").default(0).notNull(),
+	createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
+	updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
 });

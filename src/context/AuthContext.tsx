@@ -11,7 +11,10 @@ export interface UserProfile {
 	name: string | null;
 	email: string;
 	image?: string | null;
+	phone?: string | null;
 	role: string;
+	emailNotifications?: boolean;
+	projectUpdates?: boolean;
 }
 
 export interface AuthContextType {

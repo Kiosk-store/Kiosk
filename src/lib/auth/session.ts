@@ -12,7 +12,10 @@ export interface SessionUser {
 	name: string | null;
 	email: string;
 	image: string | null;
+	phone?: string | null;
 	role: string;
+	emailNotifications?: boolean;
+	projectUpdates?: boolean;
 }
 
 /**
@@ -90,6 +93,9 @@ export async function getAuthenticatedUser(): Promise<SessionUser | null> {
 		name: userRecord.name,
 		email: userRecord.email,
 		image: userRecord.image,
+		phone: userRecord.phone,
 		role: userRecord.role,
+		emailNotifications: userRecord.emailNotifications,
+		projectUpdates: userRecord.projectUpdates,
 	};
 }

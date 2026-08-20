@@ -21,7 +21,7 @@ export interface InitializePaymentInput {
 	name: string;
 	tx_ref: string;
 	redirect_url: string;
-	payment_plan?: string;
+	payment_options?: string;
 	title?: string;
 	description?: string;
 	meta?: Record<string, any>;
@@ -49,6 +49,7 @@ export function verifyFlutterwaveWebhookHash(verifHashHeader: string): boolean {
 
 /**
  * Initializes a Flutterwave payment transaction and returns hosted checkout link.
+ * Enables full multi-channel payment support: Card, Bank Transfer, USSD, and Mobile Money.
  */
 export async function initializeFlutterwavePayment(
 	input: InitializePaymentInput,
@@ -67,21 +68,18 @@ export async function initializeFlutterwavePayment(
 			amount: input.amount,
 			currency: input.currency.toUpperCase(),
 			redirect_url: input.redirect_url,
+			payment_options: input.payment_options || "card,banktransfer,ussd,mobilemoney",
 			customer: {
 				email: input.email,
 				name: input.name,
 			},
 			customizations: {
-				title: input.title || "Kiosk Plan Subscription",
-				description: input.description || "Subscription payment for Kiosk service plan",
+				title: input.title || "Kiosk Invoice Payment",
+				description: input.description || "Payment for Kiosk website hosting & maintenance request",
 				logo: "https://kioosk.online/logo.png",
 			},
 			meta: input.meta,
 		};
-
-		if (input.payment_plan) {
-			payload.payment_plan = input.payment_plan;
-		}
 
 		const response = await fetch(`${FLUTTERWAVE_BASE_URL}/payments`, {
 			method: "POST",

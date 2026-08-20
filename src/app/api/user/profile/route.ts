@@ -10,9 +10,12 @@ import { auth } from "@/auth";
 import { checkRateLimit } from "@/lib/ratelimit";
 
 const updateProfileSchema = z.object({
-	name: z.string().min(2, "Name must be at least 2 characters.").optional(),
-	phone: z.string().optional(),
+	name: z.string().min(1, "Name cannot be empty.").optional(),
+	phone: z.string().nullable().optional(),
 	company: z.string().optional(),
+	image: z.string().nullable().optional(),
+	emailNotifications: z.boolean().optional(),
+	projectUpdates: z.boolean().optional(),
 });
 
 /**
@@ -41,13 +44,18 @@ export async function GET() {
 				id: userRecord?.id,
 				name: userRecord?.name || "",
 				email: userRecord?.email || "",
+				phone: userRecord?.phone || "",
 				image: userRecord?.image || null,
 				role: userRecord?.role || "USER",
+				emailNotifications: userRecord?.emailNotifications ?? true,
+				projectUpdates: userRecord?.projectUpdates ?? true,
 			},
 			tenant: {
+				id: tenantRecord?.id,
 				name: tenantRecord?.name || "",
 				company: tenantRecord?.name || "",
 				plan: tenantRecord?.plan || "NONE",
+				slug: tenantRecord?.slug || "",
 			},
 		});
 	} catch (err) {
@@ -88,21 +96,28 @@ export async function PATCH(request: Request) {
 			);
 		}
 
-		const { name, company } = validation.data;
+		const { name, phone, company, image, emailNotifications, projectUpdates } = validation.data;
 
-		// 1. Update user in PostgreSQL database
-		if (name) {
+		// 1. Update user fields in PostgreSQL database
+		const userUpdates: Partial<typeof users.$inferInsert> = {
+			updatedAt: new Date(),
+		};
+
+		if (name !== undefined) userUpdates.name = name;
+		if (phone !== undefined) userUpdates.phone = phone;
+		if (image !== undefined) userUpdates.image = image;
+		if (emailNotifications !== undefined) userUpdates.emailNotifications = emailNotifications;
+		if (projectUpdates !== undefined) userUpdates.projectUpdates = projectUpdates;
+
+		if (Object.keys(userUpdates).length > 1) {
 			await db
 				.update(users)
-				.set({
-					name,
-					updatedAt: new Date(),
-				})
+				.set(userUpdates)
 				.where(eq(users.id, userId));
 		}
 
-		// 2. Update tenant company name in PostgreSQL database
-		if (company) {
+		// 2. Update or create tenant company name in PostgreSQL database
+		if (company !== undefined && company.trim() !== "") {
 			const tenant = await db.query.tenants.findFirst({
 				where: eq(tenants.ownerId, userId),
 			});
@@ -111,9 +126,25 @@ export async function PATCH(request: Request) {
 				await db
 					.update(tenants)
 					.set({
-						name: company,
+						name: company.trim(),
+						updatedAt: new Date(),
 					})
 					.where(eq(tenants.id, tenant.id));
+			} else {
+				const baseSlug = company
+					.toLowerCase()
+					.replace(/[^a-z0-9]/g, "-")
+					.replace(/-+/g, "-")
+					.slice(0, 30);
+				const randomSuffix = Math.random().toString(36).substring(2, 7);
+				const slug = `${baseSlug || "workspace"}-${randomSuffix}`;
+
+				await db.insert(tenants).values({
+					ownerId: userId,
+					name: company.trim(),
+					slug,
+					plan: "NONE",
+				});
 			}
 		}
 
@@ -121,14 +152,27 @@ export async function PATCH(request: Request) {
 			where: eq(users.id, userId),
 		});
 
+		const updatedTenant = await db.query.tenants.findFirst({
+			where: eq(tenants.ownerId, userId),
+		});
+
 		return NextResponse.json(
 			{
-				message: "Profile updated successfully in database",
+				message: "Settings updated successfully in database",
 				user: {
 					id: updatedUser?.id,
 					name: updatedUser?.name,
 					email: updatedUser?.email,
+					phone: updatedUser?.phone,
 					image: updatedUser?.image,
+					role: updatedUser?.role,
+					emailNotifications: updatedUser?.emailNotifications,
+					projectUpdates: updatedUser?.projectUpdates,
+				},
+				tenant: {
+					name: updatedTenant?.name || "",
+					company: updatedTenant?.name || "",
+					plan: updatedTenant?.plan || "NONE",
 				},
 			},
 			{ status: 200 },
