@@ -21,6 +21,8 @@ export interface AuthContextType {
 	user: UserProfile | null;
 	isLoading: boolean;
 	error: string | null;
+	isPaymentInProgress: boolean;
+	setPaymentInProgress: (inProgress: boolean) => void;
 	clearError: () => void;
 	login: (email: string, password: string) => Promise<boolean>;
 	signup: (name: string, email: string, password: string) => Promise<boolean>;
@@ -36,11 +38,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 	const [user, setUser] = useState<UserProfile | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const [isPaymentInProgress, setIsPaymentInProgressState] = useState(false);
 	const router = useRouter();
+
+	const setPaymentInProgress = (inProgress: boolean) => {
+		setIsPaymentInProgressState(inProgress);
+		if (typeof window !== "undefined") {
+			if (inProgress) {
+				sessionStorage.setItem("kiosk_payment_in_progress", "true");
+			} else {
+				sessionStorage.removeItem("kiosk_payment_in_progress");
+			}
+		}
+	};
+
+	const checkIsMakingPayment = (): boolean => {
+		if (typeof window === "undefined") return false;
+		const pathname = window.location.pathname;
+		const isPaymentRoute =
+			pathname.startsWith("/checkout") ||
+			pathname.includes("/billing") ||
+			pathname.includes("/payment");
+		const hasPaymentStorage = sessionStorage.getItem("kiosk_payment_in_progress") === "true";
+		return isPaymentInProgress || isPaymentRoute || hasPaymentStorage;
+	};
 
 	const clearError = () => setError(null);
 
-	// Fetch current session on mount
+	// Fetch current session on mount and periodic revalidation
 	const refreshUser = async () => {
 		try {
 			setIsLoading(true);
@@ -50,17 +75,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 				if (data.authenticated && data.user) {
 					setUser(data.user);
 				} else {
-					setUser(null);
+					handleSessionExpiry();
 				}
+			} else if (res.status === 401) {
+				handleSessionExpiry();
 			} else {
 				setUser(null);
 			}
 		} catch (err) {
 			console.error("[AUTH_REFRESH_ERROR]", err);
-			setUser(null);
 		} finally {
 			setIsLoading(false);
 		}
+	};
+
+	const handleSessionExpiry = () => {
+		const isMakingPayment = checkIsMakingPayment();
+		if (isMakingPayment) {
+			// Do NOT log the user out or redirect away while actively in a payment process
+			console.warn("[AUTH] Session expired but user is currently in a payment flow. Grace preserved.");
+			return;
+		}
+
+		setUser((prevUser) => {
+			if (prevUser && typeof window !== "undefined") {
+				const pathname = window.location.pathname;
+				// Auto-redirect to login if on protected routes
+				if (pathname.startsWith("/dashboard")) {
+					router.push("/get-started?tab=login&expired=true");
+				}
+			}
+			return null;
+		});
 	};
 
 	useEffect(() => {

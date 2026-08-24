@@ -2,17 +2,17 @@
 
 import { cookies } from "next/headers";
 import { db } from "@/db";
-import { users, sessions } from "@/db/schema";
-import { eq, and, lt } from "drizzle-orm";
+import { users, sessions, invoices } from "@/db/schema";
+import { eq, and, lt, gt } from "drizzle-orm";
 
 export const SESSION_COOKIE_NAME = "kiosk_session";
 
-// Session lifetime: 24 hours (86,400 seconds)
-export const SESSION_MAX_AGE_SECONDS = 24 * 60 * 60;
+// Session lifetime: 6 hours (21,600 seconds)
+export const SESSION_MAX_AGE_SECONDS = 6 * 60 * 60;
 export const SESSION_MAX_AGE_MS = SESSION_MAX_AGE_SECONDS * 1000;
 
-// Sliding session refresh threshold: if less than 12 hours remaining, extend session back to 24 hours
-export const SESSION_REFRESH_THRESHOLD_MS = 12 * 60 * 60 * 1000;
+// Sliding session refresh threshold: if less than 3 hours remaining, extend session back to 6 hours
+export const SESSION_REFRESH_THRESHOLD_MS = 3 * 60 * 60 * 1000;
 
 export interface SessionUser {
 	id: string;
@@ -26,7 +26,7 @@ export interface SessionUser {
 }
 
 /**
- * Creates a new active session and sets the HTTP-Only cookie with a 24-hour lifetime
+ * Creates a new active session and sets the HTTP-Only cookie with a 6-hour lifetime
  */
 export async function createSession(userId: string): Promise<string> {
 	const sessionToken = crypto.randomUUID();
@@ -84,8 +84,8 @@ export async function destroySession(): Promise<void> {
 }
 
 /**
- * Validates the session cookie, automatically purges expired tokens,
- * and refreshes active sessions using a sliding window.
+ * Validates the session cookie, automatically purges expired tokens (logging user out),
+ * except if the user is currently in the process of making a payment.
  */
 export async function getAuthenticatedUser(): Promise<SessionUser | null> {
 	const cookieStore = await cookies();
@@ -99,8 +99,61 @@ export async function getAuthenticatedUser(): Promise<SessionUser | null> {
 
 	// If session doesn't exist or is expired
 	if (!sessionRecord || new Date(sessionRecord.expires).getTime() < Date.now()) {
-		// Purge expired session from DB if found
 		if (sessionRecord) {
+			// Check if user is actively in the middle of making a payment
+			// (e.g. has a pending invoice created within the last 1 hour)
+			try {
+				const activePendingInvoice = await db.query.invoices.findFirst({
+					where: and(
+						eq(invoices.userId, sessionRecord.userId),
+						eq(invoices.status, "PENDING"),
+						gt(invoices.createdAt, new Date(Date.now() - 60 * 60 * 1000)),
+					),
+				});
+
+				if (activePendingInvoice) {
+					// User is currently making a payment — extend session grace window to complete payment
+					const graceExpires = new Date(Date.now() + 60 * 60 * 1000); // 1-hour grace window
+					await db
+						.update(sessions)
+						.set({ expires: graceExpires })
+						.where(eq(sessions.sessionToken, sessionToken));
+
+					try {
+						cookieStore.set(SESSION_COOKIE_NAME, sessionToken, {
+							httpOnly: true,
+							secure: process.env.NODE_ENV === "production",
+							sameSite: "lax",
+							path: "/",
+							maxAge: 60 * 60,
+							expires: graceExpires,
+						});
+					} catch (e) {
+						// Non-blocking in RSC context
+					}
+
+					const userRecord = await db.query.users.findFirst({
+						where: eq(users.id, sessionRecord.userId),
+					});
+
+					if (userRecord) {
+						return {
+							id: userRecord.id,
+							name: userRecord.name,
+							email: userRecord.email,
+							image: userRecord.image,
+							phone: userRecord.phone,
+							role: userRecord.role,
+							emailNotifications: userRecord.emailNotifications,
+							projectUpdates: userRecord.projectUpdates,
+						};
+					}
+				}
+			} catch (err) {
+				// If check fails, proceed to standard expiration purge
+			}
+
+			// Purge expired session from DB (logs user out)
 			try {
 				await db.delete(sessions).where(eq(sessions.sessionToken, sessionToken));
 			} catch (e) {

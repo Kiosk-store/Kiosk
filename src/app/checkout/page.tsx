@@ -25,6 +25,7 @@ import {
 	Smartphone,
 } from "lucide-react";
 import { useCurrency } from "@/context/CurrencyContext";
+import { useAuth } from "@/context/AuthContext";
 import { CURRENCIES, BASE_PRICES_USD, formatPrice, PlanKey } from "@/lib/currency";
 
 interface PlanDetails {
@@ -121,6 +122,8 @@ function CheckoutContent() {
 		activeCurrency,
 	);
 
+	const { setPaymentInProgress } = useAuth();
+
 	const handleCheckout = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (isProcessing) return;
@@ -128,6 +131,7 @@ function CheckoutContent() {
 		try {
 			setIsProcessing(true);
 			setErrorMessage(null);
+			setPaymentInProgress(true);
 
 			const idempotencyKey = crypto.randomUUID();
 
@@ -147,6 +151,7 @@ function CheckoutContent() {
 			const data = await res.json();
 
 			if (!res.ok || !data.link) {
+				setPaymentInProgress(false);
 				if (res.status === 401) {
 					router.push("/get-started?tab=login&redirect=/checkout");
 					return;
@@ -159,6 +164,7 @@ function CheckoutContent() {
 			window.location.href = data.link;
 		} catch (err) {
 			console.error("[CHECKOUT_ERROR]", err);
+			setPaymentInProgress(false);
 			setErrorMessage("A network error occurred. Please try again.");
 			setIsProcessing(false);
 		}
