@@ -117,9 +117,16 @@ export default function TemplatesDirectoryPage() {
 			<div className="pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full flex-1 space-y-12">
 				{/* Header */}
 				<div className="text-center max-w-3xl mx-auto space-y-4">
-					<div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold border border-blue-100">
-						<span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-						<span>Template Repository</span>
+					<div className="flex items-center justify-center gap-3">
+						<Link
+							href="/dashboard/templates"
+							className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-200/80 hover:bg-slate-300 text-slate-700 text-xs font-semibold transition-colors">
+							<span>← Dashboard Templates</span>
+						</Link>
+						<div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold border border-blue-100">
+							<span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+							<span>Template Repository</span>
+						</div>
 					</div>
 					<h1 className="text-3xl sm:text-5xl font-bold font-nohemi text-slate-900 tracking-tight">
 						Master Template Library

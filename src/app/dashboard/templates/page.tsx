@@ -35,6 +35,7 @@ interface Template {
 	features: string[];
 	industry: string;
 	previewImageBg: string;
+	previewHref: string;
 }
 
 const templates: Template[] = [
@@ -53,6 +54,7 @@ const templates: Template[] = [
 		badgeText: "text-blue-700",
 		industry: "SaaS & Tech",
 		previewImageBg: "bg-slate-900 text-white",
+		previewHref: "/templates/landing-page",
 		features: [
 			"High-converting Hero section",
 			"Interactive feature comparison grid",
@@ -75,6 +77,7 @@ const templates: Template[] = [
 		badgeText: "text-emerald-700",
 		industry: "Real Estate & Architecture",
 		previewImageBg: "bg-emerald-950 text-emerald-100",
+		previewHref: "/templates/sales-funnel",
 		features: [
 			"Full-screen property photo showcase",
 			"Schedule private tour booking form",
@@ -97,9 +100,10 @@ const templates: Template[] = [
 		badgeText: "text-purple-700",
 		industry: "E-commerce & Apparel",
 		previewImageBg: "bg-indigo-950 text-purple-200",
+		previewHref: "/templates/ecommerce",
 		features: [
 			"Instant product variant selector",
-			"Stripe & PayPal integrated checkout",
+			"Integrated multi-channel checkout",
 			"Inventory counter & size guide",
 			"Customer reviews & photo ratings",
 		],
@@ -112,18 +116,19 @@ const templates: Template[] = [
 		price: "$15",
 		delivery: "3-5 Days",
 		description:
-			"Warm organic tones showcasing craft coffee, daily menus, and store locator.",
+			"Warm organic tones showcasing craft coffee, daily food menus, and online ordering.",
 		accentBg: "bg-amber-50",
 		accentText: "text-amber-600",
 		badgeBg: "bg-amber-100/70",
 		badgeText: "text-amber-800",
 		industry: "Food & Beverage",
 		previewImageBg: "bg-stone-900 text-amber-100",
+		previewHref: "/templates/restaurant",
 		features: [
-			"Interactive menu & pricing accordion",
-			"Direct order & table reservation",
-			"Google Maps & opening hours",
-			"Instagram social feed gallery",
+			"Categorized food & drink menu tabs",
+			"Table reservation modal widget",
+			"Instant WhatsApp ordering flow",
+			"Google Maps & operating hours card",
 		],
 	},
 	{
@@ -141,6 +146,7 @@ const templates: Template[] = [
 		badgeText: "text-rose-700",
 		industry: "Health & Fitness",
 		previewImageBg: "bg-slate-950 text-rose-300",
+		previewHref: "/templates/sales-funnel",
 		features: [
 			"Membership tier breakdown",
 			"Class schedule & trainer booking",
@@ -150,24 +156,25 @@ const templates: Template[] = [
 	},
 	{
 		id: "apex-capital",
-		name: "Apex Venture Capital",
+		name: "Apex Advisory & Capital",
 		category: "Landing Page",
 		style: "Corporate",
 		price: "$15",
 		delivery: "3-5 Days",
 		description:
-			"Trustworthy corporate layout tailored for financial advisors, funds, and consultants.",
-		accentBg: "bg-blue-50",
-		accentText: "text-blue-700",
-		badgeBg: "bg-blue-100/70",
-		badgeText: "text-blue-800",
+			"Trustworthy corporate layout tailored for financial advisors, consultants, and executive firms.",
+		accentBg: "bg-teal-50",
+		accentText: "text-teal-700",
+		badgeBg: "bg-teal-100/70",
+		badgeText: "text-teal-800",
 		industry: "Finance & Consulting",
-		previewImageBg: "bg-slate-900 text-blue-200",
+		previewImageBg: "bg-slate-900 text-teal-200",
+		previewHref: "/templates/consulting",
 		features: [
-			"Portfolio track record grid",
-			"Investment thesis & partner bios",
-			"Investor relations pitch form",
-			"Compliance & disclosure footer",
+			"Consultant authority profile stack",
+			"Transparent retainer packages",
+			"Interactive booking calendar",
+			"Verified client ratings & proof stack",
 		],
 	},
 	{
@@ -185,33 +192,35 @@ const templates: Template[] = [
 		badgeText: "text-orange-700",
 		industry: "Education & Coaching",
 		previewImageBg: "bg-stone-900 text-orange-200",
+		previewHref: "/templates/sales-funnel",
 		features: [
 			"Curriculum module breakdown",
 			"Student video testimonials",
 			"Countdown timer urgency bar",
-			"Teachable / Skool integration",
+			"Opt-in lead magnet gate",
 		],
 	},
 	{
 		id: "studio-architecture",
-		name: "Minimalist Design Studio",
+		name: "Creative Agency & Studio",
 		category: "Landing Page",
 		style: "Minimalist",
 		price: "$15",
 		delivery: "3-5 Days",
 		description:
-			"Editorial grid layout for creative agencies, interior designers, and architects.",
-		accentBg: "bg-gray-100",
-		accentText: "text-gray-900",
-		badgeBg: "bg-gray-200",
-		badgeText: "text-gray-800",
+			"Editorial showcase for creative agencies, interior designers, branding studios, and architects.",
+		accentBg: "bg-indigo-50",
+		accentText: "text-indigo-900",
+		badgeBg: "bg-indigo-100",
+		badgeText: "text-indigo-800",
 		industry: "Design & Agencies",
 		previewImageBg: "bg-slate-900 text-slate-100",
+		previewHref: "/templates/agency",
 		features: [
-			"Full-width case study grid",
-			"Interactive project filtering",
-			"Client inquiry questionnaire",
-			"Press & award badges",
+			"Filterable case study showcase",
+			"Interactive scope & cost estimator",
+			"Client project intake brief form",
+			"Authority badges & services grid",
 		],
 	},
 	{
@@ -229,11 +238,12 @@ const templates: Template[] = [
 		badgeText: "text-pink-700",
 		industry: "Beauty & Wellness",
 		previewImageBg: "bg-pink-950 text-pink-200",
+		previewHref: "/templates/ecommerce",
 		features: [
-			"Routine quiz & product finder",
-			"Subscription & save checkout",
+			"Product catalog & category filter tabs",
+			"Slide-out instant cart drawer",
 			"Ingredient transparency list",
-			"User reviews with photo uploads",
+			"Integrated checkout flow",
 		],
 	},
 	{
@@ -251,6 +261,7 @@ const templates: Template[] = [
 		badgeText: "text-cyan-700",
 		industry: "AI & Developer Tools",
 		previewImageBg: "bg-slate-950 text-cyan-200",
+		previewHref: "/templates/sales-funnel",
 		features: [
 			"Interactive code snippet preview",
 			"API pricing calculator",
@@ -293,26 +304,35 @@ export default function TemplatesPage() {
 					<div>
 						<div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-extrabold uppercase tracking-wider mb-3">
 							<Sparkles className="w-3.5 h-3.5" />
-							<span>10 Premium Designs</span>
+							<span>10 Premium Designs & 6 Master Codebases</span>
 						</div>
 						<h1 className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900 tracking-tight mb-1">
 							Design Templates Showcase
 						</h1>
 						<p className="text-gray-500 text-sm font-medium">
-							Explore our curated library of proven, high-converting website designs.
+							Explore our curated library of proven, high-converting website designs with direct interactive live code previews.
 						</p>
 					</div>
 
-					<PillButton
-						href="/dashboard/projects/new"
-						baseColor="#004ac6"
-						circleColor="#ffffff"
-						textColor="#ffffff"
-						hoverTextColor="#004ac6"
-						useThunderFont={true}
-						className="px-6 py-2.5 text-xs font-bold border border-blue-600 shadow-sm self-start sm:self-auto">
-						+ Start New Build
-					</PillButton>
+					<div className="flex items-center gap-2.5 flex-wrap self-start sm:self-auto">
+						<Link
+							href="/templates"
+							className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-900 hover:bg-blue-600 text-white text-xs font-bold transition-colors shadow-xs">
+							<Layers className="w-3.5 h-3.5" />
+							<span>Master Templates Library</span>
+						</Link>
+
+						<PillButton
+							href="/dashboard/projects/new"
+							baseColor="#004ac6"
+							circleColor="#ffffff"
+							textColor="#ffffff"
+							hoverTextColor="#004ac6"
+							useThunderFont={true}
+							className="px-6 py-2.5 text-xs font-bold border border-blue-600 shadow-sm">
+							+ Start New Build
+						</PillButton>
+					</div>
 				</div>
 
 				{/* Filter Controls Bar */}
@@ -378,11 +398,12 @@ export default function TemplatesPage() {
 						{filteredTemplates.map((tpl) => (
 							<div
 								key={tpl.id}
-								className="bg-white border border-gray-200/90 rounded-3xl overflow-hidden hover:border-blue-500/40 hover:shadow-xs transition-all duration-200 flex flex-col justify-between group">
+								className="bg-white border border-gray-200/90 rounded-3xl overflow-hidden hover:border-blue-500/40 hover:shadow-lg transition-all duration-200 flex flex-col justify-between group">
 								{/* Top Mockup Header */}
 								<div>
-									<div
-										className={`p-6 ${tpl.previewImageBg} min-h-[160px] flex flex-col justify-between relative`}>
+									<Link
+										href={tpl.previewHref}
+										className={`p-6 ${tpl.previewImageBg} min-h-[160px] flex flex-col justify-between relative block cursor-pointer group/header`}>
 										<div className="flex items-center justify-between">
 											<span
 												className={`px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${tpl.badgeBg} ${tpl.badgeText}`}>
@@ -397,11 +418,12 @@ export default function TemplatesPage() {
 											<span className="text-[10px] uppercase font-bold tracking-widest text-white/60 block mb-1">
 												{tpl.industry}
 											</span>
-											<h3 className="text-lg font-bold font-nohemi leading-snug">
-												{tpl.name}
+											<h3 className="text-lg font-bold font-nohemi leading-snug group-hover/header:text-blue-300 transition-colors flex items-center justify-between">
+												<span>{tpl.name}</span>
+												<ArrowRight className="w-4 h-4 opacity-0 group-hover/header:opacity-100 transition-opacity" />
 											</h3>
 										</div>
-									</div>
+									</Link>
 
 									{/* Body Info */}
 									<div className="p-6">
@@ -435,14 +457,8 @@ export default function TemplatesPage() {
 								{/* Bottom Action Footer */}
 								<div className="p-6 pt-0 flex items-center gap-2 border-t border-gray-100/80 pt-4 mt-2">
 									<Link
-										href={
-											tpl.category === "Landing Page"
-												? "/templates/landing-page"
-												: tpl.category === "Sales Funnel"
-												? "/templates/sales-funnel"
-												: "/templates/ecommerce"
-										}
-										className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 text-xs font-semibold transition-colors cursor-pointer flex items-center justify-center gap-2 text-center">
+										href={tpl.previewHref}
+										className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-700 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 text-xs font-semibold transition-colors cursor-pointer flex items-center justify-center gap-2 text-center">
 										<Eye className="w-3.5 h-3.5 text-gray-500" />
 										<span>Live Code Preview</span>
 									</Link>
@@ -561,23 +577,32 @@ export default function TemplatesPage() {
 						</div>
 
 						{/* Modal Actions */}
-						<div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
-							<button
-								type="button"
-								onClick={() => setSelectedTemplate(null)}
-								className="px-5 py-2.5 rounded-full border border-gray-200/90 text-gray-600 hover:bg-gray-50 text-xs font-semibold transition-colors cursor-pointer">
-								Close Preview
-							</button>
+						<div className="flex items-center justify-between gap-3 pt-4 border-t border-gray-100">
+							<Link
+								href={selectedTemplate.previewHref}
+								className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-700">
+								<Eye className="w-4 h-4" />
+								<span>Open Full Page Live Preview →</span>
+							</Link>
 
-							<button
-								type="button"
-								onClick={() => {
-									setSelectedTemplate(null);
-									router.push("/dashboard/projects/new");
-								}}
-								className="px-6 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors cursor-pointer shadow-md">
-								Use This Template
-							</button>
+							<div className="flex items-center gap-2">
+								<button
+									type="button"
+									onClick={() => setSelectedTemplate(null)}
+									className="px-5 py-2.5 rounded-full border border-gray-200/90 text-gray-600 hover:bg-gray-50 text-xs font-semibold transition-colors cursor-pointer">
+									Close
+								</button>
+
+								<button
+									type="button"
+									onClick={() => {
+										setSelectedTemplate(null);
+										router.push("/dashboard/projects/new");
+									}}
+									className="px-6 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors cursor-pointer shadow-md">
+									Use This Template
+								</button>
+							</div>
 						</div>
 					</div>
 				</div>
