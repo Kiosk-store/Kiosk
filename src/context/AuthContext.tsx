@@ -65,6 +65,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 	useEffect(() => {
 		refreshUser();
+
+		// Check session validity periodically every 5 minutes
+		const interval = setInterval(() => {
+			refreshUser();
+		}, 5 * 60 * 1000);
+
+		// Re-validate session when returning to tab/window
+		const handleFocus = () => {
+			if (document.visibilityState === "visible") {
+				refreshUser();
+			}
+		};
+
+		window.addEventListener("focus", handleFocus);
+		document.addEventListener("visibilitychange", handleFocus);
+
+		return () => {
+			clearInterval(interval);
+			window.removeEventListener("focus", handleFocus);
+			document.removeEventListener("visibilitychange", handleFocus);
+		};
 	}, []);
 
 	// Password Login

@@ -2,190 +2,330 @@
 
 "use client";
 
-import Image from "next/image";
+import React from "react";
 import PillButton from "./PillButton";
-import { Clock, ShieldCheck, CheckCircle2 } from "lucide-react";
+import LottiePlayer from "./LottiePlayer";
+import ScrollReveal from "./ScrollReveal";
+import { Clock, ShieldCheck, Lock } from "lucide-react";
+
+interface StaggerTextProps {
+	text: string;
+	className?: string;
+	delay?: number;
+	staggerDuration?: number;
+}
+
+function StaggerText({
+	text,
+	className = "",
+	delay = 0,
+	staggerDuration = 0.08,
+}: StaggerTextProps) {
+	return (
+		<span className={`inline-flex whitespace-nowrap ${className}`}>
+			{text.split("").map((char, index) => (
+				<span
+					key={`${char}-${index}`}
+					className="inline-block will-change-transform"
+					style={{
+						animation: "staggerWave 3s cubic-bezier(0.45, 0, 0.55, 1) infinite",
+						animationDelay: `${delay + index * staggerDuration}s`,
+					}}>
+					{char === " " ? "\u00A0" : char}
+				</span>
+			))}
+		</span>
+	);
+}
+
+function Sparkle({ className = "", style }: { className?: string; style?: React.CSSProperties }) {
+	return (
+		<svg
+			viewBox="0 0 24 24"
+			fill="currentColor"
+			className={className}
+			style={style}
+			aria-hidden="true">
+			<path d="M12 0C12 6.627 6.627 12 0 12C6.627 12 12 17.373 12 24C12 17.373 17.373 12 24 12C17.373 12 12 6.627 12 0Z" />
+		</svg>
+	);
+}
+
+function CurvedUnderline({ className = "" }: { className?: string }) {
+	return (
+		<svg
+			viewBox="0 0 260 22"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+			className={className}
+			preserveAspectRatio="none"
+			aria-hidden="true">
+			<path
+				d="M3 14C48 3 98 22 145 10C190 -1 228 16 257 8"
+				stroke="currentColor"
+				strokeWidth="3.5"
+				strokeLinecap="round"
+			/>
+		</svg>
+	);
+}
 
 export default function Hero() {
 	return (
-		<section className="relative pt-32 pb-20 md:pt-44 md:pb-28 lg:pt-48 lg:pb-32 bg-white overflow-hidden">
-			{/* Decorative elements */}
-			<div className="absolute top-0 right-0 w-[500px] h-[500px] border-2 border-blue-100 rotate-12 pointer-events-none" />
-			<div className="absolute bottom-0 left-0 w-[400px] h-[400px] border-2 border-blue-50 -rotate-6 pointer-events-none" />
-			<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-blue-50 rounded-full pointer-events-none" />
+		<section className="relative pt-28 pb-16 sm:pt-36 sm:pb-24 md:pt-40 md:pb-28 bg-white overflow-hidden">
+			<style
+				dangerouslySetInnerHTML={{
+					__html: `
+						@keyframes staggerWave {
+							0%, 45%, 100% {
+								transform: translateY(0px);
+							}
+							20% {
+								transform: translateY(-7px);
+							}
+						}
+						@keyframes watermarkFloat {
+							0%, 100% {
+								transform: translateY(0px) rotate(0deg);
+							}
+							50% {
+								transform: translateY(-12px) rotate(0.8deg);
+							}
+						}
+						@keyframes watermarkFloatRev {
+							0%, 100% {
+								transform: translateY(0px) rotate(0deg);
+							}
+							50% {
+								transform: translateY(12px) rotate(-0.8deg);
+							}
+						}
+						@keyframes spinDashed {
+							from {
+								transform: rotate(0deg);
+							}
+							to {
+								transform: rotate(360deg);
+							}
+						}
+						@keyframes pulseSparkle {
+							0%, 100% {
+								transform: scale(0.85) rotate(0deg);
+								opacity: 0.4;
+							}
+							50% {
+								transform: scale(1.15) rotate(15deg);
+								opacity: 0.9;
+							}
+						}
+					`,
+				}}
+			/>
 
-			{/* Background effects */}
-			<div
-				aria-hidden
-				className="pointer-events-none absolute inset-0 z-0">
-				<div className="absolute -top-24 -left-24 w-[520px] h-[520px] rounded-full bg-[radial-gradient(circle,_rgba(82,39,255,0.18)_0%,_rgba(82,39,255,0)_45%)] blur-2xl opacity-90" />
-				<div className="absolute -right-12 top-24 w-[420px] h-[420px] rounded-full bg-[radial-gradient(circle,_rgba(181,151,207,0.14)_0%,_rgba(181,151,207,0)_50%)] blur-xl opacity-88" />
+			{/* Architectural Geometric Grid Background */}
+			<div className="absolute inset-0 bg-[linear-gradient(to_right,#f1f5f9_1px,transparent_1px),linear-gradient(to_bottom,#f1f5f9_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-70 pointer-events-none" />
 
-				<svg
-					className="absolute inset-0 w-full h-full overflow-visible"
-					viewBox="0 0 1200 800"
-					preserveAspectRatio="xMidYMid slice"
-					xmlns="http://www.w3.org/2000/svg">
-					<defs>
-						<linearGradient
-							id="g1"
-							x1="0%"
-							x2="100%"
-							y1="0%"
-							y2="100%">
-							<stop
-								offset="0%"
-								stopColor="var(--color-primary, #5227FF)"
-								stopOpacity="0.12"
-							/>
-							<stop
-								offset="100%"
-								stopColor="var(--color-primary, #5227FF)"
-								stopOpacity="0.04"
-							/>
-						</linearGradient>
-					</defs>
-					<path
-						d="M0 600 C300 520 600 720 900 640 C1150 560 1250 480 1400 420"
-						fill="none"
-						stroke="url(#g1)"
-						strokeWidth="140"
-						strokeLinecap="round"
-					/>
-					<circle
-						cx="980"
-						cy="140"
-						r="56"
-						fill="var(--color-primary, #5227FF)"
-						opacity="0.12"
-					/>
-					<circle
-						cx="160"
-						cy="200"
-						r="36"
-						fill="var(--color-primary, #5227FF)"
-						opacity="0.08"
-					/>
-					<circle
-						cx="420"
-						cy="520"
-						r="24"
-						fill="var(--color-primary, #5227FF)"
-						opacity="0.06"
-					/>
-				</svg>
+			{/* Design Lines & Technical Crosshairs */}
+			<div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden select-none">
+				{/* Top radiant hairline accent */}
+				<div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 max-w-4xl h-[1px] bg-gradient-to-r from-transparent via-blue-400/30 to-transparent" />
+				
+				{/* Coordinate Grid Crosshairs */}
+				<span className="absolute top-12 left-8 sm:left-14 font-mono text-[13px] font-bold text-blue-400/40">+</span>
+				<span className="absolute top-20 right-10 sm:right-24 font-mono text-[13px] font-bold text-blue-400/40">+</span>
+				<span className="absolute bottom-16 left-12 sm:left-28 font-mono text-[13px] font-bold text-blue-400/30">+</span>
+				<span className="absolute bottom-24 right-16 sm:right-32 font-mono text-[13px] font-bold text-blue-400/30">+</span>
+
+				{/* Floating Geometric Sparkles */}
+				<div
+					className="absolute top-24 left-[12%] text-blue-500 hidden sm:block"
+					style={{ animation: "pulseSparkle 4s ease-in-out infinite" }}>
+					<Sparkle className="w-5 h-5 text-blue-500/60" />
+				</div>
+				<div
+					className="absolute top-36 right-[8%] text-indigo-500 hidden md:block"
+					style={{ animation: "pulseSparkle 5s ease-in-out infinite", animationDelay: "1.5s" }}>
+					<Sparkle className="w-4 h-4 text-indigo-500/50" />
+				</div>
+				<div
+					className="absolute bottom-32 left-[6%] text-cyan-500 hidden lg:block"
+					style={{ animation: "pulseSparkle 4.5s ease-in-out infinite", animationDelay: "2.5s" }}>
+					<Sparkle className="w-3.5 h-3.5 text-cyan-500/50" />
+				</div>
 			</div>
 
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center relative z-10">
-				{/* Left Column */}
-				<div className="lg:col-span-7 space-y-6 md:space-y-8 text-center lg:text-left">
-					<h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight text-gray-900">
-						KIOSK: Simple websites for small businesses
-					</h1>
+			{/* Ambient Glowing Blobs */}
+			<div
+				aria-hidden
+				className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+				<div className="absolute -top-32 -left-32 w-[540px] h-[540px] rounded-full bg-[radial-gradient(circle,_rgba(0,74,198,0.1)_0%,_rgba(0,74,198,0)_60%)] blur-3xl" />
+				<div className="absolute top-20 right-0 w-[480px] h-[480px] rounded-full bg-[radial-gradient(circle,_rgba(99,102,241,0.06)_0%,_rgba(99,102,241,0)_60%)] blur-2xl" />
+			</div>
 
-					<p className="text-lg md:text-xl text-gray-600 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-						Landing pages or online stores - we build and host them.
-					</p>
-
-					{/* CTAs */}
-					<div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
-						{/* Primary Button */}
-						<PillButton
-							href="/get-started"
-							baseColor="#004ac6"
-							circleColor="#ffffff"
-							textColor="#ffffff"
-							hoverTextColor="#004ac6"
-							className="min-w-[180px] border-2 border-primary shadow-lg shadow-primary/20">
-							Get Started
-						</PillButton>
-
-						{/* Secondary Button */}
-						<PillButton
-							href="#how-it-works"
-							baseColor="#ffffff"
-							circleColor="#004ac6"
-							textColor="#0f172a"
-							hoverTextColor="#ffffff"
-							className="min-w-[180px] border-2 border-slate-300 hover:border-primary">
-							How It Works →
-						</PillButton>
-					</div>
-
-					{/* Metrics */}
-					<div className="pt-8 border-t-2 border-gray-200 flex flex-wrap justify-center lg:justify-start items-center gap-6 sm:gap-8 text-gray-600">
-						<div className="flex items-center gap-3">
-							<div
-								className="w-10 h-10 border-2 border-blue-600 bg-blue-50 flex items-center justify-center text-blue-600 font-bold shrink-0 rounded-full shadow-xs">
-								<Clock className="w-5 h-5" />
-							</div>
-							<div className="text-left">
-								<p className="text-sm font-bold text-gray-900">3-5 Days</p>
-								<p className="text-xs text-gray-500 font-medium">
-									Fast Launch Time
-								</p>
-							</div>
-						</div>
-
-						<div className="flex items-center gap-3">
-							<div
-								className="w-10 h-10 border-2 border-blue-600 bg-blue-50 flex items-center justify-center text-blue-600 font-bold shrink-0 rounded-full shadow-xs">
-								<ShieldCheck className="w-5 h-5" />
-							</div>
-							<div className="text-left">
-								<p className="text-sm font-bold text-gray-900">100% Yours</p>
-								<p className="text-xs text-gray-500 font-medium">
-									Your Brand & Content
-								</p>
-							</div>
-						</div>
-					</div>
+			{/* Watermark Animated Shops & Stores Layer */}
+			<div
+				aria-hidden
+				className="pointer-events-none absolute inset-0 z-0 overflow-hidden select-none">
+				{/* 1. Ambient Shopfront Watermark (Left side) */}
+				<div
+					className="absolute -top-8 -left-8 sm:left-4 md:left-8 w-72 h-72 sm:w-96 sm:h-96 opacity-[0.08] [mask-image:radial-gradient(ellipse_75%_75%_at_50%_50%,#000_60%,transparent_100%)] pointer-events-none"
+					style={{ animation: "watermarkFloat 12s ease-in-out infinite" }}>
+					<LottiePlayer
+						src="/lotties/A small shop.json"
+						className="w-full h-full object-contain filter grayscale"
+						speed={0.6}
+						autoplay={true}
+						loop={true}
+					/>
 				</div>
 
-				{/* Right Column - Preview Card */}
-				<div className="lg:col-span-5 relative mt-8 lg:mt-0">
-					<div className="absolute -top-4 -right-4 w-20 sm:w-24 h-20 sm:h-24 border-2 border-blue-200 bg-blue-50 rounded-full" />
-					<div className="absolute -bottom-4 -left-4 w-14 sm:w-16 h-14 sm:h-16 border-2 border-blue-100 bg-white rounded-full" />
+				{/* 2. Ambient Ecommerce & Shopping Watermark (Center / Right Background) */}
+				<div
+					className="absolute top-1/4 right-6 sm:right-20 md:right-36 w-64 h-64 sm:w-80 sm:h-80 opacity-[0.06] [mask-image:radial-gradient(ellipse_75%_75%_at_50%_50%,#000_60%,transparent_100%)] pointer-events-none"
+					style={{
+						animation: "watermarkFloatRev 14s ease-in-out infinite",
+						animationDelay: "2s",
+					}}>
+					<LottiePlayer
+						src="/lotties/shopping Ecommerce.json"
+						className="w-full h-full object-contain filter grayscale"
+						speed={0.6}
+						autoplay={true}
+						loop={true}
+					/>
+				</div>
 
-					<div className="relative border-2 border-gray-200 bg-white rounded-2xl overflow-hidden shadow-xl">
-						<div className="bg-gray-50 px-3 sm:px-4 py-3 flex items-center justify-between border-b-2 border-gray-200 gap-2">
-							<div className="flex items-center gap-1.5 shrink-0">
-								<div className="w-2.5 h-2.5 border border-red-400 bg-red-400 rounded-full" />
-								<div className="w-2.5 h-2.5 border border-yellow-400 bg-yellow-400 rounded-full" />
-								<div className="w-2.5 h-2.5 border border-green-400 bg-green-400 rounded-full" />
-							</div>
-							<div className="bg-white px-2.5 sm:px-3.5 py-1 border border-gray-300 text-[10px] sm:text-[11px] text-gray-600 font-mono flex items-center gap-1.5 rounded-full truncate max-w-[200px] sm:max-w-none">
-								<span className="w-2 h-2 border border-emerald-500 bg-emerald-500 rounded-full shrink-0" />
-								<span className="truncate">mybusiness.kioosk.online</span>
-							</div>
-							<span className="text-xs text-gray-400 hidden sm:inline">Secure</span>
-						</div>
+				{/* 3. Ambient Store Growth / Funnel Watermark (Bottom Center) */}
+				<div
+					className="absolute -bottom-10 left-1/3 w-60 h-60 sm:w-72 sm:h-72 opacity-[0.05] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_50%,transparent_100%)] pointer-events-none hidden sm:block"
+					style={{
+						animation: "watermarkFloat 16s ease-in-out infinite",
+						animationDelay: "4s",
+					}}>
+					<LottiePlayer
+						src="/lotties/funnel.json"
+						className="w-full h-full object-contain filter grayscale"
+						speed={0.5}
+						autoplay={true}
+						loop={true}
+					/>
+				</div>
+			</div>
 
-						<div className="aspect-[4/3] relative bg-gray-100">
-							<Image
-								src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8aQk-KbKq9uq35WVpvTGYdN49vv_82NRAiRkb7WhCYwvPU1ULvlJ2Z20SYODhiByYVtUOZpH4KiT-NHZf8R_BGqRAw9s9nU8WXx6e_tTImQxFc2JpJ5ks6nQOkXWnremwqd3HVKKVtvtHwL4qkIrRQFroX_cd3cpvT6gL9PG7bhjjyIWP2DGKgoGK1A5cgeGCa7SET1iJSmL34Kfa0m38BMJQkhFqwdDGzMEuDXUO_ABi5UfR8kJB"
-								alt="Bakery custom website preview created by Kiosk"
-								fill
-								sizes="(max-width: 1024px) 100vw, 42vw"
-								className="object-cover"
-								priority
-							/>
-						</div>
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+				<div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-6 items-center">
+					{/* Left Column: Simplified Headlines & CTAs */}
+					<div className="lg:col-span-5 space-y-6 sm:space-y-7 text-center lg:text-left">
+						{/* Main Headline */}
+						<ScrollReveal direction="up" delay={80}>
+							<div className="relative">
+								<h1 className="text-3.5xl xs:text-4xl sm:text-5xl md:text-5.5xl lg:text-6xl font-bold font-nohemi tracking-tight text-gray-900 leading-[1.12] sm:leading-[1.08]">
+									WE BUILD YOUR <StaggerText text="WEBSITE." delay={0} staggerDuration={0.07} />{" "}
+									<span className="text-blue-600">
+										YOU GROW YOUR{" "}
+										<span className="relative inline-block whitespace-nowrap">
+											<StaggerText text="BUSINESS." delay={0.7} staggerDuration={0.07} />
+											<CurvedUnderline className="absolute -bottom-1.5 sm:-bottom-2 md:-bottom-2.5 left-0 w-full h-[9px] sm:h-[12px] md:h-[15px] text-blue-500 pointer-events-none" />
+										</span>
+									</span>
+								</h1>
+							</div>
+						</ScrollReveal>
 
-						<div className="absolute bottom-3 left-3 sm:-bottom-5 sm:-left-5 bg-white/95 backdrop-blur-xs p-3 sm:p-4 border-2 border-gray-200 flex items-center gap-3 rounded-2xl shadow-lg max-w-[calc(100%-1.5rem)]">
-							<div
-								className="w-8 sm:w-10 h-8 sm:h-10 border-2 border-emerald-500 bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0 rounded-full">
-								<CheckCircle2 className="w-4 sm:w-5 h-4 sm:h-5" />
+						{/* Sub-headline */}
+						<ScrollReveal direction="up" delay={160}>
+							<p className="text-base sm:text-lg text-gray-600 max-w-lg mx-auto lg:mx-0 leading-relaxed font-medium">
+								Landing pages or online stores — we design, launch, and host them for you in 3–5 days.
+							</p>
+						</ScrollReveal>
+
+						{/* Action Buttons */}
+						<ScrollReveal direction="up" delay={240}>
+							<div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 sm:gap-4 pt-1">
+								<PillButton
+									href="/get-started"
+									baseColor="#004ac6"
+									circleColor="#ffffff"
+									textColor="#ffffff"
+									hoverTextColor="#004ac6"
+									useThunderFont={true}
+									className="w-full sm:w-auto px-8 py-3.5 sm:px-9 sm:py-4 rounded-full font-bold text-base sm:text-lg shadow-lg shadow-blue-600/20 cursor-pointer text-center">
+									Get Started
+								</PillButton>
+
+								<PillButton
+									href="/services"
+									baseColor="#ffffff"
+									circleColor="#004ac6"
+									textColor="#0f172a"
+									hoverTextColor="#ffffff"
+									className="w-full sm:w-auto px-7 py-3.5 sm:px-8 sm:py-4 rounded-full font-bold text-sm sm:text-base border-2 border-gray-200 hover:border-blue-600 shadow-2xs cursor-pointer text-center">
+									View Pricing →
+								</PillButton>
 							</div>
-							<div>
-								<p className="text-xs text-gray-500 font-medium">
-									Status: <span className="font-bold text-gray-900">Live & Published</span>
-								</p>
-								<p className="text-[10px] sm:text-xs font-bold text-blue-600">
-									Turnkey Website Ready
-								</p>
+						</ScrollReveal>
+
+						{/* Value Props Strip */}
+						<ScrollReveal direction="up" delay={320}>
+							<div className="pt-6 sm:pt-7 border-t border-gray-200/80 flex flex-wrap justify-center lg:justify-start items-center gap-5 sm:gap-7 text-gray-700">
+								<div className="flex items-center gap-3">
+									<div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0 shadow-2xs">
+										<Clock className="w-5 h-5" />
+									</div>
+									<div className="text-left">
+										<p className="text-xs sm:text-sm font-bold text-gray-900">3–5 Days</p>
+										<p className="text-[11px] text-gray-500 font-medium">Fast Turnaround</p>
+									</div>
+								</div>
+
+								<div className="flex items-center gap-3">
+									<div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shrink-0 shadow-2xs">
+										<ShieldCheck className="w-5 h-5" />
+									</div>
+									<div className="text-left">
+										<p className="text-xs sm:text-sm font-bold text-gray-900">100% Yours</p>
+										<p className="text-[11px] text-gray-500 font-medium">Brand & Content</p>
+									</div>
+								</div>
+
+								<div className="flex items-center gap-3">
+									<div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 shrink-0 shadow-2xs">
+										<Lock className="w-5 h-5" />
+									</div>
+									<div className="text-left">
+										<p className="text-xs sm:text-sm font-bold text-gray-900">Hosting Included</p>
+										<p className="text-[11px] text-gray-500 font-medium">SSL & Maintenance</p>
+									</div>
+								</div>
 							</div>
-						</div>
+						</ScrollReveal>
+					</div>
+
+					{/* Right Column: Massive Prominent Transparent Lottie with Rotating Dashed Rings */}
+					<div className="lg:col-span-7 flex items-center justify-center relative mt-4 lg:mt-0">
+						{/* Ambient Rotating Dashed Orbit Ring */}
+						<div
+							className="absolute w-[360px] h-[360px] sm:w-[480px] sm:h-[480px] md:w-[540px] md:h-[540px] rounded-full border border-dashed border-blue-200/50 pointer-events-none"
+							style={{ animation: "spinDashed 40s linear infinite" }}
+						/>
+
+						{/* Secondary Concentric Dashed Ring */}
+						<div
+							className="absolute w-[280px] h-[280px] sm:w-[380px] sm:h-[380px] rounded-full border border-dashed border-indigo-200/35 pointer-events-none"
+							style={{ animation: "spinDashed 30s linear infinite reverse" }}
+						/>
+
+						<ScrollReveal direction="up" delay={150}>
+							<div className="relative w-full max-w-[620px] lg:max-w-none h-[340px] xs:h-[380px] sm:h-[460px] md:h-[520px] lg:h-[580px] flex items-center justify-center overflow-visible">
+								<LottiePlayer
+									src="/lotties/Business Analysis.json"
+									className="w-full h-full object-contain scale-110 sm:scale-120 md:scale-125 lg:scale-130"
+									speed={1}
+									autoplay={true}
+									loop={true}
+								/>
+							</div>
+						</ScrollReveal>
 					</div>
 				</div>
 			</div>
