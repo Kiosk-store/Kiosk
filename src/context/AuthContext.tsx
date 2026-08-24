@@ -240,6 +240,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 				user,
 				isLoading,
 				error,
+				isPaymentInProgress,
+				setPaymentInProgress,
 				clearError,
 				login,
 				signup,
