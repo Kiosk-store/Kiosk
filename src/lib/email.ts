@@ -319,3 +319,59 @@ export async function sendSiteFlaggedNoticeEmail({
 
 	return sendEmail({ to: toEmail, subject, html });
 }
+
+/**
+ * Dispatches Password Reset Request Email with secure 1-hour expiration link.
+ */
+export async function sendPasswordResetEmail({
+	toEmail,
+	userName,
+	resetUrl,
+}: {
+	toEmail: string;
+	userName: string;
+	resetUrl: string;
+}) {
+	const subject = "Reset Your Kiosk Account Password";
+	const html = `
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<meta charset="utf-8">
+				<title>Reset Your Password</title>
+			</head>
+			<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; color: #0f172a; margin: 0; padding: 40px 20px;">
+				<div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; padding: 40px; border: 1px solid #e2e8f0;">
+					<div style="display: flex; align-items: center; margin-bottom: 24px;">
+						<div style="width: 32px; height: 32px; background-color: #2563eb; border-radius: 8px; color: #ffffff; font-weight: bold; text-align: center; line-height: 32px; font-size: 16px; margin-right: 12px;">K</div>
+						<span style="font-size: 20px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px;">KIOSK</span>
+					</div>
+					<h1 style="font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Password Reset Request</h1>
+					<p style="font-size: 15px; color: #334155; line-height: 1.6; margin-bottom: 20px;">
+						Hello ${userName || "there"}, we received a request to reset the password for your Kiosk account.
+					</p>
+					<p style="font-size: 14px; color: #64748b; line-height: 1.6; margin-bottom: 28px;">
+						Click the button below to choose a new password. For your security, this password reset link is valid for <strong>1 hour</strong>.
+					</p>
+
+					<div style="margin-bottom: 28px; text-align: center;">
+						<a href="${resetUrl}" style="display: inline-block; background-color: #2563eb; color: #ffffff; font-weight: 700; font-size: 14px; padding: 14px 32px; border-radius: 9999px; text-decoration: none; text-align: center;">Reset Password →</a>
+					</div>
+
+					<p style="font-size: 12px; color: #94a3b8; line-height: 1.6; margin-bottom: 20px;">
+						If you're having trouble clicking the button, copy and paste this link into your browser:<br/>
+						<a href="${resetUrl}" style="color: #2563eb; word-break: break-all;">${resetUrl}</a>
+					</p>
+
+					<hr style="border: none; border-top: 1px solid #f1f5f9; margin-bottom: 20px;" />
+					<p style="font-size: 12px; color: #94a3b8; line-height: 1.5; margin: 0;">
+						If you did not request this password reset, please ignore this email or reach out to support if you have concerns. Your password will remain unchanged.
+					</p>
+				</div>
+			</body>
+		</html>
+	`;
+
+	return sendEmail({ to: toEmail, subject, html });
+}
+
