@@ -32,9 +32,34 @@ import {
 	Shuffle,
 	Truck,
 	AlertCircle,
+	Share2,
+	Calendar,
+	Plus,
+	Minus,
+	ShoppingCart,
+	Package,
 } from "lucide-react";
 import PillButton from "@/components/PillButton";
 import { useCurrency } from "@/context/CurrencyContext";
+
+export interface ProductItem {
+	id: string;
+	name: string;
+	price: number;
+	description?: string;
+	category?: string;
+	imageUrl?: string;
+	badge?: string;
+}
+
+const CURRENCY_SYMBOLS: Record<string, string> = {
+	USD: "$",
+	NGN: "₦",
+	GHS: "GH₵",
+	KES: "KSh",
+	EUR: "€",
+	GBP: "£",
+};
 
 interface UploadedImage {
 	id: string;
@@ -114,17 +139,129 @@ function ContentForm() {
 	const [valueStack, setValueStack] = useState("");
 	const [testimonials, setTestimonials] = useState("");
 
-	// E-Commerce Specific Fields
-	const [productCatalog, setProductCatalog] = useState("");
+	// E-Commerce Specific Fields & Dynamic Products
 	const [currency, setCurrency] = useState("USD");
 	const [shippingInfo, setShippingInfo] = useState("");
+	const [products, setProducts] = useState<ProductItem[]>([
+		{
+			id: "prod-1",
+			name: "Signature Item",
+			price: 35.0,
+			description: "Handcrafted with premium materials and custom finishing.",
+			category: "Bestsellers",
+			imageUrl: "",
+			badge: "Best Seller",
+		},
+		{
+			id: "prod-2",
+			name: "Limited Edition Edition",
+			price: 55.0,
+			description: "Exclusive release with worldwide priority shipping.",
+			category: "Featured",
+			imageUrl: "",
+			badge: "New",
+		},
+	]);
+
+	// Preview Cart State (Fully functional inside Live Preview)
+	const [previewCart, setPreviewCart] = useState<{ product: ProductItem; quantity: number }[]>([]);
+	const [isPreviewCartOpen, setIsPreviewCartOpen] = useState(false);
+	const [cartNotification, setCartNotification] = useState<string | null>(null);
 
 	// Uploaded images state - Starts completely empty
 	const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
 
+	// Social & Essential Links State
+	const [whatsappLink, setWhatsappLink] = useState("");
+	const [xLink, setXLink] = useState("");
+	const [instagramLink, setInstagramLink] = useState("");
+	const [facebookLink, setFacebookLink] = useState("");
+	const [linkedinLink, setLinkedinLink] = useState("");
+	const [youtubeLink, setYoutubeLink] = useState("");
+	const [tiktokLink, setTiktokLink] = useState("");
+	const [bookingLink, setBookingLink] = useState("");
+	const [customLink, setCustomLink] = useState("");
+
 	const projectId = searchParams.get("projectId") || "default";
 	const draftKey = `kiosk_draft_content_${projectId}`;
 	const [hasLoadedDraft, setHasLoadedDraft] = useState(false);
+
+	// Product management helpers
+	const handleAddProduct = () => {
+		const newProd: ProductItem = {
+			id: `prod-${Date.now()}`,
+			name: "",
+			price: 0,
+			description: "",
+			category: "General",
+			imageUrl: "",
+			badge: "",
+		};
+		setProducts((prev) => [...prev, newProd]);
+	};
+
+	const handleUpdateProduct = (id: string, field: keyof ProductItem, value: any) => {
+		setProducts((prev) =>
+			prev.map((p) => (p.id === id ? { ...p, [field]: value } : p))
+		);
+	};
+
+	const handleDeleteProduct = (id: string) => {
+		setProducts((prev) => prev.filter((p) => p.id !== id));
+	};
+
+	const handleProductImageUpload = (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+		const url = URL.createObjectURL(file);
+		handleUpdateProduct(id, "imageUrl", url);
+	};
+
+	// Cart action helpers
+	const addToPreviewCart = (product: ProductItem) => {
+		setPreviewCart((prev) => {
+			const existingIndex = prev.findIndex((item) => item.product.id === product.id);
+			if (existingIndex > -1) {
+				const updated = [...prev];
+				updated[existingIndex].quantity += 1;
+				return updated;
+			}
+			return [...prev, { product, quantity: 1 }];
+		});
+		setCartNotification(`Added "${product.name || "Item"}" to cart`);
+		setTimeout(() => setCartNotification(null), 2500);
+		setIsPreviewCartOpen(true);
+	};
+
+	const updatePreviewCartQty = (productId: string, delta: number) => {
+		setPreviewCart((prev) => {
+			return prev
+				.map((item) => {
+					if (item.product.id === productId) {
+						const newQty = item.quantity + delta;
+						return newQty > 0 ? { ...item, quantity: newQty } : null;
+					}
+					return item;
+				})
+				.filter(Boolean) as { product: ProductItem; quantity: number }[];
+		});
+	};
+
+	const setPreviewCartQty = (productId: string, newQty: number) => {
+		if (newQty <= 0) {
+			setPreviewCart((prev) => prev.filter((item) => item.product.id !== productId));
+			return;
+		}
+		setPreviewCart((prev) =>
+			prev.map((item) =>
+				item.product.id === productId ? { ...item, quantity: newQty } : item
+			)
+		);
+	};
+
+	const removeFromPreviewCart = (productId: string) => {
+		setPreviewCart((prev) => prev.filter((item) => item.product.id !== productId));
+	};
 
 	// Load existing user submitted content from backend + localStorage cache
 	useEffect(() => {
@@ -145,6 +282,15 @@ function ContentForm() {
 				setCurrency("USD");
 				setShippingInfo("");
 				setSelectedFont("Outfit");
+				setWhatsappLink("");
+				setXLink("");
+				setInstagramLink("");
+				setFacebookLink("");
+				setLinkedinLink("");
+				setYoutubeLink("");
+				setTiktokLink("");
+				setBookingLink("");
+				setCustomLink("");
 				setUploadedImages([]);
 				setHasLoadedDraft(false);
 
@@ -184,12 +330,25 @@ function ContentForm() {
 				if (merged.valueStack) setValueStack(merged.valueStack);
 				if (merged.testimonials) setTestimonials(merged.testimonials);
 
-				// E-commerce Fields
-				if (merged.productCatalog) setProductCatalog(merged.productCatalog);
+				// E-commerce Fields & Products
+				if (Array.isArray(merged.products) && merged.products.length > 0) {
+					setProducts(merged.products);
+				}
 				if (merged.currency) setCurrency(merged.currency);
 				if (merged.shippingInfo) setShippingInfo(merged.shippingInfo);
 
 				if (merged.selectedFont) setSelectedFont(merged.selectedFont);
+
+				// Social Media & Necessary Links
+				if (merged.whatsappLink) setWhatsappLink(merged.whatsappLink);
+				if (merged.xLink) setXLink(merged.xLink);
+				if (merged.instagramLink) setInstagramLink(merged.instagramLink);
+				if (merged.facebookLink) setFacebookLink(merged.facebookLink);
+				if (merged.linkedinLink) setLinkedinLink(merged.linkedinLink);
+				if (merged.youtubeLink) setYoutubeLink(merged.youtubeLink);
+				if (merged.tiktokLink) setTiktokLink(merged.tiktokLink);
+				if (merged.bookingLink) setBookingLink(merged.bookingLink);
+				if (merged.customLink) setCustomLink(merged.customLink);
 
 				if (Array.isArray(merged.uploadedImages)) {
 					setUploadedImages(merged.uploadedImages);
@@ -218,10 +377,19 @@ function ContentForm() {
 				leadMagnetTitle,
 				valueStack,
 				testimonials,
-				productCatalog,
+				products,
 				currency,
 				shippingInfo,
 				selectedFont,
+				whatsappLink,
+				xLink,
+				instagramLink,
+				facebookLink,
+				linkedinLink,
+				youtubeLink,
+				tiktokLink,
+				bookingLink,
+				customLink,
 				uploadedImages,
 				updatedAt: new Date().toISOString(),
 			};
@@ -242,10 +410,19 @@ function ContentForm() {
 		leadMagnetTitle,
 		valueStack,
 		testimonials,
-		productCatalog,
+		products,
 		currency,
 		shippingInfo,
 		selectedFont,
+		whatsappLink,
+		xLink,
+		instagramLink,
+		facebookLink,
+		linkedinLink,
+		youtubeLink,
+		tiktokLink,
+		bookingLink,
+		customLink,
 		uploadedImages,
 	]);
 
@@ -291,10 +468,19 @@ function ContentForm() {
 				leadMagnetTitle,
 				valueStack,
 				testimonials,
-				productCatalog,
+				products,
 				currency,
 				shippingInfo,
 				selectedFont,
+				whatsappLink,
+				xLink,
+				instagramLink,
+				facebookLink,
+				linkedinLink,
+				youtubeLink,
+				tiktokLink,
+				bookingLink,
+				customLink,
 				uploadedImages,
 			};
 
@@ -723,21 +909,23 @@ function ContentForm() {
 										<select
 											value={currency}
 											onChange={(e) => setCurrency(e.target.value)}
-											className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-xs font-bold text-gray-900 focus:outline-none focus:border-emerald-600">
-											<option value="USD">USD ($)</option>
-											<option value="NGN">NGN (₦)</option>
-											<option value="GHS">GHS (GH₵)</option>
-											<option value="KES">KES (KSh)</option>
+											className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-xs font-bold text-gray-900 focus:outline-none focus:border-emerald-600 bg-white">
+											<option value="USD">USD ($ - US Dollar)</option>
+											<option value="NGN">NGN (₦ - Nigerian Naira)</option>
+											<option value="GHS">GHS (GH₵ - Ghanaian Cedi)</option>
+											<option value="KES">KES (KSh - Kenyan Shilling)</option>
+											<option value="EUR">EUR (€ - Euro)</option>
+											<option value="GBP">GBP (£ - British Pound)</option>
 										</select>
 									</div>
 
 									<div>
 										<label className="block text-xs font-bold text-gray-700 mb-1.5">
-											Shipping & Delivery Regions
+											Shipping & Delivery Policy Note
 										</label>
 										<input
 											type="text"
-											placeholder="e.g. Nationwide Shipping / 24-Hour Express Delivery"
+											placeholder="e.g. Nationwide Shipping • Same-Day Dispatch"
 											value={shippingInfo}
 											onChange={(e) => setShippingInfo(e.target.value)}
 											className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-emerald-600"
@@ -745,17 +933,180 @@ function ContentForm() {
 									</div>
 								</div>
 
-								<div>
-									<label className="block text-xs font-bold text-gray-700 mb-1.5">
-										Initial Product List (Product Name, Price, Description)
-									</label>
-									<textarea
-										rows={4}
-										placeholder="1. Custom Leather Wallet - $45.00 (Genuine handcrafted leather)&#10;2. Canvas Messenger Bag - $79.00 (Water-resistant travel bag)"
-										value={productCatalog}
-										onChange={(e) => setProductCatalog(e.target.value)}
-										className="w-full px-4 py-3 rounded-2xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-emerald-600 transition-colors leading-relaxed"
-									/>
+								{/* Product Items Manager */}
+								<div className="space-y-4 pt-2">
+									<div className="flex items-center justify-between">
+										<div>
+											<h4 className="text-xs font-bold text-gray-900">
+												Store Products & Pricing Catalog ({products.length})
+											</h4>
+											<p className="text-[11px] text-gray-500 font-medium">
+												Add items with their price, category, promo badge, and photo to sell on your storefront.
+											</p>
+										</div>
+
+										<button
+											type="button"
+											onClick={handleAddProduct}
+											className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer">
+											<Plus className="w-3.5 h-3.5" />
+											<span>Add Item</span>
+										</button>
+									</div>
+
+									<div className="space-y-4">
+										{products.map((prod, index) => (
+											<div
+												key={prod.id}
+												className="p-4 sm:p-5 rounded-2xl bg-gray-50/80 border border-gray-200/90 space-y-4 relative group">
+												<div className="flex items-center justify-between pb-3 border-b border-gray-200/70">
+													<span className="text-xs font-bold text-gray-700 flex items-center gap-2">
+														<span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-extrabold flex items-center justify-center">
+															{index + 1}
+														</span>
+														<span>Product #{index + 1} {prod.name ? `— ${prod.name}` : ""}</span>
+													</span>
+
+													<button
+														type="button"
+														onClick={() => handleDeleteProduct(prod.id)}
+														title="Delete Item"
+														className="p-1 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer">
+														<Trash2 className="w-4 h-4" />
+													</button>
+												</div>
+
+												<div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-start">
+													{/* Product Image Box */}
+													<div className="sm:col-span-3">
+														<label className="block text-[11px] font-bold text-gray-700 mb-1.5">
+															Item Image
+														</label>
+														<div className="relative w-full h-28 rounded-xl bg-white border-2 border-dashed border-gray-200 flex flex-col items-center justify-center overflow-hidden hover:border-emerald-500 transition-colors">
+															{prod.imageUrl ? (
+																<>
+																	<img
+																		src={prod.imageUrl}
+																		alt={prod.name || "Product"}
+																		className="w-full h-full object-cover"
+																	/>
+																	<button
+																		type="button"
+																		onClick={() => handleUpdateProduct(prod.id, "imageUrl", "")}
+																		className="absolute top-1.5 right-1.5 p-1 rounded-full bg-slate-900/70 text-white hover:bg-red-600 transition-colors">
+																		<X className="w-3 h-3" />
+																	</button>
+																</>
+															) : (
+																<label className="w-full h-full flex flex-col items-center justify-center cursor-pointer p-2 text-center">
+																	<ImageIcon className="w-5 h-5 text-gray-400 mb-1" />
+																	<span className="text-[10px] font-bold text-gray-600">Upload Photo</span>
+																	<input
+																		type="file"
+																		accept="image/*"
+																		onChange={(e) => handleProductImageUpload(prod.id, e)}
+																		className="hidden"
+																	/>
+																</label>
+															)}
+														</div>
+													</div>
+
+													{/* Product Fields */}
+													<div className="sm:col-span-9 space-y-3">
+														<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+															<div className="sm:col-span-2">
+																<label className="block text-[11px] font-bold text-gray-700 mb-1">
+																	Product Name *
+																</label>
+																<input
+																	type="text"
+																	placeholder="e.g. Leather Handbag"
+																	value={prod.name}
+																	onChange={(e) => handleUpdateProduct(prod.id, "name", e.target.value)}
+																	className="w-full px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-emerald-600"
+																/>
+															</div>
+
+															<div>
+																<label className="block text-[11px] font-bold text-gray-700 mb-1">
+																	Price ({CURRENCY_SYMBOLS[currency] || "$"}) *
+																</label>
+																<div className="relative">
+																	<span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">
+																		{CURRENCY_SYMBOLS[currency] || "$"}
+																	</span>
+																	<input
+																		type="number"
+																		step="0.01"
+																		min="0"
+																		placeholder="29.99"
+																		value={prod.price || ""}
+																		onChange={(e) => handleUpdateProduct(prod.id, "price", parseFloat(e.target.value) || 0)}
+																		className="w-full pl-7 pr-3 py-2 rounded-xl bg-white border border-gray-200 text-xs font-bold text-gray-900 focus:outline-none focus:border-emerald-600"
+																	/>
+																</div>
+															</div>
+														</div>
+
+														<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+															<div>
+																<label className="block text-[11px] font-bold text-gray-700 mb-1">
+																	Category / Collection
+																</label>
+																<input
+																	type="text"
+																	placeholder="e.g. Apparel, Shoes, Accessories"
+																	value={prod.category || ""}
+																	onChange={(e) => handleUpdateProduct(prod.id, "category", e.target.value)}
+																	className="w-full px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-emerald-600"
+																/>
+															</div>
+
+															<div>
+																<label className="block text-[11px] font-bold text-gray-700 mb-1">
+																	Promo Badge (Optional)
+																</label>
+																<input
+																	type="text"
+																	placeholder="e.g. Best Seller, New, 20% OFF"
+																	value={prod.badge || ""}
+																	onChange={(e) => handleUpdateProduct(prod.id, "badge", e.target.value)}
+																	className="w-full px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-emerald-600"
+																/>
+															</div>
+														</div>
+
+														<div>
+															<label className="block text-[11px] font-bold text-gray-700 mb-1">
+																Item Description & Key Highlights
+															</label>
+															<textarea
+																rows={2}
+																placeholder="Describe key features, sizing, colors, or materials..."
+																value={prod.description || ""}
+																onChange={(e) => handleUpdateProduct(prod.id, "description", e.target.value)}
+																className="w-full px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-emerald-600 leading-relaxed"
+															/>
+														</div>
+													</div>
+												</div>
+											</div>
+										))}
+
+										{products.length === 0 && (
+											<div className="p-8 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-200 space-y-2">
+												<Package className="w-8 h-8 text-gray-400 mx-auto" />
+												<p className="text-xs font-bold text-gray-700">No items added to catalog yet</p>
+												<button
+													type="button"
+													onClick={handleAddProduct}
+													className="px-4 py-2 rounded-full bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition-colors">
+													+ Add First Product
+												</button>
+											</div>
+										)}
+									</div>
 								</div>
 							</div>
 						)}
@@ -786,7 +1137,7 @@ function ContentForm() {
 
 								<div>
 									<label className="block text-[11px] font-bold text-gray-700 mb-1">
-										Phone / WhatsApp *
+										Primary Phone Number *
 									</label>
 									<input
 										type="text"
@@ -800,7 +1151,7 @@ function ContentForm() {
 
 								<div>
 									<label className="block text-[11px] font-bold text-gray-700 mb-1">
-										Address / Location
+										Address / Physical Location
 									</label>
 									<input
 										type="text"
@@ -813,8 +1164,192 @@ function ContentForm() {
 							</div>
 						</div>
 
+						{/* SECTION 5: SOCIAL MEDIA, WHATSAPP & ESSENTIAL ACTION LINKS */}
+						<div className="space-y-4 pt-4 border-t border-gray-100">
+							<div className="border-b border-gray-100 pb-3 flex items-center justify-between">
+								<div>
+									<label className="text-xs font-extrabold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+										<Share2 className="w-4 h-4 text-blue-600" />
+										<span>5. Social Media, WhatsApp & Essential Links</span>
+									</label>
+									<p className="text-[11px] text-gray-500 font-medium mt-0.5">
+										Add your direct messaging links and social handles to connect visitors across your channels.
+									</p>
+								</div>
+							</div>
+
+							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-1">
+								{/* WhatsApp */}
+								<div>
+									<label className="block text-[11px] font-bold text-gray-700 mb-1 flex items-center gap-1.5">
+										<div className="w-4 h-4 rounded-full bg-emerald-100 flex items-center justify-center">
+											<svg className="w-2.5 h-2.5 text-emerald-600 fill-current" viewBox="0 0 24 24">
+												<path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.062-2.18-.553-1.636-.677-2.73-2.316-2.812-2.425-.082-.109-.665-.883-.665-1.684 0-.8.419-1.196.568-1.356.149-.16.326-.201.435-.201.109 0 .217.001.312.006.1.005.234-.038.366.28.138.334.472 1.15.513 1.234.041.084.069.183.014.293-.055.109-.082.178-.163.272-.082.095-.172.212-.246.285-.082.08-.168.167-.072.332.096.165.426.703.914 1.138.629.561 1.159.734 1.324.816.165.082.261.071.358-.041.096-.112.414-.482.525-.647.111-.165.221-.138.371-.082.15.055.952.449 1.115.531.163.082.272.123.312.191.041.069.041.399-.103.804z" />
+											</svg>
+										</div>
+										<span>WhatsApp Chat / Direct Link</span>
+									</label>
+									<input
+										type="text"
+										placeholder="https://wa.me/15550192834 or Phone"
+										value={whatsappLink}
+										onChange={(e) => setWhatsappLink(e.target.value)}
+										className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-emerald-500 placeholder:text-gray-400"
+									/>
+								</div>
+
+								{/* X (formerly Twitter) */}
+								<div>
+									<label className="block text-[11px] font-bold text-gray-700 mb-1 flex items-center gap-1.5">
+										<div className="w-4 h-4 rounded-full bg-gray-100 flex items-center justify-center">
+											<svg className="w-2.5 h-2.5 text-black fill-current" viewBox="0 0 24 24">
+												<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+											</svg>
+										</div>
+										<span>X (Twitter) Profile</span>
+									</label>
+									<input
+										type="text"
+										placeholder="https://x.com/yourhandle"
+										value={xLink}
+										onChange={(e) => setXLink(e.target.value)}
+										className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-gray-900 placeholder:text-gray-400"
+									/>
+								</div>
+
+								{/* Instagram */}
+								<div>
+									<label className="block text-[11px] font-bold text-gray-700 mb-1 flex items-center gap-1.5">
+										<div className="w-4 h-4 rounded-full bg-pink-100 flex items-center justify-center">
+											<svg className="w-2.5 h-2.5 text-pink-600 fill-current" viewBox="0 0 24 24">
+												<path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+											</svg>
+										</div>
+										<span>Instagram Profile</span>
+									</label>
+									<input
+										type="text"
+										placeholder="https://instagram.com/yourhandle"
+										value={instagramLink}
+										onChange={(e) => setInstagramLink(e.target.value)}
+										className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-pink-500 placeholder:text-gray-400"
+									/>
+								</div>
+
+								{/* Facebook */}
+								<div>
+									<label className="block text-[11px] font-bold text-gray-700 mb-1 flex items-center gap-1.5">
+										<div className="w-4 h-4 rounded-full bg-blue-100 flex items-center justify-center">
+											<svg className="w-2.5 h-2.5 text-blue-600 fill-current" viewBox="0 0 24 24">
+												<path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+											</svg>
+										</div>
+										<span>Facebook Page</span>
+									</label>
+									<input
+										type="text"
+										placeholder="https://facebook.com/yourpage"
+										value={facebookLink}
+										onChange={(e) => setFacebookLink(e.target.value)}
+										className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 placeholder:text-gray-400"
+									/>
+								</div>
+
+								{/* LinkedIn */}
+								<div>
+									<label className="block text-[11px] font-bold text-gray-700 mb-1 flex items-center gap-1.5">
+										<div className="w-4 h-4 rounded-full bg-sky-100 flex items-center justify-center">
+											<svg className="w-2.5 h-2.5 text-sky-700 fill-current" viewBox="0 0 24 24">
+												<path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+											</svg>
+										</div>
+										<span>LinkedIn Company / Profile</span>
+									</label>
+									<input
+										type="text"
+										placeholder="https://linkedin.com/company/yourbrand"
+										value={linkedinLink}
+										onChange={(e) => setLinkedinLink(e.target.value)}
+										className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-sky-600 placeholder:text-gray-400"
+									/>
+								</div>
+
+								{/* YouTube */}
+								<div>
+									<label className="block text-[11px] font-bold text-gray-700 mb-1 flex items-center gap-1.5">
+										<div className="w-4 h-4 rounded-full bg-red-100 flex items-center justify-center">
+											<svg className="w-2.5 h-2.5 text-red-600 fill-current" viewBox="0 0 24 24">
+												<path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+											</svg>
+										</div>
+										<span>YouTube Channel / VSL Video</span>
+									</label>
+									<input
+										type="text"
+										placeholder="https://youtube.com/@yourchannel"
+										value={youtubeLink}
+										onChange={(e) => setYoutubeLink(e.target.value)}
+										className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-red-600 placeholder:text-gray-400"
+									/>
+								</div>
+
+								{/* TikTok */}
+								<div>
+									<label className="block text-[11px] font-bold text-gray-700 mb-1 flex items-center gap-1.5">
+										<div className="w-4 h-4 rounded-full bg-slate-100 flex items-center justify-center">
+											<svg className="w-2.5 h-2.5 text-black fill-current" viewBox="0 0 24 24">
+												<path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-1-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z" />
+											</svg>
+										</div>
+										<span>TikTok Profile</span>
+									</label>
+									<input
+										type="text"
+										placeholder="https://tiktok.com/@yourhandle"
+										value={tiktokLink}
+										onChange={(e) => setTiktokLink(e.target.value)}
+										className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-slate-800 placeholder:text-gray-400"
+									/>
+								</div>
+
+								{/* Calendly / Booking */}
+								<div>
+									<label className="block text-[11px] font-bold text-gray-700 mb-1 flex items-center gap-1.5">
+										<div className="w-4 h-4 rounded-full bg-blue-100 flex items-center justify-center">
+											<Calendar className="w-2.5 h-2.5 text-blue-600" />
+										</div>
+										<span>Calendly / Meeting Link</span>
+									</label>
+									<input
+										type="text"
+										placeholder="https://calendly.com/yourlink"
+										value={bookingLink}
+										onChange={(e) => setBookingLink(e.target.value)}
+										className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 placeholder:text-gray-400"
+									/>
+								</div>
+
+								{/* Google Maps / Custom Site */}
+								<div>
+									<label className="block text-[11px] font-bold text-gray-700 mb-1 flex items-center gap-1.5">
+										<div className="w-4 h-4 rounded-full bg-purple-100 flex items-center justify-center">
+											<Globe className="w-2.5 h-2.5 text-purple-600" />
+										</div>
+										<span>Google Maps / Custom Link</span>
+									</label>
+									<input
+										type="text"
+										placeholder="https://maps.google.com/... or site"
+										value={customLink}
+										onChange={(e) => setCustomLink(e.target.value)}
+										className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-purple-600 placeholder:text-gray-400"
+									/>
+								</div>
+							</div>
+						</div>
+
 						{/* Action Buttons */}
-							<div className="pt-6 border-t border-gray-100 flex items-center justify-end">
+						<div className="pt-6 border-t border-gray-100 flex items-center justify-end">
 							<PillButton
 								type="submit"
 								disabled={isSubmitting}
@@ -904,7 +1439,7 @@ function ContentForm() {
 									previewDevice === "mobile" ? "w-[375px] max-w-full min-h-[667px]" : "w-full min-h-[550px]"
 								}`}>
 								{/* RENDER: Site Navbar */}
-								<header className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
+								<header className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-20">
 									<div className="flex items-center gap-2.5">
 										{logoImage ? (
 											<img
@@ -922,10 +1457,49 @@ function ContentForm() {
 										</span>
 									</div>
 
-									<button className="px-4 py-1.5 rounded-full bg-blue-600 text-white text-xs font-bold">
-										Contact Us
-									</button>
+									<div className="flex items-center gap-2.5">
+										{activePlan === "E_COMMERCE" && (
+											<button
+												type="button"
+												onClick={() => setIsPreviewCartOpen(true)}
+												className="relative px-3 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold transition-all flex items-center gap-1.5 border border-emerald-200 cursor-pointer">
+												<ShoppingCart className="w-3.5 h-3.5" />
+												<span>Cart</span>
+												{previewCart.reduce((sum, item) => sum + item.quantity, 0) > 0 && (
+													<span className="w-4 h-4 rounded-full bg-emerald-600 text-white font-extrabold text-[9px] flex items-center justify-center animate-in zoom-in-50 duration-150">
+														{previewCart.reduce((sum, item) => sum + item.quantity, 0)}
+													</span>
+												)}
+											</button>
+										)}
+
+										<button
+											type="button"
+											onClick={() => {
+												if (whatsappLink) {
+													const waUrl = whatsappLink.startsWith("http")
+														? whatsappLink
+														: `https://wa.me/${whatsappLink.replace(/[^0-9]/g, "")}`;
+													window.open(waUrl, "_blank");
+												} else if (contactEmail) {
+													window.location.href = `mailto:${contactEmail}`;
+												} else {
+													alert("Contact trigger simulated!");
+												}
+											}}
+											className="px-4 py-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors cursor-pointer">
+											Contact Us
+										</button>
+									</div>
 								</header>
+
+								{/* RENDER: Toast Notification when Item Added */}
+								{cartNotification && (
+									<div className="bg-emerald-600 text-white text-xs font-bold py-2 px-4 text-center sticky top-14 z-30 flex items-center justify-center gap-2 animate-in slide-in-from-top duration-200">
+										<CheckCircle2 className="w-3.5 h-3.5" />
+										<span>{cartNotification}</span>
+									</div>
+								)}
 
 								{/* RENDER: Hero Section */}
 								<div className="relative bg-slate-900 text-white py-16 px-6 text-center overflow-hidden">
@@ -999,10 +1573,13 @@ function ContentForm() {
 								)}
 
 								{activePlan === "E_COMMERCE" && (
-									<div className="py-12 px-6 bg-emerald-50/50">
-										<div className="max-w-md mx-auto text-center mb-6">
-											<h2 className="text-xl font-bold font-nohemi text-gray-900">
-												Featured Product Catalog ({currency})
+									<div className="py-12 px-6 bg-emerald-50/30">
+										<div className="max-w-md mx-auto text-center mb-8">
+											<span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase tracking-wider">
+												Store Catalog
+											</span>
+											<h2 className="text-xl sm:text-2xl font-bold font-nohemi text-gray-900 mt-2">
+												Featured Store Products
 											</h2>
 											{shippingInfo && (
 												<p className="text-xs text-emerald-700 font-semibold mt-1 flex items-center justify-center gap-1">
@@ -1012,22 +1589,326 @@ function ContentForm() {
 											)}
 										</div>
 
-										{productCatalog && (
-											<div className="max-w-md mx-auto bg-white p-5 rounded-2xl border border-emerald-100 text-xs font-medium text-gray-700 leading-relaxed whitespace-pre-line">
-												{productCatalog}
+										{/* Interactive Products Grid */}
+										{products.length > 0 ? (
+											<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
+												{products.map((prod) => (
+													<div
+														key={prod.id}
+														className="bg-white border border-gray-200/90 rounded-2xl overflow-hidden shadow-2xs hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+														<div>
+															{/* Product Thumbnail Box */}
+															<div className="relative w-full h-44 bg-gray-100 overflow-hidden flex items-center justify-center">
+																{prod.imageUrl ? (
+																	<img
+																		src={prod.imageUrl}
+																		alt={prod.name || "Product"}
+																		className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+																	/>
+																) : (
+																	<div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-50">
+																		<ShoppingBag className="w-8 h-8 mb-1 opacity-60" />
+																		<span className="text-[10px] font-semibold">Store Item</span>
+																	</div>
+																)}
+
+																{prod.badge && (
+																	<span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[9px] font-extrabold uppercase tracking-wider shadow-xs">
+																		{prod.badge}
+																	</span>
+																)}
+
+																{prod.category && (
+																	<span className="absolute bottom-2.5 left-2.5 px-2 py-0.5 rounded-md bg-white/90 backdrop-blur-xs text-gray-700 text-[9px] font-bold">
+																		{prod.category}
+																	</span>
+																)}
+															</div>
+
+															{/* Product Details */}
+															<div className="p-4">
+																<h3 className="text-sm font-bold text-gray-900 font-nohemi mb-1 line-clamp-1">
+																	{prod.name || "Untitled Item"}
+																</h3>
+																<p className="text-[11px] text-gray-500 font-medium line-clamp-2 leading-relaxed">
+																	{prod.description || "High quality item ready for instant delivery."}
+																</p>
+															</div>
+														</div>
+
+														{/* Price & Add to Cart Footer */}
+														<div className="p-4 pt-0 flex items-center justify-between gap-2 border-t border-gray-100 pt-3">
+															<span className="text-sm font-extrabold text-gray-900 font-nohemi">
+																{CURRENCY_SYMBOLS[currency] || "$"}{prod.price ? Number(prod.price).toFixed(2) : "0.00"}
+															</span>
+
+															<button
+																type="button"
+																onClick={() => addToPreviewCart(prod)}
+																className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-emerald-600 text-white text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs">
+																<ShoppingCart className="w-3.5 h-3.5" />
+																<span>Add to Cart</span>
+															</button>
+														</div>
+													</div>
+												))}
+											</div>
+										) : (
+											<div className="text-center py-10 text-xs text-gray-400">
+												No products configured yet. Add products in Section 3 above.
 											</div>
 										)}
 									</div>
 								)}
 
-								{/* RENDER: Contact Footer */}
-								<footer className="py-8 px-6 bg-white border-t border-gray-100 text-center text-xs text-gray-500 space-y-2">
-									<p className="font-bold text-gray-900">
+								{/* INTERACTIVE SLIDE-OUT CART DRAWER */}
+								{isPreviewCartOpen && (
+									<div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex justify-end animate-in fade-in duration-200">
+										<div className="w-full max-w-md bg-white h-full shadow-2xl p-6 flex flex-col justify-between animate-in slide-in-from-right duration-300 z-50">
+											<div className="space-y-5 overflow-y-auto flex-1 pr-1">
+												{/* Cart Header */}
+												<div className="flex items-center justify-between border-b border-gray-100 pb-4">
+													<div className="flex items-center gap-2">
+														<div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
+															<ShoppingCart className="w-4 h-4" />
+														</div>
+														<div>
+															<h3 className="text-sm font-bold font-nohemi text-gray-900">
+																Your Shopping Cart
+															</h3>
+															<p className="text-[10px] text-gray-400 font-medium">
+																{previewCart.reduce((sum, item) => sum + item.quantity, 0)} item(s) selected
+															</p>
+														</div>
+													</div>
+
+													<button
+														type="button"
+														onClick={() => setIsPreviewCartOpen(false)}
+														className="p-1.5 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer">
+														<X className="w-4 h-4" />
+													</button>
+												</div>
+
+												{/* Items List */}
+												{previewCart.length === 0 ? (
+													<div className="text-center py-16 space-y-2">
+														<ShoppingBag className="w-10 h-10 text-gray-300 mx-auto" />
+														<p className="text-xs font-bold text-gray-700">Your cart is empty</p>
+														<p className="text-[11px] text-gray-400">Click &quot;Add to Cart&quot; on any product to test ordering.</p>
+													</div>
+												) : (
+													<div className="space-y-3">
+														{previewCart.map((item) => (
+															<div
+																key={item.product.id}
+																className="p-3.5 rounded-2xl bg-gray-50/80 border border-gray-200/80 flex items-center justify-between gap-3 text-xs">
+																<div className="flex items-center gap-3 min-w-0">
+																	{item.product.imageUrl ? (
+																		<img
+																			src={item.product.imageUrl}
+																			alt={item.product.name}
+																			className="w-12 h-12 rounded-xl object-cover border border-gray-200 shrink-0"
+																		/>
+																	) : (
+																		<div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold shrink-0">
+																			<Package className="w-5 h-5" />
+																		</div>
+																	)}
+
+																	<div className="min-w-0">
+																		<p className="font-bold text-gray-900 truncate">
+																			{item.product.name || "Item"}
+																		</p>
+																		<p className="text-[11px] text-gray-500 font-mono">
+																			{CURRENCY_SYMBOLS[currency] || "$"}{Number(item.product.price || 0).toFixed(2)} each
+																		</p>
+																	</div>
+																</div>
+
+																{/* Quantity Controls & Remove */}
+																<div className="flex items-center gap-3 shrink-0">
+																	<div className="flex items-center rounded-xl bg-white border border-gray-200 p-0.5">
+																		<button
+																			type="button"
+																			onClick={() => updatePreviewCartQty(item.product.id, -1)}
+																			className="w-6 h-6 rounded-lg text-gray-600 hover:bg-gray-100 flex items-center justify-center cursor-pointer">
+																			<Minus className="w-3 h-3" />
+																		</button>
+																		<input
+																			type="number"
+																			min="1"
+																			value={item.quantity}
+																			onChange={(e) => setPreviewCartQty(item.product.id, parseInt(e.target.value) || 1)}
+																			className="w-8 text-center text-xs font-bold text-gray-900 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+																		/>
+																		<button
+																			type="button"
+																			onClick={() => updatePreviewCartQty(item.product.id, 1)}
+																			className="w-6 h-6 rounded-lg text-gray-600 hover:bg-gray-100 flex items-center justify-center cursor-pointer">
+																			<Plus className="w-3 h-3" />
+																		</button>
+																	</div>
+
+																	<button
+																		type="button"
+																		onClick={() => removeFromPreviewCart(item.product.id)}
+																		title="Remove from Cart"
+																		className="p-1 text-gray-400 hover:text-red-600 transition-colors cursor-pointer">
+																		<Trash2 className="w-4 h-4" />
+																	</button>
+																</div>
+															</div>
+														))}
+													</div>
+												)}
+											</div>
+
+											{/* Cart Summary & Order Actions */}
+											{previewCart.length > 0 && (
+												<div className="pt-4 border-t border-gray-100 space-y-3">
+													<div className="space-y-1.5 text-xs text-gray-600">
+														<div className="flex items-center justify-between">
+															<span>Subtotal</span>
+															<span className="font-mono font-bold text-gray-900">
+																{CURRENCY_SYMBOLS[currency] || "$"}
+																{previewCart
+																	.reduce((sum, item) => sum + (Number(item.product.price) || 0) * item.quantity, 0)
+																	.toFixed(2)}
+															</span>
+														</div>
+														{shippingInfo && (
+															<div className="flex items-center justify-between text-[11px] text-emerald-700">
+																<span>Shipping</span>
+																<span>Included</span>
+															</div>
+														)}
+														<div className="flex items-center justify-between text-sm font-extrabold text-gray-900 pt-1 border-t border-gray-100">
+															<span>Estimated Total</span>
+															<span className="font-mono text-emerald-700">
+																{CURRENCY_SYMBOLS[currency] || "$"}
+																{previewCart
+																	.reduce((sum, item) => sum + (Number(item.product.price) || 0) * item.quantity, 0)
+																	.toFixed(2)}
+															</span>
+														</div>
+													</div>
+
+													<div className="space-y-2 pt-2">
+														{/* WhatsApp Direct Order Button */}
+														{whatsappLink ? (
+															<button
+																type="button"
+																onClick={() => {
+																	const total = previewCart
+																		.reduce((sum, item) => sum + (Number(item.product.price) || 0) * item.quantity, 0)
+																		.toFixed(2);
+																	const itemsText = previewCart
+																		.map((i) => `• ${i.product.name} (x${i.quantity}) - ${CURRENCY_SYMBOLS[currency] || "$"}${(i.product.price * i.quantity).toFixed(2)}`)
+																		.join("\n");
+																	const message = `Hello! I would like to place an order from *${businessName || "your store"}*:\n\n${itemsText}\n\n*Total:* ${CURRENCY_SYMBOLS[currency] || "$"}${total}`;
+																	const phoneClean = whatsappLink.replace(/[^0-9]/g, "");
+																	const waUrl = whatsappLink.startsWith("http")
+																		? `${whatsappLink}?text=${encodeURIComponent(message)}`
+																		: `https://wa.me/${phoneClean}?text=${encodeURIComponent(message)}`;
+																	window.open(waUrl, "_blank");
+																}}
+																className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-sm cursor-pointer">
+																<svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+																	<path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.062-2.18-.553-1.636-.677-2.73-2.316-2.812-2.425-.082-.109-.665-.883-.665-1.684 0-.8.419-1.196.568-1.356.149-.16.326-.201.435-.201.109 0 .217.001.312.006.1.005.234-.038.366.28.138.334.472 1.15.513 1.234.041.084.069.183.014.293-.055.109-.082.178-.163.272-.082.095-.172.212-.246.285-.082.08-.168.167-.072.332.096.165.426.703.914 1.138.629.561 1.159.734 1.324.816.165.082.261.071.358-.041.096-.112.414-.482.525-.647.111-.165.221-.138.371-.082.15.055.952.449 1.115.531.163.082.272.123.312.191.041.069.041.399-.103.804z" />
+																</svg>
+																<span>Order via WhatsApp Chat</span>
+															</button>
+														) : null}
+
+														<button
+															type="button"
+															onClick={() => {
+																alert(`Simulated Order Placed!\nTotal: ${CURRENCY_SYMBOLS[currency] || "$"}${previewCart.reduce((sum, item) => sum + (Number(item.product.price) || 0) * item.quantity, 0).toFixed(2)}\nYour customer receipt has been generated.`);
+																setPreviewCart([]);
+																setIsPreviewCartOpen(false);
+															}}
+															className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-sm cursor-pointer">
+															<CreditCard className="w-3.5 h-3.5" />
+															<span>Test Gateway Checkout</span>
+														</button>
+													</div>
+												</div>
+											)}
+										</div>
+									</div>
+								)}
+
+								{/* RENDER: Contact & Social Footer */}
+								<footer className="py-8 px-6 bg-white border-t border-gray-100 text-center text-xs text-gray-500 space-y-3">
+									<p className="font-bold text-gray-900 text-sm font-nohemi">
 										{businessName || "Your Business Name"}
 									</p>
 									<p className="text-[11px] text-gray-600">
 										Email: {contactEmail || "contact@kioosk.online"} | Phone: {contactPhone || "+1 (555) 019-2834"}
 									</p>
+									{contactAddress && (
+										<p className="text-[11px] text-gray-500">{contactAddress}</p>
+									)}
+
+									{/* Social Badges Row */}
+									{(whatsappLink || xLink || instagramLink || facebookLink || linkedinLink || youtubeLink || tiktokLink || bookingLink || customLink) && (
+										<div className="flex items-center justify-center gap-2 pt-2 flex-wrap">
+											{whatsappLink && (
+												<span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold flex items-center gap-1">
+													<svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24">
+														<path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.062-2.18-.553-1.636-.677-2.73-2.316-2.812-2.425-.082-.109-.665-.883-.665-1.684 0-.8.419-1.196.568-1.356.149-.16.326-.201.435-.201.109 0 .217.001.312.006.1.005.234-.038.366.28.138.334.472 1.15.513 1.234.041.084.069.183.014.293-.055.109-.082.178-.163.272-.082.095-.172.212-.246.285-.082.08-.168.167-.072.332.096.165.426.703.914 1.138.629.561 1.159.734 1.324.816.165.082.261.071.358-.041.096-.112.414-.482.525-.647.111-.165.221-.138.371-.082.15.055.952.449 1.115.531.163.082.272.123.312.191.041.069.041.399-.103.804z" />
+													</svg>
+													<span>WhatsApp</span>
+												</span>
+											)}
+											{xLink && (
+												<span className="px-2.5 py-1 rounded-full bg-gray-100 text-gray-900 border border-gray-200 text-[10px] font-bold flex items-center gap-1">
+													<svg className="w-2 h-2 fill-current" viewBox="0 0 24 24">
+														<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+													</svg>
+													<span>X</span>
+												</span>
+											)}
+											{instagramLink && (
+												<span className="px-2.5 py-1 rounded-full bg-pink-50 text-pink-700 border border-pink-200 text-[10px] font-bold">
+													Instagram
+												</span>
+											)}
+											{facebookLink && (
+												<span className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold">
+													Facebook
+												</span>
+											)}
+											{linkedinLink && (
+												<span className="px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-200 text-[10px] font-bold">
+													LinkedIn
+												</span>
+											)}
+											{youtubeLink && (
+												<span className="px-2.5 py-1 rounded-full bg-red-50 text-red-700 border border-red-200 text-[10px] font-bold">
+													YouTube
+												</span>
+											)}
+											{tiktokLink && (
+												<span className="px-2.5 py-1 rounded-full bg-gray-100 text-gray-900 border border-gray-200 text-[10px] font-bold">
+													TikTok
+												</span>
+											)}
+											{bookingLink && (
+												<span className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold flex items-center gap-1">
+													<Calendar className="w-3 h-3" />
+													<span>Book Meeting</span>
+												</span>
+											)}
+											{customLink && (
+												<span className="px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-bold flex items-center gap-1">
+													<Globe className="w-3 h-3" />
+													<span>Custom Link</span>
+												</span>
+											)}
+										</div>
+									)}
 								</footer>
 							</div>
 						</div>

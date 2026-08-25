@@ -3,6 +3,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Edit3, Trash2 } from "lucide-react";
 
 export interface ProjectCardProps {
@@ -66,12 +67,16 @@ export default function ProjectCard({
 	publishedUrl,
 	onDelete,
 }: ProjectCardProps) {
+	const router = useRouter();
 	const sConf = statusConfig[status] || statusConfig["Draft"];
 	const tAccent = typeAccent[type] || { bg: "bg-gray-50", icon: "text-gray-600" };
 	const iconName = typeIcon[type] || "web";
+	const editHref = `/dashboard/content?projectId=${id || ""}&plan=${encodeURIComponent(type)}`;
 
 	return (
-		<div className="group relative bg-white border border-gray-200/90 rounded-2xl p-5 sm:p-6 transition-all duration-200 hover:border-blue-500/40 hover:shadow-xs flex flex-col justify-between">
+		<div
+			onClick={() => router.push(editHref)}
+			className="group relative bg-white border border-gray-200/90 rounded-2xl p-5 sm:p-6 transition-all duration-200 hover:border-blue-500/50 hover:shadow-md flex flex-col justify-between cursor-pointer">
 			<div>
 				{/* Top Row: Icon + Name + Edit & Delete Buttons */}
 				<div className="flex items-start justify-between gap-3 mb-5">
@@ -83,16 +88,17 @@ export default function ProjectCard({
 							</span>
 						</div>
 						<div>
-							<h3 className="text-gray-900 font-nohemi font-bold text-base leading-tight">
-								{name}
+							<h3 className="text-gray-900 font-nohemi font-bold text-base leading-tight group-hover:text-blue-600 transition-colors flex items-center gap-1.5">
+								<span>{name}</span>
+								<Edit3 className="w-3.5 h-3.5 text-gray-400 group-hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity" />
 							</h3>
 							<p className="text-gray-500 text-xs mt-0.5 font-medium">{type}</p>
 						</div>
 					</div>
 
-					<div className="flex items-center gap-1.5">
+					<div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
 						<Link
-							href={`/dashboard/content?projectId=${id || ""}&plan=${encodeURIComponent(type)}`}
+							href={editHref}
 							title="Edit Project Details & Content"
 							className="p-1.5 rounded-xl text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors duration-150 cursor-pointer"
 							aria-label="Edit Project Content">
@@ -102,7 +108,10 @@ export default function ProjectCard({
 						{id && onDelete && (
 							<button
 								type="button"
-								onClick={() => onDelete(id)}
+								onClick={(e) => {
+									e.stopPropagation();
+									onDelete(id);
+								}}
 								title="Delete Project"
 								aria-label="Delete Project"
 								className="p-1.5 rounded-xl text-gray-400 hover:text-rose-600 hover:bg-rose-50 transition-colors duration-150 cursor-pointer">
@@ -141,25 +150,27 @@ export default function ProjectCard({
 				<span className="text-[11px] text-gray-400 font-medium">
 					Updated {lastUpdated}
 				</span>
-				{publishedUrl ? (
-					<a
-						href={publishedUrl}
-						target="_blank"
-						rel="noreferrer"
-						className="text-[11px] text-blue-600 font-bold hover:text-blue-700 transition-colors duration-200 flex items-center gap-1 cursor-pointer">
-						Visit Site
-						<span className="material-symbols-outlined text-[14px]">
-							open_in_new
-						</span>
-					</a>
-				) : (
-					<button className="text-[11px] text-blue-600 font-bold hover:text-blue-700 transition-colors duration-200 flex items-center gap-1 cursor-pointer">
-						Details
-						<span className="material-symbols-outlined text-[14px]">
+				<div className="flex items-center gap-3">
+					{publishedUrl && (
+						<a
+							href={publishedUrl}
+							target="_blank"
+							rel="noreferrer"
+							onClick={(e) => e.stopPropagation()}
+							className="text-[11px] text-gray-500 font-bold hover:text-blue-600 transition-colors duration-200 flex items-center gap-1 cursor-pointer">
+							<span>Visit Site</span>
+							<span className="material-symbols-outlined text-[14px]">
+								open_in_new
+							</span>
+						</a>
+					)}
+					<span className="text-[11px] text-blue-600 font-bold group-hover:text-blue-700 transition-colors duration-200 flex items-center gap-1">
+						<span>Continue Editing</span>
+						<span className="material-symbols-outlined text-[14px] group-hover:translate-x-0.5 transition-transform">
 							arrow_forward
 						</span>
-					</button>
-				)}
+					</span>
+				</div>
 			</div>
 		</div>
 	);

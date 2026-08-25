@@ -7,11 +7,24 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PillButton from "@/components/PillButton";
-import { ShoppingBag, CheckCircle2, ShoppingCart, Trash2, ShieldCheck, CreditCard, ArrowRight } from "lucide-react";
+import { ShoppingBag, CheckCircle2, ShoppingCart, Trash2, ShieldCheck, CreditCard, ArrowRight, Plus, Minus } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
-const DEMO_PRODUCTS = [
+interface Product {
+	id: number;
+	name: string;
+	price: number;
+	category: string;
+	image: string;
+}
+
+interface CartItem {
+	product: Product;
+	quantity: number;
+}
+
+const DEMO_PRODUCTS: Product[] = [
 	{ id: 1, name: "Artisan Espresso Bean Blend", price: 24.0, category: "Coffee", image: "☕" },
 	{ id: 2, name: "Single Origin Roast", price: 28.0, category: "Coffee", image: "🫘" },
 	{ id: 3, name: "Ceramic Pour-Over Dripper", price: 35.0, category: "Equipment", image: "🏺" },
@@ -19,19 +32,54 @@ const DEMO_PRODUCTS = [
 ];
 
 export default function EcommerceTemplate() {
-	const [cart, setCart] = useState<typeof DEMO_PRODUCTS>([]);
+	const [cart, setCart] = useState<CartItem[]>([]);
 	const [isCartOpen, setIsCartOpen] = useState(false);
 
-	const addToCart = (product: (typeof DEMO_PRODUCTS)[number]) => {
-		setCart((prev) => [...prev, product]);
+	const addToCart = (product: Product) => {
+		setCart((prev) => {
+			const existingIndex = prev.findIndex((item) => item.product.id === product.id);
+			if (existingIndex > -1) {
+				const updated = [...prev];
+				updated[existingIndex].quantity += 1;
+				return updated;
+			}
+			return [...prev, { product, quantity: 1 }];
+		});
 		setIsCartOpen(true);
 	};
 
-	const removeFromCart = (index: number) => {
-		setCart((prev) => prev.filter((_, i) => i !== index));
+	const updateQuantity = (productId: number, delta: number) => {
+		setCart((prev) =>
+			prev
+				.map((item) => {
+					if (item.product.id === productId) {
+						const newQty = item.quantity + delta;
+						return newQty > 0 ? { ...item, quantity: newQty } : null;
+					}
+					return item;
+				})
+				.filter(Boolean) as CartItem[],
+		);
 	};
 
-	const cartTotal = cart.reduce((sum, item) => sum + item.price, 0);
+	const setQuantity = (productId: number, qty: number) => {
+		if (qty <= 0) {
+			setCart((prev) => prev.filter((item) => item.product.id !== productId));
+			return;
+		}
+		setCart((prev) =>
+			prev.map((item) =>
+				item.product.id === productId ? { ...item, quantity: qty } : item,
+			),
+		);
+	};
+
+	const removeFromCart = (productId: number) => {
+		setCart((prev) => prev.filter((item) => item.product.id !== productId));
+	};
+
+	const totalItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+	const cartTotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
 
 	return (
 		<main className="min-h-screen bg-slate-50 flex flex-col font-sans">
@@ -65,9 +113,9 @@ export default function EcommerceTemplate() {
 					className="relative p-3 rounded-2xl bg-white border border-slate-200 shadow-xs hover:bg-slate-50 transition-colors flex items-center gap-2 cursor-pointer">
 					<ShoppingCart className="w-5 h-5 text-slate-700" />
 					<span className="text-xs font-bold text-slate-900 hidden sm:inline">Cart</span>
-					{cart.length > 0 && (
+					{totalItemCount > 0 && (
 						<span className="w-5 h-5 rounded-full bg-emerald-600 text-white font-bold text-[10px] flex items-center justify-center">
-							{cart.length}
+							{totalItemCount}
 						</span>
 					)}
 				</button>
@@ -104,18 +152,19 @@ export default function EcommerceTemplate() {
 
 			{/* Slide-out Cart Drawer Modal */}
 			{isCartOpen && (
-				<div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex justify-end">
+				<div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex justify-end animate-in fade-in duration-200">
 					<div className="w-full max-w-md bg-white h-full shadow-2xl p-6 flex flex-col justify-between animate-in slide-in-from-right duration-300">
-						<div className="space-y-6 overflow-y-auto flex-1">
+						<div className="space-y-6 overflow-y-auto flex-1 pr-1">
 							<div className="flex items-center justify-between border-b border-slate-100 pb-4">
 								<div className="flex items-center gap-2">
 									<ShoppingCart className="w-5 h-5 text-emerald-600" />
 									<h3 className="text-lg font-bold font-nohemi text-slate-900">Your Shopping Cart</h3>
+									<span className="text-xs font-bold text-slate-400">({totalItemCount} items)</span>
 								</div>
 								<button
 									type="button"
 									onClick={() => setIsCartOpen(false)}
-									className="text-xs font-bold text-slate-400 hover:text-slate-700">
+									className="text-xs font-bold text-slate-400 hover:text-slate-700 cursor-pointer">
 									Close ✕
 								</button>
 							</div>
@@ -124,21 +173,48 @@ export default function EcommerceTemplate() {
 								<p className="text-xs text-slate-400 text-center py-12">Your cart is empty. Click &quot;Add to Cart&quot; to test items.</p>
 							) : (
 								<div className="space-y-3">
-									{cart.map((item, idx) => (
-										<div key={`${item.id}-${idx}`} className="p-3 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs">
-											<div className="flex items-center gap-3">
-												<span className="text-xl">{item.image}</span>
-												<div>
-													<p className="font-bold text-slate-900">{item.name}</p>
-													<p className="font-mono text-slate-500">${item.price.toFixed(2)}</p>
+									{cart.map((item) => (
+										<div key={item.product.id} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70 flex items-center justify-between text-xs gap-3">
+											<div className="flex items-center gap-3 min-w-0">
+												<span className="text-2xl">{item.product.image}</span>
+												<div className="min-w-0">
+													<p className="font-bold text-slate-900 truncate">{item.product.name}</p>
+													<p className="font-mono text-slate-500">${item.product.price.toFixed(2)} each</p>
 												</div>
 											</div>
-											<button
-												type="button"
-												onClick={() => removeFromCart(idx)}
-												className="text-rose-500 hover:text-rose-700 p-1">
-												<Trash2 className="w-4 h-4" />
-											</button>
+
+											{/* Quantity Controls & Delete */}
+											<div className="flex items-center gap-3 shrink-0">
+												<div className="flex items-center rounded-xl bg-white border border-slate-200 p-0.5">
+													<button
+														type="button"
+														onClick={() => updateQuantity(item.product.id, -1)}
+														className="w-6 h-6 rounded-lg text-slate-600 hover:bg-slate-100 flex items-center justify-center cursor-pointer">
+														<Minus className="w-3 h-3" />
+													</button>
+													<input
+														type="number"
+														min="1"
+														value={item.quantity}
+														onChange={(e) => setQuantity(item.product.id, parseInt(e.target.value) || 1)}
+														className="w-8 text-center text-xs font-bold text-slate-900 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+													/>
+													<button
+														type="button"
+														onClick={() => updateQuantity(item.product.id, 1)}
+														className="w-6 h-6 rounded-lg text-slate-600 hover:bg-slate-100 flex items-center justify-center cursor-pointer">
+														<Plus className="w-3 h-3" />
+													</button>
+												</div>
+
+												<button
+													type="button"
+													onClick={() => removeFromCart(item.product.id)}
+													title="Remove item"
+													className="text-rose-500 hover:text-rose-700 p-1 cursor-pointer">
+													<Trash2 className="w-4 h-4" />
+												</button>
+											</div>
 										</div>
 									))}
 								</div>
@@ -149,7 +225,7 @@ export default function EcommerceTemplate() {
 						<div className="pt-4 border-t border-slate-100 space-y-4">
 							<div className="flex items-center justify-between text-sm font-bold text-slate-900">
 								<span>Subtotal</span>
-								<span className="font-mono">${cartTotal.toFixed(2)}</span>
+								<span className="font-mono text-base font-extrabold text-emerald-700">${cartTotal.toFixed(2)}</span>
 							</div>
 
 							<PillButton

@@ -28,6 +28,8 @@ import {
 	Smartphone,
 	Loader2,
 	Layers,
+	Edit3,
+	ArrowRight,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
@@ -572,13 +574,13 @@ export default function DashboardPage() {
 							)}
 
 							{activeProject && (
-								<div className="pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
+								<div className="pt-4 border-t border-gray-100 flex items-center justify-between gap-3 flex-wrap">
 									<span className="text-[11px] text-gray-400 font-medium flex items-center gap-1">
 										<Clock className="w-3.5 h-3.5" />
 										Status: {activeProject.status}
 									</span>
 
-									<div className="flex items-center gap-3">
+									<div className="flex items-center gap-2 sm:gap-3">
 										<button
 											type="button"
 											onClick={() => setIsRevisionOpen(true)}
@@ -586,9 +588,9 @@ export default function DashboardPage() {
 											Request Revision
 										</button>
 										<Link
-											href="/dashboard/projects"
-											className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors">
-											View Details →
+											href={`/dashboard/content?projectId=${activeProject.id}&plan=${encodeURIComponent(activeProject.type)}`}
+											className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1">
+											<span>Continue Editing →</span>
 										</Link>
 									</div>
 								</div>
@@ -685,21 +687,26 @@ export default function DashboardPage() {
 							) : (
 								<div className="space-y-3">
 									{projectsList.map((project) => (
-										<div
+										<Link
 											key={project.id}
-											className="p-4 rounded-2xl bg-gray-50/70 border border-gray-200/70 flex items-center justify-between gap-4">
+											href={`/dashboard/content?projectId=${project.id}&plan=${encodeURIComponent(project.type)}`}
+											className="p-4 rounded-2xl bg-gray-50/70 border border-gray-200/70 hover:border-blue-500/40 hover:bg-blue-50/40 transition-all duration-150 flex items-center justify-between gap-4 group cursor-pointer block">
 											<div>
-												<h4 className="text-sm font-bold text-gray-900">
-													{project.name}
+												<h4 className="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition-colors flex items-center gap-1.5">
+													<span>{project.name}</span>
+													<Edit3 className="w-3.5 h-3.5 text-gray-400 group-hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity" />
 												</h4>
 												<p className="text-[11px] text-gray-500 font-medium">
 													{project.type} • Status: {project.status}
 												</p>
 											</div>
-											<span className="text-xs font-bold text-blue-600 bg-white px-3 py-1 rounded-full border border-gray-200/80">
-												{project.progress}%
-											</span>
-										</div>
+											<div className="flex items-center gap-2">
+												<span className="text-xs font-bold text-blue-600 bg-white px-3 py-1 rounded-full border border-gray-200/80 group-hover:border-blue-200">
+													{project.progress}%
+												</span>
+												<ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
+											</div>
+										</Link>
 									))}
 								</div>
 							)}

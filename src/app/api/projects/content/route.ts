@@ -25,9 +25,31 @@ const contentPayloadSchema = z.object({
 	valueStack: z.string().optional(),
 	testimonials: z.string().optional(),
 	productCatalog: z.string().optional(),
+	products: z
+		.array(
+			z.object({
+				id: z.string(),
+				name: z.string(),
+				price: z.union([z.number(), z.string()]),
+				description: z.string().optional().default(""),
+				category: z.string().optional().default("General"),
+				imageUrl: z.string().optional().default(""),
+				badge: z.string().optional().default(""),
+			}),
+		)
+		.optional(),
 	currency: z.string().optional(),
 	shippingInfo: z.string().optional(),
 	selectedFont: z.string().optional(),
+	whatsappLink: z.string().optional().default(""),
+	xLink: z.string().optional().default(""),
+	instagramLink: z.string().optional().default(""),
+	facebookLink: z.string().optional().default(""),
+	linkedinLink: z.string().optional().default(""),
+	youtubeLink: z.string().optional().default(""),
+	tiktokLink: z.string().optional().default(""),
+	bookingLink: z.string().optional().default(""),
+	customLink: z.string().optional().default(""),
 	uploadedImages: z
 		.array(
 			z.object({
