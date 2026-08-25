@@ -478,11 +478,32 @@ function ContentForm() {
 		setProducts((prev) => prev.filter((p) => p.id !== id));
 	};
 
-	const handleProductImageUpload = (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleProductImageUpload = async (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
 		const url = URL.createObjectURL(file);
 		handleUpdateProduct(id, "imageUrl", url);
+
+		// Background upload to Cloudinary
+		try {
+			const formData = new FormData();
+			formData.append("file", file);
+			formData.append("folder", "kiosk/products");
+
+			const res = await fetch("/api/upload", {
+				method: "POST",
+				body: formData,
+			});
+
+			if (res.ok) {
+				const data = await res.json();
+				if (data.file?.url) {
+					handleUpdateProduct(id, "imageUrl", data.file.url);
+				}
+			}
+		} catch (err) {
+			console.warn("[PRODUCT_IMAGE_CLOUDINARY_UPLOAD_FALLBACK]", err);
+		}
 	};
 
 	// Cart action helpers
@@ -761,18 +782,40 @@ function ContentForm() {
 		uploadedImages,
 	]);
 
-	const handleLogoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleLogoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
 
 		const objectUrl = URL.createObjectURL(file);
+		const tempId = `logo-${Date.now()}`;
 		const newLogo: UploadedImage = {
-			id: `logo-${Date.now()}`,
+			id: tempId,
 			name: file.name,
 			size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
 			url: objectUrl,
 		};
 		setLogoImage(newLogo);
+
+		// Background upload to Cloudinary
+		try {
+			const formData = new FormData();
+			formData.append("file", file);
+			formData.append("folder", "kiosk/logos");
+
+			const res = await fetch("/api/upload", {
+				method: "POST",
+				body: formData,
+			});
+
+			if (res.ok) {
+				const data = await res.json();
+				if (data.file?.url) {
+					setLogoImage((prev) => (prev?.id === tempId ? { ...prev, url: data.file.url } : prev));
+				}
+			}
+		} catch (uploadErr) {
+			console.warn("[LOGO_CLOUDINARY_UPLOAD_FALLBACK]", uploadErr);
+		}
 	};
 
 	const handleRemoveLogo = () => {
@@ -786,15 +829,39 @@ function ContentForm() {
 		const files = e.target.files;
 		if (!files || files.length === 0) return;
 
-		Array.from(files).forEach((file) => {
+		Array.from(files).forEach(async (file) => {
 			const objectUrl = URL.createObjectURL(file);
+			const tempId = `brand-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
 			const newImage: UploadedImage = {
-				id: `brand-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+				id: tempId,
 				name: file.name,
 				size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
 				url: objectUrl,
 			};
 			setUploadedImages((prev) => [...prev, newImage]);
+
+			// Background upload to Cloudinary
+			try {
+				const formData = new FormData();
+				formData.append("file", file);
+				formData.append("folder", "kiosk/brand_assets");
+
+				const res = await fetch("/api/upload", {
+					method: "POST",
+					body: formData,
+				});
+
+				if (res.ok) {
+					const data = await res.json();
+					if (data.file?.url) {
+						setUploadedImages((prev) =>
+							prev.map((img) => (img.id === tempId ? { ...img, url: data.file.url } : img)),
+						);
+					}
+				}
+			} catch (uploadErr) {
+				console.warn("[BRAND_FILE_CLOUDINARY_UPLOAD_FALLBACK]", uploadErr);
+			}
 		});
 	};
 

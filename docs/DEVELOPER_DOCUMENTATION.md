@@ -62,11 +62,15 @@ src/
 │   ├── not-found.tsx           # Architectural 404 Page Not Found
 │   ├── api/
 │   │   ├── auth/               # Register, Login, Logout, Session endpoints
+│   │   ├── upload/route.ts     # Multi-tenant Cloudinary upload endpoint
+│   │   ├── user/
+│   │   │   ├── profile/route.ts# User profile & phone number persistence
+│   │   │   └── password/route.ts# Password update endpoint
 │   │   ├── payments/           # Flutterwave checkout & idempotency handlers
 │   │   ├── webhooks/           # Webhook verification & deduplication
 │   │   └── projects/
 │   │       ├── route.ts        # Project creation & list endpoints
-│   │       └── content/route.ts# Website Content Studio submission & draft sync
+│   │       └── content/route.ts# Website Content Studio submission, email alerts & draft sync
 │   └── dashboard/
 │       ├── layout.tsx          # Dashboard light theme container & Sidebar Dock
 │       ├── page.tsx            # Main dashboard overview & dynamic time greeting
@@ -74,11 +78,11 @@ src/
 │       │   ├── page.tsx        # Projects list, search, and status filters
 │       │   └── new/page.tsx    # Multi-step Start New Project wizard
 │       ├── content/
-│       │   └── page.tsx        # Website Content Studio with live interactive preview
+│       │   └── page.tsx        # Website Content Studio with live interactive preview & separated logo upload
 │       ├── templates/
 │       │   └── page.tsx        # Interactive Templates directory with live modal preview
 │       ├── billing/page.tsx    # Subscription plans & billing history
-│       └── settings/page.tsx   # Profile, security, and notification settings
+│       └── settings/page.tsx   # Profile, phone number, security, and notification settings
 └── components/
     ├── Navbar.tsx              # Public header navigation
     ├── NavbarWrapper.tsx       # Route-aware wrapper hiding marketing nav on /dashboard
@@ -96,17 +100,38 @@ src/
 
 ---
 
+## Multi-Tenant Cloudinary Media Storage Pipeline
+
+- **Storage Engine**: Serverless Cloudinary integration via Node `crypto` SHA-1 cryptographic signature authentication (`src/lib/storage/cloudinary.ts`).
+- **Strict Tenant Partitioning**:
+  - Automatically isolates user uploads under `kiosk/tenants/<tenantSlug>/<category>/` (`logos`, `brand_assets`, `products`, `avatars`).
+  - Generates collision-proof public IDs (`<name>_<timestamp>_<uuid>`) to prevent cross-tenant overwrites.
+- **Auto Image Optimization**: Automatic WebP/AVIF compression and responsive thumbnail generation via `getOptimizedImageUrl()`.
+
+---
+
+## Transactional Email Notification System
+
+Provides automated notifications via Resend API (`src/lib/email.ts`):
+1. **Admin Review Alert (`sendWebsiteReviewNotificationToAdmin`)**: Sent to `ADMIN_EMAIL` / `support@kioosk.online` with business details, plan tier, uploaded photo count, contact info, and deep-link directly to `/dashboard/content?projectId=<id>`.
+2. **Client Review Confirmation (`sendWebsiteReviewConfirmationToClient`)**: Reassures client that project is updated to **"85% • In Review"** and being personalized.
+3. **Welcome Greeting Email (`sendWelcomeEmail`)**: Dispatched on standard registration and OAuth account creation via NextAuth's `createUser` lifecycle hook.
+4. **Deep-Link URL Resolver**: Dynamic `getAppUrl()` resolves base URL seamlessly across local development, Vercel preview branches, and production.
+
+---
+
 ## Session & Authentication Lifecycle
 
 - **Session Expiration**: User session tokens expire strictly after **6 hours** of inactivity.
 - **Payment Grace Window**: If a user is actively completing a transaction on `/checkout` (`isCheckoutInProgress` state), automatic logout is suspended to prevent mid-payment session termination.
-- **Rate Limiting**: Auth endpoints enforce Upstash Redis sliding window limits (5 requests / 1 minute per IP).
+- **Rate Limiting**: Auth and upload endpoints enforce Upstash Redis sliding window limits.
 
 ---
 
 ## Coding Conventions
 
 - **TypeScript**: Strict mode enabled. Run `node node_modules/typescript/lib/tsc.js --noEmit` to verify type safety.
+- **Feedback Standards**: Settings and profile updates show concise **"Updated"** feedback.
 - **Design System Rules**:
   - Light mode theme (`bg-[#f8fafc]`, `bg-white`, `border-gray-200/90`) for main portal.
   - Live Preview dual-theming: Supports Light (`#ffffff`) and Midnight Dark Mode (`#070d1d`, `#0d162a`, `#111c33`).

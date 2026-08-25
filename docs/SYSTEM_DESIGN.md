@@ -36,8 +36,14 @@
                                                ┌───────────────────────────┐
                                                │   Backend API Handlers    │
                                                │ (/api/projects/content,   │
-                                               │  /api/payments, etc.)     │
-                                               └───────────────────────────┘
+                                               │  /api/upload, /api/auth)  │
+                                               └──────┬──────────────┬─────┘
+                                                      │              │
+                                                      ▼              ▼
+                                          ┌─────────────────┐ ┌───────────────┐
+                                          │ Neon PostgreSQL │ │  Cloudinary   │
+                                          │  & Upstash L2   │ │ Media Storage │
+                                          └─────────────────┘ └───────────────┘
 ```
 
 - **Client Runtime**: React 19, Framer Motion (Dock spring physics), GSAP (PillButton animation), Lottie-Web (`LottiePlayer`), ScrollStack, Tailwind CSS v4.

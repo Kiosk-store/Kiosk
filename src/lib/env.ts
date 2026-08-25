@@ -29,6 +29,10 @@ const envSchema = z.object({
 	UPSTASH_REDIS_REST_URL: z.string().optional(),
 	UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
 	RESEND_API_KEY: z.string().optional(),
+	ADMIN_EMAIL: z.string().optional(),
+	NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: z.string().optional(),
+	CLOUDINARY_API_KEY: z.string().optional(),
+	CLOUDINARY_API_SECRET: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

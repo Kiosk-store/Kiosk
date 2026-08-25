@@ -70,11 +70,11 @@ This document describes the visual and component architecture for the `kiosk` we
 - **Main Views**:
   - **Overview (`/dashboard`)**: Dynamic greeting, project cards, and quick actions. Clicking a project navigates directly to continue editing.
   - **Projects (`/dashboard/projects`)**: Status filter tabs (*All*, *In Progress*, *In Review*, *Live*, *Drafts*), search input, and project grid.
-  - **Website Content Studio (`/dashboard/content`)**: 4-section comprehensive form for brand info, design choices, catalog/services setup, and social/contact links, paired with a Live Interactive Preview modal.
+  - **Website Content Studio (`/dashboard/content`)**: 4-section comprehensive form with separated Primary Brand Logo module (featuring transparent checkerboard backdrop) and Brand Photos/PDFs dropzone, paired with the Live Interactive Preview modal.
   - **Templates Gallery (`/dashboard/templates`)**: Industry template showcase with category filters and instant live previews.
   - **New Project Wizard (`/dashboard/projects/new`)**: 4-step wizard (*Type → Details → Content → Review*).
   - **Billing & Subscription (`/dashboard/billing`)**: Plan overview, monthly/yearly cycle toggle (-20% discount), upgrade grid, and invoice history table.
-  - **Settings (`/dashboard/settings`)**: Tabbed forms (*Profile Info*, *Security/2FA*, *Notifications*).
+  - **Settings (`/dashboard/settings`)**: Tabbed forms (*Profile Info*, *Security/2FA*, *Notifications*) with Cloudinary avatar image picker and clean "Updated" feedback state.
   - **404 Not Found (`src/app/not-found.tsx`)**: High-aesthetic 404 display with brand typography and architectural grid lines.
 
 ---

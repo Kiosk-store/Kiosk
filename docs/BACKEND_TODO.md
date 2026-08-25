@@ -117,9 +117,15 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
 
 ---
 
-## Phase 4: Website Content Studio & Provisioning Engine
+## Phase 4: Website Content Studio, Cloudinary Media & Provisioning Engine
 - [x] Build `POST /api/projects/content` endpoint with Zod schema validation for multi-step content payloads (`src/app/api/projects/content/route.ts`).
 - [x] Build Website Content Studio (`src/app/dashboard/content/page.tsx`) with draft saving and live preview.
+- [x] **Multi-Tenant Cloudinary Storage Engine (`POST /api/upload` & `src/lib/storage/cloudinary.ts`)**:
+  - [x] Serverless SHA-1 cryptographic signature authentication.
+  - [x] Strict tenant folder partitioning: `kiosk/tenants/<tenantSlug>/<category>/` (`logos`, `brand_assets`, `products`, `avatars`).
+  - [x] Collision-proof UUID and timestamp public IDs.
+  - [x] Automatic WebP/AVIF compression & thumbnail transforms (`getOptimizedImageUrl`).
+- [x] **Dedicated Logo vs Brand Assets Modules**: Separate Primary Brand Logo dropzone (with transparency checkerboard preview) from multi-asset Brand Photos/PDFs dropzone.
 - [x] Build interactive multi-currency catalog, Add to Cart stepper, cart drawer, and WhatsApp direct checkout order generator.
 - [x] Build Sales Funnel urgency timer, 16:9 VSL video embed, value stack builder, and order bump upgrades.
 - [x] Build Landing Page authority metrics, services grid, client endorsements, and lead intake modal.
@@ -133,7 +139,11 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
 
 ## Phase 5: Observable Event Bus & Email Notifications
 - [x] Build `ProjectSubject` publish-subscribe event pipeline (Observer pattern) in `src/lib/events/ProjectSubject.ts`.
-- [x] Integrate **Resend API** transactional email system with responsive HTML templates in `src/lib/email.ts`.
+- [x] Integrate **Resend API** transactional email system with responsive HTML templates in `src/lib/email.ts`:
+  - [x] `sendWebsiteReviewNotificationToAdmin`: Informs Kiosk fulfillment team on client review submissions with deep links.
+  - [x] `sendWebsiteReviewConfirmationToClient`: Reassures client that their submission is in review (85% progress).
+  - [x] `sendWelcomeEmail`: Greets new users on registration & OAuth sign-up.
+  - [x] Dynamic `getAppUrl()` base URL resolver across local dev, preview branches, and production.
 - [ ] Wire **Upstash QStash** event bus for asynchronous decoupled event handling.
 
 ---

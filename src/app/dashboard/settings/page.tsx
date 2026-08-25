@@ -24,6 +24,9 @@ export default function SettingsPage() {
 	const [email, setEmail] = useState("");
 	const [phone, setPhone] = useState("");
 	const [company, setCompany] = useState("");
+	const [image, setImage] = useState<string | null>(null);
+	const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+	const avatarInputRef = React.useRef<HTMLInputElement>(null);
 
 	// Security Form State
 	const [currentPass, setCurrentPass] = useState("");
@@ -45,6 +48,7 @@ export default function SettingsPage() {
 						if (data.user.name) setName(data.user.name);
 						if (data.user.email) setEmail(data.user.email);
 						if (data.user.phone) setPhone(data.user.phone);
+						if (data.user.image) setImage(data.user.image);
 						if (data.user.emailNotifications !== undefined) {
 							setEmailNotifs(data.user.emailNotifications);
 						}
@@ -59,6 +63,7 @@ export default function SettingsPage() {
 					if (user.name) setName(user.name || "");
 					if (user.email) setEmail(user.email || "");
 					if (user.phone) setPhone(user.phone || "");
+					if (user.image) setImage(user.image || null);
 					if (user.emailNotifications !== undefined) {
 						setEmailNotifs(user.emailNotifications);
 					}
@@ -73,6 +78,43 @@ export default function SettingsPage() {
 
 		loadSettings();
 	}, [user]);
+
+	const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+
+		setIsUploadingAvatar(true);
+		try {
+			const formData = new FormData();
+			formData.append("file", file);
+			formData.append("folder", "kiosk/avatars");
+
+			const res = await fetch("/api/upload", {
+				method: "POST",
+				body: formData,
+			});
+
+			if (res.ok) {
+				const data = await res.json();
+				if (data.file?.url) {
+					setImage(data.file.url);
+					await fetch("/api/user/profile", {
+						method: "PATCH",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ image: data.file.url }),
+					});
+					await refreshUser();
+					setToastMsg("Updated");
+					setIsSaved(true);
+					setTimeout(() => setIsSaved(false), 3000);
+				}
+			}
+		} catch (err) {
+			console.error("[AVATAR_UPLOAD_ERROR]", err);
+		} finally {
+			setIsUploadingAvatar(false);
+		}
+	};
 
 	const displayName = user?.name || name || user?.email?.split("@")[0] || "User";
 	const initials = displayName
@@ -282,17 +324,31 @@ export default function SettingsPage() {
 						className="bg-white border border-gray-200/90 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
 						{/* Avatar Header */}
 						<div className="flex items-center gap-4 pb-6 border-b border-gray-100">
-							{user?.image ? (
-								<img
-									src={user.image}
-									alt={displayName}
-									className="w-16 h-16 rounded-full object-cover ring-2 ring-blue-600/30 shadow-xs"
-								/>
-							) : (
-								<div className="w-16 h-16 rounded-full bg-blue-600 text-white font-bold text-xl flex items-center justify-center shadow-xs">
-									{initials}
+							<input
+								ref={avatarInputRef}
+								type="file"
+								accept="image/*"
+								onChange={handleAvatarUpload}
+								className="hidden"
+							/>
+							<div
+								onClick={() => avatarInputRef.current?.click()}
+								className="relative group cursor-pointer shrink-0">
+								{image || user?.image ? (
+									<img
+										src={image || user?.image || ""}
+										alt={displayName}
+										className="w-16 h-16 rounded-full object-cover ring-2 ring-blue-600/30 shadow-xs group-hover:opacity-75 transition-opacity"
+									/>
+								) : (
+									<div className="w-16 h-16 rounded-full bg-blue-600 text-white font-bold text-xl flex items-center justify-center shadow-xs group-hover:bg-blue-700 transition-colors">
+										{initials}
+									</div>
+								)}
+								<div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-[10px] font-bold transition-opacity">
+									{isUploadingAvatar ? <Loader2 className="w-4 h-4 animate-spin" /> : "Change"}
 								</div>
-							)}
+							</div>
 							<div>
 								<h3 className="text-base font-bold text-gray-900">
 									{displayName}
@@ -300,6 +356,12 @@ export default function SettingsPage() {
 								<p className="text-xs text-gray-400 font-medium mt-0.5">
 									{user?.role === "ADMIN" ? "Administrator" : "Account Owner"}
 								</p>
+								<button
+									type="button"
+									onClick={() => avatarInputRef.current?.click()}
+									className="text-[11px] font-bold text-blue-600 hover:text-blue-700 mt-1 cursor-pointer">
+									{isUploadingAvatar ? "Uploading photo..." : "Upload Profile Photo"}
+								</button>
 							</div>
 						</div>
 

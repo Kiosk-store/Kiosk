@@ -30,6 +30,7 @@ This technical TODO roadmap outlines the high-priority engineering tasks, design
 
 ### Content Studio & Live Interactive Preview (`src/app/dashboard/content/page.tsx`)
 - [x] **Multi-Step Content Form**: Brand setup, Design & typography, Page catalog/services, and Social links.
+- [x] **Separated Logo & Brand Assets**: Dedicated Primary Brand Logo module (with checkerboard preview) separate from Brand Photos/Media Assets.
 - [x] **Theme Switcher**: Live dynamic Light Mode vs Midnight Dark Mode (`#070d1d`, `#0d162a`, `#111c33`) preview.
 - [x] **Dynamic Google Fonts**: Injected dynamically in preview based on client selection (`Playfair`, `Inter`, `Outfit`, `Montserrat`, etc.).
 - [x] **E-Commerce Live Preview & Cart**: Product uploads with badges, multi-currency support, slide-out cart drawer, and direct WhatsApp order message generation.
@@ -41,20 +42,30 @@ This technical TODO roadmap outlines the high-priority engineering tasks, design
 
 ---
 
-## 3. Authentication & Checkout Session Protection Engine
+## 3. Cloud Object Storage & Media Pipeline
+
+- [x] **Multi-Tenant Cloudinary Storage**: Serverless upload engine (`src/lib/storage/cloudinary.ts`) with SHA-1 cryptographic signature signing.
+- [x] **Strict Tenant Folder Isolation**: User uploads partitioned under `kiosk/tenants/<tenantSlug>/<category>/` (`logos`, `brand_assets`, `products`, `avatars`).
+- [x] **Collision-Proof File Hashing**: Unique timestamp & UUID public IDs preventing cross-tenant file overwrites.
+- [x] **Optimistic Background Upload**: Studio and Settings upload files in the background while displaying instant local previews.
+
+---
+
+## 4. Authentication & Checkout Session Protection Engine
 
 - [x] **6-Hour Session Expiration**: User sessions expire strictly after 6 hours of inactivity.
 - [x] **Checkout Active Grace Window**: Suspend automatic logout if client is actively completing payment on `/checkout` (`isCheckoutInProgress`).
 - [x] **Pre-Payment Auth Verification**: Validate active user session before dispatching payment payload to Flutterwave gateways.
-- [x] **Checkout Form State Persistence**: Implement `sessionStorage` / `localStorage` caching so transient form data persists across tab switches.
+- [x] **User Phone Number DB Column**: Added `phone` column to `users` table with session & profile synchronization.
 
 ---
 
-## 4. Decoupled Event Messaging & Async Workers
+## 5. Decoupled Event Messaging & Transactional Email System
 
-- [ ] **Upstash QStash Integration**: Wire QStash for asynchronous event publishing and background job dispatching.
-- [x] **Email Notification System**: Configure Resend transactional email dispatches (`src/lib/email.ts`).
-- [x] **Invoice PDF Generation**: Configure Inngest background workers (`src/inngest/client.ts`) for generating downloadable PDF payment receipts upon webhook trigger.
+- [x] **Admin Review Alert (`sendWebsiteReviewNotificationToAdmin`)**: Notifies Kiosk fulfillment team with submission details and direct Studio deep-link.
+- [x] **Client Confirmation Email (`sendWebsiteReviewConfirmationToClient`)**: Confirms submission received and status updated to 85% ("In Review").
+- [x] **Welcome Greeting Email (`sendWelcomeEmail`)**: Dispatched on standard registration and OAuth account creation via NextAuth's `createUser` lifecycle hook.
+- [x] **Dynamic Base URL Resolver**: Dynamic `getAppUrl()` resolving URLs across local dev, Vercel preview branches, and production.
 
 ---
 
