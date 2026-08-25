@@ -38,6 +38,21 @@ import {
 	Minus,
 	ShoppingCart,
 	Package,
+	Star,
+	Play,
+	Video,
+	ShieldCheck,
+	ChevronDown,
+	ChevronUp,
+	Award,
+	Clock,
+	Flame,
+	Layers,
+	MessageSquare,
+	Check,
+	TrendingUp,
+	Sun,
+	Moon,
 } from "lucide-react";
 import PillButton from "@/components/PillButton";
 import { useCurrency } from "@/context/CurrencyContext";
@@ -50,6 +65,43 @@ export interface ProductItem {
 	category?: string;
 	imageUrl?: string;
 	badge?: string;
+}
+
+export interface ServiceItem {
+	id: string;
+	title: string;
+	description: string;
+	icon?: string;
+	price?: string;
+}
+
+export interface TestimonialItem {
+	id: string;
+	name: string;
+	role?: string;
+	review: string;
+	rating: number;
+	avatarUrl?: string;
+}
+
+export interface FaqItem {
+	id: string;
+	question: string;
+	answer: string;
+}
+
+export interface StatItem {
+	id: string;
+	label: string;
+	value: string;
+}
+
+export interface ValueStackItem {
+	id: string;
+	title: string;
+	value: string;
+	description?: string;
+	isBonus?: boolean;
 }
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -120,6 +172,9 @@ function ContentForm() {
 	// Google Fonts State
 	const [selectedFont, setSelectedFont] = useState("Outfit");
 
+	// Theme Mode State (Light vs Dark Mode)
+	const [themeMode, setThemeMode] = useState<"light" | "dark">("light");
+
 	const handleRandomizeFont = () => {
 		const randomIndex = Math.floor(Math.random() * GOOGLE_FONTS_CATALOG.length);
 		setSelectedFont(GOOGLE_FONTS_CATALOG[randomIndex].name);
@@ -129,15 +184,131 @@ function ContentForm() {
 	const [businessName, setBusinessName] = useState("");
 	const [tagline, setTagline] = useState("");
 	const [aboutText, setAboutText] = useState("");
-	const [servicesList, setServicesList] = useState("");
 	const [contactEmail, setContactEmail] = useState("");
 	const [contactPhone, setContactPhone] = useState("");
 	const [contactAddress, setContactAddress] = useState("");
 
-	// Sales Funnel Specific Fields
+	// ELABORATE LANDING PAGE SPECIFIC FIELDS
+	const [ctaText, setCtaText] = useState("Claim Free Consultation");
+	const [services, setServices] = useState<ServiceItem[]>([
+		{
+			id: "srv-1",
+			title: "Strategic Growth & Consulting",
+			description: "Tailored roadmaps to scale revenue, streamline operations, and capture market leadership.",
+			icon: "TrendingUp",
+			price: "From $950",
+		},
+		{
+			id: "srv-2",
+			title: "Full-Stack Implementation",
+			description: "End-to-end bespoke development, automated workflows, and high-converting modern architecture.",
+			icon: "Layers",
+			price: "Custom Quote",
+		},
+		{
+			id: "srv-3",
+			title: "Dedicated 24/7 Managed Support",
+			description: "Round-the-clock priority maintenance, real-time analytics monitoring, and proactive optimization.",
+			icon: "ShieldCheck",
+			price: "$299/mo",
+		},
+	]);
+	const [testimonialsList, setTestimonialsList] = useState<TestimonialItem[]>([
+		{
+			id: "t-1",
+			name: "David Kendrick",
+			role: "Founder, Apex Scaling",
+			review: "Kiosk delivered exceptional execution. Our conversion rates doubled in the first 30 days alone!",
+			rating: 5,
+			avatarUrl: "",
+		},
+		{
+			id: "t-2",
+			name: "Elena Rostova",
+			role: "CMO, NovaTech Solutions",
+			review: "The visual polish and UX elevated our market positioning immediately. Truly world-class.",
+			rating: 5,
+			avatarUrl: "",
+		},
+	]);
+	const [faqs, setFaqs] = useState<FaqItem[]>([
+		{
+			id: "f-1",
+			question: "How quickly does our project go live?",
+			answer: "Most client systems launch live within 48 to 72 hours following onboarding confirmation.",
+		},
+		{
+			id: "f-2",
+			question: "Are payment gateways and WhatsApp integrated?",
+			answer: "Yes! We link direct WhatsApp ordering, Stripe, Paystack, and Calendly seamlessly.",
+		},
+		{
+			id: "f-3",
+			question: "What is your revision and satisfaction guarantee?",
+			answer: "We offer dedicated revisions until your final launch is 100% approved and published.",
+		},
+	]);
+	const [stats, setStats] = useState<StatItem[]>([
+		{ id: "st-1", label: "Client Satisfaction", value: "99.4%" },
+		{ id: "st-2", label: "Projects Delivered", value: "3,500+" },
+		{ id: "st-3", label: "Average ROI Increase", value: "4.8x" },
+	]);
+
+	// Interactive Preview States for Landing Page
+	const [activeFaqIndex, setActiveFaqIndex] = useState<number | null>(0);
+	const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+	const [contactFormSubmitted, setContactFormSubmitted] = useState(false);
+
+	// ELABORATE SALES FUNNEL SPECIFIC FIELDS
 	const [leadMagnetTitle, setLeadMagnetTitle] = useState("");
-	const [valueStack, setValueStack] = useState("");
-	const [testimonials, setTestimonials] = useState("");
+	const [videoUrl, setVideoUrl] = useState("https://www.youtube.com/embed/dQw4w9WgXcQ");
+	const [countdownMinutes, setCountdownMinutes] = useState<number>(15);
+	const [valueStackItems, setValueStackItems] = useState<ValueStackItem[]>([
+		{
+			id: "vs-1",
+			title: "Complete Core Acceleration System",
+			value: "$497",
+			description: "Step-by-step master framework with turnkey execution templates.",
+			isBonus: false,
+		},
+		{
+			id: "vs-2",
+			title: "Plug-and-Play High-Conversion Funnel Assets",
+			value: "$297",
+			description: "Pre-built high-converting copy, automations, and landing pages.",
+			isBonus: false,
+		},
+		{
+			id: "vs-3",
+			title: "BONUS: 1-on-1 VIP Strategy Roadmap Session",
+			value: "$199",
+			description: "Private audit to customize the exact roadmap for your business.",
+			isBonus: true,
+		},
+	]);
+	const [regularPrice, setRegularPrice] = useState<number>(497);
+	const [discountPrice, setDiscountPrice] = useState<number>(97);
+	const [orderBumpTitle, setOrderBumpTitle] = useState("Add VIP Inner Circle & Lifetime Mastermind (Save 80%)");
+	const [orderBumpPrice, setOrderBumpPrice] = useState<number>(27);
+	const [orderBumpDescription, setOrderBumpDescription] = useState(
+		"Get weekly direct coaching, live Q&A access, and exclusive bonus breakdown vaults."
+	);
+	const [guaranteeText, setGuaranteeText] = useState(
+		"30-Day 100% Risk-Free Guarantee. If you're not completely blown away, receive a full refund instantly."
+	);
+
+	// Interactive Preview States for Sales Funnel
+	const [isOrderBumpChecked, setIsOrderBumpChecked] = useState(false);
+	const [funnelSecondsLeft, setFunnelSecondsLeft] = useState(15 * 60);
+	const [isFunnelOrderSuccess, setIsFunnelOrderSuccess] = useState(false);
+
+	// Countdown Timer Effect for Preview
+	useEffect(() => {
+		const timer = setInterval(() => {
+			setFunnelSecondsLeft((prev) => (prev > 0 ? prev - 1 : 15 * 60));
+		}, 1000);
+		return () => clearInterval(timer);
+	}, []);
 
 	// E-Commerce Specific Fields & Dynamic Products
 	const [currency, setCurrency] = useState("USD");
@@ -185,6 +356,101 @@ function ContentForm() {
 	const projectId = searchParams.get("projectId") || "default";
 	const draftKey = `kiosk_draft_content_${projectId}`;
 	const [hasLoadedDraft, setHasLoadedDraft] = useState(false);
+
+	// Landing page helper methods
+	const handleAddService = () => {
+		setServices((prev) => [
+			...prev,
+			{
+				id: `srv-${Date.now()}`,
+				title: "",
+				description: "",
+				icon: "Check",
+				price: "",
+			},
+		]);
+	};
+
+	const handleUpdateService = (id: string, field: keyof ServiceItem, value: any) => {
+		setServices((prev) =>
+			prev.map((s) => (s.id === id ? { ...s, [field]: value } : s))
+		);
+	};
+
+	const handleDeleteService = (id: string) => {
+		setServices((prev) => prev.filter((s) => s.id !== id));
+	};
+
+	const handleAddTestimonial = () => {
+		setTestimonialsList((prev) => [
+			...prev,
+			{
+				id: `t-${Date.now()}`,
+				name: "",
+				role: "",
+				review: "",
+				rating: 5,
+				avatarUrl: "",
+			},
+		]);
+	};
+
+	const handleUpdateTestimonial = (id: string, field: keyof TestimonialItem, value: any) => {
+		setTestimonialsList((prev) =>
+			prev.map((t) => (t.id === id ? { ...t, [field]: value } : t))
+		);
+	};
+
+	const handleDeleteTestimonial = (id: string) => {
+		setTestimonialsList((prev) => prev.filter((t) => t.id !== id));
+	};
+
+	const handleAddFaq = () => {
+		setFaqs((prev) => [
+			...prev,
+			{ id: `f-${Date.now()}`, question: "", answer: "" },
+		]);
+	};
+
+	const handleUpdateFaq = (id: string, field: keyof FaqItem, value: any) => {
+		setFaqs((prev) =>
+			prev.map((f) => (f.id === id ? { ...f, [field]: value } : f))
+		);
+	};
+
+	const handleDeleteFaq = (id: string) => {
+		setFaqs((prev) => prev.filter((f) => f.id !== id));
+	};
+
+	const handleUpdateStat = (id: string, field: keyof StatItem, value: any) => {
+		setStats((prev) =>
+			prev.map((st) => (st.id === id ? { ...st, [field]: value } : st))
+		);
+	};
+
+	// Sales funnel helper methods
+	const handleAddValueStackItem = () => {
+		setValueStackItems((prev) => [
+			...prev,
+			{
+				id: `vs-${Date.now()}`,
+				title: "",
+				value: "$197",
+				description: "",
+				isBonus: false,
+			},
+		]);
+	};
+
+	const handleUpdateValueStackItem = (id: string, field: keyof ValueStackItem, value: any) => {
+		setValueStackItems((prev) =>
+			prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
+		);
+	};
+
+	const handleDeleteValueStackItem = (id: string) => {
+		setValueStackItems((prev) => prev.filter((item) => item.id !== id));
+	};
 
 	// Product management helpers
 	const handleAddProduct = () => {
@@ -271,14 +537,23 @@ function ContentForm() {
 				setBusinessName("");
 				setTagline("");
 				setAboutText("");
-				setServicesList("");
 				setContactEmail("");
 				setContactPhone("");
 				setContactAddress("");
+				setCtaText("Claim Free Consultation");
 				setLeadMagnetTitle("");
-				setValueStack("");
-				setTestimonials("");
-				setProductCatalog("");
+				setVideoUrl("https://www.youtube.com/embed/dQw4w9WgXcQ");
+				setCountdownMinutes(15);
+				setRegularPrice(497);
+				setDiscountPrice(97);
+				setOrderBumpTitle("Add VIP Inner Circle & Lifetime Mastermind (Save 80%)");
+				setOrderBumpPrice(27);
+				setOrderBumpDescription(
+					"Get weekly direct coaching, live Q&A access, and exclusive bonus breakdown vaults."
+				);
+				setGuaranteeText(
+					"30-Day 100% Risk-Free Guarantee. If you're not completely blown away, receive a full refund instantly."
+				);
 				setCurrency("USD");
 				setShippingInfo("");
 				setSelectedFont("Outfit");
@@ -320,15 +595,38 @@ function ContentForm() {
 				if (merged.businessName) setBusinessName(merged.businessName);
 				if (merged.tagline) setTagline(merged.tagline);
 				if (merged.aboutText) setAboutText(merged.aboutText);
-				if (merged.servicesList) setServicesList(merged.servicesList);
 				if (merged.contactEmail) setContactEmail(merged.contactEmail);
 				if (merged.contactPhone) setContactPhone(merged.contactPhone);
 				if (merged.contactAddress) setContactAddress(merged.contactAddress);
 
+				// Landing Page Fields
+				if (Array.isArray(merged.services) && merged.services.length > 0) {
+					setServices(merged.services);
+				}
+				if (Array.isArray(merged.testimonialsList) && merged.testimonialsList.length > 0) {
+					setTestimonialsList(merged.testimonialsList);
+				}
+				if (Array.isArray(merged.faqs) && merged.faqs.length > 0) {
+					setFaqs(merged.faqs);
+				}
+				if (Array.isArray(merged.stats) && merged.stats.length > 0) {
+					setStats(merged.stats);
+				}
+				if (merged.ctaText) setCtaText(merged.ctaText);
+
 				// Sales Funnel Fields
 				if (merged.leadMagnetTitle) setLeadMagnetTitle(merged.leadMagnetTitle);
-				if (merged.valueStack) setValueStack(merged.valueStack);
-				if (merged.testimonials) setTestimonials(merged.testimonials);
+				if (merged.videoUrl) setVideoUrl(merged.videoUrl);
+				if (merged.countdownMinutes) setCountdownMinutes(Number(merged.countdownMinutes) || 15);
+				if (Array.isArray(merged.valueStackItems) && merged.valueStackItems.length > 0) {
+					setValueStackItems(merged.valueStackItems);
+				}
+				if (merged.regularPrice !== undefined) setRegularPrice(Number(merged.regularPrice) || 497);
+				if (merged.discountPrice !== undefined) setDiscountPrice(Number(merged.discountPrice) || 97);
+				if (merged.orderBumpTitle) setOrderBumpTitle(merged.orderBumpTitle);
+				if (merged.orderBumpPrice !== undefined) setOrderBumpPrice(Number(merged.orderBumpPrice) || 27);
+				if (merged.orderBumpDescription) setOrderBumpDescription(merged.orderBumpDescription);
+				if (merged.guaranteeText) setGuaranteeText(merged.guaranteeText);
 
 				// E-commerce Fields & Products
 				if (Array.isArray(merged.products) && merged.products.length > 0) {
@@ -338,6 +636,9 @@ function ContentForm() {
 				if (merged.shippingInfo) setShippingInfo(merged.shippingInfo);
 
 				if (merged.selectedFont) setSelectedFont(merged.selectedFont);
+				if (merged.themeMode === "dark" || merged.themeMode === "light") {
+					setThemeMode(merged.themeMode);
+				}
 
 				// Social Media & Necessary Links
 				if (merged.whatsappLink) setWhatsappLink(merged.whatsappLink);
@@ -370,17 +671,32 @@ function ContentForm() {
 				businessName,
 				tagline,
 				aboutText,
-				servicesList,
 				contactEmail,
 				contactPhone,
 				contactAddress,
+				// Landing Page
+				services,
+				testimonialsList,
+				faqs,
+				stats,
+				ctaText,
+				// Sales Funnel
 				leadMagnetTitle,
-				valueStack,
-				testimonials,
+				videoUrl,
+				countdownMinutes,
+				valueStackItems,
+				regularPrice,
+				discountPrice,
+				orderBumpTitle,
+				orderBumpPrice,
+				orderBumpDescription,
+				guaranteeText,
+				// E-commerce
 				products,
 				currency,
 				shippingInfo,
 				selectedFont,
+				themeMode,
 				whatsappLink,
 				xLink,
 				instagramLink,
@@ -403,17 +719,29 @@ function ContentForm() {
 		businessName,
 		tagline,
 		aboutText,
-		servicesList,
 		contactEmail,
 		contactPhone,
 		contactAddress,
+		services,
+		testimonialsList,
+		faqs,
+		stats,
+		ctaText,
 		leadMagnetTitle,
-		valueStack,
-		testimonials,
+		videoUrl,
+		countdownMinutes,
+		valueStackItems,
+		regularPrice,
+		discountPrice,
+		orderBumpTitle,
+		orderBumpPrice,
+		orderBumpDescription,
+		guaranteeText,
 		products,
 		currency,
 		shippingInfo,
 		selectedFont,
+		themeMode,
 		whatsappLink,
 		xLink,
 		instagramLink,
@@ -461,17 +789,32 @@ function ContentForm() {
 				businessName,
 				tagline,
 				aboutText,
-				servicesList,
 				contactEmail,
 				contactPhone,
 				contactAddress,
+				// Landing Page
+				services,
+				testimonialsList,
+				faqs,
+				stats,
+				ctaText,
+				// Sales Funnel
 				leadMagnetTitle,
-				valueStack,
-				testimonials,
+				videoUrl,
+				countdownMinutes,
+				valueStackItems,
+				regularPrice,
+				discountPrice,
+				orderBumpTitle,
+				orderBumpPrice,
+				orderBumpDescription,
+				guaranteeText,
+				// E-Commerce
 				products,
 				currency,
 				shippingInfo,
 				selectedFont,
+				themeMode,
 				whatsappLink,
 				xLink,
 				instagramLink,
@@ -775,6 +1118,54 @@ function ContentForm() {
 								</div>
 							</div>
 
+							{/* Website Color Theme Mode (Light vs Dark Mode) */}
+							<div className="p-4 rounded-2xl bg-gray-50/80 border border-gray-200/90 space-y-3">
+								<div>
+									<label className="text-xs font-bold text-gray-900 block">
+										Website Color Theme Mode
+									</label>
+									<p className="text-[11px] text-gray-500 font-medium">
+										Choose whether your website will be generated in a clean Light theme or a sleek Midnight Dark theme.
+									</p>
+								</div>
+
+								<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+									<button
+										type="button"
+										onClick={() => setThemeMode("light")}
+										className={`p-3.5 rounded-2xl border-2 transition-all flex items-center gap-3 cursor-pointer text-left ${
+											themeMode === "light"
+												? "border-blue-600 bg-white shadow-xs ring-2 ring-blue-500/20"
+												: "border-gray-200 bg-white/70 hover:bg-white text-gray-700"
+										}`}>
+										<div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold shrink-0">
+											<Sun className="w-4 h-4" />
+										</div>
+										<div>
+											<p className="text-xs font-bold text-gray-900">Light Mode</p>
+											<p className="text-[10px] text-gray-500 font-medium">Clean, bright & crisp aesthetic</p>
+										</div>
+									</button>
+
+									<button
+										type="button"
+										onClick={() => setThemeMode("dark")}
+										className={`p-3.5 rounded-2xl border-2 transition-all flex items-center gap-3 cursor-pointer text-left ${
+											themeMode === "dark"
+												? "border-purple-600 bg-slate-900 shadow-xs ring-2 ring-purple-500/20 text-white"
+												: "border-gray-200 bg-slate-900/90 hover:bg-slate-900 text-slate-200"
+										}`}>
+										<div className="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold shrink-0">
+											<Moon className="w-4 h-4" />
+										</div>
+										<div>
+											<p className="text-xs font-bold text-white">Midnight Dark Mode</p>
+											<p className="text-[10px] text-slate-400 font-medium">Modern, sleek & immersive aesthetic</p>
+										</div>
+									</button>
+								</div>
+							</div>
+
 							<div>
 								<label className="block text-xs font-bold text-gray-700 mb-1.5">
 									Business / Brand Name *
@@ -823,21 +1214,300 @@ function ContentForm() {
 								<div className="border-b border-gray-100 pb-3">
 									<label className="text-xs font-extrabold text-blue-600 uppercase tracking-wider flex items-center gap-2">
 										<Globe className="w-4 h-4 text-blue-600" />
-										<span>3. Landing Page Services & Offers</span>
+										<span>3. Landing Page Structure, Services & Social Proof</span>
 									</label>
 								</div>
 
-								<div>
-									<label className="block text-xs font-bold text-gray-700 mb-1.5">
-										List Your Core Services / Key Offerings
+								{/* Primary CTA & Conversion Action */}
+								<div className="p-4 rounded-2xl bg-blue-50/50 border border-blue-100 space-y-3">
+									<label className="block text-xs font-bold text-gray-900">
+										Main Call-To-Action (CTA) Button Text
 									</label>
-									<textarea
-										rows={4}
-										placeholder="1. Strategy Consulting&#10;2. Professional Installation&#10;3. 24/7 Dedicated Support"
-										value={servicesList}
-										onChange={(e) => setServicesList(e.target.value)}
-										className="w-full px-4 py-3 rounded-2xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 transition-colors leading-relaxed"
+									<input
+										type="text"
+										placeholder="e.g. Claim Free Consultation / Book Discovery Call"
+										value={ctaText}
+										onChange={(e) => setCtaText(e.target.value)}
+										className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-blue-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600"
 									/>
+								</div>
+
+								{/* Trust & Authority Metrics */}
+								<div className="space-y-3">
+									<label className="block text-xs font-bold text-gray-900">
+										Key Statistics & Social Proof Metrics
+									</label>
+									<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+										{stats.map((st, i) => (
+											<div key={st.id || i} className="p-3 rounded-xl bg-gray-50 border border-gray-200/80 space-y-2">
+												<div>
+													<label className="block text-[10px] font-bold text-gray-500 uppercase">
+														Metric #{i + 1} Value
+													</label>
+													<input
+														type="text"
+														placeholder="99.4% / 3,500+"
+														value={st.value}
+														onChange={(e) => handleUpdateStat(st.id, "value", e.target.value)}
+														className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-gray-200 text-xs font-bold text-gray-900 focus:outline-none focus:border-blue-600"
+													/>
+												</div>
+												<div>
+													<label className="block text-[10px] font-bold text-gray-500 uppercase">
+														Label / Description
+													</label>
+													<input
+														type="text"
+														placeholder="Client Satisfaction"
+														value={st.label}
+														onChange={(e) => handleUpdateStat(st.id, "label", e.target.value)}
+														className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600"
+													/>
+												</div>
+											</div>
+										))}
+									</div>
+								</div>
+
+								{/* Core Services / Features Builder */}
+								<div className="space-y-3 pt-2">
+									<div className="flex items-center justify-between">
+										<div>
+											<h4 className="text-xs font-bold text-gray-900">
+												Core Services & Key Offerings ({services.length})
+											</h4>
+											<p className="text-[11px] text-gray-500 font-medium">
+												Add each service or signature solution provided by your business.
+											</p>
+										</div>
+
+										<button
+											type="button"
+											onClick={handleAddService}
+											className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer">
+											<Plus className="w-3.5 h-3.5" />
+											<span>Add Service</span>
+										</button>
+									</div>
+
+									<div className="space-y-3">
+										{services.map((srv, idx) => (
+											<div
+												key={srv.id}
+												className="p-4 rounded-2xl bg-gray-50/80 border border-gray-200/90 space-y-3 relative group">
+												<div className="flex items-center justify-between pb-2 border-b border-gray-200/60">
+													<span className="text-xs font-bold text-gray-700 flex items-center gap-2">
+														<span className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 text-[10px] font-extrabold flex items-center justify-center">
+															{idx + 1}
+														</span>
+														<span>Service #{idx + 1} {srv.title ? `— ${srv.title}` : ""}</span>
+													</span>
+
+													<button
+														type="button"
+														onClick={() => handleDeleteService(srv.id)}
+														title="Delete Service"
+														className="p-1 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer">
+														<Trash2 className="w-4 h-4" />
+													</button>
+												</div>
+
+												<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+													<div className="sm:col-span-2">
+														<label className="block text-[11px] font-bold text-gray-700 mb-1">
+															Service Title *
+														</label>
+														<input
+															type="text"
+															placeholder="e.g. Strategic Brand Consulting"
+															value={srv.title}
+															onChange={(e) => handleUpdateService(srv.id, "title", e.target.value)}
+															className="w-full px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600"
+														/>
+													</div>
+
+													<div>
+														<label className="block text-[11px] font-bold text-gray-700 mb-1">
+															Price / Starting At
+														</label>
+														<input
+															type="text"
+															placeholder="e.g. From $499 / Custom"
+															value={srv.price || ""}
+															onChange={(e) => handleUpdateService(srv.id, "price", e.target.value)}
+															className="w-full px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600"
+														/>
+													</div>
+												</div>
+
+												<div>
+													<label className="block text-[11px] font-bold text-gray-700 mb-1">
+														Service Description & Deliverables
+													</label>
+													<textarea
+														rows={2}
+														placeholder="Describe what is included, who it is for, and key outcomes..."
+														value={srv.description}
+														onChange={(e) => handleUpdateService(srv.id, "description", e.target.value)}
+														className="w-full px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 leading-relaxed"
+													/>
+												</div>
+											</div>
+										))}
+									</div>
+								</div>
+
+								{/* Client Testimonials Builder */}
+								<div className="space-y-3 pt-2">
+									<div className="flex items-center justify-between">
+										<div>
+											<h4 className="text-xs font-bold text-gray-900">
+												Client Testimonials & Reviews ({testimonialsList.length})
+											</h4>
+											<p className="text-[11px] text-gray-500 font-medium">
+												Showcase verified social proof and client quotes.
+											</p>
+										</div>
+
+										<button
+											type="button"
+											onClick={handleAddTestimonial}
+											className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer">
+											<Plus className="w-3.5 h-3.5" />
+											<span>Add Review</span>
+										</button>
+									</div>
+
+									<div className="space-y-3">
+										{testimonialsList.map((t) => (
+											<div key={t.id} className="p-4 rounded-2xl bg-gray-50/80 border border-gray-200/90 space-y-3">
+												<div className="flex items-center justify-between pb-2 border-b border-gray-200/60">
+													<div className="flex items-center gap-1 text-amber-500">
+														{[...Array(t.rating || 5)].map((_, i) => (
+															<Star key={i} className="w-3.5 h-3.5 fill-current" />
+														))}
+													</div>
+
+													<button
+														type="button"
+														onClick={() => handleDeleteTestimonial(t.id)}
+														title="Delete Testimonial"
+														className="p-1 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer">
+														<Trash2 className="w-4 h-4" />
+													</button>
+												</div>
+
+												<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+													<div>
+														<label className="block text-[11px] font-bold text-gray-700 mb-1">
+															Client Full Name *
+														</label>
+														<input
+															type="text"
+															placeholder="e.g. David Kendrick"
+															value={t.name}
+															onChange={(e) => handleUpdateTestimonial(t.id, "name", e.target.value)}
+															className="w-full px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600"
+														/>
+													</div>
+
+													<div>
+														<label className="block text-[11px] font-bold text-gray-700 mb-1">
+															Role / Company (Optional)
+														</label>
+														<input
+															type="text"
+															placeholder="e.g. CEO, Apex Growth"
+															value={t.role || ""}
+															onChange={(e) => handleUpdateTestimonial(t.id, "role", e.target.value)}
+															className="w-full px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600"
+														/>
+													</div>
+												</div>
+
+												<div>
+													<label className="block text-[11px] font-bold text-gray-700 mb-1">
+														Review / Testimonial Quote *
+													</label>
+													<textarea
+														rows={2}
+														placeholder='"This service completely transformed our business operations in 30 days!"'
+														value={t.review}
+														onChange={(e) => handleUpdateTestimonial(t.id, "review", e.target.value)}
+														className="w-full px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 leading-relaxed"
+													/>
+												</div>
+											</div>
+										))}
+									</div>
+								</div>
+
+								{/* Frequently Asked Questions Builder */}
+								<div className="space-y-3 pt-2">
+									<div className="flex items-center justify-between">
+										<div>
+											<h4 className="text-xs font-bold text-gray-900">
+												Frequently Asked Questions (FAQs) ({faqs.length})
+											</h4>
+											<p className="text-[11px] text-gray-500 font-medium">
+												Answer client concerns and overcome objections upfront.
+											</p>
+										</div>
+
+										<button
+											type="button"
+											onClick={handleAddFaq}
+											className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer">
+											<Plus className="w-3.5 h-3.5" />
+											<span>Add FAQ</span>
+										</button>
+									</div>
+
+									<div className="space-y-3">
+										{faqs.map((faq, idx) => (
+											<div key={faq.id} className="p-4 rounded-2xl bg-gray-50/80 border border-gray-200/90 space-y-3">
+												<div className="flex items-center justify-between pb-2 border-b border-gray-200/60">
+													<span className="text-xs font-bold text-gray-700">
+														Q{idx + 1}: {faq.question || "New Question"}
+													</span>
+
+													<button
+														type="button"
+														onClick={() => handleDeleteFaq(faq.id)}
+														title="Delete FAQ"
+														className="p-1 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer">
+														<Trash2 className="w-4 h-4" />
+													</button>
+												</div>
+
+												<div>
+													<label className="block text-[11px] font-bold text-gray-700 mb-1">
+														Question *
+													</label>
+													<input
+														type="text"
+														placeholder="e.g. How quickly can we get started?"
+														value={faq.question}
+														onChange={(e) => handleUpdateFaq(faq.id, "question", e.target.value)}
+														className="w-full px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600"
+													/>
+												</div>
+
+												<div>
+													<label className="block text-[11px] font-bold text-gray-700 mb-1">
+														Answer *
+													</label>
+													<textarea
+														rows={2}
+														placeholder="Explain clearly and provide the exact solution..."
+														value={faq.answer}
+														onChange={(e) => handleUpdateFaq(faq.id, "answer", e.target.value)}
+														className="w-full px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 leading-relaxed"
+													/>
+												</div>
+											</div>
+										))}
+									</div>
 								</div>
 							</div>
 						)}
@@ -847,46 +1517,248 @@ function ContentForm() {
 								<div className="border-b border-gray-100 pb-3">
 									<label className="text-xs font-extrabold text-purple-600 uppercase tracking-wider flex items-center gap-2">
 										<Zap className="w-4 h-4 text-purple-600" />
-										<span>3. Sales Funnel Lead Magnet & Conversion Stack</span>
+										<span>3. High-Converting Sales Funnel & Value Stack</span>
 									</label>
 								</div>
 
-								<div>
-									<label className="block text-xs font-bold text-gray-700 mb-1.5">
-										Lead Magnet / Freebie Hook Title
-									</label>
-									<input
-										type="text"
-										placeholder="e.g. Free 5-Step Guide to Scaling Your Revenue in 2026"
-										value={leadMagnetTitle}
-										onChange={(e) => setLeadMagnetTitle(e.target.value)}
-										className="w-full px-4 py-3 rounded-2xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-purple-600 transition-colors"
-									/>
+								{/* Video Pitch & Lead Magnet Hook */}
+								<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+									<div>
+										<label className="block text-xs font-bold text-gray-700 mb-1.5">
+											Lead Magnet / Hook Title *
+										</label>
+										<input
+											type="text"
+											placeholder="e.g. The 7-Figure Client Acquisition Protocol"
+											value={leadMagnetTitle}
+											onChange={(e) => setLeadMagnetTitle(e.target.value)}
+											className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-purple-600"
+										/>
+									</div>
+
+									<div>
+										<label className="block text-xs font-bold text-gray-700 mb-1.5">
+											VSL Video Link (YouTube, Vimeo, Loom)
+										</label>
+										<div className="relative">
+											<span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+												<Video className="w-4 h-4" />
+											</span>
+											<input
+												type="text"
+												placeholder="https://www.youtube.com/watch?v=..."
+												value={videoUrl}
+												onChange={(e) => setVideoUrl(e.target.value)}
+												className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-purple-600"
+											/>
+										</div>
+									</div>
 								</div>
 
+								{/* Pricing & Countdown Urgency */}
+								<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+									<div>
+										<label className="block text-xs font-bold text-gray-700 mb-1.5">
+											Regular Retail Value ($)
+										</label>
+										<input
+											type="number"
+											placeholder="497"
+											value={regularPrice || ""}
+											onChange={(e) => setRegularPrice(parseFloat(e.target.value) || 0)}
+											className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-xs font-bold text-gray-900 focus:outline-none focus:border-purple-600"
+										/>
+									</div>
+
+									<div>
+										<label className="block text-xs font-bold text-gray-700 mb-1.5">
+											Special Funnel Offer Price ($) *
+										</label>
+										<input
+											type="number"
+											placeholder="97"
+											value={discountPrice || ""}
+											onChange={(e) => setDiscountPrice(parseFloat(e.target.value) || 0)}
+											className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-xs font-bold text-purple-700 focus:outline-none focus:border-purple-600"
+										/>
+									</div>
+
+									<div>
+										<label className="block text-xs font-bold text-gray-700 mb-1.5">
+											Countdown Timer (Minutes)
+										</label>
+										<div className="relative">
+											<span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+												<Clock className="w-4 h-4" />
+											</span>
+											<input
+												type="number"
+												min="1"
+												max="120"
+												placeholder="15"
+												value={countdownMinutes || 15}
+												onChange={(e) => setCountdownMinutes(parseInt(e.target.value) || 15)}
+												className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-purple-600"
+											/>
+										</div>
+									</div>
+								</div>
+
+								{/* Offer Value Stack Builder */}
+								<div className="space-y-3 pt-2">
+									<div className="flex items-center justify-between">
+										<div>
+											<h4 className="text-xs font-bold text-gray-900">
+												Deliverables & Value Stack Breakdown ({valueStackItems.length})
+											</h4>
+											<p className="text-[11px] text-gray-500 font-medium">
+												Itemize everything included to maximize perceived value.
+											</p>
+										</div>
+
+										<button
+											type="button"
+											onClick={handleAddValueStackItem}
+											className="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer">
+											<Plus className="w-3.5 h-3.5" />
+											<span>Add Deliverable</span>
+										</button>
+									</div>
+
+									<div className="space-y-3">
+										{valueStackItems.map((item, idx) => (
+											<div key={item.id} className="p-4 rounded-2xl bg-gray-50/80 border border-gray-200/90 space-y-3">
+												<div className="flex items-center justify-between pb-2 border-b border-gray-200/60">
+													<div className="flex items-center gap-2">
+														<span className="w-5 h-5 rounded-full bg-purple-100 text-purple-700 text-[10px] font-extrabold flex items-center justify-center">
+															{idx + 1}
+														</span>
+														<span className="text-xs font-bold text-gray-900">
+															{item.title || `Deliverable #${idx + 1}`}
+														</span>
+														{item.isBonus && (
+															<span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[9px] font-extrabold uppercase">
+																Bonus
+															</span>
+														)}
+													</div>
+
+													<button
+														type="button"
+														onClick={() => handleDeleteValueStackItem(item.id)}
+														title="Delete Item"
+														className="p-1 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer">
+														<Trash2 className="w-4 h-4" />
+													</button>
+												</div>
+
+												<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+													<div className="sm:col-span-2">
+														<label className="block text-[11px] font-bold text-gray-700 mb-1">
+															Item / Module Title *
+														</label>
+														<input
+															type="text"
+															placeholder="e.g. Masterclass Video Training Course"
+															value={item.title}
+															onChange={(e) => handleUpdateValueStackItem(item.id, "title", e.target.value)}
+															className="w-full px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-purple-600"
+														/>
+													</div>
+
+													<div>
+														<label className="block text-[11px] font-bold text-gray-700 mb-1">
+															Stated Value
+														</label>
+														<input
+															type="text"
+															placeholder="e.g. $297 Value"
+															value={item.value}
+															onChange={(e) => handleUpdateValueStackItem(item.id, "value", e.target.value)}
+															className="w-full px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-purple-600"
+														/>
+													</div>
+												</div>
+
+												<div>
+													<label className="block text-[11px] font-bold text-gray-700 mb-1">
+														Description Bullet / Key Outcome
+													</label>
+													<input
+														type="text"
+														placeholder="e.g. 10 hours of video lessons with copy templates"
+														value={item.description || ""}
+														onChange={(e) => handleUpdateValueStackItem(item.id, "description", e.target.value)}
+														className="w-full px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-purple-600"
+													/>
+												</div>
+											</div>
+										))}
+									</div>
+								</div>
+
+								{/* Order Bump Settings */}
+								<div className="p-4 rounded-2xl bg-purple-50/60 border border-purple-200/80 space-y-3">
+									<div className="flex items-center gap-2">
+										<Flame className="w-4 h-4 text-purple-600" />
+										<h4 className="text-xs font-bold text-purple-900">
+											High-Converting Order Bump (Optional Upsell)
+										</h4>
+									</div>
+
+									<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+										<div className="sm:col-span-2">
+											<label className="block text-[11px] font-bold text-gray-700 mb-1">
+												Order Bump Headline
+											</label>
+											<input
+												type="text"
+												placeholder="e.g. Add VIP Inner Circle & Lifetime Coaching"
+												value={orderBumpTitle}
+												onChange={(e) => setOrderBumpTitle(e.target.value)}
+												className="w-full px-3.5 py-2 rounded-xl bg-white border border-purple-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-purple-600"
+											/>
+										</div>
+
+										<div>
+											<label className="block text-[11px] font-bold text-gray-700 mb-1">
+												Bump Price ($)
+											</label>
+											<input
+												type="number"
+												placeholder="27"
+												value={orderBumpPrice || ""}
+												onChange={(e) => setOrderBumpPrice(parseFloat(e.target.value) || 0)}
+												className="w-full px-3.5 py-2 rounded-xl bg-white border border-purple-200 text-xs font-bold text-gray-900 focus:outline-none focus:border-purple-600"
+											/>
+										</div>
+									</div>
+
+									<div>
+										<label className="block text-[11px] font-bold text-gray-700 mb-1">
+											Order Bump Teaser Description
+										</label>
+										<textarea
+											rows={2}
+											placeholder="Get weekly direct coaching, live Q&A access, and exclusive bonus breakdown vaults."
+											value={orderBumpDescription}
+											onChange={(e) => setOrderBumpDescription(e.target.value)}
+											className="w-full px-3.5 py-2 rounded-xl bg-white border border-purple-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-purple-600 leading-relaxed"
+										/>
+									</div>
+								</div>
+
+								{/* Guarantee & Risk Reversal */}
 								<div>
 									<label className="block text-xs font-bold text-gray-700 mb-1.5">
-										Offer Value Stack & Core Deliverables
+										Guarantee & Risk Reversal Terms
 									</label>
 									<textarea
-										rows={3}
-										placeholder="• Complete Video Training ($299 Value)&#10;• 1-on-1 Strategy Call ($150 Value)&#10;• Bonus Templates Package ($99 Value)"
-										value={valueStack}
-										onChange={(e) => setValueStack(e.target.value)}
-										className="w-full px-4 py-3 rounded-2xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-purple-600 transition-colors leading-relaxed"
-									/>
-								</div>
-
-								<div>
-									<label className="block text-xs font-bold text-gray-700 mb-1.5">
-										Customer Testimonials / Reviews
-									</label>
-									<textarea
-										rows={3}
-										placeholder='"This funnel doubled our leads in 14 days!" — Sarah M., CEO'
-										value={testimonials}
-										onChange={(e) => setTestimonials(e.target.value)}
-										className="w-full px-4 py-3 rounded-2xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-purple-600 transition-colors leading-relaxed"
+										rows={2}
+										placeholder="30-Day 100% Risk-Free Guarantee..."
+										value={guaranteeText}
+										onChange={(e) => setGuaranteeText(e.target.value)}
+										className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-purple-600 leading-relaxed"
 									/>
 								</div>
 							</div>
@@ -1391,38 +2263,68 @@ function ContentForm() {
 								</span>
 							</div>
 
-							{/* Device Switcher */}
-							<div className="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
+							<div className="flex items-center gap-2">
+								{/* Theme Switcher in Preview */}
+								<div className="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
+									<button
+										type="button"
+										onClick={() => setThemeMode("light")}
+										title="Switch to Light Theme"
+										className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${
+											themeMode === "light"
+												? "bg-amber-500 text-white shadow-xs"
+												: "text-slate-400 hover:text-white"
+										}`}>
+										<Sun className="w-3.5 h-3.5" />
+										<span className="hidden sm:inline">Light</span>
+									</button>
+									<button
+										type="button"
+										onClick={() => setThemeMode("dark")}
+										title="Switch to Dark Theme"
+										className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${
+											themeMode === "dark"
+												? "bg-purple-600 text-white shadow-xs"
+												: "text-slate-400 hover:text-white"
+										}`}>
+										<Moon className="w-3.5 h-3.5" />
+										<span className="hidden sm:inline">Dark</span>
+									</button>
+								</div>
+
+								{/* Device Switcher */}
+								<div className="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
+									<button
+										type="button"
+										onClick={() => setPreviewDevice("desktop")}
+										className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${
+											previewDevice === "desktop"
+												? "bg-blue-600 text-white shadow-xs"
+												: "text-slate-400 hover:text-white"
+										}`}>
+										<Monitor className="w-3.5 h-3.5" />
+										<span className="hidden sm:inline">Desktop</span>
+									</button>
+									<button
+										type="button"
+										onClick={() => setPreviewDevice("mobile")}
+										className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${
+											previewDevice === "mobile"
+												? "bg-blue-600 text-white shadow-xs"
+												: "text-slate-400 hover:text-white"
+										}`}>
+										<Smartphone className="w-3.5 h-3.5" />
+										<span className="hidden sm:inline">Mobile</span>
+									</button>
+								</div>
+
 								<button
 									type="button"
-									onClick={() => setPreviewDevice("desktop")}
-									className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${
-										previewDevice === "desktop"
-											? "bg-blue-600 text-white shadow-xs"
-											: "text-slate-400 hover:text-white"
-									}`}>
-									<Monitor className="w-3.5 h-3.5" />
-									<span className="hidden sm:inline">Desktop</span>
-								</button>
-								<button
-									type="button"
-									onClick={() => setPreviewDevice("mobile")}
-									className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${
-										previewDevice === "mobile"
-											? "bg-blue-600 text-white shadow-xs"
-											: "text-slate-400 hover:text-white"
-									}`}>
-									<Smartphone className="w-3.5 h-3.5" />
-									<span className="hidden sm:inline">Mobile</span>
+									onClick={() => setIsPreviewOpen(false)}
+									className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer">
+									<X className="w-5 h-5" />
 								</button>
 							</div>
-
-							<button
-								type="button"
-								onClick={() => setIsPreviewOpen(false)}
-								className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer">
-								<X className="w-5 h-5" />
-							</button>
 						</div>
 
 						{/* Live Interactive Site Render Window */}
@@ -1435,11 +2337,20 @@ function ContentForm() {
 
 							<div
 								style={{ fontFamily: `'${selectedFont}', sans-serif` }}
-								className={`transition-all duration-300 bg-white text-slate-900 rounded-2xl overflow-hidden shadow-2xl ${
+								className={`transition-all duration-300 rounded-2xl overflow-hidden shadow-2xl ${
+									themeMode === "dark"
+										? "bg-slate-950 text-slate-100 border border-slate-800"
+										: "bg-white text-slate-900 border border-gray-100"
+								} ${
 									previewDevice === "mobile" ? "w-[375px] max-w-full min-h-[667px]" : "w-full min-h-[550px]"
 								}`}>
 								{/* RENDER: Site Navbar */}
-								<header className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-20">
+								<header
+									className={`px-6 py-4 border-b flex items-center justify-between sticky top-0 z-20 transition-colors ${
+										themeMode === "dark"
+											? "bg-slate-900/95 border-slate-800 backdrop-blur-xs text-white"
+											: "bg-white border-gray-100 text-slate-900"
+									}`}>
 									<div className="flex items-center gap-2.5">
 										{logoImage ? (
 											<img
@@ -1452,7 +2363,7 @@ function ContentForm() {
 												{businessName ? businessName[0].toUpperCase() : "K"}
 											</div>
 										)}
-										<span className="font-bold text-sm text-gray-900 font-nohemi">
+										<span className={`font-bold text-sm font-nohemi ${themeMode === "dark" ? "text-white" : "text-gray-900"}`}>
 											{businessName || "Your Business Name"}
 										</span>
 									</div>
@@ -1528,45 +2439,431 @@ function ContentForm() {
 
 								{/* RENDER: Plan Specific Section */}
 								{activePlan === "LANDING_PAGE" && (
-									<div className="py-12 px-6 bg-slate-50">
-										<div className="max-w-md mx-auto text-center mb-8">
-											<h2 className="text-lg font-bold font-nohemi text-gray-900 mb-1">
-												Our Key Offers & Services
-											</h2>
-										</div>
-
-										<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl mx-auto">
-											{(servicesList || "Service 1\nService 2\nService 3")
-												.split("\n")
-												.filter((s) => s.trim())
-												.map((svc, i) => (
+									<div className="space-y-12 py-10 px-6 bg-slate-50/70">
+										{/* Authority & Stats Bar */}
+										{stats.length > 0 && (
+											<div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
+												{stats.map((st) => (
 													<div
-														key={i}
-														className="p-4 rounded-xl bg-white border border-gray-200/80 shadow-2xs">
-														<div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-bold mb-2">
-															{i + 1}
-														</div>
-														<p className="text-xs font-bold text-gray-900">{svc}</p>
+														key={st.id}
+														className="p-5 rounded-2xl bg-white border border-gray-200/80 shadow-2xs text-center space-y-1">
+														<p className="text-2xl sm:text-3xl font-extrabold text-blue-600 font-nohemi">
+															{st.value || "0"}
+														</p>
+														<p className="text-xs font-bold text-gray-600 uppercase tracking-wider">
+															{st.label || "Metric"}
+														</p>
 													</div>
 												))}
+											</div>
+										)}
+
+										{/* Core Services Section */}
+										<div className="max-w-4xl mx-auto space-y-6">
+											<div className="text-center max-w-md mx-auto space-y-2">
+												<span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-[10px] font-extrabold uppercase tracking-wider">
+													Our Solutions
+												</span>
+												<h2 className="text-xl sm:text-2xl font-bold font-nohemi text-gray-900">
+													Bespoke Services & Offerings
+												</h2>
+											</div>
+
+											<div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+												{services.map((srv) => (
+													<div
+														key={srv.id}
+														className="p-6 rounded-3xl bg-white border border-gray-200/90 shadow-2xs hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+														<div className="space-y-3">
+															<div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+																<TrendingUp className="w-5 h-5" />
+															</div>
+															<h3 className="text-sm font-bold font-nohemi text-gray-900">
+																{srv.title || "Service Title"}
+															</h3>
+															<p className="text-xs text-gray-500 font-medium leading-relaxed">
+																{srv.description || "Comprehensive service delivered by certified professionals."}
+															</p>
+														</div>
+
+														<div className="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between">
+															<span className="text-xs font-bold text-blue-600 font-mono">
+																{srv.price || "Contact Us"}
+															</span>
+															<button
+																type="button"
+																onClick={() => setIsContactModalOpen(true)}
+																className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-blue-600 text-white text-[11px] font-bold transition-colors cursor-pointer">
+																Inquire →
+															</button>
+														</div>
+													</div>
+												))}
+											</div>
 										</div>
+
+										{/* Testimonials & Social Proof */}
+										{testimonialsList.length > 0 && (
+											<div className="max-w-4xl mx-auto space-y-6 pt-4">
+												<div className="text-center max-w-md mx-auto space-y-2">
+													<span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-extrabold uppercase tracking-wider">
+														Social Proof
+													</span>
+													<h2 className="text-xl sm:text-2xl font-bold font-nohemi text-gray-900">
+														What Our Clients Say
+													</h2>
+												</div>
+
+												<div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+													{testimonialsList.map((t) => (
+														<div
+															key={t.id}
+															className="p-6 rounded-3xl bg-white border border-gray-200/90 shadow-2xs space-y-4">
+															<div className="flex items-center gap-1 text-amber-400">
+																{[...Array(t.rating || 5)].map((_, i) => (
+																	<Star key={i} className="w-4 h-4 fill-current" />
+																))}
+															</div>
+															<p className="text-xs font-medium text-gray-700 leading-relaxed italic">
+																&quot;{t.review || "Outstanding service and results!"}&quot;
+															</p>
+															<div className="pt-2 border-t border-gray-100 flex items-center gap-3">
+																<div className="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
+																	{t.name ? t.name[0].toUpperCase() : "C"}
+																</div>
+																<div>
+																	<p className="text-xs font-bold text-gray-900">{t.name || "Client Name"}</p>
+																	{t.role && <p className="text-[10px] text-gray-400 font-medium">{t.role}</p>}
+																</div>
+															</div>
+														</div>
+													))}
+												</div>
+											</div>
+										)}
+
+										{/* Interactive FAQ Accordion */}
+										{faqs.length > 0 && (
+											<div className="max-w-2xl mx-auto space-y-4 pt-4">
+												<div className="text-center space-y-2 mb-6">
+													<span className="px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-[10px] font-extrabold uppercase tracking-wider">
+														Got Questions?
+													</span>
+													<h2 className="text-xl font-bold font-nohemi text-gray-900">
+														Frequently Asked Questions
+													</h2>
+												</div>
+
+												<div className="space-y-3">
+													{faqs.map((faq, idx) => {
+														const isOpen = activeFaqIndex === idx;
+														return (
+															<div
+																key={faq.id}
+																className="rounded-2xl bg-white border border-gray-200/90 overflow-hidden shadow-2xs">
+																<button
+																	type="button"
+																	onClick={() => setActiveFaqIndex(isOpen ? null : idx)}
+																	className="w-full p-4 text-left flex items-center justify-between gap-3 text-xs font-bold text-gray-900 cursor-pointer hover:bg-gray-50/50">
+																	<span>{faq.question || "Frequently Asked Question"}</span>
+																	{isOpen ? (
+																		<ChevronUp className="w-4 h-4 text-blue-600 shrink-0" />
+																	) : (
+																		<ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />
+																	)}
+																</button>
+																{isOpen && (
+																	<div className="p-4 pt-0 text-xs text-gray-600 font-medium leading-relaxed border-t border-gray-100/60 bg-gray-50/30">
+																		{faq.answer || "Answer details will appear here."}
+																	</div>
+																)}
+															</div>
+														);
+													})}
+												</div>
+											</div>
+										)}
+
+										{/* Direct Bottom CTA Box */}
+										<div className="max-w-3xl mx-auto p-8 rounded-3xl bg-slate-900 text-white text-center space-y-4 shadow-xl">
+											<h3 className="text-xl font-bold font-nohemi">
+												Ready to Transform Your Business?
+											</h3>
+											<p className="text-xs text-slate-300 max-w-md mx-auto">
+												Speak with our dedicated specialists today and receive a personalized strategy session.
+											</p>
+											<button
+												type="button"
+												onClick={() => setIsContactModalOpen(true)}
+												className="px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-extrabold shadow-lg transition-transform hover:scale-105 cursor-pointer">
+												{ctaText || "Claim Free Consultation"}
+											</button>
+										</div>
+
+										{/* INTERACTIVE LEAD / CONSULTATION MODAL */}
+										{isContactModalOpen && (
+											<div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+												<div className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200 relative">
+													<button
+														type="button"
+														onClick={() => {
+															setIsContactModalOpen(false);
+															setContactFormSubmitted(false);
+														}}
+														className="absolute top-5 right-5 p-1.5 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer">
+														<X className="w-4 h-4" />
+													</button>
+
+													{contactFormSubmitted ? (
+														<div className="text-center py-8 space-y-3">
+															<CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto" />
+															<h3 className="text-lg font-bold font-nohemi text-gray-900">
+																Inquiry Received!
+															</h3>
+															<p className="text-xs text-gray-500 max-w-xs mx-auto">
+																Thank you for reaching out. We will contact you at your email address shortly.
+															</p>
+															<button
+																type="button"
+																onClick={() => {
+																	setIsContactModalOpen(false);
+																	setContactFormSubmitted(false);
+																}}
+																className="px-5 py-2 rounded-full bg-slate-900 text-white text-xs font-bold">
+																Close
+															</button>
+														</div>
+													) : (
+														<div className="space-y-4">
+															<div>
+																<span className="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold uppercase">
+																	Interactive Form Test
+																</span>
+																<h3 className="text-lg font-bold font-nohemi text-gray-900 mt-1">
+																	{ctaText || "Get In Touch"}
+																</h3>
+																<p className="text-xs text-gray-500 font-medium">
+																	Fill in the simulated form below to test client lead intake.
+																</p>
+															</div>
+
+															<form
+																onSubmit={(e) => {
+																	e.preventDefault();
+																	setContactFormSubmitted(true);
+																}}
+																className="space-y-3">
+																<div>
+																	<label className="block text-[11px] font-bold text-gray-700 mb-1">
+																		Your Name
+																	</label>
+																	<input
+																		type="text"
+																		required
+																		defaultValue="Jane Doe"
+																		className="w-full px-3.5 py-2 rounded-xl bg-gray-50 border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600"
+																	/>
+																</div>
+																<div>
+																	<label className="block text-[11px] font-bold text-gray-700 mb-1">
+																		Email Address
+																	</label>
+																	<input
+																		type="email"
+																		required
+																		defaultValue="jane@company.com"
+																		className="w-full px-3.5 py-2 rounded-xl bg-gray-50 border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600"
+																	/>
+																</div>
+																<div>
+																	<label className="block text-[11px] font-bold text-gray-700 mb-1">
+																		Project Details / Inquiries
+																	</label>
+																	<textarea
+																		rows={2}
+																		defaultValue="I am interested in scaling my operations with your strategy."
+																		className="w-full px-3.5 py-2 rounded-xl bg-gray-50 border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600"
+																	/>
+																</div>
+
+																<button
+																	type="submit"
+																	className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors shadow-md cursor-pointer">
+																	Submit Test Inquiry
+																</button>
+															</form>
+														</div>
+													)}
+												</div>
+											</div>
+										)}
 									</div>
 								)}
 
 								{activePlan === "SALES_FUNNEL" && (
-									<div className="py-12 px-6 bg-purple-50/50">
-										<div className="max-w-md mx-auto text-center mb-6">
-											<span className="px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-[10px] font-bold uppercase">
-												Exclusive Offer
-											</span>
-											<h2 className="text-xl font-bold font-nohemi text-gray-900 mt-2">
-												{leadMagnetTitle || "Special Lead Magnet Offer"}
-											</h2>
+									<div className="py-10 px-6 bg-slate-950 text-white space-y-12">
+										{/* Urgency Countdown Sticky Bar */}
+										<div className="p-3 rounded-2xl bg-gradient-to-r from-red-600 via-purple-600 to-red-600 text-white flex items-center justify-between text-xs font-extrabold max-w-4xl mx-auto shadow-lg animate-pulse">
+											<div className="flex items-center gap-2">
+												<Flame className="w-4 h-4" />
+												<span>FLASH SALE: LIMITED TIME DISCOUNT</span>
+											</div>
+											<div className="font-mono text-sm tracking-wider bg-black/40 px-3 py-1 rounded-xl">
+												{Math.floor(funnelSecondsLeft / 60)
+													.toString()
+													.padStart(2, "0")}
+												:
+												{(funnelSecondsLeft % 60).toString().padStart(2, "0")}
+											</div>
 										</div>
 
-										{valueStack && (
-											<div className="max-w-md mx-auto bg-white p-5 rounded-2xl border border-purple-100 text-xs font-medium text-gray-700 leading-relaxed whitespace-pre-line mb-6">
-												{valueStack}
+										{/* VSL Video Header & Player */}
+										<div className="max-w-3xl mx-auto text-center space-y-6">
+											<div className="space-y-3">
+												<span className="px-3.5 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs font-bold uppercase tracking-wider border border-purple-500/30">
+													Special Video Presentation
+												</span>
+												<h2 className="text-2xl sm:text-4xl font-extrabold font-nohemi leading-tight">
+													{leadMagnetTitle || "Exclusive Free Training & Breakthrough Presentation"}
+												</h2>
+											</div>
+
+											{/* Video Player Mockup / Embed */}
+											<div className="relative aspect-video rounded-3xl overflow-hidden bg-slate-900 border border-purple-500/30 shadow-2xl shadow-purple-500/10 flex items-center justify-center group">
+												{videoUrl && videoUrl.includes("youtube.com") ? (
+													<iframe
+														src={videoUrl}
+														title="VSL Video"
+														className="w-full h-full"
+														allowFullScreen
+													/>
+												) : (
+													<div className="text-center space-y-3 p-6">
+														<div className="w-16 h-16 rounded-full bg-purple-600 text-white flex items-center justify-center mx-auto shadow-xl group-hover:scale-110 transition-transform cursor-pointer">
+															<Play className="w-7 h-7 fill-current ml-1" />
+														</div>
+														<p className="text-xs font-bold text-slate-300">Click to Play Video Presentation</p>
+													</div>
+												)}
+											</div>
+										</div>
+
+										{/* Value Stack Breakdown Presentation */}
+										<div className="max-w-3xl mx-auto bg-slate-900/90 border border-purple-500/30 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
+											<div className="text-center space-y-1">
+												<span className="text-[11px] font-bold text-purple-400 uppercase tracking-wider">
+													Everything You Get Today
+												</span>
+												<h3 className="text-xl font-bold font-nohemi">
+													Complete System Deliverables Stack
+												</h3>
+											</div>
+
+											<div className="space-y-3">
+												{valueStackItems.map((item, i) => (
+													<div
+														key={item.id}
+														className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 flex items-start justify-between gap-4">
+														<div className="flex items-start gap-3">
+															<div className="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold shrink-0 mt-0.5">
+																<Check className="w-3.5 h-3.5" />
+															</div>
+															<div>
+																<div className="flex items-center gap-2">
+																	<p className="text-xs font-bold text-white">{item.title || `Item #${i + 1}`}</p>
+																	{item.isBonus && (
+																		<span className="px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-400 text-[9px] font-bold">
+																			BONUS
+																		</span>
+																	)}
+																</div>
+																{item.description && (
+																	<p className="text-[11px] text-slate-400 font-medium mt-0.5">
+																		{item.description}
+																	</p>
+																)}
+															</div>
+														</div>
+
+														<span className="text-xs font-mono font-bold text-purple-300 shrink-0">
+															{item.value || "$197 Value"}
+														</span>
+													</div>
+												))}
+											</div>
+
+											{/* Interactive Order Bump Box */}
+											{orderBumpTitle && (
+												<div className="p-4 rounded-2xl bg-purple-950/60 border-2 border-dashed border-purple-500/60 flex items-start gap-3">
+													<input
+														type="checkbox"
+														id="bumpCheck"
+														checked={isOrderBumpChecked}
+														onChange={(e) => setIsOrderBumpChecked(e.target.checked)}
+														className="w-4 h-4 rounded text-purple-600 mt-1 cursor-pointer accent-purple-600"
+													/>
+													<label htmlFor="bumpCheck" className="text-xs cursor-pointer select-none space-y-1">
+														<p className="font-bold text-purple-200">
+															⚡ ONE-TIME OFFER: {orderBumpTitle} (+${orderBumpPrice || 27})
+														</p>
+														<p className="text-[11px] text-slate-400 font-medium">
+															{orderBumpDescription || "Instant masterclass upgrade and bonus tools."}
+														</p>
+													</label>
+												</div>
+											)}
+
+											{/* Price Breakdown & Instant Claim CTA */}
+											<div className="pt-4 border-t border-slate-800 text-center space-y-4">
+												<div className="flex items-center justify-center gap-3 text-sm">
+													<span className="text-slate-400 line-through font-mono">
+														Total Value: ${regularPrice || 497}
+													</span>
+													<span className="text-xl font-extrabold text-emerald-400 font-mono">
+														Today: ${discountPrice + (isOrderBumpChecked ? (Number(orderBumpPrice) || 0) : 0)}
+													</span>
+												</div>
+
+												<button
+													type="button"
+													onClick={() => setIsFunnelOrderSuccess(true)}
+													className="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-extrabold text-sm shadow-xl shadow-purple-600/30 transition-all hover:scale-[1.02] cursor-pointer flex items-center justify-center gap-2 font-nohemi">
+													<span>Claim Special Offer Now →</span>
+												</button>
+
+												{/* Guarantee Seal */}
+												<div className="flex items-center justify-center gap-2 text-xs text-slate-400 pt-2">
+													<ShieldCheck className="w-4 h-4 text-emerald-400" />
+													<span>{guaranteeText || "30-Day 100% Risk-Free Money Back Guarantee"}</span>
+												</div>
+											</div>
+										</div>
+
+										{/* INTERACTIVE FUNNEL SUCCESS MODAL */}
+										{isFunnelOrderSuccess && (
+											<div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200 text-slate-900">
+												<div className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 text-center space-y-4 shadow-2xl animate-in zoom-in-95 duration-200">
+													<CheckCircle2 className="w-14 h-14 text-emerald-600 mx-auto" />
+													<h3 className="text-xl font-bold font-nohemi text-gray-900">
+														Order Successfully Completed!
+													</h3>
+													<p className="text-xs text-gray-500 font-medium leading-relaxed">
+														Your access passes have been generated. Total charged:{" "}
+														<span className="font-bold text-gray-900 font-mono">
+															${discountPrice + (isOrderBumpChecked ? (Number(orderBumpPrice) || 0) : 0)}
+														</span>
+													</p>
+													<div className="p-3 bg-gray-50 rounded-xl text-left text-xs font-mono text-gray-600 space-y-1">
+														<p>Order ID: #FNL-{Date.now().toString().slice(-6)}</p>
+														<p>Status: CONFIRMED & ACTIVE</p>
+													</div>
+													<button
+														type="button"
+														onClick={() => setIsFunnelOrderSuccess(false)}
+														className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors">
+														Close Preview Confirmation
+													</button>
+												</div>
 											</div>
 										)}
 									</div>
@@ -1840,15 +3137,20 @@ function ContentForm() {
 								)}
 
 								{/* RENDER: Contact & Social Footer */}
-								<footer className="py-8 px-6 bg-white border-t border-gray-100 text-center text-xs text-gray-500 space-y-3">
-									<p className="font-bold text-gray-900 text-sm font-nohemi">
+								<footer
+									className={`py-8 px-6 border-t text-center text-xs space-y-3 transition-colors ${
+										themeMode === "dark"
+											? "bg-slate-900 border-slate-800 text-slate-400"
+											: "bg-white border-gray-100 text-gray-500"
+									}`}>
+									<p className={`font-bold text-sm font-nohemi ${themeMode === "dark" ? "text-white" : "text-gray-900"}`}>
 										{businessName || "Your Business Name"}
 									</p>
-									<p className="text-[11px] text-gray-600">
+									<p className={`text-[11px] ${themeMode === "dark" ? "text-slate-300" : "text-gray-600"}`}>
 										Email: {contactEmail || "contact@kioosk.online"} | Phone: {contactPhone || "+1 (555) 019-2834"}
 									</p>
 									{contactAddress && (
-										<p className="text-[11px] text-gray-500">{contactAddress}</p>
+										<p className={`text-[11px] ${themeMode === "dark" ? "text-slate-400" : "text-gray-500"}`}>{contactAddress}</p>
 									)}
 
 									{/* Social Badges Row */}

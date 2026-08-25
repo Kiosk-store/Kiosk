@@ -25,6 +25,72 @@ const contentPayloadSchema = z.object({
 	valueStack: z.string().optional(),
 	testimonials: z.string().optional(),
 	productCatalog: z.string().optional(),
+	// Elaborate Landing Page Fields
+	services: z
+		.array(
+			z.object({
+				id: z.string(),
+				title: z.string(),
+				description: z.string().optional().default(""),
+				icon: z.string().optional().default(""),
+				price: z.string().optional().default(""),
+			}),
+		)
+		.optional(),
+	testimonialsList: z
+		.array(
+			z.object({
+				id: z.string(),
+				name: z.string(),
+				role: z.string().optional().default(""),
+				review: z.string(),
+				rating: z.number().optional().default(5),
+				avatarUrl: z.string().optional().default(""),
+			}),
+		)
+		.optional(),
+	faqs: z
+		.array(
+			z.object({
+				id: z.string(),
+				question: z.string(),
+				answer: z.string(),
+			}),
+		)
+		.optional(),
+	stats: z
+		.array(
+			z.object({
+				id: z.string(),
+				label: z.string(),
+				value: z.string(),
+			}),
+		)
+		.optional(),
+	ctaText: z.string().optional().default("Get Started Today"),
+
+	// Elaborate Sales Funnel Fields
+	videoUrl: z.string().optional().default(""),
+	countdownMinutes: z.union([z.number(), z.string()]).optional().default(15),
+	valueStackItems: z
+		.array(
+			z.object({
+				id: z.string(),
+				title: z.string(),
+				value: z.string(),
+				description: z.string().optional().default(""),
+				isBonus: z.boolean().optional().default(false),
+			}),
+		)
+		.optional(),
+	regularPrice: z.union([z.number(), z.string()]).optional().default(497),
+	discountPrice: z.union([z.number(), z.string()]).optional().default(97),
+	orderBumpTitle: z.string().optional().default(""),
+	orderBumpPrice: z.union([z.number(), z.string()]).optional().default(27),
+	orderBumpDescription: z.string().optional().default(""),
+	guaranteeText: z.string().optional().default("30-Day 100% Money-Back Guarantee"),
+
+	// E-Commerce Fields
 	products: z
 		.array(
 			z.object({
@@ -41,6 +107,7 @@ const contentPayloadSchema = z.object({
 	currency: z.string().optional(),
 	shippingInfo: z.string().optional(),
 	selectedFont: z.string().optional(),
+	themeMode: z.enum(["light", "dark"]).optional().default("light"),
 	whatsappLink: z.string().optional().default(""),
 	xLink: z.string().optional().default(""),
 	instagramLink: z.string().optional().default(""),
