@@ -13,45 +13,48 @@ This technical TODO roadmap outlines the high-priority engineering tasks, design
 ## 1. Front-End Redesign & Visual Design Audit
 
 ### Hero Section Redesign (`src/components/Hero.tsx`)
-- [ ] **High-Impact Headline & Typography**: Redesign hero title with solid high-contrast typography, clean pill badges, and modern responsive font scaling.
-- [ ] **Interactive CTA Integration**: Enhance primary and secondary `PillButton` triggers with hover states and subtle button shadows.
-- [ ] **Visual Metric Cards & Icons**: Replace empty placeholder badge circles with Lucide React icons (`Zap`, `ShieldCheck`, `TrendingUp`, `Sparkles`).
-- [ ] **Enhanced Browser Window Mockup**: Upgrade live website preview card with dynamic status indicators, solid card floaters, and crisp card borders.
+- [x] **High-Impact Headline & Typography**: Redesign hero title with solid high-contrast typography, clean pill badges, and modern responsive font scaling.
+- [x] **Interactive CTA Integration**: Enhance primary and secondary `PillButton` triggers with hover states and subtle button shadows.
+- [x] **Visual Metric Cards & Icons**: Replace empty placeholder badge circles with Lucide React icons (`Zap`, `ShieldCheck`, `TrendingUp`, `Sparkles`).
+- [x] **Enhanced Browser Window Mockup**: Upgrade live website preview card with dynamic status indicators, solid card floaters, and crisp card borders.
 
 ### Design Typos & Visual Consistency Audit
-- [ ] **Icon & Element Alignment**: Audit components for missing icon SVGs inside circular badges (`Hero.tsx`, `CTA.tsx`, `HowItWorks.tsx`).
-- [ ] **Color Token Audit**: Enforce consistent solid design token usage (`#004ac6` primary blue, `emerald-500` status indicators, `slate-900` text).
-- [ ] **Copy Clean Up**: Remove illegal em-dashes from user-facing copy in compliance with Kiosk developer guidelines.
-- [ ] **Responsive Spacing**: Fix mobile-to-desktop padding shifts (`pt-32` vs `pt-44`) and container padding alignment.
+- [x] **Icon & Element Alignment**: Audit components for missing icon SVGs inside circular badges (`Hero.tsx`, `CTA.tsx`, `HowItWorks.tsx`).
+- [x] **Color Token Audit**: Enforce consistent solid design token usage (`#004ac6` primary blue, `emerald-500` status indicators, `slate-900` text).
+- [x] **Copy Clean Up**: Remove illegal em-dashes from user-facing copy in compliance with Kiosk developer guidelines.
+- [x] **Responsive Spacing**: Fix mobile-to-desktop padding shifts (`pt-32` vs `pt-44`) and container padding alignment.
 
 ---
 
-## 2. Multi-Tenant Industry Site Templates (4-6 Preset Engine)
+## 2. Multi-Tenant Industry Site Templates & Content Studio
 
-### Factory Architecture (`src/lib/factory/SiteTemplateFactory.ts`)
-- [ ] **Template 1: Modern Business Landing Page** - Single page with Hero CTA, Services Grid, WhatsApp direct booking, and contact form.
-- [ ] **Template 2: High-Converting Sales Funnel** - Multi-stage funnel with landing offer, value stack, lead capture, CRM integration, and thank-you page.
-- [ ] **Template 3: E-Commerce Storefront** - Full digital store with catalog grid, cart drawer, Stripe/Flutterwave payment gateway, and order receipt.
-- [ ] **Template 4: Creative Agency Showcase** - Visual showcase with case studies, interactive portfolio grid, pricing tables, and client intake form.
-- [ ] **Template 5: Local Restaurant & Bistro** - Dynamic food menu showcase, table reservation modal, direct WhatsApp ordering, and location map.
-- [ ] **Template 6: Professional Services & Consulting** - Expert profile, service package calculator, calendar booking widget, and client testimonials stack.
+### Content Studio & Live Interactive Preview (`src/app/dashboard/content/page.tsx`)
+- [x] **Multi-Step Content Form**: Brand setup, Design & typography, Page catalog/services, and Social links.
+- [x] **Theme Switcher**: Live dynamic Light Mode vs Midnight Dark Mode (`#070d1d`, `#0d162a`, `#111c33`) preview.
+- [x] **Dynamic Google Fonts**: Injected dynamically in preview based on client selection (`Playfair`, `Inter`, `Outfit`, `Montserrat`, etc.).
+- [x] **E-Commerce Live Preview & Cart**: Product uploads with badges, multi-currency support, slide-out cart drawer, and direct WhatsApp order message generation.
+- [x] **Sales Funnel Live Preview**: Urgency countdown timer, 16:9 VSL video embed, value stack breakdown, order bump upgrades, and simulated order dialog.
+- [x] **Landing Page Live Preview**: Authority stats bar, 3-column services grid, client reviews, FAQ accordion, and lead intake modal.
+- [x] **Authentic Smartphone Mockup Viewport**: Mobile frame (`w-[380px] rounded-[44px] border-[8px] border-slate-800`) with dynamic island / speaker status bar.
+- [x] **Templates Directory Dock Linking**: Direct dock icon linking to `/dashboard/templates` with live template preview modals.
+- [x] **Project Cards Direct Navigation**: Clicking any project card in the dashboard opens `/dashboard/content?projectId=<id>` to resume editing.
 
 ---
 
 ## 3. Authentication & Checkout Session Protection Engine
 
-- [ ] **Background Token Auto-Refresh**: Wire silent token refresh on `/checkout` entry so JWT access tokens do not expire during payment flows.
-- [ ] **Pre-Payment Auth Verification**: Validate active user session before dispatching payment payload to Flutterwave / Stripe gateways.
-- [ ] **Checkout Form State Persistence**: Implement encrypted `sessionStorage` caching so transient form data persists if users navigate to 3D Secure bank verification tabs.
-- [ ] **Grace Period Cookie Handler**: Set a 1-hour session extension window when visitors are actively interacting with `/checkout`.
+- [x] **6-Hour Session Expiration**: User sessions expire strictly after 6 hours of inactivity.
+- [x] **Checkout Active Grace Window**: Suspend automatic logout if client is actively completing payment on `/checkout` (`isCheckoutInProgress`).
+- [x] **Pre-Payment Auth Verification**: Validate active user session before dispatching payment payload to Flutterwave gateways.
+- [x] **Checkout Form State Persistence**: Implement `sessionStorage` / `localStorage` caching so transient form data persists across tab switches.
 
 ---
 
 ## 4. Decoupled Event Messaging & Async Workers
 
 - [ ] **Upstash QStash Integration**: Wire QStash for asynchronous event publishing and background job dispatching.
-- [ ] **Email Notification Decoupling**: Offload Resend transactional email dispatches (`src/lib/email.ts`) from blocking HTTP request threads to QStash workers.
-- [ ] **Invoice PDF Generation**: Verify Inngest background workers (`src/inngest/client.ts`) for generating downloadable PDF payment receipts upon webhook trigger.
+- [x] **Email Notification System**: Configure Resend transactional email dispatches (`src/lib/email.ts`).
+- [x] **Invoice PDF Generation**: Configure Inngest background workers (`src/inngest/client.ts`) for generating downloadable PDF payment receipts upon webhook trigger.
 
 ---
 
@@ -63,16 +66,15 @@ This technical TODO roadmap outlines the high-priority engineering tasks, design
   - `POST /api/payments/initialize` (atomic lock `SETNX` double-charge protection).
   - `POST /api/webhooks/flutterwave` (secret hash verification and event deduplication).
 - [ ] **GitHub Actions CI/CD Pipeline (`.github/workflows/ci.yml`)**:
-  - Automated `npx tsc --noEmit` and ESLint checks on every PR.
+  - Automated `tsc --noEmit` and ESLint checks on every PR.
   - Automatic Vitest suite execution on merges.
 
 ---
 
 ## 6. Production Deployment Pre-Flight & Infrastructure
 
-
-- [ ] **Wildcard Subdomain Middleware Audit**: Verify `<client>.kiosk.site` header forwarding and edge routing in `src/middleware.ts`.
-- [ ] **Production Build Audit**: Execute `npm run build` locally to verify 0 build errors and zero TypeScript compile issues (`npx tsc --noEmit`).
+- [x] **Wildcard Subdomain Middleware Audit**: Verify `<client>.kiosk.site` header forwarding and edge routing in `src/middleware.ts`.
+- [x] **TypeScript Strict Check**: Execute `node node_modules/typescript/lib/tsc.js --noEmit` locally (0 errors verified).
 
 ---
 
@@ -80,20 +82,23 @@ This technical TODO roadmap outlines the high-priority engineering tasks, design
 
 | Category | High Priority Task | Status | Target Deliverable |
 | :--- | :--- | :---: | :--- |
-| **Design / UI** | Hero Section Redesign & Interactive Card | Pending | `src/components/Hero.tsx` |
-| **Design / UI** | Design Typos & Visual Audit Adjustments | Pending | Design polish across UI |
-| **Templates** | 4-6 Industry Site Template Engine | Pending | `SiteTemplateFactory.ts` |
-| **Auth** | Checkout Session & Token Persistence | Pending | `src/app/checkout/page.tsx` |
-| **Async Bus** | Upstash QStash Event Bus Setup | Pending | `src/lib/events/` |
-| **Testing** | Playwright E2E Test Suite | Pending | `*.e2e-spec.ts` |
-| **DevOps** | GitHub Actions CI/CD Pipeline | Pending | `.github/workflows/` |
-| **Deploy** | Production Pre-Flight Audit | Pending | Vercel & Neon Setup |
+| **Design / UI** | Hero Section Redesign & Interactive Card | Completed | `src/components/Hero.tsx` |
+| **Design / UI** | Design Typos & Visual Audit Adjustments | Completed | Clean visual standards |
+| **Studio** | Content Studio with Live Preview & Dark Mode | Completed | `src/app/dashboard/content/` |
+| **Templates** | Templates Directory with Live Modals | Completed | `src/app/dashboard/templates/` |
+| **Auth** | 6-Hour Session Token & Checkout Grace Window | Completed | `src/lib/auth/session.ts` |
+| **E-Commerce** | Multi-Currency Catalog & WhatsApp Ordering | Completed | Content Studio & Preview |
+| **Async Bus** | Upstash QStash Event Bus Setup | In Progress | `src/lib/events/` |
+| **Testing** | Playwright E2E Test Suite | In Progress | `*.e2e-spec.ts` |
+| **DevOps** | GitHub Actions CI/CD Pipeline | In Progress | `.github/workflows/` |
+| **Deploy** | Production Pre-Flight Audit | Ready | Vercel & Neon Setup |
 
 ---
 
 ## Verification & Acceptance Criteria
 
-1. **Type Safety**: `npx tsc --noEmit` completes with **0 errors**.
+1. **Type Safety**: `tsc --noEmit` completes with **0 errors**.
 2. **Build Success**: `npm run build` generates optimized production bundles without warnings or failures.
-3. **Template Coverage**: 6 fully configured site templates available in `SiteTemplateFactory`.
-4. **UI Design Standard**: 100% clean solid typography, responsive layout, zero missing icons, and vibrant modern aesthetic.
+3. **Template Coverage**: Interactive presets and content studio available across all subscription tiers.
+4. **UI Design Standard**: 100% clean solid typography, zero gradients, authentic mobile frame mockup, and sleek dark mode preview.
+

@@ -15,6 +15,16 @@
 const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
 const EMAIL_FROM = process.env.EMAIL_FROM || "Kiosk <noreply@kioosk.online>";
 
+/**
+ * Resolves the active base application URL across local dev, preview branches, and production.
+ */
+function getAppUrl(): string {
+	if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
+	if (process.env.AUTH_URL) return process.env.AUTH_URL.replace(/\/$/, "");
+	if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`.replace(/\/$/, "");
+	return "https://kioosk.online";
+}
+
 export interface SendEmailPayload {
 	to: string;
 	subject: string;
@@ -69,6 +79,7 @@ export async function sendEmail({ to, subject, html }: SendEmailPayload): Promis
  * @param userName - User full name or display handle
  */
 export async function sendWelcomeEmail(toEmail: string, userName: string) {
+	const appUrl = getAppUrl();
 	const subject = "Welcome to Kiosk! Your Multi-Tenant Workspace is Live";
 	const html = `
 		<!DOCTYPE html>
@@ -88,11 +99,176 @@ export async function sendWelcomeEmail(toEmail: string, userName: string) {
 						Your custom multi-tenant workspace is fully provisioned and ready. You can now build, manage, and scale your custom website landing pages, sales funnels, and e-commerce stores.
 					</p>
 					<div style="margin-bottom: 32px;">
-						<a href="${process.env.NEXT_PUBLIC_APP_URL || "https://kioosk.online"}/dashboard" style="display: inline-block; background-color: #2563eb; color: #ffffff; font-weight: 700; font-size: 14px; padding: 12px 28px; border-radius: 9999px; text-decoration: none;">Go to Your Dashboard →</a>
+						<a href="${appUrl}/dashboard" style="display: inline-block; background-color: #2563eb; color: #ffffff; font-weight: 700; font-size: 14px; padding: 12px 28px; border-radius: 9999px; text-decoration: none;">Go to Your Dashboard →</a>
 					</div>
 					<hr style="border: none; border-top: 1px solid #f1f5f9; margin-bottom: 24px;" />
 					<p style="font-size: 12px; color: #94a3b8; line-height: 1.5;">
 						If you have any questions, our dedicated support team is available 24/7 inside your workspace.
+					</p>
+				</div>
+			</body>
+		</html>
+	`;
+
+	return sendEmail({ to: toEmail, subject, html });
+}
+
+export interface WebsiteReviewEmailPayload {
+	clientName: string;
+	clientEmail: string;
+	businessName: string;
+	tagline: string;
+	plan: string;
+	logoUrl?: string | null;
+	imagesCount?: number;
+	productsCount?: number;
+	servicesCount?: number;
+	projectId?: string;
+	contactPhone?: string;
+	contactEmail?: string;
+	whatsappLink?: string;
+	selectedFont?: string;
+	themeMode?: string;
+}
+
+/**
+ * Dispatches Website Review Notification to Kiosk Administrator / Fulfillment Team.
+ */
+export async function sendWebsiteReviewNotificationToAdmin(payload: WebsiteReviewEmailPayload) {
+	const adminEmail = process.env.ADMIN_EMAIL || process.env.NOTIFICATION_EMAIL || "support@kioosk.online";
+	const appUrl = getAppUrl();
+	const reviewUrl = payload.projectId ? `${appUrl}/dashboard/content?projectId=${payload.projectId}` : `${appUrl}/dashboard/projects`;
+	const subject = `🚀 New Website Review Request: ${payload.businessName} (${payload.plan.replace(/_/g, " ")})`;
+
+	const html = `
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<meta charset="utf-8">
+				<title>New Website Review Request</title>
+			</head>
+			<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; color: #0f172a; margin: 0; padding: 30px 15px;">
+				<div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; padding: 32px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+					<div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 16px; margin-bottom: 24px;">
+						<div style="display: flex; align-items: center;">
+							<div style="width: 32px; height: 32px; background-color: #004ac6; border-radius: 8px; color: #ffffff; font-weight: 800; text-align: center; line-height: 32px; font-size: 16px; margin-right: 10px;">K</div>
+							<span style="font-size: 18px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px;">KIOSK FULFILLMENT</span>
+						</div>
+						<span style="background-color: #dbeafe; color: #1e40af; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase;">Review Action Required</span>
+					</div>
+
+					<h1 style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">New Website Content Submitted</h1>
+					<p style="font-size: 14px; color: #64748b; margin: 0 0 24px 0;">
+						A client has submitted their website setup and content for review and personalization.
+					</p>
+
+					<!-- Business Profile Card -->
+					<div style="background-color: #f8fafc; border-radius: 12px; padding: 20px; border: 1px solid #e2e8f0; margin-bottom: 24px;">
+						<div style="margin-bottom: 12px;">
+							<span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Business Name</span>
+							<h2 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 2px 0 0 0;">${payload.businessName}</h2>
+						</div>
+
+						<div style="margin-bottom: 12px;">
+							<span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Headline / Tagline</span>
+							<p style="font-size: 14px; font-weight: 600; color: #334155; margin: 2px 0 0 0;">${payload.tagline || "N/A"}</p>
+						</div>
+
+						<div style="display: flex; flex-wrap: wrap; gap: 16px; border-top: 1px dashed #cbd5e1; padding-top: 12px; margin-top: 12px;">
+							<div style="flex: 1; min-width: 120px;">
+								<span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Tier Plan</span>
+								<p style="font-size: 13px; font-weight: 700; color: #004ac6; margin: 2px 0 0 0;">${payload.plan.replace(/_/g, " ")}</p>
+							</div>
+							<div style="flex: 1; min-width: 120px;">
+								<span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Theme & Font</span>
+								<p style="font-size: 13px; font-weight: 600; color: #334155; margin: 2px 0 0 0;">${payload.themeMode || "Light"} / ${payload.selectedFont || "Default"}</p>
+							</div>
+							<div style="flex: 1; min-width: 120px;">
+								<span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Brand Photos</span>
+								<p style="font-size: 13px; font-weight: 600; color: #334155; margin: 2px 0 0 0;">${payload.imagesCount || 0} Files Attached</p>
+							</div>
+						</div>
+					</div>
+
+					<!-- Client Contact Box -->
+					<div style="background-color: #ffffff; border-radius: 12px; padding: 16px; border: 1px solid #e2e8f0; margin-bottom: 24px;">
+						<span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; display: block; margin-bottom: 8px;">Client Information</span>
+						<p style="font-size: 13px; color: #334155; margin: 0 0 4px 0;"><strong>Client Name:</strong> ${payload.clientName}</p>
+						<p style="font-size: 13px; color: #334155; margin: 0 0 4px 0;"><strong>Account Email:</strong> <a href="mailto:${payload.clientEmail}" style="color: #004ac6;">${payload.clientEmail}</a></p>
+						${payload.contactPhone ? `<p style="font-size: 13px; color: #334155; margin: 0 0 4px 0;"><strong>Phone:</strong> ${payload.contactPhone}</p>` : ""}
+						${payload.whatsappLink ? `<p style="font-size: 13px; color: #334155; margin: 0 0 4px 0;"><strong>WhatsApp:</strong> ${payload.whatsappLink}</p>` : ""}
+						${payload.projectId ? `<p style="font-size: 13px; color: #334155; margin: 0;"><strong>Project ID:</strong> <code>${payload.projectId}</code></p>` : ""}
+					</div>
+
+					<div style="text-align: center; margin-bottom: 24px;">
+						<a href="${reviewUrl}" style="display: inline-block; background-color: #004ac6; color: #ffffff; font-weight: 700; font-size: 14px; padding: 12px 32px; border-radius: 9999px; text-decoration: none;">Review & Edit Project in Studio →</a>
+					</div>
+
+					<hr style="border: none; border-top: 1px solid #f1f5f9; margin-bottom: 16px;" />
+					<p style="font-size: 11px; color: #94a3b8; line-height: 1.5; margin: 0; text-align: center;">
+						Automated fulfillment alert from Kiosk Platform.
+					</p>
+				</div>
+			</body>
+		</html>
+	`;
+
+	return sendEmail({ to: adminEmail, subject, html });
+}
+
+/**
+ * Dispatches Website Review Confirmation Email to the client.
+ */
+export async function sendWebsiteReviewConfirmationToClient(
+	toEmail: string,
+	clientName: string,
+	businessName: string,
+	plan: string,
+) {
+	const appUrl = getAppUrl();
+	const subject = `We've Received Your Details: ${businessName} is Now in Review!`;
+	const html = `
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<meta charset="utf-8">
+				<title>Website In Review</title>
+			</head>
+			<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; color: #0f172a; margin: 0; padding: 30px 15px;">
+				<div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; padding: 32px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+					<div style="display: flex; align-items: center; margin-bottom: 24px;">
+						<div style="width: 32px; height: 32px; background-color: #004ac6; border-radius: 8px; color: #ffffff; font-weight: 800; text-align: center; line-height: 32px; font-size: 16px; margin-right: 10px;">K</div>
+						<span style="font-size: 18px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px;">KIOSK</span>
+					</div>
+
+					<div style="background-color: #ecfdf5; border-radius: 12px; padding: 16px; border: 1px solid #a7f3d0; margin-bottom: 24px;">
+						<span style="display: inline-block; background-color: #059669; color: #ffffff; font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 9999px; margin-bottom: 8px;">PROGRESS: 85% • IN REVIEW</span>
+						<h1 style="font-size: 20px; font-weight: 800; color: #065f46; margin: 0 0 6px 0;">We're Personalizing Your Website!</h1>
+						<p style="font-size: 13px; color: #047857; margin: 0;">
+							Thank you ${clientName || "there"}, we have received your custom content, brand assets, and specifications for <strong>${businessName}</strong>.
+						</p>
+					</div>
+
+					<p style="font-size: 14px; color: #334155; line-height: 1.6; margin-bottom: 20px;">
+						Our specialized design and development team is now personalizing your <strong>${plan.replace(/_/g, " ")}</strong> site layout, configuring your domain settings, and optimizing your responsive views.
+					</p>
+
+					<div style="background-color: #f8fafc; border-radius: 12px; padding: 16px; border: 1px solid #e2e8f0; margin-bottom: 24px;">
+						<p style="font-size: 13px; font-weight: 700; color: #0f172a; margin: 0 0 6px 0;">What happens next?</p>
+						<ul style="font-size: 13px; color: #64748b; margin: 0; padding-left: 20px; line-height: 1.6;">
+							<li>Our team reviews all uploaded photos and brand copy.</li>
+							<li>We configure your subdomains and live checkout/contact gateways.</li>
+							<li>You will receive an email notification as soon as your final site is published live!</li>
+						</ul>
+					</div>
+
+					<div style="text-align: center; margin-bottom: 24px;">
+						<a href="${appUrl}/dashboard/projects" style="display: inline-block; background-color: #004ac6; color: #ffffff; font-weight: 700; font-size: 14px; padding: 12px 28px; border-radius: 9999px; text-decoration: none;">Track Progress in Dashboard →</a>
+					</div>
+
+					<hr style="border: none; border-top: 1px solid #f1f5f9; margin-bottom: 16px;" />
+					<p style="font-size: 12px; color: #94a3b8; line-height: 1.5; margin: 0;">
+						Questions or need to update any details? Simply reply directly to this email or contact our support team.
 					</p>
 				</div>
 			</body>
@@ -118,6 +294,7 @@ export async function sendProjectStatusEmail(
 	status: string,
 	publishedUrl?: string,
 ) {
+	const appUrl = getAppUrl();
 	const subject = `Update on ${projectName}: Status is now ${status}`;
 	const html = `
 		<!DOCTYPE html>
@@ -133,7 +310,7 @@ export async function sendProjectStatusEmail(
 							? `<p style="font-size: 14px; color: #475569; margin-bottom: 24px;">Preview URL: <a href="${publishedUrl}" style="color: #2563eb; font-weight: 600;">${publishedUrl}</a></p>`
 							: ""
 					}
-					<a href="${process.env.NEXT_PUBLIC_APP_URL || "https://kioosk.online"}/dashboard" style="display: inline-block; background-color: #0f172a; color: #ffffff; font-weight: 700; font-size: 14px; padding: 12px 24px; border-radius: 9999px; text-decoration: none;">View Project Details</a>
+					<a href="${appUrl}/dashboard/projects" style="display: inline-block; background-color: #0f172a; color: #ffffff; font-weight: 700; font-size: 14px; padding: 12px 24px; border-radius: 9999px; text-decoration: none;">View Project Details</a>
 				</div>
 			</body>
 		</html>

@@ -10,6 +10,10 @@ import { auth } from "@/auth";
 import { CacheService } from "@/lib/cache/CacheService";
 import { ProjectSubject } from "@/lib/events/ProjectSubject";
 import { Logger } from "@/lib/logger";
+import {
+	sendWebsiteReviewNotificationToAdmin,
+	sendWebsiteReviewConfirmationToClient,
+} from "@/lib/email";
 
 const contentPayloadSchema = z.object({
 	projectId: z.string().optional(),
@@ -117,6 +121,15 @@ const contentPayloadSchema = z.object({
 	tiktokLink: z.string().optional().default(""),
 	bookingLink: z.string().optional().default(""),
 	customLink: z.string().optional().default(""),
+	logoImage: z
+		.object({
+			id: z.string(),
+			name: z.string(),
+			size: z.string(),
+			url: z.string(),
+		})
+		.nullable()
+		.optional(),
 	uploadedImages: z
 		.array(
 			z.object({
@@ -249,7 +262,42 @@ export async function POST(request: Request) {
 			},
 		});
 
-		Logger.info("Saved project content & brand assets", {
+		// Dispatch Email Alerts: 1. Inform Kiosk Admin/Team, 2. Confirm to Client
+		const clientEmail = customUser?.email || authSession?.user?.email || contentData.contactEmail;
+		const clientName = customUser?.name || authSession?.user?.name || "Valued Client";
+
+		if (clientEmail) {
+			sendWebsiteReviewConfirmationToClient(
+				clientEmail,
+				clientName,
+				contentData.businessName,
+				contentData.plan || "Website Build",
+			).catch((err) => {
+				Logger.error("Failed to send review confirmation email to client", err);
+			});
+		}
+
+		sendWebsiteReviewNotificationToAdmin({
+			clientName,
+			clientEmail: clientEmail || "unknown@client.com",
+			businessName: contentData.businessName,
+			tagline: contentData.tagline,
+			plan: contentData.plan || "Website Build",
+			logoUrl: contentData.logoImage?.url || null,
+			imagesCount: contentData.uploadedImages?.length || 0,
+			productsCount: contentData.products?.length || 0,
+			servicesCount: contentData.services?.length || 0,
+			projectId: projectId || undefined,
+			contactPhone: contentData.contactPhone,
+			contactEmail: contentData.contactEmail,
+			whatsappLink: contentData.whatsappLink,
+			selectedFont: contentData.selectedFont,
+			themeMode: contentData.themeMode,
+		}).catch((err) => {
+			Logger.error("Failed to send review notification email to admin", err);
+		});
+
+		Logger.info("Saved project content & brand assets and dispatched review emails", {
 			tenantId: tenant.id,
 			businessName: contentData.businessName,
 		});

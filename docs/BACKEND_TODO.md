@@ -14,11 +14,11 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
 | **Load Balancing** | Layer 4 (AWS NLB / Cloudflare) + Layer 7 Application Load Balancer |
 | **Rate Limiting** | `@upstash/ratelimit` + Upstash Redis Sliding Window Algorithm |
 | **Authentication** | Auth.js v5 (NextAuth) + Zod + Upstash Redis Session Cache |
-| **Session Protection**| Automatic Token Refresh & Checkout State Persistence (Zero Logout During Payment) |
+| **Session Protection**| Automatic Token Refresh & Checkout State Persistence (6-Hour Expiry, Zero Logout During Payment) |
 | **Double-Charge Protection**| Upstash Redis Atomic Locks (`SETNX`) + Webhook Event Deduplication |
 | **Database** | PostgreSQL (Neon Serverless / AWS Aurora) |
 | **ORM & Querying** | Drizzle ORM / Prisma ORM + PgBouncer Connection Pooling |
-| **Payments** | Stripe Billing API + Paystack Engine + Upstash Idempotency Locks |
+| **Payments** | Stripe Billing API + Flutterwave Gateway + Upstash Idempotency Locks |
 | **Background Jobs** | Inngest / BullMQ (Async serverless worker queues) |
 | **Caching Engine** | Upstash Redis (Serverless-optimized HTTP/REST Redis Cluster) |
 | **Email & Transact** | Resend + React Email (`@react-email/components`) |
@@ -28,7 +28,7 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
 
 ---
 
-## Phase 1: Authentication & Authorization Engine (STARTING PRIORITY)
+## Phase 1: Authentication & Authorization Engine
 
 ### 1. Stack Dependencies & Database Schema
 - [x] Install core Auth dependencies (`next-auth@beta`, `@auth/drizzle-adapter`, `@auth/prisma-adapter`, `zod`).
@@ -51,7 +51,8 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
 - [x] Install `bcryptjs` for secure password hashing.
 - [x] Create security module (`src/lib/auth/password.ts`) with Zod schema validation.
 - [x] Configure HTTP-Only session cookie security (`SameSite=Lax`, `Secure` in production, dual-token flush on logout).
-- [x] Conduct code security & vulnerability audit (`security_audit_report.md`).
+- [x] Set session token lifetime to 6 hours (`maxAge: 6 * 60 * 60`).
+- [x] Conduct code security & vulnerability audit.
 
 ### 4. Auth & User Profile API Route Handlers (`src/app/api/auth/*` & `src/app/api/user/*`)
 - [x] **`POST /api/auth/register`**:
@@ -73,10 +74,9 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
   - Update user profile details (`name`) in Neon PostgreSQL with Zod validation and live `useAuth()` sync.
 
 ### 5. Checkout Session Protection (Zero Logout During Payment)
-- [ ] **Background Token Auto-Refresh**: Configure NextAuth silent token refresh on `/checkout` entry so JWT access tokens never expire mid-payment.
-- [ ] **Pre-Payment Auth Lock**: Validate active user session *before* submitting payment payload to Stripe/Paystack.
-- [ ] **Form State Persistence**: Store transient checkout form state in encrypted `sessionStorage` so if a user opens a 3D Secure bank verification tab, their checkout form remains fully populated upon return.
-- [ ] **Grace Period Cookie Handling**: Set a 1-hour session extension window while a user is actively on `/checkout`.
+- [x] **Session Extension on Payment**: Suspend automatic logout if client has active `isCheckoutInProgress` state on `/checkout`.
+- [x] **Pre-Payment Auth Lock**: Validate active user session *before* submitting payment payload.
+- [x] **Form State Persistence**: Store transient checkout and content form state in `sessionStorage` / `localStorage` drafts.
 
 ### 6. OAuth 2.0 Google & GitHub Providers
 - [x] Configure Google & GitHub OAuth client keys template in `.env` & `.env.example`.
@@ -117,9 +117,15 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
 
 ---
 
-## Phase 4: Domain & Site Provisioning Engine
-- [x] Build `SiteTemplateFactory` (Factory pattern) & multi-tenant projects API (`GET/POST /api/projects`) in `src/app/api/projects/route.ts`.
-- [x] Build Site Provisioning & Template Selection page (`src/app/dashboard/projects/new/page.tsx`).
+## Phase 4: Website Content Studio & Provisioning Engine
+- [x] Build `POST /api/projects/content` endpoint with Zod schema validation for multi-step content payloads (`src/app/api/projects/content/route.ts`).
+- [x] Build Website Content Studio (`src/app/dashboard/content/page.tsx`) with draft saving and live preview.
+- [x] Build interactive multi-currency catalog, Add to Cart stepper, cart drawer, and WhatsApp direct checkout order generator.
+- [x] Build Sales Funnel urgency timer, 16:9 VSL video embed, value stack builder, and order bump upgrades.
+- [x] Build Landing Page authority metrics, services grid, client endorsements, and lead intake modal.
+- [x] Build Themes & Fonts system (Light vs Midnight Dark Mode, dynamic Google Fonts injection).
+- [x] Build Templates Directory (`src/app/dashboard/templates/page.tsx`) with direct dock navigation and live template preview overlays.
+- [x] Connect Project Cards on dashboard to navigate directly to `/dashboard/content?projectId=<id>` for editing.
 - [x] Automate wildcard subdomain (`<client>.kiosk.site`) & custom domain edge routing engine in `src/middleware.ts`.
 - [x] Setup **Inngest** serverless background workers for PDF invoice generation and asset optimization (`src/inngest/client.ts` & `/api/inngest`).
 
@@ -141,4 +147,5 @@ This TODO roadmap defines the enterprise-scalable backend architecture for **Kio
 ## Phase 7: Test-Driven Development (TDD) & CI/CD Pipeline
 - [x] Write Unit Tests for Security, SiteTemplateFactory, CacheService, and ProjectSubject (`src/__tests__/auth.spec.ts`).
 - [ ] Write E2E API tests with **Playwright** (`*.e2e-spec.ts`).
-- [ ] Setup **GitHub Actions** CI/CD pipeline for automated linting, type-checking (`npx tsc --noEmit`), Vitest suite execution, and Vercel deployment.
+- [ ] Setup **GitHub Actions** CI/CD pipeline for automated linting, type-checking (`tsc --noEmit`), Vitest suite execution, and Vercel deployment.
+

@@ -86,5 +86,6 @@ This checklist defines every step required to deploy **Kiosk** to production on 
 
 ## 🧪 8. Final Build & Verification Pre-Flight
 
-- [ ] **Type Check**: Execute `npx tsc --noEmit` locally (Must return 0 errors).
+- [ ] **Type Check**: Execute `node node_modules/typescript/lib/tsc.js --noEmit` locally (Must return 0 errors).
 - [ ] **Production Build Test**: Execute `npm run build` locally to verify zero build errors.
+- [ ] **Live Preview Verification**: Verify Live Preview modal and Content Studio API routes (`POST /api/projects/content`) across Desktop and Mobile viewports.

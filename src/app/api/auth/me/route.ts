@@ -1,8 +1,9 @@
-/** @format */
-
 import { NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth/session";
 import { auth } from "@/auth";
+import { db } from "@/db";
+import { users } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 export async function GET() {
 	try {
@@ -20,16 +21,21 @@ export async function GET() {
 
 		// 2. Fallback to Auth.js session (Google OAuth)
 		const authSession = await auth();
-		if (authSession?.user) {
+		if (authSession?.user?.id) {
+			const dbUser = await db.query.users.findFirst({
+				where: eq(users.id, authSession.user.id),
+			});
+
 			return NextResponse.json(
 				{
 					authenticated: true,
 					user: {
-						id: authSession.user.id || "",
-						name: authSession.user.name || null,
-						email: authSession.user.email || "",
-						image: authSession.user.image || null,
-						role: (authSession.user as any).role || "USER",
+						id: authSession.user.id,
+						name: dbUser?.name || authSession.user.name || null,
+						email: dbUser?.email || authSession.user.email || "",
+						image: dbUser?.image || authSession.user.image || null,
+						phone: dbUser?.phone || null,
+						role: dbUser?.role || (authSession.user as any).role || "USER",
 					},
 				},
 				{ status: 200 },

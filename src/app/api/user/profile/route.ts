@@ -158,7 +158,7 @@ export async function PATCH(request: Request) {
 
 		return NextResponse.json(
 			{
-				message: "Settings updated successfully in database",
+				message: "Updated",
 				user: {
 					id: updatedUser?.id,
 					name: updatedUser?.name,

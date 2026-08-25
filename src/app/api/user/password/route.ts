@@ -90,7 +90,7 @@ export async function PATCH(request: Request) {
 			.where(eq(users.id, userId));
 
 		return NextResponse.json(
-			{ message: "Password updated successfully in database." },
+			{ message: "Updated" },
 			{ status: 200 },
 		);
 	} catch (err) {

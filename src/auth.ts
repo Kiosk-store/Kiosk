@@ -8,6 +8,7 @@ import { db } from "@/db";
 import { users, accounts, sessions, verificationTokens } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { verifyPassword } from "@/lib/auth/password";
+import { sendWelcomeEmail } from "@/lib/email";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
 	trustHost: true,
@@ -86,6 +87,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 				(session.user as { role?: string }).role = token.role as string;
 			}
 			return session;
+		},
+	},
+	events: {
+		async createUser({ user }) {
+			if (user.email) {
+				sendWelcomeEmail(user.email, user.name || "Valued User").catch((err) => {
+					console.error("[AUTH_EVENT_WELCOME_EMAIL_ERROR]", err);
+				});
+			}
 		},
 	},
 	secret: process.env.AUTH_SECRET,

@@ -16,7 +16,7 @@ export default function SettingsPage() {
 	const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
 	const [isLoading, setIsLoading] = useState(false);
 	const [isSaved, setIsSaved] = useState(false);
-	const [toastMsg, setToastMsg] = useState("Your settings have been saved successfully!");
+	const [toastMsg, setToastMsg] = useState("Updated");
 	const [error, setError] = useState<string | null>(null);
 
 	// Profile Form State
@@ -82,7 +82,7 @@ export default function SettingsPage() {
 		.toUpperCase()
 		.slice(0, 2);
 
-	// Save Profile & Company Settings to Database
+	// Save Profile & Company Settings
 	const handleSaveProfile = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setError(null);
@@ -119,19 +119,19 @@ export default function SettingsPage() {
 
 			await refreshUser();
 			setIsLoading(false);
-			setToastMsg("Profile settings saved successfully in database!");
+			setToastMsg("Updated");
 			setIsSaved(true);
 			setTimeout(() => {
 				setIsSaved(false);
-			}, 3500);
+			}, 3000);
 		} catch (err) {
 			console.error("[PROFILE_SAVE_ERROR]", err);
-			setError("Failed to save profile settings to database.");
+			setError("Failed to update profile settings.");
 			setIsLoading(false);
 		}
 	};
 
-	// Save Password to Database
+	// Save Password
 	const handleSavePassword = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setError(null);
@@ -166,19 +166,19 @@ export default function SettingsPage() {
 			setNewPass("");
 			setConfirmPass("");
 			setIsLoading(false);
-			setToastMsg("Password updated successfully in database!");
+			setToastMsg("Updated");
 			setIsSaved(true);
 			setTimeout(() => {
 				setIsSaved(false);
-			}, 3500);
+			}, 3000);
 		} catch (err) {
 			console.error("[PASSWORD_SAVE_ERROR]", err);
-			setError("An unexpected network error occurred while updating password.");
+			setError("An unexpected error occurred while updating password.");
 			setIsLoading(false);
 		}
 	};
 
-	// Save Notification Preferences to Database
+	// Save Notification Preferences
 	const handleSaveNotifications = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setError(null);
@@ -204,14 +204,14 @@ export default function SettingsPage() {
 
 			await refreshUser();
 			setIsLoading(false);
-			setToastMsg("Notification preferences saved successfully in database!");
+			setToastMsg("Updated");
 			setIsSaved(true);
 			setTimeout(() => {
 				setIsSaved(false);
-			}, 3500);
+			}, 3000);
 		} catch (err) {
 			console.error("[NOTIFICATIONS_SAVE_ERROR]", err);
-			setError("Failed to save notification preferences to database.");
+			setError("Failed to update notification preferences.");
 			setIsLoading(false);
 		}
 	};

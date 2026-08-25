@@ -140,7 +140,8 @@ const GOOGLE_FONTS_CATALOG = [
 function ContentForm() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
-	const fileInputRef = useRef<HTMLInputElement>(null);
+	const logoFileInputRef = useRef<HTMLInputElement>(null);
+	const brandFilesInputRef = useRef<HTMLInputElement>(null);
 	const { formatPlanPrice, isLoading: isCurrencyLoading } = useCurrency();
 
 	// Plan & Payment Status Detection
@@ -339,7 +340,8 @@ function ContentForm() {
 	const [isPreviewCartOpen, setIsPreviewCartOpen] = useState(false);
 	const [cartNotification, setCartNotification] = useState<string | null>(null);
 
-	// Uploaded images state - Starts completely empty
+	// Uploaded Logo & Brand Assets (Separated)
+	const [logoImage, setLogoImage] = useState<UploadedImage | null>(null);
 	const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
 
 	// Social & Essential Links State
@@ -651,6 +653,9 @@ function ContentForm() {
 				if (merged.bookingLink) setBookingLink(merged.bookingLink);
 				if (merged.customLink) setCustomLink(merged.customLink);
 
+				if (merged.logoImage) {
+					setLogoImage(merged.logoImage);
+				}
 				if (Array.isArray(merged.uploadedImages)) {
 					setUploadedImages(merged.uploadedImages);
 				}
@@ -706,6 +711,7 @@ function ContentForm() {
 				tiktokLink,
 				bookingLink,
 				customLink,
+				logoImage,
 				uploadedImages,
 				updatedAt: new Date().toISOString(),
 			};
@@ -751,17 +757,39 @@ function ContentForm() {
 		tiktokLink,
 		bookingLink,
 		customLink,
+		logoImage,
 		uploadedImages,
 	]);
 
-	const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleLogoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+
+		const objectUrl = URL.createObjectURL(file);
+		const newLogo: UploadedImage = {
+			id: `logo-${Date.now()}`,
+			name: file.name,
+			size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
+			url: objectUrl,
+		};
+		setLogoImage(newLogo);
+	};
+
+	const handleRemoveLogo = () => {
+		setLogoImage(null);
+		if (logoFileInputRef.current) {
+			logoFileInputRef.current.value = "";
+		}
+	};
+
+	const handleBrandFilesSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const files = e.target.files;
 		if (!files || files.length === 0) return;
 
 		Array.from(files).forEach((file) => {
 			const objectUrl = URL.createObjectURL(file);
 			const newImage: UploadedImage = {
-				id: `img-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+				id: `brand-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
 				name: file.name,
 				size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
 				url: objectUrl,
@@ -770,7 +798,7 @@ function ContentForm() {
 		});
 	};
 
-	const handleRemoveImage = (id: string) => {
+	const handleRemoveBrandFile = (id: string) => {
 		setUploadedImages((prev) => prev.filter((img) => img.id !== id));
 	};
 
@@ -824,6 +852,7 @@ function ContentForm() {
 				tiktokLink,
 				bookingLink,
 				customLink,
+				logoImage,
 				uploadedImages,
 			};
 
@@ -859,7 +888,6 @@ function ContentForm() {
 	};
 
 	const heroImage = uploadedImages.length > 0 ? uploadedImages[0].url : null;
-	const logoImage = uploadedImages.length > 1 ? uploadedImages[1].url : heroImage;
 
 	return (
 		<div className="w-full min-h-screen bg-[#f8fafc]">
@@ -1002,71 +1030,165 @@ function ContentForm() {
 						onSubmit={handleSubmit}
 						className="bg-white border border-gray-200/90 rounded-3xl p-6 sm:p-8 space-y-8 shadow-2xs">
 						
-						{/* SECTION 1: BUSINESS LOGO & BRAND ASSETS */}
-						<div className="space-y-4">
-							<div className="flex items-center justify-between border-b border-gray-100 pb-3">
+						{/* SECTION 1: LOGO & BRAND ASSETS (SEPARATED) */}
+						<div className="space-y-5">
+							<div className="border-b border-gray-100 pb-3">
 								<label className="text-xs font-extrabold text-gray-900 uppercase tracking-wider flex items-center gap-2">
 									<ImageIcon className="w-4 h-4 text-blue-600" />
-									<span>1. Upload Logo & Brand Photos ({uploadedImages.length})</span>
+									<span>1. Brand Identity & Media Assets</span>
 								</label>
-								<span className="text-[11px] text-gray-400 font-medium">PNG, JPG, SVG up to 25MB</span>
 							</div>
 
-							<input
-								ref={fileInputRef}
-								type="file"
-								multiple
-								accept="image/*,.pdf"
-								onChange={handleImageSelect}
-								className="hidden"
-							/>
-
-							<div
-								onClick={() => fileInputRef.current?.click()}
-								className="border-2 border-dashed border-blue-200 hover:border-blue-500 rounded-2xl p-8 text-center transition-all cursor-pointer bg-blue-50/20 hover:bg-blue-50/50 group">
-								<div className="w-12 h-12 rounded-2xl bg-white border border-blue-100 flex items-center justify-center mx-auto mb-3 shadow-2xs group-hover:scale-105 transition-transform">
-									<Upload className="w-6 h-6 text-blue-600" />
+							{/* 1A: PRIMARY BRAND LOGO */}
+							<div className="p-5 rounded-2xl bg-gray-50/70 border border-gray-200/90 space-y-3">
+								<div className="flex items-center justify-between">
+									<div>
+										<label className="text-xs font-bold text-gray-900 flex items-center gap-1.5">
+											<span>Primary Brand Logo</span>
+											<span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">
+												Header & Footer
+											</span>
+										</label>
+										<p className="text-[11px] text-gray-500 font-medium">
+											Upload your business logo for the website header and footer. Transparent PNG or SVG recommended.
+										</p>
+									</div>
+									<span className="text-[10px] text-gray-400 font-medium hidden sm:inline">PNG, SVG, JPG, WebP</span>
 								</div>
-								<p className="text-xs font-bold text-gray-900 mb-1">
-									Click to Upload Business Images or Drag & Drop
-								</p>
-								<p className="text-[11px] text-gray-500 font-medium">
-									Upload your business logo, hero background photos, product shots, or brand assets.
-								</p>
-							</div>
 
-							{uploadedImages.length > 0 && (
-								<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 pt-2">
-									{uploadedImages.map((img) => (
-										<div
-											key={img.id}
-											className="p-3 rounded-2xl bg-gray-50 border border-gray-200/80 flex items-center justify-between gap-3 group relative overflow-hidden">
-											<img
-												src={img.url}
-												alt={img.name}
-												className="w-12 h-12 rounded-xl object-cover border border-gray-200 shrink-0"
-											/>
-											<div className="flex-1 min-w-0">
+								<input
+									ref={logoFileInputRef}
+									type="file"
+									accept="image/*"
+									onChange={handleLogoSelect}
+									className="hidden"
+								/>
+
+								{logoImage ? (
+									<div className="p-4 rounded-xl bg-white border border-gray-200 flex items-center justify-between gap-4 shadow-2xs">
+										<div className="flex items-center gap-3 min-w-0">
+											<div className="w-14 h-14 rounded-xl border border-gray-200 bg-[repeating-conic-gradient(#f1f5f9_0%_25%,#ffffff_0%_50%)] bg-[length:12px_12px] flex items-center justify-center p-1 shrink-0 overflow-hidden">
+												<img
+													src={logoImage.url}
+													alt={logoImage.name}
+													className="max-h-full max-w-full object-contain"
+												/>
+											</div>
+											<div className="min-w-0">
 												<p className="text-xs font-bold text-gray-900 truncate">
-													{img.name}
+													{logoImage.name}
 												</p>
 												<p className="text-[10px] text-gray-400 font-medium">
-													{img.size}
+													{logoImage.size} • Logo Active
 												</p>
 											</div>
+										</div>
+
+										<div className="flex items-center gap-2 shrink-0">
 											<button
 												type="button"
-												onClick={(e) => {
-													e.stopPropagation();
-													handleRemoveImage(img.id);
-												}}
-												className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer shrink-0">
+												onClick={() => logoFileInputRef.current?.click()}
+												className="px-3 py-1.5 rounded-lg border border-gray-200 text-[11px] font-bold text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer">
+												Change Logo
+											</button>
+											<button
+												type="button"
+												onClick={handleRemoveLogo}
+												className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer">
 												<Trash2 className="w-4 h-4" />
 											</button>
 										</div>
-									))}
+									</div>
+								) : (
+									<div
+										onClick={() => logoFileInputRef.current?.click()}
+										className="border-2 border-dashed border-blue-200 hover:border-blue-500 rounded-xl p-6 text-center transition-all cursor-pointer bg-white hover:bg-blue-50/40 group">
+										<div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center mx-auto mb-2 text-blue-600 group-hover:scale-105 transition-transform">
+											<Upload className="w-5 h-5" />
+										</div>
+										<p className="text-xs font-bold text-gray-900 mb-0.5">
+											Upload Brand Logo
+										</p>
+										<p className="text-[10px] text-gray-500 font-medium">
+											Click to browse or drag and drop your logo file
+										</p>
+									</div>
+								)}
+							</div>
+
+							{/* 1B: OTHER BRAND PHOTOS & MARKETING ASSETS */}
+							<div className="p-5 rounded-2xl bg-gray-50/70 border border-gray-200/90 space-y-3">
+								<div className="flex items-center justify-between">
+									<div>
+										<label className="text-xs font-bold text-gray-900 flex items-center gap-1.5">
+											<span>Brand Photos & Marketing Assets</span>
+											<span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-200 text-gray-700">
+												{uploadedImages.length} Uploaded
+											</span>
+										</label>
+										<p className="text-[11px] text-gray-500 font-medium">
+											Upload hero background pictures, team/facility shots, product photos, or promotional materials.
+										</p>
+									</div>
+									<span className="text-[10px] text-gray-400 font-medium hidden sm:inline">Multiple Files Allowed</span>
 								</div>
-							)}
+
+								<input
+									ref={brandFilesInputRef}
+									type="file"
+									multiple
+									accept="image/*,.pdf"
+									onChange={handleBrandFilesSelect}
+									className="hidden"
+								/>
+
+								<div
+									onClick={() => brandFilesInputRef.current?.click()}
+									className="border-2 border-dashed border-gray-200 hover:border-blue-500 rounded-xl p-6 text-center transition-all cursor-pointer bg-white hover:bg-blue-50/30 group">
+									<div className="w-10 h-10 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center mx-auto mb-2 text-gray-600 group-hover:text-blue-600 group-hover:bg-blue-50 transition-colors">
+										<Upload className="w-5 h-5" />
+									</div>
+									<p className="text-xs font-bold text-gray-900 mb-0.5">
+										Click to Upload Brand Photos & Files
+									</p>
+									<p className="text-[10px] text-gray-500 font-medium">
+										PNG, JPG, SVG, WebP, or PDF up to 25MB each
+									</p>
+								</div>
+
+								{uploadedImages.length > 0 && (
+									<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 pt-2">
+										{uploadedImages.map((img) => (
+											<div
+												key={img.id}
+												className="p-3 rounded-xl bg-white border border-gray-200 flex items-center justify-between gap-3 group relative shadow-2xs">
+												<img
+													src={img.url}
+													alt={img.name}
+													className="w-11 h-11 rounded-lg object-cover border border-gray-200 shrink-0"
+												/>
+												<div className="flex-1 min-w-0">
+													<p className="text-xs font-bold text-gray-900 truncate">
+														{img.name}
+													</p>
+													<p className="text-[10px] text-gray-400 font-medium">
+														{img.size}
+													</p>
+												</div>
+												<button
+													type="button"
+													onClick={(e) => {
+														e.stopPropagation();
+														handleRemoveBrandFile(img.id);
+													}}
+													className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer shrink-0">
+													<Trash2 className="w-3.5 h-3.5" />
+												</button>
+											</div>
+										))}
+									</div>
+								)}
+							</div>
 						</div>
 
 						{/* SECTION 2: CORE BUSINESS INFORMATION */}
@@ -2369,11 +2491,13 @@ function ContentForm() {
 												: "bg-white/95 border-gray-100 backdrop-blur-md text-slate-900"
 										}`}>
 										<div className="flex items-center gap-2 min-w-0">
-											{logoImage ? (
+											{logoImage?.url ? (
 												<img
-													src={logoImage}
-													alt="Logo"
-													className={`w-7 h-7 rounded-lg object-cover shrink-0 border ${themeMode === "dark" ? "border-slate-700" : "border-gray-200"}`}
+													src={logoImage.url}
+													alt={businessName || "Logo"}
+													className={`h-7 w-auto max-h-7 max-w-[120px] rounded-lg object-contain shrink-0 border ${
+														themeMode === "dark" ? "border-slate-700 bg-black/20" : "border-gray-200 bg-white"
+													}`}
 												/>
 											) : (
 												<div className="w-7 h-7 rounded-lg bg-blue-600 text-white font-bold text-xs shrink-0 flex items-center justify-center">
@@ -3501,9 +3625,19 @@ function ContentForm() {
 											? "bg-[#070d1d] border-slate-800 text-slate-400"
 											: "bg-white border-gray-100 text-gray-500"
 									}`}>
-									<p className={`font-bold text-sm font-nohemi ${themeMode === "dark" ? "text-white" : "text-gray-900"}`}>
-										{businessName || "Your Business Name"}
-									</p>
+									{logoImage?.url ? (
+										<div className="flex justify-center mb-1">
+											<img
+												src={logoImage.url}
+												alt={businessName || "Brand Logo"}
+												className="h-8 w-auto max-w-[140px] object-contain"
+											/>
+										</div>
+									) : (
+										<p className={`font-bold text-sm font-nohemi ${themeMode === "dark" ? "text-white" : "text-gray-900"}`}>
+											{businessName || "Your Business Name"}
+										</p>
+									)}
 									<p className={`text-[11px] ${themeMode === "dark" ? "text-slate-300" : "text-gray-600"}`}>
 										Email: {contactEmail || "contact@kioosk.online"} | Phone: {contactPhone || "+1 (555) 019-2834"}
 									</p>

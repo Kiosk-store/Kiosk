@@ -123,8 +123,9 @@ export const apiRatelimit = new Ratelimit({
 | :--- | :--- | :--- | :--- |
 | **Authentication** | `/api/auth/login`, `/api/auth/register` | **5 requests / 1 min** per IP | HTTP `429 Too Many Requests` |
 | **Public API** | `/api/v1/public/*` | **60 requests / 1 min** per IP | HTTP `429 Too Many Requests` |
+| **Content Studio & Projects** | `/api/projects`, `/api/projects/content` | **120 requests / 1 min** per User ID | HTTP `429 Too Many Requests` |
 | **Client Workspace** | `/api/v1/projects/*`, `/checkout` | **200 requests / 1 min** per User ID | HTTP `429 Too Many Requests` |
-| **Webhooks** | `/api/webhooks/stripe` | **500 requests / 1 min** (IP Whitelisted) | HTTP `429 Too Many Requests` |
+| **Webhooks** | `/api/webhooks/flutterwave`, `/api/webhooks/stripe` | **500 requests / 1 min** (IP Whitelisted) | HTTP `429 Too Many Requests` |
 
 ### Rate Limit HTTP Headers Response
 When a client makes a request, the middleware injects standard rate limit headers:
@@ -177,10 +178,10 @@ When a client makes a request, the middleware injects standard rate limit header
 - Integrated authentication supporting Google OAuth 2.0 and GitHub OAuth.
 - Authorization Code Flow with PKCE (Proof Key for Code Exchange) to eliminate interception vectors on mobile/SPA clients.
 
-### 3. JWT Token Lifecycle & Rotation
-- **Access Tokens**: Short-lived (15 minutes), signed via RS256 algorithm with private key stored in Cloud KMS / Vault.
-- **Refresh Tokens**: Long-lived (7 days), stored in HTTP-Only, SameSite=Strict, Secure cookies.
-- **Revocation & Blacklisting**: Token revocation enforced via Redis token blacklist lookup on sensitive API requests.
+### 3. Session Token Lifecycle & Checkout Protection
+- **Session Tokens**: Active lifetime set to **6 hours** (`maxAge: 6 * 60 * 60`).
+- **Payment Grace Window**: Automatic logout timer is suspended while a user is actively on `/checkout` (`isCheckoutInProgress` state) or completing 3D Secure bank redirects.
+- **Revocation & Blacklisting**: Token revocation enforced via database and Redis token blacklist lookup on sensitive API requests.
 
 ---
 
