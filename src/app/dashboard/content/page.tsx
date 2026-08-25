@@ -53,6 +53,7 @@ import {
 	TrendingUp,
 	Sun,
 	Moon,
+	Menu,
 } from "lucide-react";
 import PillButton from "@/components/PillButton";
 import { useCurrency } from "@/context/CurrencyContext";
@@ -335,10 +336,19 @@ function ContentForm() {
 		},
 	]);
 
-	// Preview Cart State (Fully functional inside Live Preview)
+	// Preview Cart & Navigation State (Inside Live Preview)
 	const [previewCart, setPreviewCart] = useState<{ product: ProductItem; quantity: number }[]>([]);
 	const [isPreviewCartOpen, setIsPreviewCartOpen] = useState(false);
+	const [isPreviewMobileMenuOpen, setIsPreviewMobileMenuOpen] = useState(false);
 	const [cartNotification, setCartNotification] = useState<string | null>(null);
+
+	const scrollToPreviewSection = (sectionId: string) => {
+		setIsPreviewMobileMenuOpen(false);
+		const el = document.getElementById(sectionId);
+		if (el) {
+			el.scrollIntoView({ behavior: "smooth", block: "start" });
+		}
+	};
 
 	// Uploaded Logo & Brand Assets (Separated)
 	const [logoImage, setLogoImage] = useState<UploadedImage | null>(null);
@@ -2550,70 +2560,291 @@ function ContentForm() {
 
 								{/* Scrollable Viewport within Device Frame */}
 								<div className="flex-1 overflow-y-auto w-full relative">
+									{/* RENDER: Top Announcement Banner */}
+									<div
+										className={`py-1.5 px-3 text-center text-[10px] sm:text-[11px] font-bold tracking-wide uppercase transition-colors flex items-center justify-center gap-2 border-b select-none ${
+											themeMode === "dark"
+												? "bg-blue-950/80 text-blue-300 border-blue-900/60"
+												: "bg-blue-600 text-white border-blue-700"
+										}`}>
+										<span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+										<span>
+											{activePlan === "E_COMMERCE"
+												? "⚡ Free Priority Shipping on Orders This Week • Direct WhatsApp Checkout"
+												: activePlan === "SALES_FUNNEL"
+												? "🔥 Limited Offer: 80% Instant Value Discount • 100% Risk-Free Guarantee"
+												: "✨ Now Accepting New Clients • Book Your Strategy Session"}
+										</span>
+									</div>
+
 									{/* RENDER: Site Navbar */}
 									<header
-										className={`px-4 sm:px-6 py-3.5 sm:py-4 border-b flex items-center justify-between sticky top-0 z-20 transition-colors ${
+										className={`px-3.5 sm:px-6 py-3 sm:py-3.5 border-b sticky top-0 z-30 transition-colors ${
 											themeMode === "dark"
 												? "bg-[#0b1329]/95 border-slate-800/90 backdrop-blur-md text-white"
-												: "bg-white/95 border-gray-100 backdrop-blur-md text-slate-900"
+												: "bg-white/95 border-gray-100 backdrop-blur-md text-slate-900 shadow-xs"
 										}`}>
-										<div className="flex items-center gap-2 min-w-0">
-											{logoImage?.url ? (
-												<img
-													src={logoImage.url}
-													alt={businessName || "Logo"}
-													className={`h-7 w-auto max-h-7 max-w-[120px] rounded-lg object-contain shrink-0 border ${
-														themeMode === "dark" ? "border-slate-700 bg-black/20" : "border-gray-200 bg-white"
-													}`}
-												/>
-											) : (
-												<div className="w-7 h-7 rounded-lg bg-blue-600 text-white font-bold text-xs shrink-0 flex items-center justify-center">
-													{businessName ? businessName[0].toUpperCase() : "K"}
-												</div>
-											)}
-											<span className={`font-bold text-xs sm:text-sm font-nohemi truncate max-w-[110px] sm:max-w-none ${themeMode === "dark" ? "text-white" : "text-gray-900"}`}>
-												{businessName || "Your Business Name"}
-											</span>
-										</div>
+										<div className="flex items-center justify-between gap-2">
+											{/* Brand Identity */}
+											<div
+												onClick={() => scrollToPreviewSection("preview-hero")}
+												className="flex items-center gap-2.5 min-w-0 cursor-pointer group">
+												{logoImage?.url ? (
+													<img
+														src={logoImage.url}
+														alt={businessName || "Logo"}
+														className={`h-7 w-auto max-h-7 max-w-[110px] rounded-lg object-contain shrink-0 border transition-transform group-hover:scale-105 ${
+															themeMode === "dark" ? "border-slate-700 bg-black/30" : "border-gray-200 bg-white"
+														}`}
+													/>
+												) : (
+													<div className="w-7 h-7 rounded-lg bg-blue-600 text-white font-bold text-xs shrink-0 flex items-center justify-center shadow-xs">
+														{businessName ? businessName[0].toUpperCase() : "K"}
+													</div>
+												)}
+												<span className={`font-bold text-xs sm:text-sm font-nohemi truncate max-w-[100px] sm:max-w-none ${themeMode === "dark" ? "text-white" : "text-gray-900"}`}>
+													{businessName || "Your Business Name"}
+												</span>
+											</div>
 
-										<div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-											{activePlan === "E_COMMERCE" && (
+											{/* Desktop Navigation Links */}
+											<nav className="hidden md:flex items-center gap-5 text-xs font-semibold">
 												<button
 													type="button"
-													onClick={() => setIsPreviewCartOpen(true)}
-													className={`relative px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 border cursor-pointer ${
-														themeMode === "dark"
-															? "bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700"
-															: "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200"
+													onClick={() => scrollToPreviewSection("preview-hero")}
+													className={`transition-colors hover:text-blue-500 cursor-pointer ${
+														themeMode === "dark" ? "text-slate-300" : "text-gray-600"
 													}`}>
-													<ShoppingCart className="w-3.5 h-3.5" />
-													<span>Cart</span>
-													{previewCart.reduce((sum, item) => sum + item.quantity, 0) > 0 && (
-														<span className="w-4 h-4 rounded-full bg-blue-600 text-white font-extrabold text-[9px] flex items-center justify-center animate-in zoom-in-50 duration-150">
-															{previewCart.reduce((sum, item) => sum + item.quantity, 0)}
-														</span>
-													)}
+													Home
 												</button>
-											)}
 
-											<button
-												type="button"
-												onClick={() => {
-													if (whatsappLink) {
-														const waUrl = whatsappLink.startsWith("http")
-															? whatsappLink
-															: `https://wa.me/${whatsappLink.replace(/[^0-9]/g, "")}`;
-														window.open(waUrl, "_blank");
-													} else if (contactEmail) {
-														window.location.href = `mailto:${contactEmail}`;
-													} else {
-														alert("Contact trigger simulated!");
-													}
-												}}
-												className="px-3 sm:px-4 py-1.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-[11px] sm:text-xs font-bold transition-colors cursor-pointer">
-												Contact Us
-											</button>
+												{activePlan === "LANDING_PAGE" && (
+													<>
+														<button
+															type="button"
+															onClick={() => scrollToPreviewSection("preview-services")}
+															className={`transition-colors hover:text-blue-500 cursor-pointer ${
+																themeMode === "dark" ? "text-slate-300" : "text-gray-600"
+															}`}>
+															Services
+														</button>
+														<button
+															type="button"
+															onClick={() => scrollToPreviewSection("preview-reviews")}
+															className={`transition-colors hover:text-blue-500 cursor-pointer ${
+																themeMode === "dark" ? "text-slate-300" : "text-gray-600"
+															}`}>
+															Reviews
+														</button>
+														<button
+															type="button"
+															onClick={() => scrollToPreviewSection("preview-faqs")}
+															className={`transition-colors hover:text-blue-500 cursor-pointer ${
+																themeMode === "dark" ? "text-slate-300" : "text-gray-600"
+															}`}>
+															FAQs
+														</button>
+													</>
+												)}
+
+												{activePlan === "SALES_FUNNEL" && (
+													<>
+														<button
+															type="button"
+															onClick={() => scrollToPreviewSection("preview-vsl")}
+															className={`transition-colors hover:text-blue-500 cursor-pointer ${
+																themeMode === "dark" ? "text-slate-300" : "text-gray-600"
+															}`}>
+															Masterclass
+														</button>
+														<button
+															type="button"
+															onClick={() => scrollToPreviewSection("preview-value-stack")}
+															className={`transition-colors hover:text-blue-500 cursor-pointer ${
+																themeMode === "dark" ? "text-slate-300" : "text-gray-600"
+															}`}>
+															What's Inside
+														</button>
+														<button
+															type="button"
+															onClick={() => scrollToPreviewSection("preview-guarantee")}
+															className={`transition-colors hover:text-blue-500 cursor-pointer ${
+																themeMode === "dark" ? "text-slate-300" : "text-gray-600"
+															}`}>
+															Guarantee
+														</button>
+													</>
+												)}
+
+												{activePlan === "E_COMMERCE" && (
+													<>
+														<button
+															type="button"
+															onClick={() => scrollToPreviewSection("preview-products")}
+															className={`transition-colors hover:text-blue-500 cursor-pointer ${
+																themeMode === "dark" ? "text-slate-300" : "text-gray-600"
+															}`}>
+															Products ({products.length})
+														</button>
+														<button
+															type="button"
+															onClick={() => scrollToPreviewSection("preview-shipping")}
+															className={`transition-colors hover:text-blue-500 cursor-pointer ${
+																themeMode === "dark" ? "text-slate-300" : "text-gray-600"
+															}`}>
+															Shipping
+														</button>
+													</>
+												)}
+
+												<button
+													type="button"
+													onClick={() => scrollToPreviewSection("preview-contact")}
+													className={`transition-colors hover:text-blue-500 cursor-pointer ${
+														themeMode === "dark" ? "text-slate-300" : "text-gray-600"
+													}`}>
+													Contact
+												</button>
+											</nav>
+
+											{/* Action Controls & Mobile Menu Trigger */}
+											<div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+												{activePlan === "E_COMMERCE" && (
+													<button
+														type="button"
+														onClick={() => setIsPreviewCartOpen(true)}
+														className={`relative px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 border cursor-pointer ${
+															themeMode === "dark"
+																? "bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700"
+																: "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200"
+														}`}>
+														<ShoppingCart className="w-3.5 h-3.5" />
+														<span className="hidden sm:inline">Cart</span>
+														{previewCart.reduce((sum, item) => sum + item.quantity, 0) > 0 && (
+															<span className="w-4 h-4 rounded-full bg-blue-600 text-white font-extrabold text-[9px] flex items-center justify-center animate-in zoom-in-50 duration-150">
+																{previewCart.reduce((sum, item) => sum + item.quantity, 0)}
+															</span>
+														)}
+													</button>
+												)}
+
+												<button
+													type="button"
+													onClick={() => {
+														if (whatsappLink) {
+															const waUrl = whatsappLink.startsWith("http")
+																? whatsappLink
+																: `https://wa.me/${whatsappLink.replace(/[^0-9]/g, "")}`;
+															window.open(waUrl, "_blank");
+														} else if (contactEmail) {
+															window.location.href = `mailto:${contactEmail}`;
+														} else {
+															setIsContactModalOpen(true);
+														}
+													}}
+													className="px-3 sm:px-4 py-1.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-[11px] sm:text-xs font-bold transition-colors shadow-xs cursor-pointer">
+													{activePlan === "E_COMMERCE" ? "Order Now" : activePlan === "SALES_FUNNEL" ? "Get Offer" : "Contact"}
+												</button>
+
+												{/* Mobile Hamburger Toggle Button */}
+												<button
+													type="button"
+													onClick={() => setIsPreviewMobileMenuOpen(!isPreviewMobileMenuOpen)}
+													aria-label="Toggle navigation menu"
+													className={`p-1.5 rounded-lg md:hidden border transition-colors cursor-pointer ${
+														themeMode === "dark"
+															? "border-slate-800 text-slate-300 hover:bg-slate-800"
+															: "border-gray-200 text-gray-700 hover:bg-gray-100"
+													}`}>
+													{isPreviewMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+												</button>
+											</div>
 										</div>
+
+										{/* Mobile Navigation Dropdown Drawer */}
+										{isPreviewMobileMenuOpen && (
+											<div
+												className={`md:hidden pt-3 pb-2 mt-2 border-t space-y-1.5 animate-in slide-in-from-top-2 duration-150 ${
+													themeMode === "dark" ? "border-slate-800 text-slate-200" : "border-gray-100 text-gray-800"
+												}`}>
+												<button
+													type="button"
+													onClick={() => scrollToPreviewSection("preview-hero")}
+													className="w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-600/10 hover:text-blue-500 transition-colors">
+													Home
+												</button>
+
+												{activePlan === "LANDING_PAGE" && (
+													<>
+														<button
+															type="button"
+															onClick={() => scrollToPreviewSection("preview-services")}
+															className="w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-600/10 hover:text-blue-500 transition-colors">
+															Services & Solutions
+														</button>
+														<button
+															type="button"
+															onClick={() => scrollToPreviewSection("preview-reviews")}
+															className="w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-600/10 hover:text-blue-500 transition-colors">
+															Client Reviews
+														</button>
+														<button
+															type="button"
+															onClick={() => scrollToPreviewSection("preview-faqs")}
+															className="w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-600/10 hover:text-blue-500 transition-colors">
+															Frequently Asked Questions
+														</button>
+													</>
+												)}
+
+												{activePlan === "SALES_FUNNEL" && (
+													<>
+														<button
+															type="button"
+															onClick={() => scrollToPreviewSection("preview-vsl")}
+															className="w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-600/10 hover:text-blue-500 transition-colors">
+															Video Masterclass
+														</button>
+														<button
+															type="button"
+															onClick={() => scrollToPreviewSection("preview-value-stack")}
+															className="w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-600/10 hover:text-blue-500 transition-colors">
+															Value Stack & Bonuses
+														</button>
+														<button
+															type="button"
+															onClick={() => scrollToPreviewSection("preview-guarantee")}
+															className="w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-600/10 hover:text-blue-500 transition-colors">
+															Risk-Free Guarantee
+														</button>
+													</>
+												)}
+
+												{activePlan === "E_COMMERCE" && (
+													<>
+														<button
+															type="button"
+															onClick={() => scrollToPreviewSection("preview-products")}
+															className="w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-600/10 hover:text-blue-500 transition-colors">
+															Store Products ({products.length})
+														</button>
+														<button
+															type="button"
+															onClick={() => scrollToPreviewSection("preview-shipping")}
+															className="w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-600/10 hover:text-blue-500 transition-colors">
+															Shipping & Policies
+														</button>
+													</>
+												)}
+
+												<button
+													type="button"
+													onClick={() => scrollToPreviewSection("preview-contact")}
+													className="w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-600/10 hover:text-blue-500 transition-colors">
+													Contact & Socials
+												</button>
+											</div>
+										)}
 									</header>
 
 									{/* RENDER: Toast Notification when Item Added */}
@@ -2626,6 +2857,7 @@ function ContentForm() {
 
 									{/* RENDER: Hero Section */}
 									<div
+										id="preview-hero"
 										className={`py-12 px-4 sm:py-20 sm:px-12 text-center border-b transition-colors relative ${
 											themeMode === "dark"
 												? "bg-slate-950 text-white border-slate-800"
@@ -2691,7 +2923,7 @@ function ContentForm() {
 										}`}>
 										{/* Authority & Stats Bar */}
 										{stats.length > 0 && (
-											<div className="max-w-4xl mx-auto">
+											<div id="preview-stats" className="max-w-4xl mx-auto">
 												<div
 													className={`grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x rounded-2xl border p-2 transition-colors ${
 														themeMode === "dark"
@@ -2716,7 +2948,7 @@ function ContentForm() {
 										)}
 
 										{/* Core Services Section */}
-										<div className="max-w-4xl mx-auto space-y-8">
+										<div id="preview-services" className="max-w-4xl mx-auto space-y-8">
 											<div className="text-center max-w-md mx-auto space-y-2">
 												<span
 													className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
@@ -2791,14 +3023,14 @@ function ContentForm() {
 
 										{/* Testimonials & Social Proof */}
 										{testimonialsList.length > 0 && (
-											<div className="max-w-4xl mx-auto space-y-8 pt-4">
+											<div id="preview-reviews" className="max-w-4xl mx-auto space-y-8 pt-4">
 												<div className="text-center max-w-md mx-auto space-y-2">
 													<span
 														className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
 															themeMode === "dark"
 																? "bg-[#0d162a] text-slate-300 border-slate-800"
 																: "bg-slate-100 text-slate-700 border-slate-200"
-														}`}>
+													}`}>
 														Client Endorsements
 													</span>
 													<h2
@@ -2858,7 +3090,7 @@ function ContentForm() {
 
 										{/* Interactive FAQ Accordion */}
 										{faqs.length > 0 && (
-											<div className="max-w-2xl mx-auto space-y-4 pt-4">
+											<div id="preview-faqs" className="max-w-2xl mx-auto space-y-4 pt-4">
 												<div className="text-center space-y-2 mb-6">
 													<span
 														className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
@@ -3105,7 +3337,7 @@ function ContentForm() {
 										</div>
 
 										{/* VSL Video Header & Player */}
-										<div className="max-w-3xl mx-auto text-center space-y-6">
+										<div id="preview-vsl" className="max-w-3xl mx-auto text-center space-y-6">
 											<div className="space-y-3">
 												<span
 													className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
@@ -3150,6 +3382,7 @@ function ContentForm() {
 
 										{/* Value Stack Breakdown Presentation */}
 										<div
+											id="preview-value-stack"
 											className={`max-w-3xl mx-auto rounded-2xl p-6 sm:p-8 space-y-6 border ${
 												themeMode === "dark"
 													? "bg-[#0d162a] border-slate-800 text-white"
@@ -3276,6 +3509,7 @@ function ContentForm() {
 
 												{/* Guarantee Seal */}
 												<div
+													id="preview-guarantee"
 													className={`flex items-center justify-center gap-2 text-xs pt-2 ${
 														themeMode === "dark" ? "text-slate-400" : "text-gray-500"
 													}`}>
@@ -3330,6 +3564,7 @@ function ContentForm() {
 
 								{activePlan === "E_COMMERCE" && (
 									<div
+										id="preview-products"
 										className={`py-14 px-6 sm:px-12 transition-colors ${
 											themeMode === "dark" ? "bg-[#070d1d] text-white" : "bg-[#fbfcfd] text-slate-900"
 										}`}>
@@ -3350,6 +3585,7 @@ function ContentForm() {
 											</h2>
 											{shippingInfo && (
 												<p
+													id="preview-shipping"
 													className={`text-xs font-semibold flex items-center justify-center gap-1.5 ${
 														themeMode === "dark" ? "text-slate-400" : "text-gray-600"
 													}`}>
@@ -3687,6 +3923,7 @@ function ContentForm() {
 
 								{/* RENDER: Contact & Social Footer */}
 								<footer
+									id="preview-contact"
 									className={`py-8 px-6 border-t text-center text-xs space-y-3 transition-colors ${
 										themeMode === "dark"
 											? "bg-[#070d1d] border-slate-800 text-slate-400"
