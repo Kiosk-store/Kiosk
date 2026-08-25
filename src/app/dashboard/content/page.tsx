@@ -2337,163 +2337,259 @@ function ContentForm() {
 
 							<div
 								style={{ fontFamily: `'${selectedFont}', sans-serif` }}
-								className={`transition-all duration-300 rounded-2xl overflow-hidden shadow-2xl ${
-									themeMode === "dark"
-										? "bg-slate-950 text-slate-100 border border-slate-800"
-										: "bg-white text-slate-900 border border-gray-100"
+								className={`transition-all duration-300 relative ${
+									previewDevice === "mobile"
+										? "w-[380px] max-w-full h-[760px] max-h-[85vh] rounded-[44px] border-[8px] border-slate-800 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden bg-slate-900 ring-1 ring-slate-700/50"
+										: "w-full min-h-[550px] rounded-2xl overflow-hidden shadow-2xl border"
 								} ${
-									previewDevice === "mobile" ? "w-[375px] max-w-full min-h-[667px]" : "w-full min-h-[550px]"
+									themeMode === "dark"
+										? "bg-slate-950 text-slate-100 border-slate-800"
+										: "bg-white text-slate-900 border-gray-100"
 								}`}>
-								{/* RENDER: Site Navbar */}
-								<header
-									className={`px-6 py-4 border-b flex items-center justify-between sticky top-0 z-20 transition-colors ${
-										themeMode === "dark"
-											? "bg-slate-900/95 border-slate-800 backdrop-blur-xs text-white"
-											: "bg-white border-gray-100 text-slate-900"
-									}`}>
-									<div className="flex items-center gap-2.5">
-										{logoImage ? (
-											<img
-												src={logoImage}
-												alt="Logo"
-												className="w-7 h-7 rounded-lg object-cover border border-gray-200"
-											/>
-										) : (
-											<div className="w-7 h-7 rounded-lg bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
-												{businessName ? businessName[0].toUpperCase() : "K"}
-											</div>
-										)}
-										<span className={`font-bold text-sm font-nohemi ${themeMode === "dark" ? "text-white" : "text-gray-900"}`}>
-											{businessName || "Your Business Name"}
-										</span>
-									</div>
-
-									<div className="flex items-center gap-2.5">
-										{activePlan === "E_COMMERCE" && (
-											<button
-												type="button"
-												onClick={() => setIsPreviewCartOpen(true)}
-												className="relative px-3 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold transition-all flex items-center gap-1.5 border border-emerald-200 cursor-pointer">
-												<ShoppingCart className="w-3.5 h-3.5" />
-												<span>Cart</span>
-												{previewCart.reduce((sum, item) => sum + item.quantity, 0) > 0 && (
-													<span className="w-4 h-4 rounded-full bg-emerald-600 text-white font-extrabold text-[9px] flex items-center justify-center animate-in zoom-in-50 duration-150">
-														{previewCart.reduce((sum, item) => sum + item.quantity, 0)}
-													</span>
-												)}
-											</button>
-										)}
-
-										<button
-											type="button"
-											onClick={() => {
-												if (whatsappLink) {
-													const waUrl = whatsappLink.startsWith("http")
-														? whatsappLink
-														: `https://wa.me/${whatsappLink.replace(/[^0-9]/g, "")}`;
-													window.open(waUrl, "_blank");
-												} else if (contactEmail) {
-													window.location.href = `mailto:${contactEmail}`;
-												} else {
-													alert("Contact trigger simulated!");
-												}
-											}}
-											className="px-4 py-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors cursor-pointer">
-											Contact Us
-										</button>
-									</div>
-								</header>
-
-								{/* RENDER: Toast Notification when Item Added */}
-								{cartNotification && (
-									<div className="bg-emerald-600 text-white text-xs font-bold py-2 px-4 text-center sticky top-14 z-30 flex items-center justify-center gap-2 animate-in slide-in-from-top duration-200">
-										<CheckCircle2 className="w-3.5 h-3.5" />
-										<span>{cartNotification}</span>
+								{/* Mobile Dynamic Status Bar */}
+								{previewDevice === "mobile" && (
+									<div className="w-full bg-[#0a0f1d] pt-2 pb-1.5 px-6 flex items-center justify-between z-30 shrink-0 border-b border-slate-800/80 select-none">
+										<span className="text-[10px] font-mono font-bold text-slate-400">9:41</span>
+										<div className="w-20 h-3.5 bg-black rounded-full border border-slate-800 flex items-center justify-end px-2">
+											<div className="w-1.5 h-1.5 rounded-full bg-blue-500/80 animate-pulse" />
+										</div>
+										<div className="flex items-center gap-1 text-[10px] text-slate-400">
+											<span>5G</span>
+										</div>
 									</div>
 								)}
 
-								{/* RENDER: Hero Section */}
-								<div className="relative bg-slate-900 text-white py-16 px-6 text-center overflow-hidden">
-									{heroImage && (
-										<div className="absolute inset-0 z-0">
-											<img
-												src={heroImage}
-												alt="Hero Background"
-												className="w-full h-full object-cover opacity-30 blur-xs"
-											/>
+								{/* Scrollable Viewport within Device Frame */}
+								<div className="flex-1 overflow-y-auto w-full relative">
+									{/* RENDER: Site Navbar */}
+									<header
+										className={`px-4 sm:px-6 py-3.5 sm:py-4 border-b flex items-center justify-between sticky top-0 z-20 transition-colors ${
+											themeMode === "dark"
+												? "bg-[#0b1329]/95 border-slate-800/90 backdrop-blur-md text-white"
+												: "bg-white/95 border-gray-100 backdrop-blur-md text-slate-900"
+										}`}>
+										<div className="flex items-center gap-2 min-w-0">
+											{logoImage ? (
+												<img
+													src={logoImage}
+													alt="Logo"
+													className={`w-7 h-7 rounded-lg object-cover shrink-0 border ${themeMode === "dark" ? "border-slate-700" : "border-gray-200"}`}
+												/>
+											) : (
+												<div className="w-7 h-7 rounded-lg bg-blue-600 text-white font-bold text-xs shrink-0 flex items-center justify-center">
+													{businessName ? businessName[0].toUpperCase() : "K"}
+												</div>
+											)}
+											<span className={`font-bold text-xs sm:text-sm font-nohemi truncate max-w-[110px] sm:max-w-none ${themeMode === "dark" ? "text-white" : "text-gray-900"}`}>
+												{businessName || "Your Business Name"}
+											</span>
+										</div>
+
+										<div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+											{activePlan === "E_COMMERCE" && (
+												<button
+													type="button"
+													onClick={() => setIsPreviewCartOpen(true)}
+													className={`relative px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 border cursor-pointer ${
+														themeMode === "dark"
+															? "bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700"
+															: "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200"
+													}`}>
+													<ShoppingCart className="w-3.5 h-3.5" />
+													<span>Cart</span>
+													{previewCart.reduce((sum, item) => sum + item.quantity, 0) > 0 && (
+														<span className="w-4 h-4 rounded-full bg-blue-600 text-white font-extrabold text-[9px] flex items-center justify-center animate-in zoom-in-50 duration-150">
+															{previewCart.reduce((sum, item) => sum + item.quantity, 0)}
+														</span>
+													)}
+												</button>
+											)}
+
+											<button
+												type="button"
+												onClick={() => {
+													if (whatsappLink) {
+														const waUrl = whatsappLink.startsWith("http")
+															? whatsappLink
+															: `https://wa.me/${whatsappLink.replace(/[^0-9]/g, "")}`;
+														window.open(waUrl, "_blank");
+													} else if (contactEmail) {
+														window.location.href = `mailto:${contactEmail}`;
+													} else {
+														alert("Contact trigger simulated!");
+													}
+												}}
+												className="px-3 sm:px-4 py-1.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-[11px] sm:text-xs font-bold transition-colors cursor-pointer">
+												Contact Us
+											</button>
+										</div>
+									</header>
+
+									{/* RENDER: Toast Notification when Item Added */}
+									{cartNotification && (
+										<div className="bg-emerald-600 text-white text-xs font-bold py-2 px-4 text-center sticky top-12 sm:top-14 z-30 flex items-center justify-center gap-2 animate-in slide-in-from-top duration-200">
+											<CheckCircle2 className="w-3.5 h-3.5" />
+											<span>{cartNotification}</span>
 										</div>
 									)}
 
-									<div className="relative z-10 max-w-xl mx-auto space-y-4">
-										<span className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-[10px] font-extrabold uppercase tracking-wider border border-blue-500/30">
-											{activePlan.replace("_", " ")}
-										</span>
-										<h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight font-nohemi leading-tight">
-											{tagline || "Your Custom Business Tagline & Headline"}
-										</h1>
-										<p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed max-w-md mx-auto">
-											{aboutText || "Enter your value proposition and business summary above."}
-										</p>
+									{/* RENDER: Hero Section */}
+									<div
+										className={`py-12 px-4 sm:py-20 sm:px-12 text-center border-b transition-colors relative ${
+											themeMode === "dark"
+												? "bg-slate-950 text-white border-slate-800"
+												: "bg-slate-900 text-white border-slate-800"
+										}`}>
+										{heroImage && (
+											<div className="absolute inset-0 z-0 overflow-hidden">
+												<img
+													src={heroImage}
+													alt="Hero Background"
+													className="w-full h-full object-cover opacity-20"
+												/>
+											</div>
+										)}
+
+										<div className="relative z-10 max-w-2xl mx-auto space-y-4 sm:space-y-5">
+											<span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 text-[10px] sm:text-[11px] font-semibold tracking-wide uppercase">
+												{activePlan.replace("_", " ")}
+											</span>
+
+											<h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight font-nohemi leading-tight text-white">
+												{tagline || "Your Custom Business Tagline & Headline"}
+											</h1>
+
+											<p className="text-xs sm:text-sm text-slate-300 font-normal leading-relaxed max-w-lg mx-auto">
+												{aboutText || "Enter your value proposition and business summary above."}
+											</p>
+
+											<div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3 w-full sm:w-auto">
+												<button
+													type="button"
+													onClick={() => {
+														if (activePlan === "E_COMMERCE") {
+															setIsPreviewCartOpen(true);
+														} else if (activePlan === "SALES_FUNNEL") {
+															setIsFunnelOrderSuccess(true);
+														} else {
+															setIsContactModalOpen(true);
+														}
+													}}
+													className="w-full sm:w-auto px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-colors shadow-xs cursor-pointer">
+													{ctaText || (activePlan === "E_COMMERCE" ? "Explore Catalog" : activePlan === "SALES_FUNNEL" ? "Claim Offer" : "Get Started")}
+												</button>
+
+												<button
+													type="button"
+													onClick={() => {
+														if (contactEmail) window.location.href = `mailto:${contactEmail}`;
+														else alert("Contact trigger simulated!");
+													}}
+													className="w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-colors cursor-pointer">
+													Contact Us
+												</button>
+											</div>
+										</div>
 									</div>
-								</div>
 
 								{/* RENDER: Plan Specific Section */}
 								{activePlan === "LANDING_PAGE" && (
-									<div className="space-y-12 py-10 px-6 bg-slate-50/70">
+									<div
+										className={`space-y-16 py-14 px-6 sm:px-12 transition-colors ${
+											themeMode === "dark" ? "bg-[#070d1d] text-slate-100" : "bg-[#fcfcfd] text-slate-900"
+										}`}>
 										{/* Authority & Stats Bar */}
 										{stats.length > 0 && (
-											<div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
-												{stats.map((st) => (
-													<div
-														key={st.id}
-														className="p-5 rounded-2xl bg-white border border-gray-200/80 shadow-2xs text-center space-y-1">
-														<p className="text-2xl sm:text-3xl font-extrabold text-blue-600 font-nohemi">
-															{st.value || "0"}
-														</p>
-														<p className="text-xs font-bold text-gray-600 uppercase tracking-wider">
-															{st.label || "Metric"}
-														</p>
-													</div>
-												))}
+											<div className="max-w-4xl mx-auto">
+												<div
+													className={`grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x rounded-2xl border p-2 transition-colors ${
+														themeMode === "dark"
+															? "bg-[#0d162a] border-slate-800 divide-slate-800"
+															: "bg-white border-gray-200/80 divide-gray-100 shadow-xs"
+													}`}>
+													{stats.map((st) => (
+														<div key={st.id} className="p-6 text-center space-y-1">
+															<p className="text-3xl font-extrabold font-nohemi text-blue-500">
+																{st.value || "0"}
+															</p>
+															<p
+																className={`text-xs font-medium uppercase tracking-wider ${
+																	themeMode === "dark" ? "text-slate-400" : "text-gray-500"
+																}`}>
+																{st.label || "Metric"}
+															</p>
+														</div>
+													))}
+												</div>
 											</div>
 										)}
 
 										{/* Core Services Section */}
-										<div className="max-w-4xl mx-auto space-y-6">
+										<div className="max-w-4xl mx-auto space-y-8">
 											<div className="text-center max-w-md mx-auto space-y-2">
-												<span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-[10px] font-extrabold uppercase tracking-wider">
-													Our Solutions
+												<span
+													className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+														themeMode === "dark"
+															? "bg-[#0d162a] text-slate-300 border-slate-800"
+															: "bg-slate-100 text-slate-700 border-slate-200"
+													}`}>
+													Services & Solutions
 												</span>
-												<h2 className="text-xl sm:text-2xl font-bold font-nohemi text-gray-900">
-													Bespoke Services & Offerings
+												<h2
+													className={`text-2xl font-bold font-nohemi ${
+														themeMode === "dark" ? "text-white" : "text-gray-900"
+													}`}>
+													Bespoke Offerings
 												</h2>
 											</div>
 
-											<div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+											<div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
 												{services.map((srv) => (
 													<div
 														key={srv.id}
-														className="p-6 rounded-3xl bg-white border border-gray-200/90 shadow-2xs hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+														className={`p-6 rounded-2xl border transition-all duration-150 flex flex-col justify-between ${
+															themeMode === "dark"
+																? "bg-[#0d162a] border-slate-800 hover:border-slate-700"
+																: "bg-white border-gray-200/80 hover:border-gray-300 shadow-xs"
+														}`}>
 														<div className="space-y-3">
-															<div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+															<div
+																className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold border ${
+																	themeMode === "dark"
+																		? "bg-slate-800 border-slate-700 text-blue-400"
+																		: "bg-slate-50 border-gray-200 text-blue-600"
+																}`}>
 																<TrendingUp className="w-5 h-5" />
 															</div>
-															<h3 className="text-sm font-bold font-nohemi text-gray-900">
+															<h3
+																className={`text-sm font-bold font-nohemi ${
+																	themeMode === "dark" ? "text-white" : "text-gray-900"
+																}`}>
 																{srv.title || "Service Title"}
 															</h3>
-															<p className="text-xs text-gray-500 font-medium leading-relaxed">
+															<p
+																className={`text-xs font-normal leading-relaxed ${
+																	themeMode === "dark" ? "text-slate-400" : "text-gray-500"
+																}`}>
 																{srv.description || "Comprehensive service delivered by certified professionals."}
 															</p>
 														</div>
 
-														<div className="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between">
-															<span className="text-xs font-bold text-blue-600 font-mono">
+														<div
+															className={`pt-4 mt-5 border-t flex items-center justify-between ${
+																themeMode === "dark" ? "border-slate-800" : "border-gray-100"
+															}`}>
+															<span className="text-xs font-bold text-blue-500 font-mono">
 																{srv.price || "Contact Us"}
 															</span>
 															<button
 																type="button"
 																onClick={() => setIsContactModalOpen(true)}
-																className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-blue-600 text-white text-[11px] font-bold transition-colors cursor-pointer">
+																className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-colors cursor-pointer ${
+																	themeMode === "dark"
+																		? "bg-slate-800 hover:bg-slate-700 text-white border border-slate-700"
+																		: "bg-slate-900 hover:bg-slate-800 text-white"
+																}`}>
 																Inquire →
 															</button>
 														</div>
@@ -2504,36 +2600,63 @@ function ContentForm() {
 
 										{/* Testimonials & Social Proof */}
 										{testimonialsList.length > 0 && (
-											<div className="max-w-4xl mx-auto space-y-6 pt-4">
+											<div className="max-w-4xl mx-auto space-y-8 pt-4">
 												<div className="text-center max-w-md mx-auto space-y-2">
-													<span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-extrabold uppercase tracking-wider">
-														Social Proof
+													<span
+														className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+															themeMode === "dark"
+																? "bg-[#0d162a] text-slate-300 border-slate-800"
+																: "bg-slate-100 text-slate-700 border-slate-200"
+														}`}>
+														Client Endorsements
 													</span>
-													<h2 className="text-xl sm:text-2xl font-bold font-nohemi text-gray-900">
-														What Our Clients Say
+													<h2
+														className={`text-2xl font-bold font-nohemi ${
+															themeMode === "dark" ? "text-white" : "text-gray-900"
+														}`}>
+														What Clients Say
 													</h2>
 												</div>
 
-												<div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+												<div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 													{testimonialsList.map((t) => (
 														<div
 															key={t.id}
-															className="p-6 rounded-3xl bg-white border border-gray-200/90 shadow-2xs space-y-4">
-															<div className="flex items-center gap-1 text-amber-400">
+															className={`p-6 rounded-2xl border space-y-4 ${
+																themeMode === "dark"
+																	? "bg-[#0d162a] border-slate-800 text-slate-200"
+																	: "bg-white border-gray-200/80 text-gray-800 shadow-xs"
+															}`}>
+															<div className="flex items-center gap-1 text-amber-500">
 																{[...Array(t.rating || 5)].map((_, i) => (
-																	<Star key={i} className="w-4 h-4 fill-current" />
+																	<Star key={i} className="w-3.5 h-3.5 fill-current" />
 																))}
 															</div>
-															<p className="text-xs font-medium text-gray-700 leading-relaxed italic">
+															<p className="text-xs font-normal leading-relaxed italic">
 																&quot;{t.review || "Outstanding service and results!"}&quot;
 															</p>
-															<div className="pt-2 border-t border-gray-100 flex items-center gap-3">
-																<div className="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
+															<div
+																className={`pt-3 border-t flex items-center gap-3 ${
+																	themeMode === "dark" ? "border-slate-800" : "border-gray-100"
+																}`}>
+																<div className="w-8 h-8 rounded-full bg-slate-800 text-white font-bold text-xs flex items-center justify-center border border-slate-700">
 																	{t.name ? t.name[0].toUpperCase() : "C"}
 																</div>
 																<div>
-																	<p className="text-xs font-bold text-gray-900">{t.name || "Client Name"}</p>
-																	{t.role && <p className="text-[10px] text-gray-400 font-medium">{t.role}</p>}
+																	<p
+																		className={`text-xs font-bold ${
+																			themeMode === "dark" ? "text-white" : "text-gray-900"
+																		}`}>
+																		{t.name || "Client Name"}
+																	</p>
+																	{t.role && (
+																		<p
+																			className={`text-[10px] ${
+																				themeMode === "dark" ? "text-slate-400" : "text-gray-400"
+																			}`}>
+																			{t.role}
+																		</p>
+																	)}
 																</div>
 															</div>
 														</div>
@@ -2546,10 +2669,18 @@ function ContentForm() {
 										{faqs.length > 0 && (
 											<div className="max-w-2xl mx-auto space-y-4 pt-4">
 												<div className="text-center space-y-2 mb-6">
-													<span className="px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-[10px] font-extrabold uppercase tracking-wider">
-														Got Questions?
+													<span
+														className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+															themeMode === "dark"
+																? "bg-[#0d162a] text-slate-300 border-slate-800"
+																: "bg-slate-100 text-slate-700 border-slate-200"
+														}`}>
+														Q&A
 													</span>
-													<h2 className="text-xl font-bold font-nohemi text-gray-900">
+													<h2
+														className={`text-2xl font-bold font-nohemi ${
+															themeMode === "dark" ? "text-white" : "text-gray-900"
+														}`}>
 														Frequently Asked Questions
 													</h2>
 												</div>
@@ -2560,20 +2691,33 @@ function ContentForm() {
 														return (
 															<div
 																key={faq.id}
-																className="rounded-2xl bg-white border border-gray-200/90 overflow-hidden shadow-2xs">
+																className={`rounded-xl border overflow-hidden transition-colors ${
+																	themeMode === "dark"
+																		? "bg-[#0d162a] border-slate-800"
+																		: "bg-white border-gray-200/80 shadow-xs"
+																}`}>
 																<button
 																	type="button"
 																	onClick={() => setActiveFaqIndex(isOpen ? null : idx)}
-																	className="w-full p-4 text-left flex items-center justify-between gap-3 text-xs font-bold text-gray-900 cursor-pointer hover:bg-gray-50/50">
+																	className={`w-full p-4 text-left flex items-center justify-between gap-3 text-xs font-bold cursor-pointer ${
+																		themeMode === "dark"
+																			? "text-white hover:bg-slate-800/50"
+																			: "text-gray-900 hover:bg-gray-50/50"
+																	}`}>
 																	<span>{faq.question || "Frequently Asked Question"}</span>
 																	{isOpen ? (
-																		<ChevronUp className="w-4 h-4 text-blue-600 shrink-0" />
+																		<ChevronUp className="w-4 h-4 text-blue-400 shrink-0" />
 																	) : (
 																		<ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />
 																	)}
 																</button>
 																{isOpen && (
-																	<div className="p-4 pt-0 text-xs text-gray-600 font-medium leading-relaxed border-t border-gray-100/60 bg-gray-50/30">
+																	<div
+																		className={`p-4 pt-0 text-xs font-normal leading-relaxed border-t ${
+																			themeMode === "dark"
+																				? "border-slate-800 text-slate-300 bg-[#070d1d]"
+																				: "border-gray-100 text-gray-600 bg-gray-50/40"
+																		}`}>
 																		{faq.answer || "Answer details will appear here."}
 																	</div>
 																)}
@@ -2585,42 +2729,57 @@ function ContentForm() {
 										)}
 
 										{/* Direct Bottom CTA Box */}
-										<div className="max-w-3xl mx-auto p-8 rounded-3xl bg-slate-900 text-white text-center space-y-4 shadow-xl">
-											<h3 className="text-xl font-bold font-nohemi">
+										<div
+											className={`max-w-3xl mx-auto p-10 rounded-2xl text-center space-y-4 border ${
+												themeMode === "dark"
+													? "bg-[#0d162a] border-slate-800 text-white"
+													: "bg-slate-900 border-slate-800 text-white"
+											}`}>
+											<h3 className="text-2xl font-bold font-nohemi text-white">
 												Ready to Transform Your Business?
 											</h3>
-											<p className="text-xs text-slate-300 max-w-md mx-auto">
+											<p className="text-xs text-slate-300 max-w-md mx-auto leading-relaxed">
 												Speak with our dedicated specialists today and receive a personalized strategy session.
 											</p>
-											<button
-												type="button"
-												onClick={() => setIsContactModalOpen(true)}
-												className="px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-extrabold shadow-lg transition-transform hover:scale-105 cursor-pointer">
-												{ctaText || "Claim Free Consultation"}
-											</button>
+											<div className="pt-2">
+												<button
+													type="button"
+													onClick={() => setIsContactModalOpen(true)}
+													className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-colors shadow-sm cursor-pointer">
+													{ctaText || "Claim Free Consultation"}
+												</button>
+											</div>
 										</div>
 
 										{/* INTERACTIVE LEAD / CONSULTATION MODAL */}
 										{isContactModalOpen && (
-											<div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
-												<div className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200 relative">
+											<div className="absolute inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+												<div
+													className={`w-full max-w-md rounded-2xl p-5 sm:p-8 space-y-4 sm:space-y-5 border shadow-2xl animate-in zoom-in-95 duration-200 relative max-h-[90%] overflow-y-auto ${
+														themeMode === "dark"
+															? "bg-[#0d162a] border-slate-800 text-white"
+															: "bg-white border-gray-200 text-gray-900"
+													}`}>
 													<button
 														type="button"
 														onClick={() => {
 															setIsContactModalOpen(false);
 															setContactFormSubmitted(false);
 														}}
-														className="absolute top-5 right-5 p-1.5 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer">
+														className="absolute top-5 right-5 p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer">
 														<X className="w-4 h-4" />
 													</button>
 
 													{contactFormSubmitted ? (
 														<div className="text-center py-8 space-y-3">
 															<CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto" />
-															<h3 className="text-lg font-bold font-nohemi text-gray-900">
+															<h3
+																className={`text-lg font-bold font-nohemi ${
+																	themeMode === "dark" ? "text-white" : "text-gray-900"
+																}`}>
 																Inquiry Received!
 															</h3>
-															<p className="text-xs text-gray-500 max-w-xs mx-auto">
+															<p className="text-xs text-gray-400 max-w-xs mx-auto">
 																Thank you for reaching out. We will contact you at your email address shortly.
 															</p>
 															<button
@@ -2629,20 +2788,28 @@ function ContentForm() {
 																	setIsContactModalOpen(false);
 																	setContactFormSubmitted(false);
 																}}
-																className="px-5 py-2 rounded-full bg-slate-900 text-white text-xs font-bold">
+																className="px-5 py-2 rounded-xl bg-slate-800 text-white text-xs font-bold">
 																Close
 															</button>
 														</div>
 													) : (
 														<div className="space-y-4">
 															<div>
-																<span className="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold uppercase">
-																	Interactive Form Test
+																<span
+																	className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
+																		themeMode === "dark"
+																			? "bg-slate-800 text-slate-300 border-slate-700"
+																			: "bg-slate-100 text-slate-700 border-slate-200"
+																	}`}>
+																	Interactive Form
 																</span>
-																<h3 className="text-lg font-bold font-nohemi text-gray-900 mt-1">
+																<h3
+																	className={`text-lg font-bold font-nohemi mt-1 ${
+																		themeMode === "dark" ? "text-white" : "text-gray-900"
+																	}`}>
 																	{ctaText || "Get In Touch"}
 																</h3>
-																<p className="text-xs text-gray-500 font-medium">
+																<p className="text-xs text-gray-400 font-normal">
 																	Fill in the simulated form below to test client lead intake.
 																</p>
 															</div>
@@ -2654,41 +2821,62 @@ function ContentForm() {
 																}}
 																className="space-y-3">
 																<div>
-																	<label className="block text-[11px] font-bold text-gray-700 mb-1">
+																	<label
+																		className={`block text-[11px] font-bold mb-1 ${
+																			themeMode === "dark" ? "text-slate-300" : "text-gray-700"
+																		}`}>
 																		Your Name
 																	</label>
 																	<input
 																		type="text"
 																		required
 																		defaultValue="Jane Doe"
-																		className="w-full px-3.5 py-2 rounded-xl bg-gray-50 border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600"
+																		className={`w-full px-3.5 py-2.5 rounded-xl border text-xs font-medium focus:outline-none focus:border-blue-600 ${
+																			themeMode === "dark"
+																				? "bg-slate-800 border-slate-700 text-white"
+																				: "bg-gray-50 border-gray-200 text-gray-900"
+																		}`}
 																	/>
 																</div>
 																<div>
-																	<label className="block text-[11px] font-bold text-gray-700 mb-1">
+																	<label
+																		className={`block text-[11px] font-bold mb-1 ${
+																			themeMode === "dark" ? "text-slate-300" : "text-gray-700"
+																		}`}>
 																		Email Address
 																	</label>
 																	<input
 																		type="email"
 																		required
 																		defaultValue="jane@company.com"
-																		className="w-full px-3.5 py-2 rounded-xl bg-gray-50 border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600"
+																		className={`w-full px-3.5 py-2.5 rounded-xl border text-xs font-medium focus:outline-none focus:border-blue-600 ${
+																			themeMode === "dark"
+																				? "bg-slate-800 border-slate-700 text-white"
+																				: "bg-gray-50 border-gray-200 text-gray-900"
+																		}`}
 																	/>
 																</div>
 																<div>
-																	<label className="block text-[11px] font-bold text-gray-700 mb-1">
-																		Project Details / Inquiries
+																	<label
+																		className={`block text-[11px] font-bold mb-1 ${
+																			themeMode === "dark" ? "text-slate-300" : "text-gray-700"
+																		}`}>
+																		Project Inquiries
 																	</label>
 																	<textarea
 																		rows={2}
-																		defaultValue="I am interested in scaling my operations with your strategy."
-																		className="w-full px-3.5 py-2 rounded-xl bg-gray-50 border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600"
+																		defaultValue="I am interested in scaling my business."
+																		className={`w-full px-3.5 py-2.5 rounded-xl border text-xs font-medium focus:outline-none focus:border-blue-600 ${
+																			themeMode === "dark"
+																				? "bg-slate-800 border-slate-700 text-white"
+																				: "bg-gray-50 border-gray-200 text-gray-900"
+																		}`}
 																	/>
 																</div>
 
 																<button
 																	type="submit"
-																	className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors shadow-md cursor-pointer">
+																	className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors shadow-sm cursor-pointer">
 																	Submit Test Inquiry
 																</button>
 															</form>
@@ -2701,14 +2889,22 @@ function ContentForm() {
 								)}
 
 								{activePlan === "SALES_FUNNEL" && (
-									<div className="py-10 px-6 bg-slate-950 text-white space-y-12">
-										{/* Urgency Countdown Sticky Bar */}
-										<div className="p-3 rounded-2xl bg-gradient-to-r from-red-600 via-purple-600 to-red-600 text-white flex items-center justify-between text-xs font-extrabold max-w-4xl mx-auto shadow-lg animate-pulse">
+									<div
+										className={`py-10 px-4 sm:py-14 sm:px-12 space-y-8 sm:space-y-12 transition-colors ${
+											themeMode === "dark" ? "bg-[#070d1d] text-white" : "bg-[#fafbfc] text-slate-900"
+										}`}>
+										{/* Clean Urgency Countdown Bar */}
+										<div
+											className={`p-3.5 rounded-xl border flex flex-col sm:flex-row items-center justify-between gap-2.5 text-center sm:text-left text-xs font-bold max-w-3xl mx-auto ${
+												themeMode === "dark"
+													? "bg-[#0d162a] border-slate-800 text-slate-200"
+													: "bg-slate-900 border-slate-800 text-white"
+											}`}>
 											<div className="flex items-center gap-2">
-												<Flame className="w-4 h-4" />
-												<span>FLASH SALE: LIMITED TIME DISCOUNT</span>
+												<Clock className="w-4 h-4 text-amber-400" />
+												<span className="text-[11px] sm:text-xs">SPECIAL OFFER RESERVED FOR:</span>
 											</div>
-											<div className="font-mono text-sm tracking-wider bg-black/40 px-3 py-1 rounded-xl">
+											<div className="font-mono text-xs sm:text-sm tracking-widest bg-black/50 px-3 py-1 rounded-lg border border-slate-700 text-amber-400">
 												{Math.floor(funnelSecondsLeft / 60)
 													.toString()
 													.padStart(2, "0")}
@@ -2720,16 +2916,29 @@ function ContentForm() {
 										{/* VSL Video Header & Player */}
 										<div className="max-w-3xl mx-auto text-center space-y-6">
 											<div className="space-y-3">
-												<span className="px-3.5 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs font-bold uppercase tracking-wider border border-purple-500/30">
-													Special Video Presentation
+												<span
+													className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+														themeMode === "dark"
+															? "bg-[#0d162a] text-slate-300 border-slate-800"
+															: "bg-slate-100 text-slate-700 border-slate-200"
+													}`}>
+													Video Presentation
 												</span>
-												<h2 className="text-2xl sm:text-4xl font-extrabold font-nohemi leading-tight">
+												<h2
+													className={`text-2xl sm:text-4xl font-extrabold font-nohemi leading-tight ${
+														themeMode === "dark" ? "text-white" : "text-gray-900"
+													}`}>
 													{leadMagnetTitle || "Exclusive Free Training & Breakthrough Presentation"}
 												</h2>
 											</div>
 
-											{/* Video Player Mockup / Embed */}
-											<div className="relative aspect-video rounded-3xl overflow-hidden bg-slate-900 border border-purple-500/30 shadow-2xl shadow-purple-500/10 flex items-center justify-center group">
+											{/* Video Player Box */}
+											<div
+												className={`relative aspect-video rounded-2xl overflow-hidden border shadow-lg flex items-center justify-center ${
+													themeMode === "dark"
+														? "bg-[#0d162a] border-slate-800"
+														: "bg-slate-900 border-slate-800"
+												}`}>
 												{videoUrl && videoUrl.includes("youtube.com") ? (
 													<iframe
 														src={videoUrl}
@@ -2739,23 +2948,34 @@ function ContentForm() {
 													/>
 												) : (
 													<div className="text-center space-y-3 p-6">
-														<div className="w-16 h-16 rounded-full bg-purple-600 text-white flex items-center justify-center mx-auto shadow-xl group-hover:scale-110 transition-transform cursor-pointer">
-															<Play className="w-7 h-7 fill-current ml-1" />
+														<div className="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center mx-auto shadow-md hover:bg-blue-500 transition-colors cursor-pointer">
+															<Play className="w-6 h-6 fill-current ml-0.5" />
 														</div>
-														<p className="text-xs font-bold text-slate-300">Click to Play Video Presentation</p>
+														<p className="text-xs font-semibold text-slate-300">Click to Play Video Presentation</p>
 													</div>
 												)}
 											</div>
 										</div>
 
 										{/* Value Stack Breakdown Presentation */}
-										<div className="max-w-3xl mx-auto bg-slate-900/90 border border-purple-500/30 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
+										<div
+											className={`max-w-3xl mx-auto rounded-2xl p-6 sm:p-8 space-y-6 border ${
+												themeMode === "dark"
+													? "bg-[#0d162a] border-slate-800 text-white"
+													: "bg-white border-gray-200/90 text-gray-900 shadow-xs"
+											}`}>
 											<div className="text-center space-y-1">
-												<span className="text-[11px] font-bold text-purple-400 uppercase tracking-wider">
-													Everything You Get Today
+												<span
+													className={`text-[10px] font-bold uppercase tracking-wider ${
+														themeMode === "dark" ? "text-slate-400" : "text-gray-500"
+													}`}>
+													Deliverables Breakdown
 												</span>
-												<h3 className="text-xl font-bold font-nohemi">
-													Complete System Deliverables Stack
+												<h3
+													className={`text-xl font-bold font-nohemi ${
+														themeMode === "dark" ? "text-white" : "text-gray-900"
+													}`}>
+													Complete System Value Stack
 												</h3>
 											</div>
 
@@ -2763,50 +2983,76 @@ function ContentForm() {
 												{valueStackItems.map((item, i) => (
 													<div
 														key={item.id}
-														className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 flex items-start justify-between gap-4">
+														className={`p-4 rounded-xl border flex items-start justify-between gap-4 transition-colors ${
+															themeMode === "dark"
+																? "bg-[#111c33] border-slate-800"
+																: "bg-gray-50/80 border-gray-200/80"
+														}`}>
 														<div className="flex items-start gap-3">
-															<div className="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold shrink-0 mt-0.5">
+															<div className="w-5 h-5 rounded-md bg-emerald-500/20 text-emerald-500 flex items-center justify-center font-bold shrink-0 mt-0.5">
 																<Check className="w-3.5 h-3.5" />
 															</div>
 															<div>
 																<div className="flex items-center gap-2">
-																	<p className="text-xs font-bold text-white">{item.title || `Item #${i + 1}`}</p>
+																	<p
+																		className={`text-xs font-bold ${
+																			themeMode === "dark" ? "text-white" : "text-gray-900"
+																		}`}>
+																		{item.title || `Item #${i + 1}`}
+																	</p>
 																	{item.isBonus && (
-																		<span className="px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-400 text-[9px] font-bold">
+																		<span className="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-400 text-[9px] font-bold">
 																			BONUS
 																		</span>
 																	)}
 																</div>
 																{item.description && (
-																	<p className="text-[11px] text-slate-400 font-medium mt-0.5">
+																	<p
+																		className={`text-[11px] font-normal mt-0.5 ${
+																			themeMode === "dark" ? "text-slate-400" : "text-gray-500"
+																		}`}>
 																		{item.description}
 																	</p>
 																)}
 															</div>
 														</div>
 
-														<span className="text-xs font-mono font-bold text-purple-300 shrink-0">
+														<span
+															className={`text-xs font-mono font-bold shrink-0 ${
+																themeMode === "dark" ? "text-blue-400" : "text-gray-700"
+															}`}>
 															{item.value || "$197 Value"}
 														</span>
 													</div>
 												))}
 											</div>
 
-											{/* Interactive Order Bump Box */}
+											{/* Clean Order Bump Box */}
 											{orderBumpTitle && (
-												<div className="p-4 rounded-2xl bg-purple-950/60 border-2 border-dashed border-purple-500/60 flex items-start gap-3">
+												<div
+													className={`p-4 rounded-xl border-2 border-dashed flex items-start gap-3 ${
+														themeMode === "dark"
+															? "bg-blue-950/30 border-blue-500/40 text-slate-200"
+															: "bg-blue-50/50 border-blue-200 text-gray-800"
+													}`}>
 													<input
 														type="checkbox"
 														id="bumpCheck"
 														checked={isOrderBumpChecked}
 														onChange={(e) => setIsOrderBumpChecked(e.target.checked)}
-														className="w-4 h-4 rounded text-purple-600 mt-1 cursor-pointer accent-purple-600"
+														className="w-4 h-4 rounded text-blue-600 mt-0.5 cursor-pointer accent-blue-600"
 													/>
-													<label htmlFor="bumpCheck" className="text-xs cursor-pointer select-none space-y-1">
-														<p className="font-bold text-purple-200">
-															⚡ ONE-TIME OFFER: {orderBumpTitle} (+${orderBumpPrice || 27})
+													<label htmlFor="bumpCheck" className="text-xs cursor-pointer select-none space-y-0.5">
+														<p
+															className={`font-bold ${
+																themeMode === "dark" ? "text-white" : "text-gray-900"
+															}`}>
+															OPTIONAL UPGRADE: {orderBumpTitle} (+${orderBumpPrice || 27})
 														</p>
-														<p className="text-[11px] text-slate-400 font-medium">
+														<p
+															className={`text-[11px] font-normal ${
+																themeMode === "dark" ? "text-slate-400" : "text-gray-500"
+															}`}>
 															{orderBumpDescription || "Instant masterclass upgrade and bonus tools."}
 														</p>
 													</label>
@@ -2814,12 +3060,18 @@ function ContentForm() {
 											)}
 
 											{/* Price Breakdown & Instant Claim CTA */}
-											<div className="pt-4 border-t border-slate-800 text-center space-y-4">
+											<div
+												className={`pt-4 border-t text-center space-y-4 ${
+													themeMode === "dark" ? "border-slate-800" : "border-gray-100"
+												}`}>
 												<div className="flex items-center justify-center gap-3 text-sm">
-													<span className="text-slate-400 line-through font-mono">
+													<span
+														className={`line-through font-mono ${
+															themeMode === "dark" ? "text-slate-500" : "text-gray-400"
+														}`}>
 														Total Value: ${regularPrice || 497}
 													</span>
-													<span className="text-xl font-extrabold text-emerald-400 font-mono">
+													<span className="text-xl font-extrabold text-blue-500 font-mono">
 														Today: ${discountPrice + (isOrderBumpChecked ? (Number(orderBumpPrice) || 0) : 0)}
 													</span>
 												</div>
@@ -2827,13 +3079,16 @@ function ContentForm() {
 												<button
 													type="button"
 													onClick={() => setIsFunnelOrderSuccess(true)}
-													className="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-extrabold text-sm shadow-xl shadow-purple-600/30 transition-all hover:scale-[1.02] cursor-pointer flex items-center justify-center gap-2 font-nohemi">
+													className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition-colors shadow-sm cursor-pointer flex items-center justify-center gap-2">
 													<span>Claim Special Offer Now →</span>
 												</button>
 
 												{/* Guarantee Seal */}
-												<div className="flex items-center justify-center gap-2 text-xs text-slate-400 pt-2">
-													<ShieldCheck className="w-4 h-4 text-emerald-400" />
+												<div
+													className={`flex items-center justify-center gap-2 text-xs pt-2 ${
+														themeMode === "dark" ? "text-slate-400" : "text-gray-500"
+													}`}>
+													<ShieldCheck className="w-4 h-4 text-emerald-500" />
 													<span>{guaranteeText || "30-Day 100% Risk-Free Money Back Guarantee"}</span>
 												</div>
 											</div>
@@ -2841,27 +3096,40 @@ function ContentForm() {
 
 										{/* INTERACTIVE FUNNEL SUCCESS MODAL */}
 										{isFunnelOrderSuccess && (
-											<div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200 text-slate-900">
-												<div className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 text-center space-y-4 shadow-2xl animate-in zoom-in-95 duration-200">
-													<CheckCircle2 className="w-14 h-14 text-emerald-600 mx-auto" />
-													<h3 className="text-xl font-bold font-nohemi text-gray-900">
+											<div className="absolute inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+												<div
+													className={`w-full max-w-md rounded-2xl p-5 sm:p-8 text-center space-y-4 border shadow-2xl animate-in zoom-in-95 duration-200 max-h-[90%] overflow-y-auto ${
+														themeMode === "dark"
+															? "bg-[#0d162a] border-slate-800 text-white"
+															: "bg-white border-gray-200 text-gray-900"
+													}`}>
+													<CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
+													<h3
+														className={`text-xl font-bold font-nohemi ${
+															themeMode === "dark" ? "text-white" : "text-gray-900"
+														}`}>
 														Order Successfully Completed!
 													</h3>
-													<p className="text-xs text-gray-500 font-medium leading-relaxed">
+													<p className="text-xs text-gray-400 font-normal leading-relaxed">
 														Your access passes have been generated. Total charged:{" "}
-														<span className="font-bold text-gray-900 font-mono">
+														<span className="font-bold font-mono text-blue-500">
 															${discountPrice + (isOrderBumpChecked ? (Number(orderBumpPrice) || 0) : 0)}
 														</span>
 													</p>
-													<div className="p-3 bg-gray-50 rounded-xl text-left text-xs font-mono text-gray-600 space-y-1">
+													<div
+														className={`p-3 rounded-xl text-left text-xs font-mono space-y-1 border ${
+															themeMode === "dark"
+																? "bg-[#111c33] border-slate-700 text-slate-300"
+																: "bg-gray-50 border-gray-200 text-gray-700"
+														}`}>
 														<p>Order ID: #FNL-{Date.now().toString().slice(-6)}</p>
 														<p>Status: CONFIRMED & ACTIVE</p>
 													</div>
 													<button
 														type="button"
 														onClick={() => setIsFunnelOrderSuccess(false)}
-														className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors">
-														Close Preview Confirmation
+														className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition-colors">
+														Close Confirmation
 													</button>
 												</div>
 											</div>
@@ -2870,17 +3138,31 @@ function ContentForm() {
 								)}
 
 								{activePlan === "E_COMMERCE" && (
-									<div className="py-12 px-6 bg-emerald-50/30">
-										<div className="max-w-md mx-auto text-center mb-8">
-											<span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase tracking-wider">
-												Store Catalog
+									<div
+										className={`py-14 px-6 sm:px-12 transition-colors ${
+											themeMode === "dark" ? "bg-[#070d1d] text-white" : "bg-[#fbfcfd] text-slate-900"
+										}`}>
+										<div className="max-w-md mx-auto text-center mb-10 space-y-2">
+											<span
+												className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+													themeMode === "dark"
+														? "bg-[#0d162a] text-slate-300 border-slate-800"
+														: "bg-slate-100 text-slate-700 border-slate-200"
+												}`}>
+												Product Catalog
 											</span>
-											<h2 className="text-xl sm:text-2xl font-bold font-nohemi text-gray-900 mt-2">
-												Featured Store Products
+											<h2
+												className={`text-2xl font-bold font-nohemi ${
+													themeMode === "dark" ? "text-white" : "text-gray-900"
+												}`}>
+												Featured Products
 											</h2>
 											{shippingInfo && (
-												<p className="text-xs text-emerald-700 font-semibold mt-1 flex items-center justify-center gap-1">
-													<Truck className="w-3.5 h-3.5" />
+												<p
+													className={`text-xs font-semibold flex items-center justify-center gap-1.5 ${
+														themeMode === "dark" ? "text-slate-400" : "text-gray-600"
+													}`}>
+													<Truck className="w-3.5 h-3.5 text-blue-500" />
 													<span>{shippingInfo}</span>
 												</p>
 											)}
@@ -2892,57 +3174,83 @@ function ContentForm() {
 												{products.map((prod) => (
 													<div
 														key={prod.id}
-														className="bg-white border border-gray-200/90 rounded-2xl overflow-hidden shadow-2xs hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+														className={`rounded-2xl border overflow-hidden transition-all duration-150 flex flex-col justify-between ${
+															themeMode === "dark"
+																? "bg-[#0d162a] border-slate-800 hover:border-slate-700"
+																: "bg-white border-gray-200/80 hover:border-gray-300 shadow-xs"
+														}`}>
 														<div>
 															{/* Product Thumbnail Box */}
-															<div className="relative w-full h-44 bg-gray-100 overflow-hidden flex items-center justify-center">
+															<div
+																className={`relative w-full h-48 flex items-center justify-center overflow-hidden border-b ${
+																	themeMode === "dark"
+																		? "bg-[#070d1d] border-slate-800"
+																		: "bg-gray-50 border-gray-100"
+																}`}>
 																{prod.imageUrl ? (
 																	<img
 																		src={prod.imageUrl}
 																		alt={prod.name || "Product"}
-																		className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+																		className="w-full h-full object-cover"
 																	/>
 																) : (
-																	<div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-50">
-																		<ShoppingBag className="w-8 h-8 mb-1 opacity-60" />
-																		<span className="text-[10px] font-semibold">Store Item</span>
+																	<div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
+																		<ShoppingBag className="w-8 h-8 mb-1 opacity-50" />
+																		<span className="text-[10px] font-semibold">Product Image</span>
 																	</div>
 																)}
 
 																{prod.badge && (
-																	<span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[9px] font-extrabold uppercase tracking-wider shadow-xs">
+																	<span className="absolute top-3 left-3 px-2.5 py-0.5 rounded-md bg-blue-600 text-white text-[9px] font-bold uppercase tracking-wider shadow-xs">
 																		{prod.badge}
 																	</span>
 																)}
 
 																{prod.category && (
-																	<span className="absolute bottom-2.5 left-2.5 px-2 py-0.5 rounded-md bg-white/90 backdrop-blur-xs text-gray-700 text-[9px] font-bold">
+																	<span
+																		className={`absolute bottom-3 left-3 px-2 py-0.5 rounded-md text-[9px] font-bold border ${
+																			themeMode === "dark"
+																				? "bg-[#0d162a]/95 text-slate-200 border-slate-700"
+																				: "bg-white/95 text-gray-800 border-gray-200"
+																		}`}>
 																		{prod.category}
 																	</span>
 																)}
 															</div>
 
 															{/* Product Details */}
-															<div className="p-4">
-																<h3 className="text-sm font-bold text-gray-900 font-nohemi mb-1 line-clamp-1">
+															<div className="p-5 space-y-1.5">
+																<h3
+																	className={`text-sm font-bold font-nohemi ${
+																		themeMode === "dark" ? "text-white" : "text-gray-900"
+																	}`}>
 																	{prod.name || "Untitled Item"}
 																</h3>
-																<p className="text-[11px] text-gray-500 font-medium line-clamp-2 leading-relaxed">
+																<p
+																	className={`text-xs font-normal line-clamp-2 leading-relaxed ${
+																		themeMode === "dark" ? "text-slate-400" : "text-gray-500"
+																	}`}>
 																	{prod.description || "High quality item ready for instant delivery."}
 																</p>
 															</div>
 														</div>
 
 														{/* Price & Add to Cart Footer */}
-														<div className="p-4 pt-0 flex items-center justify-between gap-2 border-t border-gray-100 pt-3">
-															<span className="text-sm font-extrabold text-gray-900 font-nohemi">
+														<div
+															className={`p-5 pt-3 flex items-center justify-between gap-3 border-t ${
+																themeMode === "dark" ? "border-slate-800" : "border-gray-100"
+															}`}>
+															<span
+																className={`text-sm font-extrabold font-mono ${
+																	themeMode === "dark" ? "text-white" : "text-gray-900"
+																}`}>
 																{CURRENCY_SYMBOLS[currency] || "$"}{prod.price ? Number(prod.price).toFixed(2) : "0.00"}
 															</span>
 
 															<button
 																type="button"
 																onClick={() => addToPreviewCart(prod)}
-																className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-emerald-600 text-white text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs">
+																className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs">
 																<ShoppingCart className="w-3.5 h-3.5" />
 																<span>Add to Cart</span>
 															</button>
@@ -2960,18 +3268,34 @@ function ContentForm() {
 
 								{/* INTERACTIVE SLIDE-OUT CART DRAWER */}
 								{isPreviewCartOpen && (
-									<div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex justify-end animate-in fade-in duration-200">
-										<div className="w-full max-w-md bg-white h-full shadow-2xl p-6 flex flex-col justify-between animate-in slide-in-from-right duration-300 z-50">
+									<div className="absolute inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex justify-end animate-in fade-in duration-200">
+										<div
+											className={`w-full max-w-sm sm:max-w-md h-full shadow-2xl p-4 sm:p-6 flex flex-col justify-between animate-in slide-in-from-right duration-300 z-50 border-l ${
+												themeMode === "dark"
+													? "bg-[#0d162a] border-slate-800 text-white"
+													: "bg-white border-gray-200 text-gray-900"
+											}`}>
 											<div className="space-y-5 overflow-y-auto flex-1 pr-1">
 												{/* Cart Header */}
-												<div className="flex items-center justify-between border-b border-gray-100 pb-4">
+												<div
+													className={`flex items-center justify-between pb-4 border-b ${
+														themeMode === "dark" ? "border-slate-800" : "border-gray-100"
+													}`}>
 													<div className="flex items-center gap-2">
-														<div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
+														<div
+															className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold border ${
+																themeMode === "dark"
+																	? "bg-slate-800 border-slate-700 text-blue-400"
+																	: "bg-slate-50 border-gray-200 text-blue-600"
+															}`}>
 															<ShoppingCart className="w-4 h-4" />
 														</div>
 														<div>
-															<h3 className="text-sm font-bold font-nohemi text-gray-900">
-																Your Shopping Cart
+															<h3
+																className={`text-sm font-bold font-nohemi ${
+																	themeMode === "dark" ? "text-white" : "text-gray-900"
+																}`}>
+																Shopping Cart
 															</h3>
 															<p className="text-[10px] text-gray-400 font-medium">
 																{previewCart.reduce((sum, item) => sum + item.quantity, 0)} item(s) selected
@@ -2982,7 +3306,11 @@ function ContentForm() {
 													<button
 														type="button"
 														onClick={() => setIsPreviewCartOpen(false)}
-														className="p-1.5 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer">
+														className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+															themeMode === "dark"
+																? "text-gray-400 hover:text-white hover:bg-slate-800"
+																: "text-gray-400 hover:text-gray-700 hover:bg-gray-100"
+														}`}>
 														<X className="w-4 h-4" />
 													</button>
 												</div>
@@ -2990,8 +3318,13 @@ function ContentForm() {
 												{/* Items List */}
 												{previewCart.length === 0 ? (
 													<div className="text-center py-16 space-y-2">
-														<ShoppingBag className="w-10 h-10 text-gray-300 mx-auto" />
-														<p className="text-xs font-bold text-gray-700">Your cart is empty</p>
+														<ShoppingBag className="w-10 h-10 text-gray-400 opacity-40 mx-auto" />
+														<p
+															className={`text-xs font-bold ${
+																themeMode === "dark" ? "text-white" : "text-gray-700"
+															}`}>
+															Your cart is empty
+														</p>
 														<p className="text-[11px] text-gray-400">Click &quot;Add to Cart&quot; on any product to test ordering.</p>
 													</div>
 												) : (
@@ -2999,25 +3332,32 @@ function ContentForm() {
 														{previewCart.map((item) => (
 															<div
 																key={item.product.id}
-																className="p-3.5 rounded-2xl bg-gray-50/80 border border-gray-200/80 flex items-center justify-between gap-3 text-xs">
+																className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 text-xs ${
+																	themeMode === "dark"
+																		? "bg-[#111c33] border-slate-800"
+																		: "bg-gray-50/80 border-gray-200/80"
+																}`}>
 																<div className="flex items-center gap-3 min-w-0">
 																	{item.product.imageUrl ? (
 																		<img
 																			src={item.product.imageUrl}
 																			alt={item.product.name}
-																			className="w-12 h-12 rounded-xl object-cover border border-gray-200 shrink-0"
+																			className="w-12 h-12 rounded-lg object-cover border border-gray-200 shrink-0"
 																		/>
 																	) : (
-																		<div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold shrink-0">
+																		<div className="w-12 h-12 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold shrink-0">
 																			<Package className="w-5 h-5" />
 																		</div>
 																	)}
 
 																	<div className="min-w-0">
-																		<p className="font-bold text-gray-900 truncate">
+																		<p
+																			className={`font-bold truncate ${
+																				themeMode === "dark" ? "text-white" : "text-gray-900"
+																			}`}>
 																			{item.product.name || "Item"}
 																		</p>
-																		<p className="text-[11px] text-gray-500 font-mono">
+																		<p className="text-[11px] text-gray-400 font-mono">
 																			{CURRENCY_SYMBOLS[currency] || "$"}{Number(item.product.price || 0).toFixed(2)} each
 																		</p>
 																	</div>
@@ -3025,11 +3365,16 @@ function ContentForm() {
 
 																{/* Quantity Controls & Remove */}
 																<div className="flex items-center gap-3 shrink-0">
-																	<div className="flex items-center rounded-xl bg-white border border-gray-200 p-0.5">
+																	<div
+																		className={`flex items-center rounded-lg border p-0.5 ${
+																			themeMode === "dark"
+																				? "bg-[#0d162a] border-slate-700"
+																				: "bg-white border-gray-200"
+																		}`}>
 																		<button
 																			type="button"
 																			onClick={() => updatePreviewCartQty(item.product.id, -1)}
-																			className="w-6 h-6 rounded-lg text-gray-600 hover:bg-gray-100 flex items-center justify-center cursor-pointer">
+																			className="w-6 h-6 rounded text-gray-400 hover:text-white hover:bg-slate-800 flex items-center justify-center cursor-pointer">
 																			<Minus className="w-3 h-3" />
 																		</button>
 																		<input
@@ -3037,12 +3382,14 @@ function ContentForm() {
 																			min="1"
 																			value={item.quantity}
 																			onChange={(e) => setPreviewCartQty(item.product.id, parseInt(e.target.value) || 1)}
-																			className="w-8 text-center text-xs font-bold text-gray-900 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+																			className={`w-8 text-center text-xs font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+																				themeMode === "dark" ? "text-white bg-transparent" : "text-gray-900 bg-transparent"
+																			}`}
 																		/>
 																		<button
 																			type="button"
 																			onClick={() => updatePreviewCartQty(item.product.id, 1)}
-																			className="w-6 h-6 rounded-lg text-gray-600 hover:bg-gray-100 flex items-center justify-center cursor-pointer">
+																			className="w-6 h-6 rounded text-gray-400 hover:text-white hover:bg-slate-800 flex items-center justify-center cursor-pointer">
 																			<Plus className="w-3 h-3" />
 																		</button>
 																	</div>
@@ -3051,7 +3398,7 @@ function ContentForm() {
 																		type="button"
 																		onClick={() => removeFromPreviewCart(item.product.id)}
 																		title="Remove from Cart"
-																		className="p-1 text-gray-400 hover:text-red-600 transition-colors cursor-pointer">
+																		className="p-1 text-gray-400 hover:text-red-400 transition-colors cursor-pointer">
 																		<Trash2 className="w-4 h-4" />
 																	</button>
 																</div>
@@ -3063,11 +3410,17 @@ function ContentForm() {
 
 											{/* Cart Summary & Order Actions */}
 											{previewCart.length > 0 && (
-												<div className="pt-4 border-t border-gray-100 space-y-3">
-													<div className="space-y-1.5 text-xs text-gray-600">
+												<div
+													className={`pt-4 border-t space-y-3 ${
+														themeMode === "dark" ? "border-slate-800" : "border-gray-100"
+													}`}>
+													<div className="space-y-1.5 text-xs text-gray-400">
 														<div className="flex items-center justify-between">
 															<span>Subtotal</span>
-															<span className="font-mono font-bold text-gray-900">
+															<span
+																className={`font-mono font-bold ${
+																	themeMode === "dark" ? "text-white" : "text-gray-900"
+																}`}>
 																{CURRENCY_SYMBOLS[currency] || "$"}
 																{previewCart
 																	.reduce((sum, item) => sum + (Number(item.product.price) || 0) * item.quantity, 0)
@@ -3075,14 +3428,19 @@ function ContentForm() {
 															</span>
 														</div>
 														{shippingInfo && (
-															<div className="flex items-center justify-between text-[11px] text-emerald-700">
+															<div className="flex items-center justify-between text-[11px] text-blue-400 font-medium">
 																<span>Shipping</span>
 																<span>Included</span>
 															</div>
 														)}
-														<div className="flex items-center justify-between text-sm font-extrabold text-gray-900 pt-1 border-t border-gray-100">
+														<div
+															className={`flex items-center justify-between text-sm font-extrabold pt-2 border-t ${
+																themeMode === "dark"
+																	? "border-slate-800 text-white"
+																	: "border-gray-100 text-gray-900"
+															}`}>
 															<span>Estimated Total</span>
-															<span className="font-mono text-emerald-700">
+															<span className="font-mono text-blue-400">
 																{CURRENCY_SYMBOLS[currency] || "$"}
 																{previewCart
 																	.reduce((sum, item) => sum + (Number(item.product.price) || 0) * item.quantity, 0)
@@ -3110,7 +3468,7 @@ function ContentForm() {
 																		: `https://wa.me/${phoneClean}?text=${encodeURIComponent(message)}`;
 																	window.open(waUrl, "_blank");
 																}}
-																className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-sm cursor-pointer">
+																className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-xs cursor-pointer">
 																<svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
 																	<path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.062-2.18-.553-1.636-.677-2.73-2.316-2.812-2.425-.082-.109-.665-.883-.665-1.684 0-.8.419-1.196.568-1.356.149-.16.326-.201.435-.201.109 0 .217.001.312.006.1.005.234-.038.366.28.138.334.472 1.15.513 1.234.041.084.069.183.014.293-.055.109-.082.178-.163.272-.082.095-.172.212-.246.285-.082.08-.168.167-.072.332.096.165.426.703.914 1.138.629.561 1.159.734 1.324.816.165.082.261.071.358-.041.096-.112.414-.482.525-.647.111-.165.221-.138.371-.082.15.055.952.449 1.115.531.163.082.272.123.312.191.041.069.041.399-.103.804z" />
 																</svg>
@@ -3125,7 +3483,7 @@ function ContentForm() {
 																setPreviewCart([]);
 																setIsPreviewCartOpen(false);
 															}}
-															className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-sm cursor-pointer">
+															className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-xs cursor-pointer">
 															<CreditCard className="w-3.5 h-3.5" />
 															<span>Test Gateway Checkout</span>
 														</button>
@@ -3140,7 +3498,7 @@ function ContentForm() {
 								<footer
 									className={`py-8 px-6 border-t text-center text-xs space-y-3 transition-colors ${
 										themeMode === "dark"
-											? "bg-slate-900 border-slate-800 text-slate-400"
+											? "bg-[#070d1d] border-slate-800 text-slate-400"
 											: "bg-white border-gray-100 text-gray-500"
 									}`}>
 									<p className={`font-bold text-sm font-nohemi ${themeMode === "dark" ? "text-white" : "text-gray-900"}`}>
@@ -3157,7 +3515,12 @@ function ContentForm() {
 									{(whatsappLink || xLink || instagramLink || facebookLink || linkedinLink || youtubeLink || tiktokLink || bookingLink || customLink) && (
 										<div className="flex items-center justify-center gap-2 pt-2 flex-wrap">
 											{whatsappLink && (
-												<span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold flex items-center gap-1">
+												<span
+													className={`px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 border ${
+														themeMode === "dark"
+															? "bg-[#111c33] border-slate-700 text-emerald-400"
+															: "bg-emerald-50 text-emerald-700 border-emerald-200"
+													}`}>
 													<svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24">
 														<path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.062-2.18-.553-1.636-.677-2.73-2.316-2.812-2.425-.082-.109-.665-.883-.665-1.684 0-.8.419-1.196.568-1.356.149-.16.326-.201.435-.201.109 0 .217.001.312.006.1.005.234-.038.366.28.138.334.472 1.15.513 1.234.041.084.069.183.014.293-.055.109-.082.178-.163.272-.082.095-.172.212-.246.285-.082.08-.168.167-.072.332.096.165.426.703.914 1.138.629.561 1.159.734 1.324.816.165.082.261.071.358-.041.096-.112.414-.482.525-.647.111-.165.221-.138.371-.082.15.055.952.449 1.115.531.163.082.272.123.312.191.041.069.041.399-.103.804z" />
 													</svg>
@@ -3165,7 +3528,12 @@ function ContentForm() {
 												</span>
 											)}
 											{xLink && (
-												<span className="px-2.5 py-1 rounded-full bg-gray-100 text-gray-900 border border-gray-200 text-[10px] font-bold flex items-center gap-1">
+												<span
+													className={`px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 border ${
+														themeMode === "dark"
+															? "bg-[#111c33] border-slate-700 text-slate-200"
+															: "bg-gray-100 text-gray-900 border-gray-200"
+													}`}>
 													<svg className="w-2 h-2 fill-current" viewBox="0 0 24 24">
 														<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
 													</svg>
@@ -3173,38 +3541,73 @@ function ContentForm() {
 												</span>
 											)}
 											{instagramLink && (
-												<span className="px-2.5 py-1 rounded-full bg-pink-50 text-pink-700 border border-pink-200 text-[10px] font-bold">
+												<span
+													className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
+														themeMode === "dark"
+															? "bg-[#111c33] border-slate-700 text-pink-400"
+															: "bg-pink-50 text-pink-700 border-pink-200"
+													}`}>
 													Instagram
 												</span>
 											)}
 											{facebookLink && (
-												<span className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold">
+												<span
+													className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
+														themeMode === "dark"
+															? "bg-[#111c33] border-slate-700 text-blue-400"
+															: "bg-blue-50 text-blue-700 border-blue-200"
+													}`}>
 													Facebook
 												</span>
 											)}
 											{linkedinLink && (
-												<span className="px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-200 text-[10px] font-bold">
+												<span
+													className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
+														themeMode === "dark"
+															? "bg-[#111c33] border-slate-700 text-sky-400"
+															: "bg-sky-50 text-sky-700 border-sky-200"
+													}`}>
 													LinkedIn
 												</span>
 											)}
 											{youtubeLink && (
-												<span className="px-2.5 py-1 rounded-full bg-red-50 text-red-700 border border-red-200 text-[10px] font-bold">
+												<span
+													className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
+														themeMode === "dark"
+															? "bg-[#111c33] border-slate-700 text-red-400"
+															: "bg-red-50 text-red-700 border-red-200"
+													}`}>
 													YouTube
 												</span>
 											)}
 											{tiktokLink && (
-												<span className="px-2.5 py-1 rounded-full bg-gray-100 text-gray-900 border border-gray-200 text-[10px] font-bold">
+												<span
+													className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
+														themeMode === "dark"
+															? "bg-[#111c33] border-slate-700 text-slate-200"
+															: "bg-gray-100 text-gray-900 border-gray-200"
+													}`}>
 													TikTok
 												</span>
 											)}
 											{bookingLink && (
-												<span className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold flex items-center gap-1">
+												<span
+													className={`px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 border ${
+														themeMode === "dark"
+															? "bg-[#111c33] border-slate-700 text-blue-400"
+															: "bg-blue-50 text-blue-700 border-blue-200"
+													}`}>
 													<Calendar className="w-3 h-3" />
 													<span>Book Meeting</span>
 												</span>
 											)}
 											{customLink && (
-												<span className="px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-bold flex items-center gap-1">
+												<span
+													className={`px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 border ${
+														themeMode === "dark"
+															? "bg-[#111c33] border-slate-700 text-purple-400"
+															: "bg-purple-50 text-purple-700 border-purple-200"
+													}`}>
 													<Globe className="w-3 h-3" />
 													<span>Custom Link</span>
 												</span>
@@ -3212,6 +3615,7 @@ function ContentForm() {
 										</div>
 									)}
 								</footer>
+								</div>
 							</div>
 						</div>
 					</div>
