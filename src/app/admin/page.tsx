@@ -129,7 +129,7 @@ export default function AdminDashboardPage() {
 							<h1 className="font-extrabold font-nohemi text-xl tracking-tight text-gray-900">
 								Admin Workspace
 							</h1>
-							<span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">
+							<span className="px-3 py-1 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">
 								OPERATIONAL
 							</span>
 						</div>
@@ -144,14 +144,14 @@ export default function AdminDashboardPage() {
 						type="button"
 						onClick={fetchDashboardData}
 						disabled={isRefreshing}
-						className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 text-xs font-bold transition-all cursor-pointer shadow-2xs">
+						className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 text-xs font-bold transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-2xs">
 						<RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-blue-600" : ""}`} />
 						<span>Refresh Data</span>
 					</button>
 
 					<Link
 						href="/dashboard"
-						className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white hover:bg-gray-50 border border-gray-200 text-gray-900 text-xs font-bold transition-all shadow-2xs hover:border-gray-300">
+						className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-full bg-white hover:bg-gray-50 border border-gray-200 text-gray-900 text-xs font-bold transition-all shadow-2xs hover:shadow-sm hover:border-gray-300 hover:scale-105 active:scale-95">
 						<span>Customer View</span>
 						<ArrowRight className="w-3.5 h-3.5 text-gray-400" />
 					</Link>
@@ -187,7 +187,7 @@ export default function AdminDashboardPage() {
 
 					<Link
 						href="/admin/projects"
-						className="inline-flex items-center justify-between p-3 rounded-2xl bg-amber-50/60 hover:bg-amber-100/80 border border-amber-200/50 text-amber-900 text-xs font-bold transition-colors">
+						className="inline-flex items-center justify-between px-5 py-2.5 rounded-full bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-900 text-xs font-bold transition-all hover:scale-102 active:scale-98">
 						<span>Open Queue</span>
 						<ArrowRight className="w-3.5 h-3.5 text-amber-700" />
 					</Link>
@@ -218,7 +218,7 @@ export default function AdminDashboardPage() {
 
 					<Link
 						href="/admin/billing"
-						className="inline-flex items-center justify-between p-3 rounded-2xl bg-purple-50/60 hover:bg-purple-100/80 border border-purple-200/50 text-purple-900 text-xs font-bold transition-colors">
+						className="inline-flex items-center justify-between px-5 py-2.5 rounded-full bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-900 text-xs font-bold transition-all hover:scale-102 active:scale-98">
 						<span>Billing Ledger</span>
 						<ArrowRight className="w-3.5 h-3.5 text-purple-700" />
 					</Link>
@@ -249,7 +249,7 @@ export default function AdminDashboardPage() {
 
 					<Link
 						href="/admin/projects"
-						className="inline-flex items-center justify-between p-3 rounded-2xl bg-emerald-50/60 hover:bg-emerald-100/80 border border-emerald-200/50 text-emerald-900 text-xs font-bold transition-colors">
+						className="inline-flex items-center justify-between px-5 py-2.5 rounded-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-900 text-xs font-bold transition-all hover:scale-102 active:scale-98">
 						<span>Inspect Sites</span>
 						<ArrowRight className="w-3.5 h-3.5 text-emerald-700" />
 					</Link>
@@ -280,7 +280,7 @@ export default function AdminDashboardPage() {
 
 					<Link
 						href="/admin/users"
-						className="inline-flex items-center justify-between p-3 rounded-2xl bg-blue-50/60 hover:bg-blue-100/80 border border-blue-200/50 text-blue-900 text-xs font-bold transition-colors">
+						className="inline-flex items-center justify-between px-5 py-2.5 rounded-full bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-900 text-xs font-bold transition-all hover:scale-102 active:scale-98">
 						<span>Directory</span>
 						<ArrowRight className="w-3.5 h-3.5 text-blue-700" />
 					</Link>
@@ -301,7 +301,7 @@ export default function AdminDashboardPage() {
 						</p>
 					</div>
 
-					{/* Search Bar */}
+					{/* Search Bar & Full Queue Pill */}
 					<div className="flex items-center gap-3">
 						<div className="relative w-full sm:w-72">
 							<Search className="w-3.5 h-3.5 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -310,20 +310,20 @@ export default function AdminDashboardPage() {
 								placeholder="Search by business, email, slug..."
 								value={searchFilter}
 								onChange={(e) => setSearchFilter(e.target.value)}
-								className="w-full pl-9 pr-3 py-2 rounded-2xl border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 bg-gray-50/60 shadow-2xs"
+								className="w-full pl-9 pr-4 py-2.5 rounded-full border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 bg-gray-50/60 shadow-2xs"
 							/>
 						</div>
 
 						<Link
 							href="/admin/projects"
-							className="px-4 py-2 rounded-2xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-bold transition-colors whitespace-nowrap">
+							className="px-5 py-2.5 rounded-full bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-bold transition-all hover:scale-105 active:scale-95 whitespace-nowrap shadow-2xs">
 							Full Queue
 						</Link>
 					</div>
 				</div>
 
 				{filteredProjects.length === 0 ? (
-					<div className="p-16 text-center space-y-2 bg-gray-50/40 rounded-2xl border border-dashed border-gray-200">
+					<div className="p-16 text-center space-y-2 bg-gray-50/40 rounded-3xl border border-dashed border-gray-200">
 						<CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto" />
 						<h4 className="text-sm font-bold text-gray-900">No submissions found</h4>
 						<p className="text-xs text-gray-500">
@@ -375,7 +375,7 @@ export default function AdminDashboardPage() {
 											</td>
 
 											<td className="py-4 pr-4">
-												<span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-gray-100 text-gray-800 border border-gray-200">
+												<span className="px-3 py-1 rounded-full text-[10px] font-bold bg-gray-100 text-gray-800 border border-gray-200">
 													{p.type}
 												</span>
 											</td>
@@ -389,7 +389,7 @@ export default function AdminDashboardPage() {
 
 											<td className="py-4 pr-4">
 												<span
-													className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold ${
+													className={`px-3 py-1 rounded-full text-[10px] font-extrabold ${
 														isReview
 															? "bg-amber-50 text-amber-800 border border-amber-200"
 															: isLive
@@ -419,7 +419,7 @@ export default function AdminDashboardPage() {
 											<td className="py-4 text-right">
 												<Link
 													href={`/admin/projects/${p.id}`}
-													className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold transition-all shadow-2xs hover:shadow-sm">
+													className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold transition-all shadow-sm hover:shadow-md hover:scale-105 active:scale-95">
 													<span>Review Studio</span>
 													<ArrowRight className="w-3 h-3 ml-0.5" />
 												</Link>
