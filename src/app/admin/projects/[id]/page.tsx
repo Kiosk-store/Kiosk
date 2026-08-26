@@ -221,9 +221,9 @@ export default function AdminProjectReviewPage({
 				if (notifyClient) {
 					setStatus("Live");
 					setProgress(100);
-					setSaveSuccessMessage("🎉 Website published LIVE and launch email sent to client!");
+					setSaveSuccessMessage("Website published LIVE and launch email sent to client.");
 				} else {
-					setSaveSuccessMessage("✅ Project fulfillment updates saved successfully.");
+					setSaveSuccessMessage("Project fulfillment updates saved successfully.");
 				}
 				setTimeout(() => setSaveSuccessMessage(null), 5000);
 			} else {
@@ -312,8 +312,8 @@ export default function AdminProjectReviewPage({
 				</div>
 			)}
 
-			{/* ACTION COMMAND CENTER: STATUS & PUBLISH CONTROLS */}
-			<div className="bg-gradient-to-r from-slate-900 via-slate-950 to-blue-950 rounded-3xl p-6 sm:p-8 text-white shadow-xl space-y-6">
+			{/* ACTION COMMAND CENTER: STATUS & PUBLISH CONTROLS - SOLID SLATE 900 */}
+			<div className="bg-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl space-y-6 border border-slate-800">
 				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
 					<div className="flex items-center gap-3">
 						<div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-extrabold shadow-md">
@@ -336,7 +336,7 @@ export default function AdminProjectReviewPage({
 						onClick={() => handleSaveProject(true)}
 						className="px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer group">
 						<Send className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-						<span>🚀 Publish Website & Email Client Launch Notification</span>
+						<span>Publish Website & Email Client Launch Notification</span>
 					</button>
 				</div>
 
