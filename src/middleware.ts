@@ -97,13 +97,13 @@ export async function middleware(request: NextRequest) {
 			if (subdomain && subdomain !== "www") {
 				// Rewrite internally to the tenant route handler
 				return NextResponse.rewrite(
-					new URL(`/_tenants/${subdomain}${pathname}`, request.url),
+					new URL(`/tenants/${subdomain}${pathname}`, request.url),
 				);
 			}
 		} else {
 			// Scenario B: Custom domain format (e.g. "bellabakery.com")
 			return NextResponse.rewrite(
-				new URL(`/_domains/${currentHost}${pathname}`, request.url),
+				new URL(`/domains/${currentHost}${pathname}`, request.url),
 			);
 		}
 	}
