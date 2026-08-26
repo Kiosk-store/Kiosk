@@ -16,7 +16,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 /** Routes requiring active user authentication */
-const PROTECTED_ROUTES = ["/dashboard", "/checkout"];
+const PROTECTED_ROUTES = ["/dashboard", "/checkout", "/admin"];
 
 /** Routes intended only for unauthenticated visitors */
 const AUTH_ROUTES = ["/get-started"];

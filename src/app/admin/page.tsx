@@ -18,7 +18,9 @@ import {
 	TrendingUp,
 	ShieldCheck,
 	AlertCircle,
+	ArrowRight,
 } from "lucide-react";
+import PillButton from "@/components/PillButton";
 
 interface AdminStats {
 	totalProjects: number;
@@ -102,27 +104,35 @@ export default function AdminDashboardPage() {
 
 	return (
 		<div className="space-y-8 animate-in fade-in duration-200">
-			{/* Welcome Banner */}
-			<div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 text-white shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-				<div className="space-y-2">
+			{/* Welcome Hero Banner */}
+			<div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-blue-900 via-blue-950 to-slate-950 text-white shadow-xl shadow-blue-900/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 border border-blue-800/40 relative overflow-hidden">
+				<div className="space-y-2 relative z-10">
 					<div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-bold border border-blue-500/30">
 						<Sparkles className="w-3.5 h-3.5" />
 						<span>Kiosk Fulfillment Operations</span>
 					</div>
 					<h1 className="text-2xl sm:text-3xl font-extrabold font-nohemi tracking-tight">
-						Master Operations & Review Hub
+						Fulfillment & Operations Hub
 					</h1>
-					<p className="text-slate-300 text-xs sm:text-sm font-medium max-w-xl">
-						Review submitted customer business info, manage QA pipelines, publish client subdomains, and monitor live website instances.
+					<p className="text-blue-200/90 text-xs sm:text-sm font-medium max-w-xl leading-relaxed">
+						Review submitted customer copy and brand assets, coordinate QA and customizations, and publish live client websites.
 					</p>
 				</div>
 
-				<div className="flex items-center gap-3">
-					<Link
-						href="/admin/projects"
-						className="px-5 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all shadow-md flex items-center gap-2">
-						<Layers className="w-4 h-4" />
-						<span>Open Fulfillment Queue ({stats?.inReviewCount || 0})</span>
+				<div className="relative z-10">
+					<Link href="/admin/projects">
+						<PillButton
+							baseColor="#ffffff"
+							circleColor="#004ac6"
+							textColor="#004ac6"
+							hoverTextColor="#ffffff"
+							useThunderFont={true}
+							className="px-6 py-3 rounded-full font-bold text-xs shadow-lg">
+							<span className="inline-flex items-center gap-2">
+								<Layers className="w-4 h-4" />
+								<span>Open Queue ({stats?.inReviewCount || 0})</span>
+							</span>
+						</PillButton>
 					</Link>
 				</div>
 			</div>
@@ -130,10 +140,10 @@ export default function AdminDashboardPage() {
 			{/* KPI Metrics Grid */}
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 				{/* In Review / Pending Action */}
-				<div className="p-5 rounded-2xl bg-white border border-amber-200/90 shadow-2xs space-y-3">
+				<div className="p-5 rounded-3xl bg-white border border-amber-200/90 shadow-2xs space-y-3 hover:border-amber-400 transition-colors">
 					<div className="flex items-center justify-between">
 						<span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-							In Review (Action Needed)
+							In Review (Pending QA)
 						</span>
 						<div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
 							<Clock className="w-4 h-4" />
@@ -146,12 +156,12 @@ export default function AdminDashboardPage() {
 						<span className="text-[11px] font-bold text-gray-400">submissions</span>
 					</div>
 					<p className="text-[11px] text-gray-500 font-medium">
-						Client content awaiting QA & customization
+						Client content awaiting QA & launch
 					</p>
 				</div>
 
 				{/* In Progress */}
-				<div className="p-5 rounded-2xl bg-white border border-blue-200/90 shadow-2xs space-y-3">
+				<div className="p-5 rounded-3xl bg-white border border-blue-200/90 shadow-2xs space-y-3 hover:border-blue-400 transition-colors">
 					<div className="flex items-center justify-between">
 						<span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
 							In Progress
@@ -172,7 +182,7 @@ export default function AdminDashboardPage() {
 				</div>
 
 				{/* Live & Published */}
-				<div className="p-5 rounded-2xl bg-white border border-emerald-200/90 shadow-2xs space-y-3">
+				<div className="p-5 rounded-3xl bg-white border border-emerald-200/90 shadow-2xs space-y-3 hover:border-emerald-400 transition-colors">
 					<div className="flex items-center justify-between">
 						<span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
 							Live Websites
@@ -193,7 +203,7 @@ export default function AdminDashboardPage() {
 				</div>
 
 				{/* Total Revenue */}
-				<div className="p-5 rounded-2xl bg-white border border-purple-200/90 shadow-2xs space-y-3">
+				<div className="p-5 rounded-3xl bg-white border border-purple-200/90 shadow-2xs space-y-3 hover:border-purple-400 transition-colors">
 					<div className="flex items-center justify-between">
 						<span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
 							Revenue Collected
@@ -230,7 +240,7 @@ export default function AdminDashboardPage() {
 						href="/admin/projects"
 						className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-700">
 						<span>View All Submissions ({stats?.totalProjects || 0})</span>
-						<ArrowUpRight className="w-4 h-4" />
+						<ArrowRight className="w-4 h-4" />
 					</Link>
 				</div>
 
@@ -268,10 +278,10 @@ export default function AdminDashboardPage() {
 														<img
 															src={p.logoUrl}
 															alt={p.name}
-															className="w-9 h-9 rounded-xl object-contain border border-gray-200 bg-white p-1 shrink-0"
+															className="w-10 h-10 rounded-xl object-contain border border-gray-200 bg-white p-1 shrink-0 shadow-2xs"
 														/>
 													) : (
-														<div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 font-extrabold flex items-center justify-center shrink-0">
+														<div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 font-extrabold flex items-center justify-center shrink-0">
 															{p.name.charAt(0).toUpperCase()}
 														</div>
 													)}
@@ -329,8 +339,8 @@ export default function AdminDashboardPage() {
 											<td className="py-4 text-right">
 												<Link
 													href={`/admin/projects/${p.id}`}
-													className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold transition-colors shadow-2xs">
-													<span>Review & Launch →</span>
+													className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold transition-all shadow-xs">
+													<span>Review Studio →</span>
 												</Link>
 											</td>
 										</tr>
