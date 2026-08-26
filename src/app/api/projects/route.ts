@@ -98,6 +98,7 @@ export async function POST(request: Request) {
 		const [newProject] = await db
 			.insert(projects)
 			.values({
+				id: crypto.randomUUID(),
 				tenantId: tenant.id,
 				name,
 				type,
