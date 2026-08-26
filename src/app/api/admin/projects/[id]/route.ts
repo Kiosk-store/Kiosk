@@ -138,10 +138,20 @@ export async function PATCH(
 					: null;
 
 				if (owner?.email) {
+					let businessTitle = existingProject.name;
+					if (existingProject.content) {
+						try {
+							const parsed = typeof existingProject.content === "string" ? JSON.parse(existingProject.content) : existingProject.content;
+							if (parsed?.businessName) businessTitle = parsed.businessName;
+						} catch (e) {}
+					}
+
+					const recipientName = owner.name?.trim() || (owner.email ? owner.email.split("@")[0] : "");
+
 					sendWebsiteLiveEmail({
 						toEmail: owner.email,
-						clientName: owner.name || "Valued Client",
-						businessName: existingProject.name,
+						clientName: recipientName,
+						businessName: businessTitle,
 						publishedUrl: publishedUrl,
 						plan: existingProject.type,
 					}).catch((emailErr) => {
