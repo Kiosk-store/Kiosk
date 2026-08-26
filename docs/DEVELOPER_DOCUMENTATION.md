@@ -4,7 +4,7 @@
 
 ## Purpose
 
-This document provides onboarding and technical guidance for engineers working on `kiosk`. It covers environment setup, routing, component guidelines, dependency rules, live preview architecture, and deployment instructions.
+This document provides onboarding, architectural, and operational technical guidance for engineers working on `kiosk`. It covers environment setup, routing, multi-tenancy, the admin fulfillment backoffice, database schemas, dynamic live site rendering, and deployment instructions.
 
 ---
 
@@ -18,147 +18,115 @@ cd kiosk
 npm install
 ```
 
-2. Start the development server:
+2. Configure local environment variables in `.env.local`:
+
+```env
+NEXT_PUBLIC_APP_URL="https://kioosk.online"
+DATABASE_URL="postgresql://<user>:<password>@<host>/<database>?sslmode=require"
+AUTH_SECRET="your_secret_key"
+ADMIN_EMAIL="kioskonline3@gmail.com"
+NOTIFICATION_EMAIL="kioskonline3@gmail.com"
+RESEND_API_KEY="re_..."
+EMAIL_FROM="Kiosk <noreply@kioosk.online>"
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME="your_cloud_name"
+CLOUDINARY_API_KEY="your_api_key"
+CLOUDINARY_API_SECRET="your_api_secret"
+FLUTTERWAVE_PUBLIC_KEY="FLWPUBK-..."
+FLUTTERWAVE_SECRET_KEY="FLWSECK-..."
+```
+
+3. Start the development server:
 
 ```bash
 npm run dev
 ```
 
-3. Open http://localhost:3000 to view the application.
+4. Open http://localhost:3000 to view the application.
 
 ---
 
-## Key Dependencies
+## Key Dependencies & Technologies
 
-- **Next.js 16 (App Router)**: Framework powering client and server routes.
-- **React 19**: UI library.
-- **Auth.js v5 (`next-auth@beta`)**: Multi-provider authentication and session management.
-- **Drizzle ORM & Neon PostgreSQL**: Data layer with PgBouncer connection pooling.
-- **Upstash Redis (`@upstash/redis` & `@upstash/ratelimit`)**: Sliding window rate limiting, L2 caching, and payment idempotency locks.
-- **Framer Motion 11.18.2**: Component animations and React Bits `<Dock />` spring physics.
-- **GSAP & `@gsap/react`**: Timeline motion, `<ScrollStack />`, and `<PillButton />` hover effects.
-- **Lottie-Web (`lottie-web`)**: SSR-safe client-side vector animation player (`<LottiePlayer />`).
-- **Tailwind CSS v4**: Utility styling framework.
-- **Lucide React & Material Symbols**: Icon system.
-
-> [!IMPORTANT]
-> **Dependency Stability Notice**: Keep `framer-motion` pinned at `11.18.2` (or stable v11) to avoid Next.js Turbopack missing module errors found in v12 preview tarballs.
+- **Next.js 16 (App Router)**: Edge middleware routing, dynamic multi-tenant subdomains, and server components.
+- **React 19**: Modern component architecture.
+- **Drizzle ORM & Neon PostgreSQL**: Persistence layer with connection pooling.
+- **Auth.js v5 / NextAuth & Custom Sessions**: Dual-mode session handling and edge-level authentication guards.
+- **Cloudinary Storage**: Multi-tenant media bucket with isolated folder paths (`kiosk/tenants/<tenantId>/...`).
+- **Resend API**: Transactional email dispatch system.
+- **Upstash Redis**: Rate limiting, caching, and payment idempotency.
+- **Tailwind CSS v4 & Framer Motion**: Utility styling and interactive floating `<Dock />`.
+- **Lucide React**: Vector icon system.
 
 ---
 
-## Application Routes & Component Structure
+## Architecture & Application Routes
 
 ```
 src/
 ├── app/
-│   ├── layout.tsx              # Root layout with NavbarWrapper
-│   ├── globals.css             # Design tokens, fonts, and @media responsive root scaling
+│   ├── layout.tsx              # Root marketing layout with NavbarWrapper
+│   ├── globals.css             # Design tokens and font variables
 │   ├── page.tsx                # Marketing landing page
-│   ├── about/page.tsx          # About page
-│   ├── pricing/page.tsx        # Pricing page
-│   ├── services/page.tsx       # Dedicated 7-section Services page with Lottie player & quiz
-│   ├── contact/page.tsx        # Contact page
+│   ├── services/page.tsx       # Services directory
 │   ├── get-started/page.tsx    # Sign In / Sign Up authentication page
-│   ├── not-found.tsx           # Architectural 404 Page Not Found
-│   ├── api/
-│   │   ├── auth/               # Register, Login, Logout, Session endpoints
-│   │   ├── upload/route.ts     # Multi-tenant Cloudinary upload endpoint
-│   │   ├── user/
-│   │   │   ├── profile/route.ts# User profile & phone number persistence
-│   │   │   └── password/route.ts# Password update endpoint
-│   │   ├── payments/           # Flutterwave checkout & idempotency handlers
-│   │   ├── webhooks/           # Webhook verification & deduplication
-│   │   └── projects/
-│   │       ├── route.ts        # Project creation & list endpoints
-│   │       └── content/route.ts# Website Content Studio submission, email alerts & draft sync
-│   └── dashboard/
-│       ├── layout.tsx          # Dashboard light theme container & Sidebar Dock
-│       ├── page.tsx            # Main dashboard overview & dynamic time greeting
-│       ├── projects/
-│       │   ├── page.tsx        # Projects list, search, and status filters
-│       │   └── new/page.tsx    # Multi-step Start New Project wizard
-│       ├── content/
-│       │   └── page.tsx        # Website Content Studio with live interactive preview & separated logo upload
-│       ├── templates/
-│       │   └── page.tsx        # Interactive Templates directory with live modal preview
-│       ├── billing/page.tsx    # Subscription plans & billing history
-│       └── settings/page.tsx   # Profile, phone number, security, and notification settings
-└── components/
-    ├── Navbar.tsx              # Public header navigation
-    ├── NavbarWrapper.tsx       # Route-aware wrapper hiding marketing nav on /dashboard
-    ├── PillButton.tsx          # Flagship GSAP animated pill button component
-    ├── CTA.tsx                 # Full-bleed blue background CTA section with wave transition
-    ├── Footer.tsx              # Dark footer with wave silhouette divider
-    ├── HowItWorks.tsx          # GSAP-driven scroll stack process section
-    ├── LottiePlayer.tsx        # SSR-safe Lottie vector animation player
-    ├── ScrollStack.tsx         # Stacked card scroll trigger wrapper
-    └── dashboard/
-        ├── Dock.tsx            # React Bits dock component for bottom navigation
-        ├── ProjectCard.tsx     # Project card with direct navigation to Content Studio
-        └── Sidebar.tsx         # Sidebar container wrapping Dock
+│   │
+│   ├── admin/                  # MASTER ADMIN OPERATIONS PORTAL (Auth Guarded)
+│   │   ├── layout.tsx          # Admin layout with RBAC guard & floating AdminDock
+│   │   ├── page.tsx            # Bento Grid Operations Dashboard (Live DB KPIs & Stream)
+│   │   ├── projects/
+│   │   │   ├── page.tsx        # Fulfillment Queue with search and status tabs
+│   │   │   └── [id]/page.tsx   # Fulfillment & Launch Studio (Logo/Media/Offerings review + 1-click Publish)
+│   │   ├── users/page.tsx      # User accounts directory & role management
+│   │   └── billing/page.tsx    # Master subscription invoices & revenue ledger
+│   │
+│   ├── dashboard/              # CUSTOMER DASHBOARD
+│   │   ├── layout.tsx          # Dashboard layout with floating Dock
+│   │   ├── page.tsx            # Customer overview & status trackers
+│   │   ├── content/page.tsx    # Streamlined Website Intake Form (Structured data submission)
+│   │   ├── projects/page.tsx   # Customer projects list
+│   │   ├── billing/page.tsx    # Customer subscription status
+│   │   └── settings/page.tsx   # Profile & notifications
+│   │
+│   ├── tenants/[slug]/page.tsx # DYNAMIC MULTI-TENANT SUBDOMAIN RENDERER (e.g. brand.kioosk.online)
+│   ├── domains/[domain]/page.tsx# DYNAMIC CUSTOM DOMAIN RENDERER (e.g. brand.com)
+│   │
+│   └── api/
+│       ├── admin/              # Protected admin REST endpoints (/stats, /projects, /users, /billing)
+│       ├── auth/               # Register, Login, Logout, Session handlers
+│       ├── upload/route.ts     # Multi-tenant Cloudinary upload endpoint
+│       └── projects/content/   # Customer intake submission endpoint with email alerts
+│
+├── components/
+│   ├── admin/
+│   │   └── AdminDock.tsx       # Floating Dock navigation for Admin Portal
+│   ├── tenant/
+│   │   └── TenantLiveSite.tsx  # Universal live website renderer for client sites
+│   ├── dashboard/
+│   │   ├── Dock.tsx            # Floating interactive dock navigation
+│   │   └── ProjectCard.tsx     # Project status card
+│   ├── Navbar.tsx              # Public header
+│   └── PillButton.tsx          # Interactive animated pill button
+│
+└── lib/
+    ├── auth/admin.ts           # RBAC validation & getAuthenticatedAdmin() helper
+    ├── email.ts                # Resend transactional email notification templates
+    └── storage/cloudinary.ts   # Cloudinary client & multi-tenant folder helpers
 ```
 
 ---
 
-## Multi-Tenant Cloudinary Media Storage Pipeline
+## Product Philosophy: "Done-For-You" Website Model
 
-- **Storage Engine**: Serverless Cloudinary integration via Node `crypto` SHA-1 cryptographic signature authentication (`src/lib/storage/cloudinary.ts`).
-- **Strict Tenant Partitioning**:
-  - Automatically isolates user uploads under `kiosk/tenants/<tenantSlug>/<category>/` (`logos`, `brand_assets`, `products`, `avatars`).
-  - Generates collision-proof public IDs (`<name>_<timestamp>_<uuid>`) to prevent cross-tenant overwrites.
-- **Auto Image Optimization**: Automatic WebP/AVIF compression and responsive thumbnail generation via `getOptimizedImageUrl()`.
+Kiosk is built around a **streamlined submission model** rather than a complex drag-and-drop builder:
 
----
-
-## Transactional Email Notification System
-
-Provides automated notifications via Resend API (`src/lib/email.ts`):
-1. **Admin Review Alert (`sendWebsiteReviewNotificationToAdmin`)**: Sent to `ADMIN_EMAIL` / `support@kioosk.online` with business details, plan tier, uploaded photo count, contact info, and deep-link directly to `/dashboard/content?projectId=<id>`.
-2. **Client Review Confirmation (`sendWebsiteReviewConfirmationToClient`)**: Reassures client that project is updated to **"85% • In Review"** and being personalized.
-3. **Welcome Greeting Email (`sendWelcomeEmail`)**: Dispatched on standard registration and OAuth account creation via NextAuth's `createUser` lifecycle hook.
-4. **Deep-Link URL Resolver**: Dynamic `getAppUrl()` resolves base URL seamlessly across local development, Vercel preview branches, and production.
+1. **Client Submits Info**: The business owner fills in structured form fields (Brand Name, Tagline, Story, Logo, Theme Mode, Products/Services, Contact, WhatsApp).
+2. **Operations Fulfillment**: The Kiosk team reviews submissions in the Admin Studio (`/admin/projects/[id]`), tests links, assigns domains, and clicks **Publish**.
+3. **Dynamic Multi-Tenant Rendering**: Visiting `https://<slug>.kioosk.online` dynamically pulls the client's persisted data from PostgreSQL and renders a responsive, high-converting live website with 1-click WhatsApp checkout.
 
 ---
 
-## Session & Authentication Lifecycle
+## Operations & Fulfillment Flow
 
-- **Session Expiration**: User session tokens expire strictly after **6 hours** of inactivity.
-- **Payment Grace Window**: If a user is actively completing a transaction on `/checkout` (`isCheckoutInProgress` state), automatic logout is suspended to prevent mid-payment session termination.
-- **Rate Limiting**: Auth and upload endpoints enforce Upstash Redis sliding window limits.
-
----
-
-## Coding Conventions
-
-- **TypeScript**: Strict mode enabled. Run `node node_modules/typescript/lib/tsc.js --noEmit` to verify type safety.
-- **Feedback Standards**: Settings and profile updates show concise **"Updated"** feedback.
-- **Design System Rules**:
-  - Light mode theme (`bg-[#f8fafc]`, `bg-white`, `border-gray-200/90`) for main portal.
-  - Live Preview dual-theming: Supports Light (`#ffffff`) and Midnight Dark Mode (`#070d1d`, `#0d162a`, `#111c33`).
-  - Zero background gradients (`bg-gradient-to-*` is prohibited on cards and hero urgency banners).
-  - Use `PillButton` component for primary call-to-actions.
-  - Base typography: 18px base desktop, 16px base mobile.
-  - No em-dashes `—` in user-facing marketing copy.
-
----
-
-## Navigation & Routing Best Practices
-
-1. **Client Navigation**: Always use `next/link` or `router.push()` from `next/navigation`.
-2. **Dashboard Isolation**: The marketing navbar (`StaggeredMenu`) is hidden on `/dashboard` routes via `NavbarWrapper.tsx`.
-3. **Project Card Editing**: Clicking a project card routes to `/dashboard/content?projectId=<id>`.
-4. **Log Out Flow**: Log out in the dashboard profile dropdown triggers `logout()` from `AuthContext` and redirects to `/get-started`.
-
----
-
-## Scripts & QA Verification
-
-- `npm run dev` — Start Next.js development server
-- `npm run build` — Build production bundle
-- `npm run start` — Serve production build
-- `node node_modules/typescript/lib/tsc.js --noEmit` — Type-check TypeScript codebase without emitting files
-
-Before submitting changes:
-1. Run `node node_modules/typescript/lib/tsc.js --noEmit` and ensure **0 errors**.
-2. Verify responsive layout across mobile (< 640px), tablet, and desktop viewports.
-
+1. **Submission Alert**: When a customer submits on `/dashboard/content`, an email alert is sent to `kioskonline3@gmail.com` and a confirmation receipt is sent to the client.
+2. **Review in Admin Hub**: The submission appears live on `/admin/projects`.
+3. **One-Click Launch**: In `/admin/projects/[id]`, setting status to `Live` (100%) and clicking **"Publish Website & Email Client Launch Notification"** triggers the client launch email and activates the live site.

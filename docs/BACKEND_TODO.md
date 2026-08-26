@@ -2,160 +2,73 @@
 
 # Scalable Backend Architecture TODO & Technical Roadmap — Kiosk
 
-This TODO roadmap defines the enterprise-scalable backend architecture for **Kiosk**, specifically tailored to our **Next.js 16 (App Router), React 19, TypeScript, and Tailwind CSS v4** tech stack.
+This technical roadmap defines the completed and ongoing enterprise backend architecture for **Kiosk**, tailored to our **Next.js 16 (App Router), React 19, TypeScript, and Tailwind CSS v4** tech stack.
 
 ---
 
 ## Scalable Stack Architecture Overview
 
-| Layer | Enterprise Scalable Technology Stack |
+| Layer | Technology Stack |
 | :--- | :--- |
-| **Framework** | Next.js 16 (App Router Route Handlers & Server Actions) |
-| **Load Balancing** | Layer 4 (AWS NLB / Cloudflare) + Layer 7 Application Load Balancer |
+| **Framework** | Next.js 16 (App Router Route Handlers & Server Components) |
+| **Multi-Tenancy** | Wildcard Subdomain Rewrites (`<tenant>.kioosk.online` -> `/tenants/[slug]`) + Custom Domains (`/domains/[domain]`) |
+| **Admin Operations** | Full Product Backoffice (`/admin/*`) with RBAC Guards, Live Bento Grid, and 1-Click Launch |
 | **Rate Limiting** | `@upstash/ratelimit` + Upstash Redis Sliding Window Algorithm |
-| **Authentication** | Auth.js v5 (NextAuth) + Zod + Upstash Redis Session Cache |
-| **Session Protection**| Automatic Token Refresh & Checkout State Persistence (6-Hour Expiry, Zero Logout During Payment) |
-| **Double-Charge Protection**| Upstash Redis Atomic Locks (`SETNX`) + Webhook Event Deduplication |
-| **Database** | PostgreSQL (Neon Serverless / AWS Aurora) |
-| **ORM & Querying** | Drizzle ORM / Prisma ORM + PgBouncer Connection Pooling |
-| **Payments** | Stripe Billing API + Flutterwave Gateway + Upstash Idempotency Locks |
-| **Background Jobs** | Inngest / BullMQ (Async serverless worker queues) |
-| **Caching Engine** | Upstash Redis (Serverless-optimized HTTP/REST Redis Cluster) |
-| **Email & Transact** | Resend + React Email (`@react-email/components`) |
-| **Domain Provision**| Vercel Domains API / Cloudflare API v4 (`<client>.kiosk.site`) |
-| **Testing & TDD** | Vitest + Supertest + Playwright API Testing |
-| **Observability** | Sentry Error Tracking + Axiom Structured Logging |
+| **Authentication** | Auth.js v5 (NextAuth) + Custom Session Cookies + RBAC (`ADMIN` / `SUPERADMIN`) |
+| **Database** | Neon PostgreSQL Serverless with PgBouncer Pooling |
+| **ORM & Querying** | Drizzle ORM (`drizzle-orm`, `postgres`) |
+| **Media Storage** | Cloudinary Multi-Tenant Isolated Buckets (`kiosk/tenants/<id>/...`) |
+| **Payments** | Flutterwave Multi-Plan Subscriptions & Idempotency Locks |
+| **Email & Transact** | Resend Transactional Email Engine (`src/lib/email.ts`) |
 
 ---
 
 ## Phase 1: Authentication & Authorization Engine
-
-### 1. Stack Dependencies & Database Schema
-- [x] Install core Auth dependencies (`next-auth@beta`, `@auth/drizzle-adapter`, `@auth/prisma-adapter`, `zod`).
-- [x] Install Rate Limiting dependencies (`@upstash/ratelimit`, `@upstash/redis`).
-- [x] Install Drizzle ORM & PostgreSQL client (`drizzle-orm`, `postgres`, `drizzle-kit`).
-- [x] Define core database schema in `src/db/schema.ts`:
-  - [x] `users` (`id`, `name`, `email`, `passwordHash`, `image`, `role`, `createdAt`, `updatedAt`).
-  - [x] `accounts` (`userId`, `type`, `provider`, `providerAccountId`, `refresh_token`, `access_token`).
-  - [x] `sessions` (`sessionToken`, `userId`, `expires`).
-  - [x] `verificationTokens` (`identifier`, `token`, `expires`).
-- [x] Push migration schema to Neon PostgreSQL (`npm run db:push`).
-
-### 2. Rate Limiting Middleware (`src/lib/ratelimit.ts`)
-- [x] Initialize Upstash Redis Sliding Window Rate Limiter (`src/lib/ratelimit.ts`).
-- [x] Configure Auth Rate Limiter (5 requests / 1 min on `/api/auth/*` routes).
-- [x] Configure API Rate Limiter (100 requests / 1 min on general API routes).
-- [x] Add `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset` HTTP headers and return `429 Too Many Requests` on breach.
-
-### 3. Security & Password Hashing
-- [x] Install `bcryptjs` for secure password hashing.
-- [x] Create security module (`src/lib/auth/password.ts`) with Zod schema validation.
-- [x] Configure HTTP-Only session cookie security (`SameSite=Lax`, `Secure` in production, dual-token flush on logout).
-- [x] Set session token lifetime to 6 hours (`maxAge: 6 * 60 * 60`).
-- [x] Conduct code security & vulnerability audit.
-
-### 4. Auth & User Profile API Route Handlers (`src/app/api/auth/*` & `src/app/api/user/*`)
-- [x] **`POST /api/auth/register`**:
-  - Apply Rate Limiter middleware (`authRatelimit`).
-  - Validate email & password with Zod schema.
-  - Check database for duplicate email.
-  - Hash password and insert user record into PostgreSQL.
-  - Issue session DTO & set secure auth cookie.
-- [x] **`POST /api/auth/login`**:
-  - Apply Rate Limiter middleware (`authRatelimit`).
-  - Lookup user record & verify bcrypt password hash.
-  - Issue session token & HTTP-Only refresh cookie.
-- [x] **`POST /api/auth/logout`**:
-  - Destroy active database session in Neon PostgreSQL.
-  - Invalidate and clear all `kiosk_session` and NextAuth session cookies.
-- [x] **`GET /api/auth/me`**:
-  - Return current authenticated session profile DTO (supporting custom session and Auth.js Google OAuth).
-- [x] **`PATCH /api/user/profile`**:
-  - Update user profile details (`name`) in Neon PostgreSQL with Zod validation and live `useAuth()` sync.
-
-### 5. Checkout Session Protection (Zero Logout During Payment)
-- [x] **Session Extension on Payment**: Suspend automatic logout if client has active `isCheckoutInProgress` state on `/checkout`.
-- [x] **Pre-Payment Auth Lock**: Validate active user session *before* submitting payment payload.
-- [x] **Form State Persistence**: Store transient checkout and content form state in `sessionStorage` / `localStorage` drafts.
-
-### 6. OAuth 2.0 Google & GitHub Providers
-- [x] Configure Google & GitHub OAuth client keys template in `.env` & `.env.example`.
-- [x] Mount Auth.js v5 route handler (`src/auth.ts` & `src/app/api/auth/[...nextauth]/route.ts`).
-- [x] Attach Google OAuth trigger to the "Continue with Google" button on `src/app/get-started/page.tsx`.
-
-### 7. Next.js Edge Protection & Rate Limiting Middleware (`src/middleware.ts`)
-- [x] Implement Next.js edge middleware to guard `/dashboard/*` and `/checkout` routes.
-- [x] Attach rate limit checks to incoming API requests at the edge.
-- [x] Redirect unauthenticated visitors to `/get-started?tab=login`.
-
-### 8. Frontend Auth State Integration (`src/app/get-started/page.tsx`)
-- [x] Build `AuthContext.tsx` provider with `useAuth()` custom hook (`user`, `login`, `signup`, `logout`, `isLoading`).
-- [x] Wire `handleSignupSubmit`, `handleLoginSubmit`, and `handleGoogleAuth` on `/get-started` to real API endpoints.
-- [x] Handle `429 Too Many Requests` error responses gracefully on the UI with error alerts.
-- [x] Connect dashboard profile header greetings and "Log Out" button to `logout()` context handler.
+- [x] Core schema in `src/db/schema.ts` (`users`, `accounts`, `sessions`, `verificationTokens`).
+- [x] Edge middleware protection in `src/middleware.ts` guarding `/dashboard/*`, `/checkout`, and `/admin/*`.
+- [x] Dual-session authentication (Custom secure HTTP-only cookies + Auth.js Google OAuth).
+- [x] Rate limiting middleware with Upstash Redis.
+- [x] User role management (`USER` ↔ `ADMIN` ↔ `SUPERADMIN`).
 
 ---
 
-## Phase 2: Load Balancing & Infrastructure Architecture
-- [ ] Configure **Layer 4 Load Balancer** (Cloudflare Anycast / AWS NLB) for TCP packet routing & DDoS protection.
-- [ ] Configure **Layer 7 Load Balancer** (AWS ALB / NGINX / Vercel Edge Router) with Weighted Round-Robin algorithm.
-- [x] Configure health check endpoint (`GET /api/healthz`) returning HTTP `200 OK` with DB & Redis latency metrics.
-- [x] Configure **Neon PostgreSQL** serverless driver & PgBouncer connection pool (`prepare: false`) in `src/db/index.ts`.
-- [x] Write schema models for `tenants`, `projects`, `subscriptions`, and `idempotency_keys` in `src/db/schema.ts`.
+## Phase 2: Multi-Tenant Architecture & Media Storage
+- [x] `tenants` and `projects` tables in `src/db/schema.ts`.
+- [x] Edge Subdomain Rewriter in `src/middleware.ts` (`<tenant>.kioosk.online` -> `/tenants/[slug]`).
+- [x] Custom Domain Rewriter (`<customdomain.com>` -> `/domains/[domain]`).
+- [x] Multi-tenant Cloudinary API endpoint (`/api/upload`) with namespace folder isolation.
+- [x] Dynamic Live Website Renderer (`<TenantLiveSite />`) for Landing Pages, Sales Funnels, and E-Commerce Stores.
+- [x] 1-Click WhatsApp Commerce with pre-filled order messages.
 
 ---
 
-## Phase 3: Subscriptions & Payment Double-Charge Protection
-- [x] Integrate **Flutterwave REST API v3 Gateway** (`src/lib/flutterwave.ts`).
-- [x] **Strict Payment Idempotency Engine (`Idempotency-Key`)**:
-  - [x] Implement Upstash Redis atomic lock (`SETNX @kiosk/idempotency:<key> LOCKED EX 300`) in `POST /api/payments/initialize` to block concurrent double charges.
-  - [x] Support multi-currency checkout (`USD`, `NGN`, `GHS`, `KES`) mapped to active plans ($20/mo, $30/mo, $43/mo).
-- [x] **Webhook Security & Deduplication (`POST /api/webhooks/flutterwave`)**:
-  - [x] Secret hash verification via `verif-hash` header.
-  - [x] Event deduplication in Upstash Redis (`@kiosk/webhook:flw:<id>`).
-  - [x] Transaction verification with Flutterwave API and Neon PostgreSQL tenant plan upgrade.
+## Phase 3: Operations & Fulfillment Backoffice (`/admin`)
+- [x] RBAC security module (`src/lib/auth/admin.ts`) guarding all `/admin/*` pages and `/api/admin/*` routes.
+- [x] Master Admin Bento Grid Dashboard (`/admin/page.tsx`) with real-time database KPIs.
+- [x] Fulfillment Queue (`/admin/projects/page.tsx`) with search and status filters.
+- [x] Project Fulfillment & Launch Studio (`/admin/projects/[id]/page.tsx`):
+  - Brand assets inspector (Logo full-res, media gallery, structured copy, offerings).
+  - Published domain assignment (`https://brand.kioosk.online`).
+  - Internal fulfillment notes.
+  - 1-Click **"Publish Website & Email Client Launch Notification"** action.
+- [x] Users Directory (`/admin/users/page.tsx`) with role assignment.
+- [x] Billing & Invoices Ledger (`/admin/billing/page.tsx`).
+- [x] Interactive floating `AdminDock` navigation.
 
 ---
 
-## Phase 4: Website Content Studio, Cloudinary Media & Provisioning Engine
-- [x] Build `POST /api/projects/content` endpoint with Zod schema validation for multi-step content payloads (`src/app/api/projects/content/route.ts`).
-- [x] Build Website Content Studio (`src/app/dashboard/content/page.tsx`) with draft saving and live preview.
-- [x] **Multi-Tenant Cloudinary Storage Engine (`POST /api/upload` & `src/lib/storage/cloudinary.ts`)**:
-  - [x] Serverless SHA-1 cryptographic signature authentication.
-  - [x] Strict tenant folder partitioning: `kiosk/tenants/<tenantSlug>/<category>/` (`logos`, `brand_assets`, `products`, `avatars`).
-  - [x] Collision-proof UUID and timestamp public IDs.
-  - [x] Automatic WebP/AVIF compression & thumbnail transforms (`getOptimizedImageUrl`).
-- [x] **Dedicated Logo vs Brand Assets Modules**: Separate Primary Brand Logo dropzone (with transparency checkerboard preview) from multi-asset Brand Photos/PDFs dropzone.
-- [x] Build interactive multi-currency catalog, Add to Cart stepper, cart drawer, and WhatsApp direct checkout order generator.
-- [x] Build Sales Funnel urgency timer, 16:9 VSL video embed, value stack builder, and order bump upgrades.
-- [x] Build Landing Page authority metrics, services grid, client endorsements, and lead intake modal.
-- [x] Build Themes & Fonts system (Light vs Midnight Dark Mode, dynamic Google Fonts injection).
-- [x] Build Templates Directory (`src/app/dashboard/templates/page.tsx`) with direct dock navigation and live template preview overlays.
-- [x] Connect Project Cards on dashboard to navigate directly to `/dashboard/content?projectId=<id>` for editing.
-- [x] Automate wildcard subdomain (`<client>.kiosk.site`) & custom domain edge routing engine in `src/middleware.ts`.
-- [x] Setup **Inngest** serverless background workers for PDF invoice generation and asset optimization (`src/inngest/client.ts` & `/api/inngest`).
+## Phase 4: Transactional Email Notification System (`src/lib/email.ts`)
+- [x] Admin Intake Alert: Instant notification to `kioskonline3@gmail.com` with review link.
+- [x] Client Intake Receipt: Confirmation email acknowledging submission.
+- [x] Website Live Celebration Email: Dispatched to client with live URL when admin publishes.
+- [x] Hosting Renewal Invoices & Grace Period Notices.
+- [x] Password Reset & Account Welcome emails.
+- [x] Clean, accessible 580px email shell with zero clutter and high readability.
 
 ---
 
-## Phase 5: Observable Event Bus & Email Notifications
-- [x] Build `ProjectSubject` publish-subscribe event pipeline (Observer pattern) in `src/lib/events/ProjectSubject.ts`.
-- [x] Integrate **Resend API** transactional email system with responsive HTML templates in `src/lib/email.ts`:
-  - [x] `sendWebsiteReviewNotificationToAdmin`: Informs Kiosk fulfillment team on client review submissions with deep links.
-  - [x] `sendWebsiteReviewConfirmationToClient`: Reassures client that their submission is in review (85% progress).
-  - [x] `sendWelcomeEmail`: Greets new users on registration & OAuth sign-up.
-  - [x] Dynamic `getAppUrl()` base URL resolver across local dev, preview branches, and production.
-- [ ] Wire **Upstash QStash** event bus for asynchronous decoupled event handling.
-
----
-
-## Phase 6: Multi-Layer Caching Architecture
-- [x] Setup L1 process LRU memory cache & L2 Upstash Redis Cache-Aside layer (`src/lib/cache/CacheService.ts`).
-- [x] Attach event-driven cache eviction hooks on database mutations in `/api/projects`.
-
----
-
-## Phase 7: Test-Driven Development (TDD) & CI/CD Pipeline
-- [x] Write Unit Tests for Security, SiteTemplateFactory, CacheService, and ProjectSubject (`src/__tests__/auth.spec.ts`).
-- [ ] Write E2E API tests with **Playwright** (`*.e2e-spec.ts`).
-- [ ] Setup **GitHub Actions** CI/CD pipeline for automated linting, type-checking (`tsc --noEmit`), Vitest suite execution, and Vercel deployment.
-
+## Phase 5: Payment Gateway & Subscriptions
+- [x] Flutterwave Multi-Plan Subscription Integration (3 tiers x 2 cycles).
+- [x] Webhook verification and signature hashing.
+- [x] Automated invoice generation and payment idempotency.
+- [x] Grace period handling and renewal tracking.
