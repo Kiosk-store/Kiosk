@@ -2,34 +2,21 @@
 
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { tenants, invoices } from "@/db/schema";
+import { invoices } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
-import { getAuthenticatedUser } from "@/lib/auth/session";
-import { auth } from "@/auth";
+import { getAuthenticatedTenantContext } from "@/lib/auth/session";
+
+export const dynamic = "force-dynamic";
 
 /**
  * GET /api/billing/invoices - Fetches tenant billing status, pending invoices, and invoice history
  */
 export async function GET() {
 	try {
-		const authSession = await auth();
-		const customUser = await getAuthenticatedUser();
-		const userId = authSession?.user?.id || customUser?.id;
+		const { user, tenant } = await getAuthenticatedTenantContext();
 
-		if (!userId) {
+		if (!user || !tenant) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-		}
-
-		const tenant = await db.query.tenants.findFirst({
-			where: eq(tenants.ownerId, userId),
-		});
-
-		if (!tenant) {
-			return NextResponse.json({
-				tenant: null,
-				pendingInvoice: null,
-				invoices: [],
-			});
 		}
 
 		// Fetch all invoices for tenant ordered by creation date

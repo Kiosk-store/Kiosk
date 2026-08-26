@@ -5,15 +5,22 @@ import { db } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
 	try {
 		// 1. Check custom database session
 		const customUser = await getAuthenticatedUser();
 		if (customUser) {
+			// Refresh user from DB to ensure freshest role & plan
+			const freshUser = await db.query.users.findFirst({
+				where: eq(users.id, customUser.id),
+			});
+
 			return NextResponse.json(
 				{
 					authenticated: true,
-					user: customUser,
+					user: freshUser || customUser,
 				},
 				{ status: 200 },
 			);
@@ -21,16 +28,23 @@ export async function GET() {
 
 		// 2. Fallback to Auth.js session (Google OAuth)
 		const authSession = await auth();
-		if (authSession?.user?.id) {
-			const dbUser = await db.query.users.findFirst({
-				where: eq(users.id, authSession.user.id),
-			});
+		if (authSession?.user) {
+			const userEmail = authSession.user.email?.toLowerCase().trim();
+			const dbUser = userEmail
+				? await db.query.users.findFirst({
+						where: eq(users.email, userEmail),
+				  })
+				: authSession.user.id
+				? await db.query.users.findFirst({
+						where: eq(users.id, authSession.user.id),
+				  })
+				: null;
 
 			return NextResponse.json(
 				{
 					authenticated: true,
 					user: {
-						id: authSession.user.id,
+						id: dbUser?.id || authSession.user.id,
 						name: dbUser?.name || authSession.user.name || null,
 						email: dbUser?.email || authSession.user.email || "",
 						image: dbUser?.image || authSession.user.image || null,

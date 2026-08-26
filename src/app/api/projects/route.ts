@@ -3,9 +3,9 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/db";
-import { tenants, projects } from "@/db/schema";
+import { tenants, projects, users } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
-import { getAuthenticatedUser } from "@/lib/auth/session";
+import { getAuthenticatedUser, getAuthenticatedTenantContext } from "@/lib/auth/session";
 import { auth } from "@/auth";
 import { checkRateLimit } from "@/lib/ratelimit";
 import { SiteTemplateFactory } from "@/lib/factory/SiteTemplateFactory";
@@ -21,10 +21,25 @@ const createProjectSchema = z.object({
 /**
  * Resolves or automatically provisions a default tenant for a user
  */
-async function getOrCreateTenantForUser(userId: string, userName: string | null) {
+async function getOrCreateTenantForUser(userId: string, userName: string | null, userEmail?: string | null) {
 	let tenant = await db.query.tenants.findFirst({
 		where: eq(tenants.ownerId, userId),
 	});
+
+	if (!tenant && userEmail) {
+		const dbUser = await db.query.users.findFirst({
+			where: eq(users.email, userEmail.toLowerCase().trim()),
+		});
+		if (dbUser && dbUser.id !== userId) {
+			tenant = await db.query.tenants.findFirst({
+				where: eq(tenants.ownerId, dbUser.id),
+			});
+			if (tenant) {
+				// Re-link tenant to active session user id
+				await db.update(tenants).set({ ownerId: userId }).where(eq(tenants.id, tenant.id));
+			}
+		}
+	}
 
 	if (!tenant) {
 		const slug = `${(userName || "workspace").toLowerCase().replace(/[^a-z0-9]/g, "")}-${crypto.randomUUID().slice(0, 6)}`;
@@ -57,25 +72,10 @@ export async function GET(request: Request) {
 			);
 		}
 
-		// Authenticate User
-		const authSession = await auth();
-		const customUser = await getAuthenticatedUser();
-		const userId = authSession?.user?.id || customUser?.id;
-		const userName = authSession?.user?.name || customUser?.name || null;
+		const { user, tenant } = await getAuthenticatedTenantContext();
 
-		if (!userId) {
+		if (!user || !tenant) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-		}
-
-		const tenant = await getOrCreateTenantForUser(userId, userName);
-		const cacheKey = `tenant:projects:${tenant.id}`;
-
-		// Check Multi-Layer Cache
-		const cachedData = await CacheService.get<{ tenant: any; projects: any[] }>(cacheKey);
-		if (cachedData) {
-			return NextResponse.json(cachedData, {
-				headers: { "X-Cache-Status": "HIT" },
-			});
 		}
 
 		const tenantProjects = await db.query.projects.findMany({
@@ -88,12 +88,7 @@ export async function GET(request: Request) {
 			projects: tenantProjects,
 		};
 
-		// Store in Cache (5 min TTL)
-		await CacheService.set(cacheKey, responsePayload, 300);
-
-		return NextResponse.json(responsePayload, {
-			headers: { "X-Cache-Status": "MISS" },
-		});
+		return NextResponse.json(responsePayload);
 	} catch (err) {
 		console.error("[GET_PROJECTS_ERROR]", err);
 		return NextResponse.json(

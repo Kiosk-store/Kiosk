@@ -219,3 +219,66 @@ export async function getAuthenticatedUser(): Promise<SessionUser | null> {
 		projectUpdates: userRecord.projectUpdates,
 	};
 }
+
+/**
+ * Unified helper resolving the active database user and their tenant workspace,
+ * supporting both custom session cookies and NextAuth / Google OAuth sessions.
+ */
+export async function getAuthenticatedTenantContext() {
+	// 1. Try custom session cookie
+	const customUser = await getAuthenticatedUser();
+	let dbUser: any = null;
+
+	if (customUser) {
+		dbUser = await db.query.users.findFirst({
+			where: eq(users.id, customUser.id),
+		});
+	}
+
+	// 2. Fallback to NextAuth Google OAuth
+	if (!dbUser) {
+		const { auth } = await import("@/auth");
+		const authSession = await auth();
+		if (authSession?.user) {
+			const email = authSession.user.email?.toLowerCase().trim();
+			if (email) {
+				dbUser = await db.query.users.findFirst({
+					where: eq(users.email, email),
+				});
+			}
+			if (!dbUser && authSession.user.id) {
+				dbUser = await db.query.users.findFirst({
+					where: eq(users.id, authSession.user.id),
+				});
+			}
+		}
+	}
+
+	if (!dbUser) {
+		return { user: null, tenant: null };
+	}
+
+	// 3. Find or auto-provision tenant for this user
+	const { tenants } = await import("@/db/schema");
+	let tenant = await db.query.tenants.findFirst({
+		where: eq(tenants.ownerId, dbUser.id),
+	});
+
+	if (!tenant) {
+		const cleanSlug = `${(dbUser.name || "workspace").toLowerCase().replace(/[^a-z0-9]/g, "")}-${crypto.randomUUID().slice(0, 6)}`;
+		const [newTenant] = await db
+			.insert(tenants)
+			.values({
+				ownerId: dbUser.id,
+				name: `${dbUser.name || "User"}'s Workspace`,
+				slug: cleanSlug,
+				plan: "NONE",
+				billingStatus: "ACTIVE",
+			})
+			.returning();
+		tenant = newTenant;
+	}
+
+	return { user: dbUser, tenant };
+}
+

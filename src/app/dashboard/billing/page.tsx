@@ -135,32 +135,34 @@ export function BillingPageContent() {
 	}, []);
 
 	const getCurrentPlanTitle = () => {
-		switch (tenantPlan) {
-			case "LANDING_PAGE":
-				return "Landing Page Plan";
-			case "SALES_FUNNEL":
-				return "Sales Funnel Plan";
-			case "E_COMMERCE":
-				return "E-commerce Store Plan";
-			default:
-				return "No Active Subscription";
+		const p = (tenantPlan || "").toUpperCase();
+		if (p.includes("ECOMMERCE") || p.includes("E_COMMERCE") || p.includes("STORE")) {
+			return "E-commerce Store Plan";
 		}
+		if (p.includes("FUNNEL")) {
+			return "Sales Funnel Plan";
+		}
+		if (p.includes("LANDING")) {
+			return "Landing Page Plan";
+		}
+		return "No Active Subscription";
 	};
 
 	const getCurrentPlanDesc = () => {
-		switch (tenantPlan) {
-			case "LANDING_PAGE":
-				return `You are currently on the Landing Page subscription (${formatPlanPrice("landing", "monthly")}/mo). Add a Sales Funnel or E-commerce Store to your account anytime.`;
-			case "SALES_FUNNEL":
-				return `You are currently on the Sales Funnel subscription (${formatPlanPrice("funnel", "monthly")}/mo). Expand your brand with additional pages anytime.`;
-			case "E_COMMERCE":
-				return `You are currently on the E-commerce Store subscription (${formatPlanPrice("store", "monthly")}/mo). Enjoy full online store and product catalog features.`;
-			default:
-				return "You do not have an active paid subscription. Select a plan below to activate your workspace and order your site.";
+		const p = (tenantPlan || "").toUpperCase();
+		if (p.includes("ECOMMERCE") || p.includes("E_COMMERCE") || p.includes("STORE")) {
+			return `You are currently on the E-commerce Store subscription (${formatPlanPrice("store", "monthly")}/mo). Enjoy full online store, product catalog, and WhatsApp commerce features.`;
 		}
+		if (p.includes("FUNNEL")) {
+			return `You are currently on the Sales Funnel subscription (${formatPlanPrice("funnel", "monthly")}/mo). Expand your brand with high-converting pages anytime.`;
+		}
+		if (p.includes("LANDING")) {
+			return `You are currently on the Landing Page subscription (${formatPlanPrice("landing", "monthly")}/mo). Add a Sales Funnel or E-commerce Store to your account anytime.`;
+		}
+		return "You do not have an active paid subscription. Select a plan below to activate your workspace and order your site.";
 	};
 
-	const isPaid = tenantPlan !== "NONE";
+	const isPaid = tenantPlan && tenantPlan !== "NONE";
 
 	// Calculate remaining grace period days
 	const getGraceDaysRemaining = (graceEndStr: string) => {

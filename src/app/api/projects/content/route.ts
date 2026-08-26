@@ -5,8 +5,7 @@ import { z } from "zod";
 import { db } from "@/db";
 import { tenants, projects } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
-import { getAuthenticatedUser } from "@/lib/auth/session";
-import { auth } from "@/auth";
+import { getAuthenticatedTenantContext } from "@/lib/auth/session";
 import { CacheService } from "@/lib/cache/CacheService";
 import { ProjectSubject } from "@/lib/events/ProjectSubject";
 import { Logger } from "@/lib/logger";
@@ -147,20 +146,10 @@ const contentPayloadSchema = z.object({
  */
 export async function GET(request: Request) {
 	try {
-		const authSession = await auth();
-		const customUser = await getAuthenticatedUser();
-		const userId = authSession?.user?.id || customUser?.id;
+		const { user, tenant } = await getAuthenticatedTenantContext();
 
-		if (!userId) {
+		if (!user || !tenant) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-		}
-
-		const tenant = await db.query.tenants.findFirst({
-			where: eq(tenants.ownerId, userId),
-		});
-
-		if (!tenant) {
-			return NextResponse.json({ content: null });
 		}
 
 		const { searchParams } = new URL(request.url);
@@ -184,20 +173,10 @@ export async function GET(request: Request) {
  */
 export async function POST(request: Request) {
 	try {
-		const authSession = await auth();
-		const customUser = await getAuthenticatedUser();
-		const userId = authSession?.user?.id || customUser?.id;
+		const { user, tenant } = await getAuthenticatedTenantContext();
 
-		if (!userId) {
-			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-		}
-
-		const tenant = await db.query.tenants.findFirst({
-			where: eq(tenants.ownerId, userId),
-		});
-
-		if (!tenant) {
-			return NextResponse.json({ error: "Tenant workspace not found" }, { status: 404 });
+		if (!user || !tenant) {
+			return NextResponse.json({ error: "Tenant workspace not found or unauthorized" }, { status: 401 });
 		}
 
 		const body = await request.json();
@@ -266,8 +245,8 @@ export async function POST(request: Request) {
 		});
 
 		// Dispatch Email Alerts: 1. Inform Kiosk Admin/Team, 2. Confirm to Client
-		const clientEmail = customUser?.email || authSession?.user?.email || contentData.contactEmail;
-		const clientName = customUser?.name || authSession?.user?.name || "Valued Client";
+		const clientEmail = user?.email || contentData.contactEmail;
+		const clientName = user?.name || "Valued Client";
 
 		if (clientEmail) {
 			sendWebsiteReviewConfirmationToClient(
