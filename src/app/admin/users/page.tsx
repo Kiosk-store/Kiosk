@@ -137,7 +137,7 @@ export default function AdminUsersPage() {
 				{isLoading ? (
 					<div className="p-16 flex flex-col items-center justify-center gap-3">
 						<Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
-						<p className="text-xs font-bold text-gray-500">Loading user accounts...</p>
+						<p className="text-xs font-bold text-gray-500">Loading...</p>
 					</div>
 				) : filteredUsers.length === 0 ? (
 					<div className="p-16 text-center space-y-2">

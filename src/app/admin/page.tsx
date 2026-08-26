@@ -15,8 +15,6 @@ import {
 	Search,
 	Globe,
 	TrendingUp,
-	Database,
-	Server,
 	RefreshCw,
 } from "lucide-react";
 
@@ -110,7 +108,7 @@ export default function AdminBentoDashboardPage() {
 		return (
 			<div className="min-h-[70vh] flex flex-col items-center justify-center gap-3">
 				<Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
-				<p className="text-xs font-bold text-gray-500">Connecting to database...</p>
+				<p className="text-xs font-bold text-gray-500">Loading...</p>
 			</div>
 		);
 	}
@@ -139,13 +137,6 @@ export default function AdminBentoDashboardPage() {
 				</div>
 
 				<div className="flex flex-wrap items-center gap-3">
-					{/* Database Indicator */}
-					<div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold">
-						<span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-						<Database className="w-3.5 h-3.5" />
-						<span>PostgreSQL Connected</span>
-					</div>
-
 					<button
 						type="button"
 						onClick={fetchDashboardData}
@@ -170,10 +161,10 @@ export default function AdminBentoDashboardPage() {
 			<div className="grid grid-cols-1 md:grid-cols-12 gap-5">
 				
 				{/* 1. Submissions In Review */}
-				<div className="md:col-span-4 p-6 rounded-3xl bg-white border border-gray-200 shadow-2xs flex flex-col justify-between space-y-4">
+				<div className="md:col-span-3 p-6 rounded-3xl bg-white border border-gray-200 shadow-2xs flex flex-col justify-between space-y-4">
 					<div className="flex items-center justify-between">
 						<span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-							In Review Queue
+							In Review
 						</span>
 						<div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
 							<Clock className="w-4 h-4" />
@@ -185,26 +176,26 @@ export default function AdminBentoDashboardPage() {
 							<h3 className="text-3xl font-extrabold font-nohemi text-amber-700">
 								{stats?.inReviewCount || 0}
 							</h3>
-							<span className="text-xs font-bold text-gray-400">pending action</span>
+							<span className="text-xs font-bold text-gray-400">pending</span>
 						</div>
 						<p className="text-xs text-gray-500 font-medium mt-1">
-							Client submissions awaiting review and launch
+							Submissions awaiting review
 						</p>
 					</div>
 
 					<Link
 						href="/admin/projects"
 						className="inline-flex items-center justify-between p-3 rounded-2xl bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold transition-colors">
-						<span>View Queue ({stats?.inReviewCount || 0})</span>
+						<span>Open Queue</span>
 						<ArrowRight className="w-4 h-4" />
 					</Link>
 				</div>
 
 				{/* 2. Total Revenue */}
-				<div className="md:col-span-4 p-6 rounded-3xl bg-white border border-gray-200 shadow-2xs flex flex-col justify-between space-y-4">
+				<div className="md:col-span-3 p-6 rounded-3xl bg-white border border-gray-200 shadow-2xs flex flex-col justify-between space-y-4">
 					<div className="flex items-center justify-between">
 						<span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-							Revenue Collected
+							Total Revenue
 						</span>
 						<div className="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center">
 							<TrendingUp className="w-4 h-4" />
@@ -226,13 +217,13 @@ export default function AdminBentoDashboardPage() {
 					<Link
 						href="/admin/billing"
 						className="inline-flex items-center justify-between p-3 rounded-2xl bg-purple-50 hover:bg-purple-100 text-purple-900 text-xs font-bold transition-colors">
-						<span>Open Billing Ledger</span>
+						<span>Billing Ledger</span>
 						<ArrowRight className="w-4 h-4" />
 					</Link>
 				</div>
 
 				{/* 3. Live Websites */}
-				<div className="md:col-span-4 p-6 rounded-3xl bg-white border border-gray-200 shadow-2xs flex flex-col justify-between space-y-4">
+				<div className="md:col-span-3 p-6 rounded-3xl bg-white border border-gray-200 shadow-2xs flex flex-col justify-between space-y-4">
 					<div className="flex items-center justify-between">
 						<span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
 							Live Websites
@@ -250,83 +241,47 @@ export default function AdminBentoDashboardPage() {
 							<span className="text-xs font-bold text-gray-400">sites active</span>
 						</div>
 						<p className="text-xs text-gray-500 font-medium mt-1">
-							Published and serving traffic on .kioosk.online
+							Published on .kioosk.online
 						</p>
 					</div>
 
 					<Link
 						href="/admin/projects"
 						className="inline-flex items-center justify-between p-3 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 text-xs font-bold transition-colors">
-						<span>Inspect Live Sites</span>
+						<span>Inspect Sites</span>
 						<ArrowRight className="w-4 h-4" />
 					</Link>
 				</div>
 
 				{/* 4. Registered Users & Workspaces */}
-				<div className="md:col-span-6 p-6 rounded-3xl bg-white border border-gray-200 shadow-2xs flex flex-col justify-between space-y-4">
+				<div className="md:col-span-3 p-6 rounded-3xl bg-white border border-gray-200 shadow-2xs flex flex-col justify-between space-y-4">
 					<div className="flex items-center justify-between">
 						<span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-							Registered Customers & Workspaces
+							Customers & Workspaces
 						</span>
 						<div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center">
 							<Users className="w-4 h-4" />
 						</div>
 					</div>
 
-					<div className="grid grid-cols-2 gap-4">
-						<div>
-							<h4 className="text-2xl font-extrabold font-nohemi text-gray-900">
-								{stats?.totalUsers || 0}
-							</h4>
-							<p className="text-xs text-gray-500 font-medium">Customer Accounts</p>
-						</div>
-						<div>
-							<h4 className="text-2xl font-extrabold font-nohemi text-gray-900">
+					<div>
+						<div className="flex items-baseline gap-2">
+							<h3 className="text-3xl font-extrabold font-nohemi text-blue-700">
 								{stats?.totalTenants || 0}
-							</h4>
-							<p className="text-xs text-gray-500 font-medium">Tenant Workspaces</p>
+							</h3>
+							<span className="text-xs font-bold text-gray-400">tenants ({stats?.totalUsers || 0} users)</span>
 						</div>
+						<p className="text-xs text-gray-500 font-medium mt-1">
+							Active tenant workspaces
+						</p>
 					</div>
 
 					<Link
 						href="/admin/users"
 						className="inline-flex items-center justify-between p-3 rounded-2xl bg-blue-50 hover:bg-blue-100 text-blue-900 text-xs font-bold transition-colors">
-						<span>Manage Users & Roles</span>
+						<span>Manage Users</span>
 						<ArrowRight className="w-4 h-4" />
 					</Link>
-				</div>
-
-				{/* 5. Infrastructure Status */}
-				<div className="md:col-span-6 p-6 rounded-3xl bg-white border border-gray-200 shadow-2xs space-y-4">
-					<div className="flex items-center justify-between">
-						<span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-							System Infrastructure
-						</span>
-						<div className="w-8 h-8 rounded-xl bg-gray-100 text-gray-700 flex items-center justify-center">
-							<Server className="w-4 h-4" />
-						</div>
-					</div>
-
-					<div className="space-y-2.5 text-xs">
-						<div className="flex items-center justify-between p-2.5 bg-gray-50 rounded-xl">
-							<span className="text-gray-700 font-medium">PostgreSQL Database (Neon)</span>
-							<span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800">
-								Connected
-							</span>
-						</div>
-						<div className="flex items-center justify-between p-2.5 bg-gray-50 rounded-xl">
-							<span className="text-gray-700 font-medium">Media Storage (Cloudinary)</span>
-							<span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800">
-								Active
-							</span>
-						</div>
-						<div className="flex items-center justify-between p-2.5 bg-gray-50 rounded-xl">
-							<span className="text-gray-700 font-medium">Transactional Email (Resend)</span>
-							<span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800">
-								Active
-							</span>
-						</div>
-					</div>
 				</div>
 
 				{/* 6. Real-time Submissions Stream Table (12 COLS) */}
