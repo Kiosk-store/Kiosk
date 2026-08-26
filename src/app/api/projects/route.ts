@@ -3,63 +3,23 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/db";
-import { tenants, projects, users } from "@/db/schema";
+import { projects } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
-import { getAuthenticatedUser, getAuthenticatedTenantContext } from "@/lib/auth/session";
-import { auth } from "@/auth";
+import { getAuthenticatedTenantContext } from "@/lib/auth/session";
 import { checkRateLimit } from "@/lib/ratelimit";
 import { SiteTemplateFactory } from "@/lib/factory/SiteTemplateFactory";
 import type { SiteTier } from "@/lib/factory/SiteTemplateFactory";
-import { CacheService } from "@/lib/cache/CacheService";
 import { ProjectSubject } from "@/lib/events/ProjectSubject";
+
+export const dynamic = "force-dynamic";
 
 const createProjectSchema = z.object({
 	name: z.string().min(2, "Project name must be at least 2 characters."),
-	type: z.enum(["Landing Page", "Sales Funnel", "E-commerce"]),
+	type: z.enum(["Landing Page", "Sales Funnel", "E-commerce", "E-commerce Store"]),
 });
 
 /**
- * Resolves or automatically provisions a default tenant for a user
- */
-async function getOrCreateTenantForUser(userId: string, userName: string | null, userEmail?: string | null) {
-	let tenant = await db.query.tenants.findFirst({
-		where: eq(tenants.ownerId, userId),
-	});
-
-	if (!tenant && userEmail) {
-		const dbUser = await db.query.users.findFirst({
-			where: eq(users.email, userEmail.toLowerCase().trim()),
-		});
-		if (dbUser && dbUser.id !== userId) {
-			tenant = await db.query.tenants.findFirst({
-				where: eq(tenants.ownerId, dbUser.id),
-			});
-			if (tenant) {
-				// Re-link tenant to active session user id
-				await db.update(tenants).set({ ownerId: userId }).where(eq(tenants.id, tenant.id));
-			}
-		}
-	}
-
-	if (!tenant) {
-		const slug = `${(userName || "workspace").toLowerCase().replace(/[^a-z0-9]/g, "")}-${crypto.randomUUID().slice(0, 6)}`;
-		const [newTenant] = await db
-			.insert(tenants)
-			.values({
-				ownerId: userId,
-				name: `${userName || "User"}'s Workspace`,
-				slug,
-				plan: "NONE",
-			})
-			.returning();
-		tenant = newTenant;
-	}
-
-	return tenant;
-}
-
-/**
- * GET /api/projects - Returns list of projects for current user's tenant with Cache-Aside support
+ * GET /api/projects - Returns list of projects for current user's tenant
  */
 export async function GET(request: Request) {
 	try {
@@ -83,12 +43,10 @@ export async function GET(request: Request) {
 			orderBy: (p, { desc }) => [desc(p.createdAt)],
 		});
 
-		const responsePayload = {
+		return NextResponse.json({
 			tenant,
 			projects: tenantProjects,
-		};
-
-		return NextResponse.json(responsePayload);
+		});
 	} catch (err) {
 		console.error("[GET_PROJECTS_ERROR]", err);
 		return NextResponse.json(
@@ -99,7 +57,7 @@ export async function GET(request: Request) {
 }
 
 /**
- * POST /api/projects - Creates a new project and dispatches event to ProjectSubject bus
+ * POST /api/projects - Creates a new project under the authenticated tenant
  */
 export async function POST(request: Request) {
 	try {
@@ -112,14 +70,10 @@ export async function POST(request: Request) {
 			);
 		}
 
-		// Authenticate User
-		const authSession = await auth();
-		const customUser = await getAuthenticatedUser();
-		const userId = authSession?.user?.id || customUser?.id;
-		const userName = authSession?.user?.name || customUser?.name || null;
+		const { user, tenant } = await getAuthenticatedTenantContext();
 
-		if (!userId) {
-			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+		if (!user || !tenant) {
+			return NextResponse.json({ error: "Unauthorized. Please log in." }, { status: 401 });
 		}
 
 		const body = await request.json();
@@ -132,12 +86,12 @@ export async function POST(request: Request) {
 		}
 
 		const { name, type } = validation.data;
-		const tenant = await getOrCreateTenantForUser(userId, userName);
 
-		// Use Factory pattern to create template configuration
-		const templateConfig = SiteTemplateFactory.createTemplate(type as SiteTier);
+		// Map type to template config
+		const normalizedType = type === "E-commerce Store" ? "E-commerce" : type;
+		const templateConfig = SiteTemplateFactory.createTemplate(normalizedType as SiteTier);
 
-		// Generate clean project subdomain slug directly from Project Name (e.g. "Bella Bakery" -> "bella-bakery.kioosk.online")
+		// Generate clean project subdomain slug
 		const projectSlug = name.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
 		const projectSubdomain = projectSlug || "project";
 
@@ -153,15 +107,19 @@ export async function POST(request: Request) {
 			})
 			.returning();
 
-		// Dispatch domain event via Observer pattern
-		const eventBus = ProjectSubject.getInstance();
-		await eventBus.notify({
-			id: crypto.randomUUID(),
-			type: "PROJECT_CREATED",
-			timestamp: new Date().toISOString(),
-			tenantId: tenant.id,
-			payload: newProject,
-		});
+		// Dispatch domain event
+		try {
+			const eventBus = ProjectSubject.getInstance();
+			await eventBus.notify({
+				id: crypto.randomUUID(),
+				type: "PROJECT_CREATED",
+				timestamp: new Date().toISOString(),
+				tenantId: tenant.id,
+				payload: newProject,
+			});
+		} catch (e) {
+			// Non-blocking event notification
+		}
 
 		return NextResponse.json(
 			{
@@ -184,11 +142,9 @@ export async function POST(request: Request) {
  */
 export async function DELETE(request: Request) {
 	try {
-		const authSession = await auth();
-		const customUser = await getAuthenticatedUser();
-		const userId = authSession?.user?.id || customUser?.id;
+		const { user, tenant } = await getAuthenticatedTenantContext();
 
-		if (!userId) {
+		if (!user || !tenant) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
 
@@ -197,14 +153,6 @@ export async function DELETE(request: Request) {
 
 		if (!projectId) {
 			return NextResponse.json({ error: "projectId is required" }, { status: 400 });
-		}
-
-		const tenant = await db.query.tenants.findFirst({
-			where: eq(tenants.ownerId, userId),
-		});
-
-		if (!tenant) {
-			return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
 		}
 
 		// Delete project matching both ID and tenant ownership
@@ -217,14 +165,9 @@ export async function DELETE(request: Request) {
 			return NextResponse.json({ error: "Project not found or unauthorized" }, { status: 404 });
 		}
 
-		// Invalidate cache
-		await CacheService.invalidate(`tenant:projects:${tenant.id}`);
-		await CacheService.invalidate(`tenant:content:${tenant.id}:${projectId}`);
-
 		return NextResponse.json({ success: true, message: "Project deleted successfully" });
 	} catch (err) {
 		console.error("[DELETE_PROJECT_ERROR]", err);
 		return NextResponse.json({ error: "Failed to delete project" }, { status: 500 });
 	}
 }
-
