@@ -619,13 +619,13 @@ export default function DashboardPage() {
 								</div>
 								<div>
 									<p className="text-xl sm:text-2xl font-bold font-nohemi text-gray-900">
-										{tenantInfo?.plan === "LANDING_PAGE"
-											? "Landing Page"
-											: tenantInfo?.plan === "SALES_FUNNEL"
-											? "Sales Funnel"
-											: tenantInfo?.plan === "E_COMMERCE"
-											? "E-Commerce"
-											: "NONE"}
+										{(() => {
+											const p = (tenantInfo?.plan || "").toUpperCase();
+											if (p.includes("COMMERCE") || p.includes("STORE")) return "E-Commerce";
+											if (p.includes("FUNNEL")) return "Sales Funnel";
+											if (p.includes("LANDING")) return "Landing Page";
+											return "Free Plan";
+										})()}
 									</p>
 									<p className="text-xs text-gray-500 font-medium">Active Plan</p>
 								</div>
