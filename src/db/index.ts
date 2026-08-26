@@ -11,5 +11,12 @@ if (!connectionString) {
 }
 
 // prepare: false is required for Neon PgBouncer transaction pooling
-const client = postgres(connectionString, { max: 10, prepare: false });
+// ssl: "require" is required for Neon AWS cloud connections
+const client = postgres(connectionString, {
+	max: process.env.NODE_ENV === "production" ? 5 : 10,
+	prepare: false,
+	ssl: "require",
+	connect_timeout: 10,
+});
+
 export const db = drizzle(client, { schema });
