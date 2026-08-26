@@ -552,3 +552,75 @@ export async function sendPasswordResetEmail({
 	return sendEmail({ to: toEmail, subject, html });
 }
 
+export interface WebsiteLiveEmailPayload {
+	toEmail: string;
+	clientName: string;
+	businessName: string;
+	publishedUrl: string;
+	plan: string;
+}
+
+/**
+ * Dispatches celebratory Website Live Notification to client with their live published URL.
+ */
+export async function sendWebsiteLiveEmail(payload: WebsiteLiveEmailPayload) {
+	const appUrl = getAppUrl();
+	const subject = `🎉 Your Website is Officially LIVE: ${payload.businessName}!`;
+
+	const html = `
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<meta charset="utf-8">
+				<title>Your Website is Live!</title>
+			</head>
+			<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; color: #0f172a; margin: 0; padding: 40px 20px;">
+				<div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; padding: 40px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+					<div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 20px; margin-bottom: 24px;">
+						<div style="display: flex; align-items: center;">
+							<div style="width: 36px; height: 36px; background-color: #004ac6; border-radius: 10px; color: #ffffff; font-weight: 800; text-align: center; line-height: 36px; font-size: 18px; margin-right: 12px;">K</div>
+							<span style="font-size: 20px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px;">KIOSK</span>
+						</div>
+						<span style="background-color: #dcfce7; color: #15803d; font-size: 11px; font-weight: 800; padding: 5px 12px; border-radius: 9999px; text-transform: uppercase;">🚀 Published Live</span>
+					</div>
+
+					<h1 style="font-size: 24px; font-weight: 800; color: #0f172a; margin: 0 0 12px 0;">Congratulations, ${payload.clientName || "there"}!</h1>
+					<p style="font-size: 15px; color: #475569; line-height: 1.6; margin: 0 0 24px 0;">
+						Our fulfillment and QA engineering team has completed your <strong>${payload.businessName}</strong> website. Your custom ${payload.plan.replace(/_/g, " ")} is officially published and live on the internet!
+					</p>
+
+					<!-- Live URL Card -->
+					<div style="background: linear-gradient(135deg, #004ac6 0%, #1e40af 100%); border-radius: 14px; padding: 24px; color: #ffffff; margin-bottom: 28px; text-align: center;">
+						<p style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #93c5fd; margin: 0 0 8px 0;">Your Live Website URL</p>
+						<h2 style="font-size: 18px; font-weight: 800; color: #ffffff; word-break: break-all; margin: 0 0 16px 0;">
+							${payload.publishedUrl}
+						</h2>
+						<a href="${payload.publishedUrl}" target="_blank" style="display: inline-block; background-color: #ffffff; color: #004ac6; font-weight: 800; font-size: 14px; padding: 12px 28px; border-radius: 9999px; text-decoration: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">Visit Your Live Site →</a>
+					</div>
+
+					<div style="background-color: #f8fafc; border-radius: 12px; padding: 16px 20px; border: 1px solid #e2e8f0; margin-bottom: 24px;">
+						<h3 style="font-size: 13px; font-weight: 700; color: #0f172a; margin: 0 0 6px 0;">What happens next?</h3>
+						<ul style="font-size: 13px; color: #64748b; margin: 0; padding-left: 18px; line-height: 1.6;">
+							<li>Your high-converting sales funnels and lead forms are active.</li>
+							<li>You can manage your contact details anytime inside your dashboard.</li>
+							<li>Need any small copy tweaks or updates? Our priority support team is available 24/7.</li>
+						</ul>
+					</div>
+
+					<div style="text-align: center; margin-bottom: 24px;">
+						<a href="${appUrl}/dashboard" style="display: inline-block; background-color: #f1f5f9; color: #0f172a; font-weight: 700; font-size: 13px; padding: 10px 24px; border-radius: 9999px; text-decoration: none; border: 1px solid #cbd5e1;">Go to Your Dashboard</a>
+					</div>
+
+					<hr style="border: none; border-top: 1px solid #f1f5f9; margin-bottom: 20px;" />
+					<p style="font-size: 12px; color: #94a3b8; line-height: 1.5; margin: 0; text-align: center;">
+						Thank you for choosing Kiosk. We're excited to help your business scale!
+					</p>
+				</div>
+			</body>
+		</html>
+	`;
+
+	return sendEmail({ to: payload.toEmail, subject, html });
+}
+
+

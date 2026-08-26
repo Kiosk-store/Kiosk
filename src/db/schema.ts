@@ -119,9 +119,11 @@ export const projects = pgTable("projects", {
 		.references(() => tenants.id, { onDelete: "cascade" }),
 	name: text("name").notNull(),
 	type: text("type").notNull(), // "Landing Page" | "Sales Funnel" | "E-commerce"
-	status: text("status").default("In Progress").notNull(), // "Draft" | "In Progress" | "Published"
+	status: text("status").default("In Progress").notNull(), // "Draft" | "In Progress" | "In Review" | "Live" | "Published"
 	progress: integer("progress").default(0).notNull(),
 	publishedUrl: text("publishedUrl"),
+	content: text("content"), // Serialized snapshot of submitted structured content
+	adminNotes: text("adminNotes"), // Internal fulfillment team notes & instructions
 	createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
 	updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
 });

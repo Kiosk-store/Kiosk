@@ -25,7 +25,9 @@ const navItems: NavItem[] = [
 export default function Sidebar() {
 	const pathname = usePathname();
 	const router = useRouter();
-	const { logout } = useAuth();
+	const { user, logout } = useAuth();
+
+	const isAdminUser = user?.role === "ADMIN" || user?.role === "SUPERADMIN";
 
 	const dockItems: DockItemData[] = [
 		...navItems.map((item) => {
@@ -54,6 +56,22 @@ export default function Sidebar() {
 					: "",
 			};
 		}),
+		...(isAdminUser
+			? [
+					{
+						icon: (
+							<span
+								className="material-symbols-outlined text-[22px] text-amber-600"
+								style={{ fontVariationSettings: "'FILL' 1, 'wght' 600" }}>
+								admin_panel_settings
+							</span>
+						),
+						label: "Admin Hub",
+						onClick: () => router.push("/admin"),
+						className: "!bg-amber-50/70 !border-amber-200",
+					},
+			  ]
+			: []),
 		{
 			icon: (
 				<span className="material-symbols-outlined text-[22px] text-rose-500">

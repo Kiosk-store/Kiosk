@@ -221,12 +221,14 @@ export async function POST(request: Request) {
 		await CacheService.set(cacheKey, contentData, 2592000);
 
 		// Update specific Project Progress to 85% & Status to "In Review"
+		// Update specific Project Progress to 85%, Status to "In Review", and store content in database
 		if (projectId) {
 			await db
 				.update(projects)
 				.set({
 					progress: 85,
 					status: "In Review",
+					content: JSON.stringify(contentData),
 					updatedAt: new Date(),
 				})
 				.where(and(eq(projects.id, projectId), eq(projects.tenantId, tenant.id)));
@@ -240,6 +242,7 @@ export async function POST(request: Request) {
 					.set({
 						progress: 85,
 						status: "In Review",
+						content: JSON.stringify(contentData),
 						updatedAt: new Date(),
 					})
 					.where(eq(projects.id, userProjects[0].id));
