@@ -1,12 +1,14 @@
 /**
  * Resend Transactional Email Notification System
  *
- * Provides transactional email dispatching for user lifecycle events:
+ * Professional, clean, and accessible transactional email templates for Kiosk:
  * 1. Welcome Greeting Email (`sendWelcomeEmail`)
- * 2. Project Status Update Notice (`sendProjectStatusEmail`)
- * 3. Password Reset Request Email (`sendPasswordResetEmail`)
- *
- * Features automatic local development fallback logging when `RESEND_API_KEY` is not set.
+ * 2. Admin Submission Alert (`sendWebsiteReviewNotificationToAdmin`)
+ * 3. Client Submission Confirmation (`sendWebsiteReviewConfirmationToClient`)
+ * 4. Website Live Published Email (`sendWebsiteLiveEmail`)
+ * 5. Project Status Update Notice (`sendProjectStatusEmail`)
+ * 6. Payment & Renewal Requests (`sendPaymentRequestEmail`, `sendGracePeriodReminderEmail`, `sendSiteFlaggedNoticeEmail`)
+ * 7. Password Reset Request Email (`sendPasswordResetEmail`)
  *
  * @module email
  * @format
@@ -33,9 +35,6 @@ export interface SendEmailPayload {
 
 /**
  * Dispatches an email via Resend API or logs fallback payload in local development mode.
- *
- * @param payload - Recipient, subject line, and HTML template string
- * @returns Object indicating success status and message ID or error
  */
 export async function sendEmail({ to, subject, html }: SendEmailPayload): Promise<{ success: boolean; id?: string; error?: string }> {
 	if (!RESEND_API_KEY) {
@@ -73,42 +72,114 @@ export async function sendEmail({ to, subject, html }: SendEmailPayload): Promis
 }
 
 /**
- * Dispatches Welcome Email to newly registered users.
- *
- * @param toEmail - User email address
- * @param userName - User full name or display handle
+ * Helper generating consistent email base shell
  */
-export async function sendWelcomeEmail(toEmail: string, userName: string) {
-	const appUrl = getAppUrl();
-	const subject = "Welcome to Kiosk! Your Multi-Tenant Workspace is Live";
-	const html = `
+function renderEmailShell({
+	title,
+	headerTag,
+	contentHtml,
+	footerNote,
+}: {
+	title: string;
+	headerTag?: string;
+	contentHtml: string;
+	footerNote?: string;
+}) {
+	return `
 		<!DOCTYPE html>
-		<html>
+		<html lang="en">
 			<head>
 				<meta charset="utf-8">
-				<title>Welcome to Kiosk</title>
+				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				<title>${title}</title>
 			</head>
-			<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; color: #0f172a; margin: 0; padding: 40px 20px;">
-				<div style="max-w: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; padding: 40px; border: 1px solid #e2e8f0;">
-					<div style="display: flex; align-items: center; margin-bottom: 24px;">
-						<div style="width: 32px; height: 32px; background-color: #2563eb; border-radius: 8px; color: #ffffff; font-weight: bold; text-align: center; line-height: 32px; font-size: 16px; margin-right: 12px;">K</div>
-						<span style="font-size: 20px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px;">KIOSK</span>
-					</div>
-					<h1 style="font-size: 24px; font-weight: 700; color: #0f172a; margin-bottom: 16px;">Welcome aboard, ${userName}!</h1>
-					<p style="font-size: 15px; color: #475569; line-height: 1.6; margin-bottom: 24px;">
-						Your custom multi-tenant workspace is fully provisioned and ready. You can now build, manage, and scale your custom website landing pages, sales funnels, and e-commerce stores.
-					</p>
-					<div style="margin-bottom: 32px;">
-						<a href="${appUrl}/dashboard" style="display: inline-block; background-color: #2563eb; color: #ffffff; font-weight: 700; font-size: 14px; padding: 12px 28px; border-radius: 9999px; text-decoration: none;">Go to Your Dashboard →</a>
-					</div>
-					<hr style="border: none; border-top: 1px solid #f1f5f9; margin-bottom: 24px;" />
-					<p style="font-size: 12px; color: #94a3b8; line-height: 1.5;">
-						If you have any questions, our dedicated support team is available 24/7 inside your workspace.
-					</p>
-				</div>
+			<body style="margin: 0; padding: 32px 16px; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #0f172a; line-height: 1.5; -webkit-font-smoothing: antialiased;">
+				<table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+					<tr>
+						<td align="center">
+							<table role="presentation" width="100%" style="max-width: 580px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; border-spacing: 0; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);" cellpadding="0" cellspacing="0">
+								<!-- Top Header -->
+								<tr>
+									<td style="padding: 24px 32px; border-bottom: 1px solid #f1f5f9;">
+										<table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+											<tr>
+												<td align="left">
+													<table role="presentation" border="0" cellspacing="0" cellpadding="0">
+														<tr>
+															<td style="width: 32px; height: 32px; background-color: #004ac6; border-radius: 8px; text-align: center; vertical-align: middle; color: #ffffff; font-weight: 800; font-size: 16px;">
+																K
+															</td>
+															<td style="padding-left: 10px; font-size: 18px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px;">
+																KIOSK
+															</td>
+														</tr>
+													</table>
+												</td>
+												${
+													headerTag
+														? `<td align="right">
+																<span style="display: inline-block; padding: 4px 10px; font-size: 11px; font-weight: 700; color: #004ac6; background-color: #eff6ff; border: 1px solid #dbeafe; border-radius: 9999px; text-transform: uppercase;">
+																	${headerTag}
+																</span>
+														   </td>`
+														: ""
+												}
+											</tr>
+										</table>
+									</td>
+								</tr>
+
+								<!-- Main Body Content -->
+								<tr>
+									<td style="padding: 32px;">
+										${contentHtml}
+									</td>
+								</tr>
+
+								<!-- Clean Footer -->
+								<tr>
+									<td style="padding: 20px 32px; background-color: #f8fafc; border-top: 1px solid #f1f5f9; text-align: center;">
+										<p style="margin: 0; font-size: 12px; color: #94a3b8; line-height: 1.5;">
+											${footerNote || "This is an automated notification from your Kiosk workspace."}<br/>
+											© ${new Date().getFullYear()} Kiosk Technologies. All rights reserved.
+										</p>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
 			</body>
 		</html>
 	`;
+}
+
+/**
+ * 1. Welcome Greeting Email
+ */
+export async function sendWelcomeEmail(toEmail: string, userName: string) {
+	const appUrl = getAppUrl();
+	const subject = "Welcome to Kiosk - Your Workspace is Ready";
+	const contentHtml = `
+		<h1 style="margin: 0 0 12px 0; font-size: 20px; font-weight: 800; color: #0f172a;">Welcome aboard, ${userName}!</h1>
+		<p style="margin: 0 0 20px 0; font-size: 14px; color: #475569; line-height: 1.6;">
+			Your Kiosk workspace is fully configured. You can now submit your business details, view live website builds, and manage your online presence in one place.
+		</p>
+		<div style="margin: 28px 0; text-align: left;">
+			<a href="${appUrl}/dashboard" style="display: inline-block; background-color: #004ac6; color: #ffffff; font-weight: 700; font-size: 13px; padding: 12px 28px; border-radius: 9999px; text-decoration: none;">
+				Open Your Dashboard
+			</a>
+		</div>
+		<p style="margin: 0; font-size: 13px; color: #64748b; line-height: 1.6;">
+			If you ever have questions or need assistance with your site, our team is available to help anytime.
+		</p>
+	`;
+
+	const html = renderEmailShell({
+		title: "Welcome to Kiosk",
+		headerTag: "Account Ready",
+		contentHtml,
+	});
 
 	return sendEmail({ to: toEmail, subject, html });
 }
@@ -132,92 +203,77 @@ export interface WebsiteReviewEmailPayload {
 }
 
 /**
- * Dispatches Website Review Notification to Kiosk Administrator / Fulfillment Team.
+ * 2. Admin Submission Alert
  */
 export async function sendWebsiteReviewNotificationToAdmin(payload: WebsiteReviewEmailPayload) {
-	const adminEmail = process.env.ADMIN_EMAIL || process.env.NOTIFICATION_EMAIL || "support@kioosk.online";
+	const adminEmail = process.env.ADMIN_EMAIL || process.env.NOTIFICATION_EMAIL || "kioskonline3@gmail.com";
 	const appUrl = getAppUrl();
-	const reviewUrl = payload.projectId ? `${appUrl}/dashboard/content?projectId=${payload.projectId}` : `${appUrl}/dashboard/projects`;
-	const subject = `🚀 New Website Review Request: ${payload.businessName} (${payload.plan.replace(/_/g, " ")})`;
+	const reviewUrl = payload.projectId ? `${appUrl}/admin/projects/${payload.projectId}` : `${appUrl}/admin/projects`;
+	const subject = `New Submission: ${payload.businessName} (${payload.plan.replace(/_/g, " ")})`;
 
-	const html = `
-		<!DOCTYPE html>
-		<html>
-			<head>
-				<meta charset="utf-8">
-				<title>New Website Review Request</title>
-			</head>
-			<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; color: #0f172a; margin: 0; padding: 30px 15px;">
-				<div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; padding: 32px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-					<div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 16px; margin-bottom: 24px;">
-						<div style="display: flex; align-items: center;">
-							<div style="width: 32px; height: 32px; background-color: #004ac6; border-radius: 8px; color: #ffffff; font-weight: 800; text-align: center; line-height: 32px; font-size: 16px; margin-right: 10px;">K</div>
-							<span style="font-size: 18px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px;">KIOSK FULFILLMENT</span>
-						</div>
-						<span style="background-color: #dbeafe; color: #1e40af; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase;">Review Action Required</span>
-					</div>
+	const contentHtml = `
+		<h1 style="margin: 0 0 8px 0; font-size: 20px; font-weight: 800; color: #0f172a;">New Client Content Submitted</h1>
+		<p style="margin: 0 0 20px 0; font-size: 14px; color: #64748b;">
+			A client has submitted their website intake details for fulfillment review and domain publishing.
+		</p>
 
-					<h1 style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">New Website Content Submitted</h1>
-					<p style="font-size: 14px; color: #64748b; margin: 0 0 24px 0;">
-						A client has submitted their website setup and content for review and personalization.
-					</p>
+		<!-- Business Summary Card -->
+		<div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+			<div style="margin-bottom: 12px;">
+				<span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Business Name</span>
+				<p style="font-size: 16px; font-weight: 800; color: #0f172a; margin: 2px 0 0 0;">${payload.businessName}</p>
+			</div>
 
-					<!-- Business Profile Card -->
-					<div style="background-color: #f8fafc; border-radius: 12px; padding: 20px; border: 1px solid #e2e8f0; margin-bottom: 24px;">
-						<div style="margin-bottom: 12px;">
-							<span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Business Name</span>
-							<h2 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 2px 0 0 0;">${payload.businessName}</h2>
-						</div>
+			<div style="margin-bottom: 12px;">
+				<span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Tagline</span>
+				<p style="font-size: 13px; font-weight: 600; color: #334155; margin: 2px 0 0 0;">${payload.tagline || "N/A"}</p>
+			</div>
 
-						<div style="margin-bottom: 12px;">
-							<span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Headline / Tagline</span>
-							<p style="font-size: 14px; font-weight: 600; color: #334155; margin: 2px 0 0 0;">${payload.tagline || "N/A"}</p>
-						</div>
+			<div style="border-top: 1px solid #e2e8f0; padding-top: 12px; margin-top: 12px;">
+				<table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+					<tr>
+						<td style="font-size: 12px; color: #64748b;">Plan:</td>
+						<td align="right" style="font-size: 12px; font-weight: 700; color: #004ac6;">${payload.plan.replace(/_/g, " ")}</td>
+					</tr>
+					<tr>
+						<td style="font-size: 12px; color: #64748b; padding-top: 6px;">Theme Mode:</td>
+						<td align="right" style="font-size: 12px; font-weight: 600; color: #334155; padding-top: 6px;">${payload.themeMode || "Light"}</td>
+					</tr>
+					<tr>
+						<td style="font-size: 12px; color: #64748b; padding-top: 6px;">Brand Assets:</td>
+						<td align="right" style="font-size: 12px; font-weight: 600; color: #334155; padding-top: 6px;">${payload.imagesCount || 0} Photos Attached</td>
+					</tr>
+				</table>
+			</div>
+		</div>
 
-						<div style="display: flex; flex-wrap: wrap; gap: 16px; border-top: 1px dashed #cbd5e1; padding-top: 12px; margin-top: 12px;">
-							<div style="flex: 1; min-width: 120px;">
-								<span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Tier Plan</span>
-								<p style="font-size: 13px; font-weight: 700; color: #004ac6; margin: 2px 0 0 0;">${payload.plan.replace(/_/g, " ")}</p>
-							</div>
-							<div style="flex: 1; min-width: 120px;">
-								<span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Theme & Font</span>
-								<p style="font-size: 13px; font-weight: 600; color: #334155; margin: 2px 0 0 0;">${payload.themeMode || "Light"} / ${payload.selectedFont || "Default"}</p>
-							</div>
-							<div style="flex: 1; min-width: 120px;">
-								<span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Brand Photos</span>
-								<p style="font-size: 13px; font-weight: 600; color: #334155; margin: 2px 0 0 0;">${payload.imagesCount || 0} Files Attached</p>
-							</div>
-						</div>
-					</div>
+		<!-- Client Contact Info -->
+		<div style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+			<span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; display: block; margin-bottom: 8px;">Customer Information</span>
+			<p style="font-size: 13px; color: #334155; margin: 0 0 4px 0;"><strong>Name:</strong> ${payload.clientName}</p>
+			<p style="font-size: 13px; color: #334155; margin: 0 0 4px 0;"><strong>Email:</strong> <a href="mailto:${payload.clientEmail}" style="color: #004ac6; text-decoration: none;">${payload.clientEmail}</a></p>
+			${payload.contactPhone ? `<p style="font-size: 13px; color: #334155; margin: 0 0 4px 0;"><strong>Phone:</strong> ${payload.contactPhone}</p>` : ""}
+			${payload.whatsappLink ? `<p style="font-size: 13px; color: #334155; margin: 0;"><strong>WhatsApp:</strong> ${payload.whatsappLink}</p>` : ""}
+		</div>
 
-					<!-- Client Contact Box -->
-					<div style="background-color: #ffffff; border-radius: 12px; padding: 16px; border: 1px solid #e2e8f0; margin-bottom: 24px;">
-						<span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; display: block; margin-bottom: 8px;">Client Information</span>
-						<p style="font-size: 13px; color: #334155; margin: 0 0 4px 0;"><strong>Client Name:</strong> ${payload.clientName}</p>
-						<p style="font-size: 13px; color: #334155; margin: 0 0 4px 0;"><strong>Account Email:</strong> <a href="mailto:${payload.clientEmail}" style="color: #004ac6;">${payload.clientEmail}</a></p>
-						${payload.contactPhone ? `<p style="font-size: 13px; color: #334155; margin: 0 0 4px 0;"><strong>Phone:</strong> ${payload.contactPhone}</p>` : ""}
-						${payload.whatsappLink ? `<p style="font-size: 13px; color: #334155; margin: 0 0 4px 0;"><strong>WhatsApp:</strong> ${payload.whatsappLink}</p>` : ""}
-						${payload.projectId ? `<p style="font-size: 13px; color: #334155; margin: 0;"><strong>Project ID:</strong> <code>${payload.projectId}</code></p>` : ""}
-					</div>
-
-					<div style="text-align: center; margin-bottom: 24px;">
-						<a href="${reviewUrl}" style="display: inline-block; background-color: #004ac6; color: #ffffff; font-weight: 700; font-size: 14px; padding: 12px 32px; border-radius: 9999px; text-decoration: none;">Review & Edit Project in Studio →</a>
-					</div>
-
-					<hr style="border: none; border-top: 1px solid #f1f5f9; margin-bottom: 16px;" />
-					<p style="font-size: 11px; color: #94a3b8; line-height: 1.5; margin: 0; text-align: center;">
-						Automated fulfillment alert from Kiosk Platform.
-					</p>
-				</div>
-			</body>
-		</html>
+		<div style="text-align: center; margin-bottom: 8px;">
+			<a href="${reviewUrl}" style="display: inline-block; background-color: #004ac6; color: #ffffff; font-weight: 700; font-size: 13px; padding: 12px 32px; border-radius: 9999px; text-decoration: none;">
+				Open Review Studio in Admin Hub
+			</a>
+		</div>
 	`;
+
+	const html = renderEmailShell({
+		title: "New Website Review Request",
+		headerTag: "Action Required",
+		contentHtml,
+	});
 
 	return sendEmail({ to: adminEmail, subject, html });
 }
 
 /**
- * Dispatches Website Review Confirmation Email to the client.
+ * 3. Client Submission Confirmation Email
  */
 export async function sendWebsiteReviewConfirmationToClient(
 	toEmail: string,
@@ -226,66 +282,108 @@ export async function sendWebsiteReviewConfirmationToClient(
 	plan: string,
 ) {
 	const appUrl = getAppUrl();
-	const subject = `We've Received Your Details: ${businessName} is Now in Review!`;
-	const html = `
-		<!DOCTYPE html>
-		<html>
-			<head>
-				<meta charset="utf-8">
-				<title>Website In Review</title>
-			</head>
-			<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; color: #0f172a; margin: 0; padding: 30px 15px;">
-				<div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; padding: 32px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-					<div style="display: flex; align-items: center; margin-bottom: 24px;">
-						<div style="width: 32px; height: 32px; background-color: #004ac6; border-radius: 8px; color: #ffffff; font-weight: 800; text-align: center; line-height: 32px; font-size: 16px; margin-right: 10px;">K</div>
-						<span style="font-size: 18px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px;">KIOSK</span>
-					</div>
+	const subject = `Details Received: ${businessName} is Now in Review`;
 
-					<div style="background-color: #ecfdf5; border-radius: 12px; padding: 16px; border: 1px solid #a7f3d0; margin-bottom: 24px;">
-						<span style="display: inline-block; background-color: #059669; color: #ffffff; font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 9999px; margin-bottom: 8px;">PROGRESS: 85% • IN REVIEW</span>
-						<h1 style="font-size: 20px; font-weight: 800; color: #065f46; margin: 0 0 6px 0;">We're Personalizing Your Website!</h1>
-						<p style="font-size: 13px; color: #047857; margin: 0;">
-							Thank you ${clientName || "there"}, we have received your custom content, brand assets, and specifications for <strong>${businessName}</strong>.
-						</p>
-					</div>
+	const contentHtml = `
+		<div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+			<span style="display: inline-block; background-color: #16a34a; color: #ffffff; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 9999px; margin-bottom: 6px; text-transform: uppercase;">In Review</span>
+			<h1 style="font-size: 18px; font-weight: 800; color: #15803d; margin: 0 0 4px 0;">We have received your business details!</h1>
+			<p style="font-size: 13px; color: #166534; margin: 0;">
+				Thank you ${clientName || "there"}, our team has received your content and brand assets for <strong>${businessName}</strong>.
+			</p>
+		</div>
 
-					<p style="font-size: 14px; color: #334155; line-height: 1.6; margin-bottom: 20px;">
-						Our specialized design and development team is now personalizing your <strong>${plan.replace(/_/g, " ")}</strong> site layout, configuring your domain settings, and optimizing your responsive views.
-					</p>
+		<p style="font-size: 14px; color: #334155; line-height: 1.6; margin-bottom: 16px;">
+			Our fulfillment team is now personalizing your <strong>${plan.replace(/_/g, " ")}</strong> website layout, setting up your domain, and optimizing your responsive views.
+		</p>
 
-					<div style="background-color: #f8fafc; border-radius: 12px; padding: 16px; border: 1px solid #e2e8f0; margin-bottom: 24px;">
-						<p style="font-size: 13px; font-weight: 700; color: #0f172a; margin: 0 0 6px 0;">What happens next?</p>
-						<ul style="font-size: 13px; color: #64748b; margin: 0; padding-left: 20px; line-height: 1.6;">
-							<li>Our team reviews all uploaded photos and brand copy.</li>
-							<li>We configure your subdomains and live checkout/contact gateways.</li>
-							<li>You will receive an email notification as soon as your final site is published live!</li>
-						</ul>
-					</div>
+		<div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+			<p style="font-size: 13px; font-weight: 700; color: #0f172a; margin: 0 0 8px 0;">What happens next?</p>
+			<ul style="font-size: 13px; color: #64748b; margin: 0; padding-left: 18px; line-height: 1.6;">
+				<li>Our team reviews your submitted brand photos and copy.</li>
+				<li>We configure your subdomains and WhatsApp ordering triggers.</li>
+				<li>You will receive an email as soon as your website is live!</li>
+			</ul>
+		</div>
 
-					<div style="text-align: center; margin-bottom: 24px;">
-						<a href="${appUrl}/dashboard/projects" style="display: inline-block; background-color: #004ac6; color: #ffffff; font-weight: 700; font-size: 14px; padding: 12px 28px; border-radius: 9999px; text-decoration: none;">Track Progress in Dashboard →</a>
-					</div>
-
-					<hr style="border: none; border-top: 1px solid #f1f5f9; margin-bottom: 16px;" />
-					<p style="font-size: 12px; color: #94a3b8; line-height: 1.5; margin: 0;">
-						Questions or need to update any details? Simply reply directly to this email or contact our support team.
-					</p>
-				</div>
-			</body>
-		</html>
+		<div style="text-align: left; margin-bottom: 16px;">
+			<a href="${appUrl}/dashboard/projects" style="display: inline-block; background-color: #004ac6; color: #ffffff; font-weight: 700; font-size: 13px; padding: 12px 28px; border-radius: 9999px; text-decoration: none;">
+				Track Status in Dashboard
+			</a>
+		</div>
 	`;
+
+	const html = renderEmailShell({
+		title: "Website Details Received",
+		headerTag: "In Progress",
+		contentHtml,
+	});
 
 	return sendEmail({ to: toEmail, subject, html });
 }
 
+export interface WebsiteLiveEmailPayload {
+	toEmail: string;
+	clientName: string;
+	businessName: string;
+	publishedUrl: string;
+	plan: string;
+}
+
 /**
- * Dispatches Project Build Status Updates to users.
- *
- * @param toEmail - User email address
- * @param userName - User name
- * @param projectName - Name of site project
- * @param status - Project status (e.g. "In Progress", "Published")
- * @param publishedUrl - Subdomain URL
+ * 4. Website Live Published Email
+ */
+export async function sendWebsiteLiveEmail(payload: WebsiteLiveEmailPayload) {
+	const appUrl = getAppUrl();
+	const subject = `Your Website is Live: ${payload.businessName}`;
+
+	const contentHtml = `
+		<div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+			<span style="display: inline-block; background-color: #16a34a; color: #ffffff; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 9999px; margin-bottom: 6px; text-transform: uppercase;">Published</span>
+			<h1 style="font-size: 18px; font-weight: 800; color: #15803d; margin: 0 0 4px 0;">Your website is officially live!</h1>
+			<p style="font-size: 13px; color: #166534; margin: 0;">
+				Congratulations ${payload.clientName || "there"}, your <strong>${payload.businessName}</strong> website has completed review and is published online.
+			</p>
+		</div>
+
+		<!-- Live URL Box -->
+		<div style="background-color: #004ac6; border-radius: 12px; padding: 24px; color: #ffffff; margin-bottom: 24px; text-align: center;">
+			<span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #93c5fd; display: block; margin-bottom: 6px;">Your Published Website</span>
+			<p style="font-size: 16px; font-weight: 800; color: #ffffff; word-break: break-all; margin: 0 0 16px 0;">
+				${payload.publishedUrl}
+			</p>
+			<a href="${payload.publishedUrl}" target="_blank" style="display: inline-block; background-color: #ffffff; color: #004ac6; font-weight: 800; font-size: 13px; padding: 10px 26px; border-radius: 9999px; text-decoration: none;">
+				Visit Your Live Website
+			</a>
+		</div>
+
+		<div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+			<p style="font-size: 13px; font-weight: 700; color: #0f172a; margin: 0 0 6px 0;">Next steps for your business:</p>
+			<ul style="font-size: 13px; color: #64748b; margin: 0; padding-left: 18px; line-height: 1.6;">
+				<li>Share your link across WhatsApp, Instagram, and social bio links.</li>
+				<li>Inquiries and WhatsApp orders will route directly to your phone.</li>
+				<li>You can update business hours and details anytime from your dashboard.</li>
+			</ul>
+		</div>
+
+		<div style="text-align: left;">
+			<a href="${appUrl}/dashboard" style="display: inline-block; background-color: #f1f5f9; color: #0f172a; font-weight: 700; font-size: 13px; padding: 10px 24px; border-radius: 9999px; text-decoration: none; border: 1px solid #cbd5e1;">
+				Go to Dashboard
+			</a>
+		</div>
+	`;
+
+	const html = renderEmailShell({
+		title: "Your Website is Live",
+		headerTag: "Published Live",
+		contentHtml,
+	});
+
+	return sendEmail({ to: payload.toEmail, subject, html });
+}
+
+/**
+ * 5. Project Status Email
  */
 export async function sendProjectStatusEmail(
 	toEmail: string,
@@ -295,32 +393,35 @@ export async function sendProjectStatusEmail(
 	publishedUrl?: string,
 ) {
 	const appUrl = getAppUrl();
-	const subject = `Update on ${projectName}: Status is now ${status}`;
-	const html = `
-		<!DOCTYPE html>
-		<html>
-			<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; color: #0f172a; margin: 0; padding: 40px 20px;">
-				<div style="max-w: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; padding: 40px; border: 1px solid #e2e8f0;">
-					<h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 16px;">Hello ${userName},</h2>
-					<p style="font-size: 15px; color: #475569; line-height: 1.6; margin-bottom: 24px;">
-						Great news! Your project <strong>${projectName}</strong> has been updated to status: <span style="background-color: #dbeafe; color: #1e40af; font-weight: 700; padding: 4px 10px; border-radius: 9999px; font-size: 12px;">${status}</span>.
-					</p>
-					${
-						publishedUrl
-							? `<p style="font-size: 14px; color: #475569; margin-bottom: 24px;">Preview URL: <a href="${publishedUrl}" style="color: #2563eb; font-weight: 600;">${publishedUrl}</a></p>`
-							: ""
-					}
-					<a href="${appUrl}/dashboard/projects" style="display: inline-block; background-color: #0f172a; color: #ffffff; font-weight: 700; font-size: 14px; padding: 12px 24px; border-radius: 9999px; text-decoration: none;">View Project Details</a>
-				</div>
-			</body>
-		</html>
+	const subject = `Update on ${projectName}: Status is ${status}`;
+	const contentHtml = `
+		<h1 style="margin: 0 0 12px 0; font-size: 18px; font-weight: 800; color: #0f172a;">Project Status Update</h1>
+		<p style="margin: 0 0 16px 0; font-size: 14px; color: #475569; line-height: 1.6;">
+			Hello ${userName}, your project <strong>${projectName}</strong> has been updated to: <strong style="color: #004ac6;">${status}</strong>.
+		</p>
+		${
+			publishedUrl
+				? `<p style="margin: 0 0 20px 0; font-size: 13px; color: #475569;">Published URL: <a href="${publishedUrl}" style="color: #004ac6; font-weight: 700; text-decoration: none;">${publishedUrl}</a></p>`
+				: ""
+		}
+		<div style="margin-top: 20px;">
+			<a href="${appUrl}/dashboard/projects" style="display: inline-block; background-color: #004ac6; color: #ffffff; font-weight: 700; font-size: 13px; padding: 10px 24px; border-radius: 9999px; text-decoration: none;">
+				View Project
+			</a>
+		</div>
 	`;
+
+	const html = renderEmailShell({
+		title: "Project Status Update",
+		headerTag: status,
+		contentHtml,
+	});
 
 	return sendEmail({ to: toEmail, subject, html });
 }
 
 /**
- * Dispatches Fresh Scheduled Payment Request (Invoice) for upcoming billing cycle.
+ * 6. Payment Request / Invoice Email
  */
 export async function sendPaymentRequestEmail({
 	toEmail,
@@ -341,62 +442,50 @@ export async function sendPaymentRequestEmail({
 	dueDate: string;
 	paymentLink: string;
 }) {
-	const subject = `Invoice ${invoiceNumber}: Kiosk ${plan} Renewal Payment Request`;
-	const html = `
-		<!DOCTYPE html>
-		<html>
-			<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; color: #0f172a; margin: 0; padding: 40px 20px;">
-				<div style="max-w: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; padding: 40px; border: 1px solid #e2e8f0;">
-					<div style="display: flex; align-items: center; margin-bottom: 24px;">
-						<div style="width: 32px; height: 32px; background-color: #004ac6; border-radius: 8px; color: #ffffff; font-weight: bold; text-align: center; line-height: 32px; font-size: 16px; margin-right: 12px;">K</div>
-						<span style="font-size: 20px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px;">KIOSK BILLING</span>
-					</div>
-					<h1 style="font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">Upcoming Hosting Renewal Invoice</h1>
-					<p style="font-size: 14px; color: #64748b; margin-bottom: 24px;">Invoice Number: <strong>${invoiceNumber}</strong> | Due Date: <strong>${dueDate}</strong></p>
-					
-					<p style="font-size: 15px; color: #334155; line-height: 1.6; margin-bottom: 20px;">
-						Hello ${userName}, your monthly hosting and maintenance subscription for <strong>${plan}</strong> is ready for renewal.
-					</p>
+	const subject = `Invoice ${invoiceNumber}: Kiosk ${plan} Renewal`;
+	const contentHtml = `
+		<h1 style="margin: 0 0 6px 0; font-size: 18px; font-weight: 800; color: #0f172a;">Website Hosting Renewal Invoice</h1>
+		<p style="margin: 0 0 20px 0; font-size: 13px; color: #64748b;">Invoice Number: <strong>${invoiceNumber}</strong> | Due Date: <strong>${dueDate}</strong></p>
 
-					<div style="background-color: #f8fafc; border-radius: 12px; padding: 20px; border: 1px solid #e2e8f0; margin-bottom: 24px;">
-						<div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px;">
-							<span style="color: #64748b;">Plan Subscription</span>
-							<strong style="color: #0f172a;">${plan}</strong>
-						</div>
-						<div style="display: flex; justify-content: space-between; font-size: 16px; border-top: 1px dashed #cbd5e1; padding-top: 10px;">
-							<span style="font-weight: 700; color: #0f172a;">Total Due</span>
-							<strong style="font-weight: 800; color: #004ac6;">${currency} ${amount}.00</strong>
-						</div>
-					</div>
+		<p style="margin: 0 0 16px 0; font-size: 14px; color: #334155; line-height: 1.6;">
+			Hello ${userName}, your monthly hosting and maintenance subscription for <strong>${plan}</strong> is ready for renewal.
+		</p>
 
-					<div style="margin-bottom: 28px; text-align: center;">
-						<a href="${paymentLink}" style="display: block; background-color: #004ac6; color: #ffffff; font-weight: 700; font-size: 15px; padding: 14px 28px; border-radius: 9999px; text-decoration: none; text-align: center;">Click to Pay Invoice (${currency} ${amount}.00) →</a>
-					</div>
+		<div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+			<table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+				<tr>
+					<td style="font-size: 13px; color: #64748b;">Plan:</td>
+					<td align="right" style="font-size: 13px; font-weight: 700; color: #0f172a;">${plan}</td>
+				</tr>
+				<tr>
+					<td style="font-size: 14px; font-weight: 700; color: #0f172a; padding-top: 10px; border-top: 1px solid #e2e8f0;">Total Amount:</td>
+					<td align="right" style="font-size: 16px; font-weight: 800; color: #004ac6; padding-top: 10px; border-top: 1px solid #e2e8f0;">${currency} ${amount}.00</td>
+				</tr>
+			</table>
+		</div>
 
-					<div style="background-color: #eff6ff; border-radius: 10px; padding: 16px; border: 1px solid #bfdbfe; margin-bottom: 24px;">
-						<p style="font-size: 12px; font-weight: 700; color: #1e40af; margin: 0 0 4px 0;">Flexible Payment Channels Supported:</p>
-						<p style="font-size: 12px; color: #1e3a8a; margin: 0;">
-							✓ Debit/Credit Card (Visa, Mastercard, Verve)<br/>
-							✓ Instant Bank Transfer (Virtual Account)<br/>
-							✓ USSD (*737#, *919#, etc.)<br/>
-							✓ Mobile Money Wallets
-						</p>
-					</div>
+		<div style="text-align: center; margin-bottom: 20px;">
+			<a href="${paymentLink}" style="display: inline-block; background-color: #004ac6; color: #ffffff; font-weight: 700; font-size: 14px; padding: 12px 32px; border-radius: 9999px; text-decoration: none;">
+				Pay Invoice (${currency} ${amount}.00)
+			</a>
+		</div>
 
-					<hr style="border: none; border-top: 1px solid #f1f5f9; margin-bottom: 20px;" />
-					<p style="font-size: 12px; color: #94a3b8; line-height: 1.5; margin: 0;">
-						Note: We do not automatically debit your card silently. Please click the button above to pay and keep your website online.
-					</p>
-				</div>
-			</body>
-		</html>
+		<p style="margin: 0; font-size: 12px; color: #94a3b8; line-height: 1.5; text-align: center;">
+			Supports Card, Bank Transfer, USSD, and Mobile Money.
+		</p>
 	`;
+
+	const html = renderEmailShell({
+		title: `Invoice ${invoiceNumber}`,
+		headerTag: "Renewal Due",
+		contentHtml,
+	});
 
 	return sendEmail({ to: toEmail, subject, html });
 }
 
 /**
- * Dispatches Grace Period Reminder when invoice payment is past due.
+ * 7. Grace Period Reminder Email
  */
 export async function sendGracePeriodReminderEmail({
 	toEmail,
@@ -417,40 +506,38 @@ export async function sendGracePeriodReminderEmail({
 	daysRemaining: number;
 	paymentLink: string;
 }) {
-	const subject = `Urgent: ${daysRemaining} Days of Grace Period Remaining for ${invoiceNumber}`;
-	const html = `
-		<!DOCTYPE html>
-		<html>
-			<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; color: #0f172a; margin: 0; padding: 40px 20px;">
-				<div style="max-w: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; padding: 40px; border: 1px solid #fed7aa;">
-					<div style="display: inline-block; background-color: #ffedd5; color: #c2410c; font-size: 12px; font-weight: 800; padding: 4px 12px; border-radius: 9999px; margin-bottom: 16px;">
-						GRACE PERIOD NOTICE (${daysRemaining} DAYS REMAINING)
-					</div>
-					<h1 style="font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Your Kiosk Website Hosting Renewal is Due</h1>
-					<p style="font-size: 15px; color: #334155; line-height: 1.6; margin-bottom: 20px;">
-						Hello ${userName}, we noticed the renewal invoice <strong>#${invoiceNumber}</strong> (${currency} ${amount}.00) for your <strong>${plan}</strong> website has not been completed.
-					</p>
-					<p style="font-size: 14px; color: #475569; line-height: 1.6; margin-bottom: 24px;">
-						Your website remains active under our 7-day grace period. Please settle this invoice within the next <strong>${daysRemaining} days</strong> to prevent temporary site suspension.
-					</p>
+	const subject = `Notice: ${daysRemaining} Days Remaining for Invoice #${invoiceNumber}`;
+	const contentHtml = `
+		<div style="background-color: #fff7ed; border: 1px solid #ffedd5; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+			<span style="display: inline-block; background-color: #ea580c; color: #ffffff; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 9999px; margin-bottom: 6px; text-transform: uppercase;">Grace Period</span>
+			<h1 style="font-size: 18px; font-weight: 800; color: #9a3412; margin: 0 0 4px 0;">Hosting Renewal Pending</h1>
+			<p style="font-size: 13px; color: #c2410c; margin: 0;">
+				Hello ${userName}, renewal invoice #${invoiceNumber} for your <strong>${plan}</strong> website remains unpaid.
+			</p>
+		</div>
 
-					<div style="margin-bottom: 28px; text-align: center;">
-						<a href="${paymentLink}" style="display: block; background-color: #ea580c; color: #ffffff; font-weight: 700; font-size: 15px; padding: 14px 28px; border-radius: 9999px; text-decoration: none; text-align: center;">Pay Overdue Invoice (${currency} ${amount}.00) →</a>
-					</div>
+		<p style="font-size: 14px; color: #334155; line-height: 1.6; margin-bottom: 20px;">
+			Your website remains active under our grace period. Please complete payment within the next <strong>${daysRemaining} days</strong> to ensure uninterrupted service.
+		</p>
 
-					<p style="font-size: 12px; color: #64748b; line-height: 1.5; margin: 0;">
-						Supports Card, Direct Bank Transfer, USSD, and Mobile Money.
-					</p>
-				</div>
-			</body>
-		</html>
+		<div style="text-align: center; margin-bottom: 16px;">
+			<a href="${paymentLink}" style="display: inline-block; background-color: #ea580c; color: #ffffff; font-weight: 700; font-size: 14px; padding: 12px 32px; border-radius: 9999px; text-decoration: none;">
+				Pay Invoice (${currency} ${amount}.00)
+			</a>
+		</div>
 	`;
+
+	const html = renderEmailShell({
+		title: "Grace Period Notice",
+		headerTag: "Urgent",
+		contentHtml,
+	});
 
 	return sendEmail({ to: toEmail, subject, html });
 }
 
 /**
- * Dispatches Site Flagged / Suspended Notification when grace period expires.
+ * 8. Site Flagged / Suspended Notice Email
  */
 export async function sendSiteFlaggedNoticeEmail({
 	toEmail,
@@ -469,36 +556,38 @@ export async function sendSiteFlaggedNoticeEmail({
 	currency: string;
 	paymentLink: string;
 }) {
-	const subject = `Action Required: Website Temporarily Flagged for Unpaid Renewal #${invoiceNumber}`;
-	const html = `
-		<!DOCTYPE html>
-		<html>
-			<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; color: #0f172a; margin: 0; padding: 40px 20px;">
-				<div style="max-w: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; padding: 40px; border: 1px solid #fecaca;">
-					<div style="display: inline-block; background-color: #fee2e2; color: #b91c1c; font-size: 12px; font-weight: 800; padding: 4px 12px; border-radius: 9999px; margin-bottom: 16px;">
-						SITE FLAGGED / PAYMENT REQUIRED
-					</div>
-					<h1 style="font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Your Website Hosting Has Expired</h1>
-					<p style="font-size: 15px; color: #334155; line-height: 1.6; margin-bottom: 20px;">
-						Hello ${userName}, the 7-day grace period for invoice <strong>#${invoiceNumber}</strong> has ended without payment. Your website for <strong>${plan}</strong> is currently displaying a temporary payment notice.
-					</p>
-					<p style="font-size: 14px; color: #475569; line-height: 1.6; margin-bottom: 24px;">
-						Your site files, domain configurations, and content remain completely safe. To instantly restore your website to live status, click the button below to complete the renewal payment.
-					</p>
+	const subject = `Action Required: Website Renewal Expired #${invoiceNumber}`;
+	const contentHtml = `
+		<div style="background-color: #fef2f2; border: 1px solid #fee2e2; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+			<span style="display: inline-block; background-color: #dc2626; color: #ffffff; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 9999px; margin-bottom: 6px; text-transform: uppercase;">Payment Required</span>
+			<h1 style="font-size: 18px; font-weight: 800; color: #991b1b; margin: 0 0 4px 0;">Hosting Renewal Overdue</h1>
+			<p style="font-size: 13px; color: #b91c1c; margin: 0;">
+				Hello ${userName}, the grace period for invoice #${invoiceNumber} has ended.
+			</p>
+		</div>
 
-					<div style="margin-bottom: 28px; text-align: center;">
-						<a href="${paymentLink}" style="display: block; background-color: #dc2626; color: #ffffff; font-weight: 700; font-size: 15px; padding: 14px 28px; border-radius: 9999px; text-decoration: none; text-align: center;">Instantly Restore Website (${currency} ${amount}.00) →</a>
-					</div>
-				</div>
-			</body>
-		</html>
+		<p style="font-size: 14px; color: #334155; line-height: 1.6; margin-bottom: 20px;">
+			Your website files, data, and configurations are secure. To restore your site to live status, please complete the renewal payment.
+		</p>
+
+		<div style="text-align: center; margin-bottom: 16px;">
+			<a href="${paymentLink}" style="display: inline-block; background-color: #dc2626; color: #ffffff; font-weight: 700; font-size: 14px; padding: 12px 32px; border-radius: 9999px; text-decoration: none;">
+				Restore Website (${currency} ${amount}.00)
+			</a>
+		</div>
 	`;
+
+	const html = renderEmailShell({
+		title: "Website Renewal Expired",
+		headerTag: "Expired",
+		contentHtml,
+	});
 
 	return sendEmail({ to: toEmail, subject, html });
 }
 
 /**
- * Dispatches Password Reset Request Email with secure 1-hour expiration link.
+ * 9. Password Reset Request Email
  */
 export async function sendPasswordResetEmail({
 	toEmail,
@@ -509,118 +598,32 @@ export async function sendPasswordResetEmail({
 	userName: string;
 	resetUrl: string;
 }) {
-	const subject = "Reset Your Kiosk Account Password";
-	const html = `
-		<!DOCTYPE html>
-		<html>
-			<head>
-				<meta charset="utf-8">
-				<title>Reset Your Password</title>
-			</head>
-			<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; color: #0f172a; margin: 0; padding: 40px 20px;">
-				<div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; padding: 40px; border: 1px solid #e2e8f0;">
-					<div style="display: flex; align-items: center; margin-bottom: 24px;">
-						<div style="width: 32px; height: 32px; background-color: #2563eb; border-radius: 8px; color: #ffffff; font-weight: bold; text-align: center; line-height: 32px; font-size: 16px; margin-right: 12px;">K</div>
-						<span style="font-size: 20px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px;">KIOSK</span>
-					</div>
-					<h1 style="font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">Password Reset Request</h1>
-					<p style="font-size: 15px; color: #334155; line-height: 1.6; margin-bottom: 20px;">
-						Hello ${userName || "there"}, we received a request to reset the password for your Kiosk account.
-					</p>
-					<p style="font-size: 14px; color: #64748b; line-height: 1.6; margin-bottom: 28px;">
-						Click the button below to choose a new password. For your security, this password reset link is valid for <strong>1 hour</strong>.
-					</p>
+	const subject = "Reset Your Kiosk Password";
+	const contentHtml = `
+		<h1 style="margin: 0 0 12px 0; font-size: 18px; font-weight: 800; color: #0f172a;">Password Reset Request</h1>
+		<p style="margin: 0 0 16px 0; font-size: 14px; color: #334155; line-height: 1.6;">
+			Hello ${userName || "there"}, we received a request to reset the password for your Kiosk account.
+		</p>
+		<p style="margin: 0 0 24px 0; font-size: 13px; color: #64748b; line-height: 1.6;">
+			Click the button below to choose a new password. This secure link is valid for <strong>1 hour</strong>.
+		</p>
 
-					<div style="margin-bottom: 28px; text-align: center;">
-						<a href="${resetUrl}" style="display: inline-block; background-color: #2563eb; color: #ffffff; font-weight: 700; font-size: 14px; padding: 14px 32px; border-radius: 9999px; text-decoration: none; text-align: center;">Reset Password →</a>
-					</div>
+		<div style="margin-bottom: 24px;">
+			<a href="${resetUrl}" style="display: inline-block; background-color: #004ac6; color: #ffffff; font-weight: 700; font-size: 13px; padding: 12px 28px; border-radius: 9999px; text-decoration: none;">
+				Reset Password
+			</a>
+		</div>
 
-					<p style="font-size: 12px; color: #94a3b8; line-height: 1.6; margin-bottom: 20px;">
-						If you're having trouble clicking the button, copy and paste this link into your browser:<br/>
-						<a href="${resetUrl}" style="color: #2563eb; word-break: break-all;">${resetUrl}</a>
-					</p>
-
-					<hr style="border: none; border-top: 1px solid #f1f5f9; margin-bottom: 20px;" />
-					<p style="font-size: 12px; color: #94a3b8; line-height: 1.5; margin: 0;">
-						If you did not request this password reset, please ignore this email or reach out to support if you have concerns. Your password will remain unchanged.
-					</p>
-				</div>
-			</body>
-		</html>
+		<p style="margin: 0 0 12px 0; font-size: 12px; color: #94a3b8; line-height: 1.5;">
+			If you did not request this, please ignore this email. Your password will remain unchanged.
+		</p>
 	`;
+
+	const html = renderEmailShell({
+		title: "Reset Your Password",
+		headerTag: "Security",
+		contentHtml,
+	});
 
 	return sendEmail({ to: toEmail, subject, html });
 }
-
-export interface WebsiteLiveEmailPayload {
-	toEmail: string;
-	clientName: string;
-	businessName: string;
-	publishedUrl: string;
-	plan: string;
-}
-
-/**
- * Dispatches celebratory Website Live Notification to client with their live published URL.
- */
-export async function sendWebsiteLiveEmail(payload: WebsiteLiveEmailPayload) {
-	const appUrl = getAppUrl();
-	const subject = `🎉 Your Website is Officially LIVE: ${payload.businessName}!`;
-
-	const html = `
-		<!DOCTYPE html>
-		<html>
-			<head>
-				<meta charset="utf-8">
-				<title>Your Website is Live!</title>
-			</head>
-			<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; color: #0f172a; margin: 0; padding: 40px 20px;">
-				<div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; padding: 40px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-					<div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 20px; margin-bottom: 24px;">
-						<div style="display: flex; align-items: center;">
-							<div style="width: 36px; height: 36px; background-color: #004ac6; border-radius: 10px; color: #ffffff; font-weight: 800; text-align: center; line-height: 36px; font-size: 18px; margin-right: 12px;">K</div>
-							<span style="font-size: 20px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px;">KIOSK</span>
-						</div>
-						<span style="background-color: #dcfce7; color: #15803d; font-size: 11px; font-weight: 800; padding: 5px 12px; border-radius: 9999px; text-transform: uppercase;">🚀 Published Live</span>
-					</div>
-
-					<h1 style="font-size: 24px; font-weight: 800; color: #0f172a; margin: 0 0 12px 0;">Congratulations, ${payload.clientName || "there"}!</h1>
-					<p style="font-size: 15px; color: #475569; line-height: 1.6; margin: 0 0 24px 0;">
-						Our fulfillment and QA engineering team has completed your <strong>${payload.businessName}</strong> website. Your custom ${payload.plan.replace(/_/g, " ")} is officially published and live on the internet!
-					</p>
-
-					<!-- Live URL Card -->
-					<div style="background: linear-gradient(135deg, #004ac6 0%, #1e40af 100%); border-radius: 14px; padding: 24px; color: #ffffff; margin-bottom: 28px; text-align: center;">
-						<p style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #93c5fd; margin: 0 0 8px 0;">Your Live Website URL</p>
-						<h2 style="font-size: 18px; font-weight: 800; color: #ffffff; word-break: break-all; margin: 0 0 16px 0;">
-							${payload.publishedUrl}
-						</h2>
-						<a href="${payload.publishedUrl}" target="_blank" style="display: inline-block; background-color: #ffffff; color: #004ac6; font-weight: 800; font-size: 14px; padding: 12px 28px; border-radius: 9999px; text-decoration: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">Visit Your Live Site →</a>
-					</div>
-
-					<div style="background-color: #f8fafc; border-radius: 12px; padding: 16px 20px; border: 1px solid #e2e8f0; margin-bottom: 24px;">
-						<h3 style="font-size: 13px; font-weight: 700; color: #0f172a; margin: 0 0 6px 0;">What happens next?</h3>
-						<ul style="font-size: 13px; color: #64748b; margin: 0; padding-left: 18px; line-height: 1.6;">
-							<li>Your high-converting sales funnels and lead forms are active.</li>
-							<li>You can manage your contact details anytime inside your dashboard.</li>
-							<li>Need any small copy tweaks or updates? Our priority support team is available 24/7.</li>
-						</ul>
-					</div>
-
-					<div style="text-align: center; margin-bottom: 24px;">
-						<a href="${appUrl}/dashboard" style="display: inline-block; background-color: #f1f5f9; color: #0f172a; font-weight: 700; font-size: 13px; padding: 10px 24px; border-radius: 9999px; text-decoration: none; border: 1px solid #cbd5e1;">Go to Your Dashboard</a>
-					</div>
-
-					<hr style="border: none; border-top: 1px solid #f1f5f9; margin-bottom: 20px;" />
-					<p style="font-size: 12px; color: #94a3b8; line-height: 1.5; margin: 0; text-align: center;">
-						Thank you for choosing Kiosk. We're excited to help your business scale!
-					</p>
-				</div>
-			</body>
-		</html>
-	`;
-
-	return sendEmail({ to: payload.toEmail, subject, html });
-}
-
-
