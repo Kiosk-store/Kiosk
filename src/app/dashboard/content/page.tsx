@@ -10,50 +10,26 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
 	ArrowLeft,
 	Upload,
-	FileText,
 	CheckCircle2,
 	Sparkles,
 	Loader2,
-	HelpCircle,
-	Eye,
-	X,
-	Monitor,
-	Smartphone,
 	Image as ImageIcon,
 	Trash2,
 	Globe,
 	Phone,
-	Mail,
 	Zap,
 	ShoppingBag,
-	CreditCard,
-	Tag,
-	FileCheck,
-	Shuffle,
-	Truck,
 	AlertCircle,
 	Share2,
 	Calendar,
 	Plus,
-	Minus,
-	ShoppingCart,
 	Package,
 	Star,
-	Play,
 	Video,
-	ShieldCheck,
-	ChevronDown,
-	ChevronUp,
-	Award,
 	Clock,
 	Flame,
-	Layers,
-	MessageSquare,
-	Check,
-	TrendingUp,
 	Sun,
 	Moon,
-	Menu,
 } from "lucide-react";
 import PillButton from "@/components/PillButton";
 import { useCurrency } from "@/context/CurrencyContext";
@@ -123,21 +99,6 @@ interface UploadedImage {
 
 type PlanType = "LANDING_PAGE" | "SALES_FUNNEL" | "E_COMMERCE";
 
-const GOOGLE_FONTS_CATALOG = [
-	{ name: "Outfit", category: "Modern Sans-Serif" },
-	{ name: "Inter", category: "Clean & Universal" },
-	{ name: "Plus Jakarta Sans", category: "Corporate & Tech" },
-	{ name: "Poppins", category: "Geometric Sans" },
-	{ name: "Playfair Display", category: "Luxury Serif" },
-	{ name: "Montserrat", category: "Bold Branding" },
-	{ name: "Lora", category: "Editorial Serif" },
-	{ name: "Space Grotesk", category: "Futuristic Sans" },
-	{ name: "Syne", category: "Artistic & Creative" },
-	{ name: "DM Sans", category: "Minimalist Sans" },
-	{ name: "Cinzel", category: "High Fashion Serif" },
-	{ name: "Roboto", category: "Classic Sans" },
-];
-
 function ContentForm() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
@@ -168,19 +129,9 @@ function ContentForm() {
 
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isSubmitted, setIsSubmitted] = useState(false);
-	const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-	const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
-
-	// Google Fonts State
-	const [selectedFont, setSelectedFont] = useState("Outfit");
 
 	// Theme Mode State (Light vs Dark Mode)
 	const [themeMode, setThemeMode] = useState<"light" | "dark">("light");
-
-	const handleRandomizeFont = () => {
-		const randomIndex = Math.floor(Math.random() * GOOGLE_FONTS_CATALOG.length);
-		setSelectedFont(GOOGLE_FONTS_CATALOG[randomIndex].name);
-	};
 
 	// ZERO DEMO DATA - Start completely empty for clean user entry
 	const [businessName, setBusinessName] = useState("");
@@ -256,11 +207,6 @@ function ContentForm() {
 		{ id: "st-3", label: "Average ROI Increase", value: "4.8x" },
 	]);
 
-	// Interactive Preview States for Landing Page
-	const [activeFaqIndex, setActiveFaqIndex] = useState<number | null>(0);
-	const [isContactModalOpen, setIsContactModalOpen] = useState(false);
-	const [contactFormSubmitted, setContactFormSubmitted] = useState(false);
-
 	// ELABORATE SALES FUNNEL SPECIFIC FIELDS
 	const [leadMagnetTitle, setLeadMagnetTitle] = useState("");
 	const [videoUrl, setVideoUrl] = useState("https://www.youtube.com/embed/dQw4w9WgXcQ");
@@ -299,19 +245,6 @@ function ContentForm() {
 		"30-Day 100% Risk-Free Guarantee. If you're not completely blown away, receive a full refund instantly."
 	);
 
-	// Interactive Preview States for Sales Funnel
-	const [isOrderBumpChecked, setIsOrderBumpChecked] = useState(false);
-	const [funnelSecondsLeft, setFunnelSecondsLeft] = useState(15 * 60);
-	const [isFunnelOrderSuccess, setIsFunnelOrderSuccess] = useState(false);
-
-	// Countdown Timer Effect for Preview
-	useEffect(() => {
-		const timer = setInterval(() => {
-			setFunnelSecondsLeft((prev) => (prev > 0 ? prev - 1 : 15 * 60));
-		}, 1000);
-		return () => clearInterval(timer);
-	}, []);
-
 	// E-Commerce Specific Fields & Dynamic Products
 	const [currency, setCurrency] = useState("USD");
 	const [shippingInfo, setShippingInfo] = useState("");
@@ -335,20 +268,6 @@ function ContentForm() {
 			badge: "New",
 		},
 	]);
-
-	// Preview Cart & Navigation State (Inside Live Preview)
-	const [previewCart, setPreviewCart] = useState<{ product: ProductItem; quantity: number }[]>([]);
-	const [isPreviewCartOpen, setIsPreviewCartOpen] = useState(false);
-	const [isPreviewMobileMenuOpen, setIsPreviewMobileMenuOpen] = useState(false);
-	const [cartNotification, setCartNotification] = useState<string | null>(null);
-
-	const scrollToPreviewSection = (sectionId: string) => {
-		setIsPreviewMobileMenuOpen(false);
-		const el = document.getElementById(sectionId);
-		if (el) {
-			el.scrollIntoView({ behavior: "smooth", block: "start" });
-		}
-	};
 
 	// Uploaded Logo & Brand Assets (Separated)
 	const [logoImage, setLogoImage] = useState<UploadedImage | null>(null);
@@ -516,52 +435,6 @@ function ContentForm() {
 		}
 	};
 
-	// Cart action helpers
-	const addToPreviewCart = (product: ProductItem) => {
-		setPreviewCart((prev) => {
-			const existingIndex = prev.findIndex((item) => item.product.id === product.id);
-			if (existingIndex > -1) {
-				const updated = [...prev];
-				updated[existingIndex].quantity += 1;
-				return updated;
-			}
-			return [...prev, { product, quantity: 1 }];
-		});
-		setCartNotification(`Added "${product.name || "Item"}" to cart`);
-		setTimeout(() => setCartNotification(null), 2500);
-		setIsPreviewCartOpen(true);
-	};
-
-	const updatePreviewCartQty = (productId: string, delta: number) => {
-		setPreviewCart((prev) => {
-			return prev
-				.map((item) => {
-					if (item.product.id === productId) {
-						const newQty = item.quantity + delta;
-						return newQty > 0 ? { ...item, quantity: newQty } : null;
-					}
-					return item;
-				})
-				.filter(Boolean) as { product: ProductItem; quantity: number }[];
-		});
-	};
-
-	const setPreviewCartQty = (productId: string, newQty: number) => {
-		if (newQty <= 0) {
-			setPreviewCart((prev) => prev.filter((item) => item.product.id !== productId));
-			return;
-		}
-		setPreviewCart((prev) =>
-			prev.map((item) =>
-				item.product.id === productId ? { ...item, quantity: newQty } : item
-			)
-		);
-	};
-
-	const removeFromPreviewCart = (productId: string) => {
-		setPreviewCart((prev) => prev.filter((item) => item.product.id !== productId));
-	};
-
 	// Load existing user submitted content from backend + localStorage cache
 	useEffect(() => {
 		async function loadSavedContent() {
@@ -589,7 +462,6 @@ function ContentForm() {
 				);
 				setCurrency("USD");
 				setShippingInfo("");
-				setSelectedFont("Outfit");
 				setWhatsappLink("");
 				setXLink("");
 				setInstagramLink("");
@@ -668,7 +540,6 @@ function ContentForm() {
 				if (merged.currency) setCurrency(merged.currency);
 				if (merged.shippingInfo) setShippingInfo(merged.shippingInfo);
 
-				if (merged.selectedFont) setSelectedFont(merged.selectedFont);
 				if (merged.themeMode === "dark" || merged.themeMode === "light") {
 					setThemeMode(merged.themeMode);
 				}
@@ -731,7 +602,6 @@ function ContentForm() {
 				products,
 				currency,
 				shippingInfo,
-				selectedFont,
 				themeMode,
 				whatsappLink,
 				xLink,
@@ -777,7 +647,6 @@ function ContentForm() {
 		products,
 		currency,
 		shippingInfo,
-		selectedFont,
 		themeMode,
 		whatsappLink,
 		xLink,
@@ -918,7 +787,6 @@ function ContentForm() {
 				products,
 				currency,
 				shippingInfo,
-				selectedFont,
 				themeMode,
 				whatsappLink,
 				xLink,
@@ -964,8 +832,6 @@ function ContentForm() {
 		}
 	};
 
-	const heroImage = uploadedImages.length > 0 ? uploadedImages[0].url : null;
-
 	return (
 		<div className="w-full min-h-screen bg-[#f8fafc]">
 			{/* Main Container */}
@@ -983,32 +849,10 @@ function ContentForm() {
 						<Link
 							href="/templates"
 							target="_blank"
-							className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-bold border border-blue-200 transition-colors">
+							className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-bold border border-blue-200 transition-colors">
 							<Globe className="w-3.5 h-3.5" />
 							<span>Browse Templates</span>
 						</Link>
-
-						{/* Icon-Only Preview Button with Tooltip on Hover */}
-						<div className="relative group/preview">
-							<PillButton
-								type="button"
-								onClick={() => setIsPreviewOpen((prev) => !prev)}
-								baseColor="#eff6ff"
-								circleColor="#004ac6"
-								textColor="#004ac6"
-								hoverTextColor="#004ac6"
-								aria-label="Preview Custom Site"
-								className="p-2.5 rounded-full border border-blue-200 shadow-2xs">
-								<Eye className="w-4 h-4 text-blue-600" />
-							</PillButton>
-
-							{/* Tooltip Badge on Hover */}
-							<div className="absolute right-0 top-11 opacity-0 group-hover/preview:opacity-100 transition-opacity pointer-events-none z-30">
-								<span className="px-2.5 py-1 rounded-lg bg-gray-900 text-white text-[10px] font-bold shadow-md whitespace-nowrap">
-									Live Preview
-								</span>
-							</div>
-						</div>
 					</div>
 				</div>
 
@@ -1061,25 +905,16 @@ function ContentForm() {
 					</div>
 
 					{/* Done-For-You Model Guarantee Banner */}
-					<div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
-						<div className="flex items-start sm:items-center gap-3">
-							<div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-								<Sparkles className="w-4 h-4" />
-							</div>
-							<div>
-								<h4 className="font-bold text-gray-900">Done-For-You Website Personalization</h4>
-								<p className="text-gray-600 text-[11px] font-medium mt-0.5">
-									No builder or design skill needed. Fill in your business details below — our team personalizes your template and launches your live site in 3-5 days.
-								</p>
-							</div>
+					<div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200/80 flex items-center gap-3 text-xs">
+						<div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+							<Sparkles className="w-4 h-4" />
 						</div>
-						<button
-							type="button"
-							onClick={() => setIsPreviewOpen(true)}
-							className="shrink-0 px-3.5 py-1.5 rounded-full bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 font-bold text-xs shadow-2xs flex items-center gap-1.5 transition-colors cursor-pointer">
-							<Eye className="w-3.5 h-3.5" />
-							<span>Live Mockup Preview</span>
-						</button>
+						<div>
+							<h4 className="font-bold text-gray-900">Done-For-You Website Personalization</h4>
+							<p className="text-gray-600 text-[11px] font-medium mt-0.5">
+								No builder or design skill needed. Fill in your business details below — our team personalizes your template and launches your live site in 3-5 days.
+							</p>
+						</div>
 					</div>
 
 					{/* Interactive Plan Selector Switcher */}
@@ -1117,7 +952,7 @@ function ContentForm() {
 							Details Received!
 						</h2>
 						<p className="text-xs text-gray-500 font-medium mb-6 leading-relaxed">
-							Our design team has received your business details and {uploadedImages.length} brand images. Updating your custom website layout...
+							Our design team has received your business details and {uploadedImages.length} brand images. Personalizing your custom website...
 						</p>
 						<div className="w-full bg-emerald-100 rounded-full h-1.5 overflow-hidden">
 							<div className="bg-emerald-600 h-full w-full animate-pulse" />
@@ -1295,95 +1130,43 @@ function ContentForm() {
 							<div className="border-b border-gray-100 pb-3">
 								<label className="text-xs font-extrabold text-gray-900 uppercase tracking-wider flex items-center gap-2">
 									<Globe className="w-4 h-4 text-blue-600" />
-									<span>2. Core Business Information & Typography</span>
+									<span>2. Business Information & Theme Style</span>
 								</label>
 							</div>
 
-							{/* Google Fonts Picker & Randomizer */}
-							<div className="p-4 rounded-2xl bg-blue-50/50 border border-blue-100 space-y-3">
-								<div className="flex items-center justify-between gap-2">
-									<div>
-										<label className="text-xs font-bold text-gray-900 block">
-											Select Site Google Font Typography
-										</label>
-										<p className="text-[11px] text-gray-500 font-medium">
-											Choose a Google Font or click Randomize to test different typography styles.
-										</p>
-									</div>
-
-									<button
-										type="button"
-										onClick={handleRandomizeFont}
-										className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 shrink-0 cursor-pointer">
-										<Shuffle className="w-3.5 h-3.5" />
-										<span>Randomize Font</span>
-									</button>
-								</div>
-
-								<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-									<select
-										value={selectedFont}
-										onChange={(e) => setSelectedFont(e.target.value)}
-										className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-blue-200 text-xs font-bold text-gray-900 focus:outline-none focus:border-blue-600 cursor-pointer">
-										{GOOGLE_FONTS_CATALOG.map((font) => (
-											<option key={font.name} value={font.name}>
-												{font.name} ({font.category})
-											</option>
-										))}
-									</select>
-
-									<div className="px-3.5 py-2 rounded-xl bg-white border border-gray-200 flex items-center justify-between text-xs font-bold text-gray-900 truncate">
-										<span className="text-[11px] text-gray-400 font-normal">Active Typography:</span>
-										<span style={{ fontFamily: selectedFont }}>{selectedFont}</span>
-									</div>
-								</div>
-							</div>
-
-							{/* Website Color Theme Mode (Light vs Dark Mode) */}
-							<div className="p-4 rounded-2xl bg-gray-50/80 border border-gray-200/90 space-y-3">
+							{/* Website Color Theme Mode (Light vs Dark Checkbox Selector) */}
+							<div className="p-4 rounded-2xl bg-gray-50/80 border border-gray-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
 								<div>
 									<label className="text-xs font-bold text-gray-900 block">
-										Website Color Theme Mode
+										Website Theme Mode
 									</label>
 									<p className="text-[11px] text-gray-500 font-medium">
-										Choose whether your website will be generated in a clean Light theme or a sleek Midnight Dark theme.
+										Select your preferred aesthetic for the website design.
 									</p>
 								</div>
 
-								<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-									<button
-										type="button"
-										onClick={() => setThemeMode("light")}
-										className={`p-3.5 rounded-2xl border-2 transition-all flex items-center gap-3 cursor-pointer text-left ${
-											themeMode === "light"
-												? "border-blue-600 bg-white shadow-xs ring-2 ring-blue-500/20"
-												: "border-gray-200 bg-white/70 hover:bg-white text-gray-700"
-										}`}>
-										<div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold shrink-0">
-											<Sun className="w-4 h-4" />
-										</div>
-										<div>
-											<p className="text-xs font-bold text-gray-900">Light Mode</p>
-											<p className="text-[10px] text-gray-500 font-medium">Clean, bright & crisp aesthetic</p>
-										</div>
-									</button>
+								<div className="flex items-center gap-6">
+									<label className="flex items-center gap-2 text-xs font-bold text-gray-800 cursor-pointer select-none">
+										<input
+											type="checkbox"
+											checked={themeMode === "light"}
+											onChange={() => setThemeMode("light")}
+											className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
+										/>
+										<Sun className="w-3.5 h-3.5 text-amber-600" />
+										<span>Light Theme</span>
+									</label>
 
-									<button
-										type="button"
-										onClick={() => setThemeMode("dark")}
-										className={`p-3.5 rounded-2xl border-2 transition-all flex items-center gap-3 cursor-pointer text-left ${
-											themeMode === "dark"
-												? "border-purple-600 bg-slate-900 shadow-xs ring-2 ring-purple-500/20 text-white"
-												: "border-gray-200 bg-slate-900/90 hover:bg-slate-900 text-slate-200"
-										}`}>
-										<div className="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold shrink-0">
-											<Moon className="w-4 h-4" />
-										</div>
-										<div>
-											<p className="text-xs font-bold text-white">Midnight Dark Mode</p>
-											<p className="text-[10px] text-slate-400 font-medium">Modern, sleek & immersive aesthetic</p>
-										</div>
-									</button>
+									<label className="flex items-center gap-2 text-xs font-bold text-gray-800 cursor-pointer select-none">
+										<input
+											type="checkbox"
+											checked={themeMode === "dark"}
+											onChange={() => setThemeMode("dark")}
+											className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
+										/>
+										<Moon className="w-3.5 h-3.5 text-purple-600" />
+										<span>Dark Theme</span>
+									</label>
 								</div>
 							</div>
 
@@ -2087,7 +1870,7 @@ function ContentForm() {
 																		type="button"
 																		onClick={() => handleUpdateProduct(prod.id, "imageUrl", "")}
 																		className="absolute top-1.5 right-1.5 p-1 rounded-full bg-slate-900/70 text-white hover:bg-red-600 transition-colors">
-																		<X className="w-3 h-3" />
+																		<Trash2 className="w-3 h-3" />
 																	</button>
 																</>
 															) : (
@@ -2472,1619 +2255,6 @@ function ContentForm() {
 					</form>
 				)}
 			</div>
-
-			{/* LIVE INTERACTIVE SITE PREVIEW MODAL */}
-			{isPreviewOpen && (
-				<div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-6 overflow-y-auto animate-in fade-in duration-200">
-					<div className="w-full max-w-5xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
-						{/* Top Control Bar */}
-						<div className="px-6 py-3.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between gap-4">
-							<div className="flex items-center gap-3">
-								<div className="w-3 h-3 rounded-full bg-red-500" />
-								<div className="w-3 h-3 rounded-full bg-amber-500" />
-								<div className="w-3 h-3 rounded-full bg-emerald-500" />
-								<span className="text-xs font-mono font-bold text-slate-400 ml-2 truncate max-w-[200px] sm:max-w-xs">
-									https://{businessName ? businessName.toLowerCase().replace(/[^a-z0-9]/g, "") : "site"}.kioosk.online
-								</span>
-							</div>
-
-							<div className="flex items-center gap-2">
-								{/* Theme Switcher in Preview */}
-								<div className="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
-									<button
-										type="button"
-										onClick={() => setThemeMode("light")}
-										title="Switch to Light Theme"
-										className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${
-											themeMode === "light"
-												? "bg-amber-500 text-white shadow-xs"
-												: "text-slate-400 hover:text-white"
-										}`}>
-										<Sun className="w-3.5 h-3.5" />
-										<span className="hidden sm:inline">Light</span>
-									</button>
-									<button
-										type="button"
-										onClick={() => setThemeMode("dark")}
-										title="Switch to Dark Theme"
-										className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${
-											themeMode === "dark"
-												? "bg-purple-600 text-white shadow-xs"
-												: "text-slate-400 hover:text-white"
-										}`}>
-										<Moon className="w-3.5 h-3.5" />
-										<span className="hidden sm:inline">Dark</span>
-									</button>
-								</div>
-
-								{/* Device Switcher */}
-								<div className="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
-									<button
-										type="button"
-										onClick={() => setPreviewDevice("desktop")}
-										className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${
-											previewDevice === "desktop"
-												? "bg-blue-600 text-white shadow-xs"
-												: "text-slate-400 hover:text-white"
-										}`}>
-										<Monitor className="w-3.5 h-3.5" />
-										<span className="hidden sm:inline">Desktop</span>
-									</button>
-									<button
-										type="button"
-										onClick={() => setPreviewDevice("mobile")}
-										className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${
-											previewDevice === "mobile"
-												? "bg-blue-600 text-white shadow-xs"
-												: "text-slate-400 hover:text-white"
-										}`}>
-										<Smartphone className="w-3.5 h-3.5" />
-										<span className="hidden sm:inline">Mobile</span>
-									</button>
-								</div>
-
-								<button
-									type="button"
-									onClick={() => setIsPreviewOpen(false)}
-									className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer">
-									<X className="w-5 h-5" />
-								</button>
-							</div>
-						</div>
-
-						{/* Live Interactive Site Render Window */}
-						<div className="flex-1 overflow-y-auto bg-slate-950 p-4 sm:p-8 flex items-center justify-center">
-							{/* Dynamically Load Selected Google Font */}
-							<link
-								rel="stylesheet"
-								href={`https://fonts.googleapis.com/css2?family=${selectedFont.replace(/\s+/g, "+")}:wght@400;600;700;800&display=swap`}
-							/>
-
-							<div
-								style={{ fontFamily: `'${selectedFont}', sans-serif` }}
-								className={`transition-all duration-300 relative ${
-									previewDevice === "mobile"
-										? "w-[380px] max-w-full h-[760px] max-h-[85vh] rounded-[44px] border-[8px] border-slate-800 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden bg-slate-900 ring-1 ring-slate-700/50"
-										: "w-full min-h-[550px] rounded-2xl overflow-hidden shadow-2xl border"
-								} ${
-									themeMode === "dark"
-										? "bg-slate-950 text-slate-100 border-slate-800"
-										: "bg-white text-slate-900 border-gray-100"
-								}`}>
-								{/* Mobile Dynamic Status Bar */}
-								{previewDevice === "mobile" && (
-									<div className="w-full bg-[#0a0f1d] pt-2 pb-1.5 px-6 flex items-center justify-between z-30 shrink-0 border-b border-slate-800/80 select-none">
-										<span className="text-[10px] font-mono font-bold text-slate-400">9:41</span>
-										<div className="w-20 h-3.5 bg-black rounded-full border border-slate-800 flex items-center justify-end px-2">
-											<div className="w-1.5 h-1.5 rounded-full bg-blue-500/80 animate-pulse" />
-										</div>
-										<div className="flex items-center gap-1 text-[10px] text-slate-400">
-											<span>5G</span>
-										</div>
-									</div>
-								)}
-
-								{/* Scrollable Viewport within Device Frame */}
-								<div className="flex-1 overflow-y-auto w-full relative">
-									{/* RENDER: Top Announcement Banner */}
-									<div
-										className={`py-1.5 px-3 text-center text-[10px] sm:text-[11px] font-bold tracking-wide uppercase transition-colors flex items-center justify-center gap-2 border-b select-none ${
-											themeMode === "dark"
-												? "bg-blue-950/80 text-blue-300 border-blue-900/60"
-												: "bg-blue-600 text-white border-blue-700"
-										}`}>
-										<span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-										<span>
-											{activePlan === "E_COMMERCE"
-												? "⚡ Free Priority Shipping on Orders This Week • Direct WhatsApp Checkout"
-												: activePlan === "SALES_FUNNEL"
-												? "🔥 Limited Offer: 80% Instant Value Discount • 100% Risk-Free Guarantee"
-												: "✨ Now Accepting New Clients • Book Your Strategy Session"}
-										</span>
-									</div>
-
-									{/* RENDER: Site Navbar */}
-									<header
-										className={`px-3.5 sm:px-6 py-3 sm:py-3.5 border-b sticky top-0 z-30 transition-colors ${
-											themeMode === "dark"
-												? "bg-[#0b1329]/95 border-slate-800/90 backdrop-blur-md text-white"
-												: "bg-white/95 border-gray-100 backdrop-blur-md text-slate-900 shadow-xs"
-										}`}>
-										<div className="flex items-center justify-between gap-2">
-											{/* Brand Identity */}
-											<div
-												onClick={() => scrollToPreviewSection("preview-hero")}
-												className="flex items-center gap-2.5 min-w-0 cursor-pointer group">
-												{logoImage?.url ? (
-													<img
-														src={logoImage.url}
-														alt={businessName || "Logo"}
-														className={`h-7 w-auto max-h-7 max-w-[110px] rounded-lg object-contain shrink-0 border transition-transform group-hover:scale-105 ${
-															themeMode === "dark" ? "border-slate-700 bg-black/30" : "border-gray-200 bg-white"
-														}`}
-													/>
-												) : (
-													<div className="w-7 h-7 rounded-lg bg-blue-600 text-white font-bold text-xs shrink-0 flex items-center justify-center shadow-xs">
-														{businessName ? businessName[0].toUpperCase() : "K"}
-													</div>
-												)}
-												<span className={`font-bold text-xs sm:text-sm font-nohemi truncate max-w-[100px] sm:max-w-none ${themeMode === "dark" ? "text-white" : "text-gray-900"}`}>
-													{businessName || "Your Business Name"}
-												</span>
-											</div>
-
-											{/* Desktop Navigation Links */}
-											<nav className="hidden md:flex items-center gap-5 text-xs font-semibold">
-												<button
-													type="button"
-													onClick={() => scrollToPreviewSection("preview-hero")}
-													className={`transition-colors hover:text-blue-500 cursor-pointer ${
-														themeMode === "dark" ? "text-slate-300" : "text-gray-600"
-													}`}>
-													Home
-												</button>
-
-												{activePlan === "LANDING_PAGE" && (
-													<>
-														<button
-															type="button"
-															onClick={() => scrollToPreviewSection("preview-services")}
-															className={`transition-colors hover:text-blue-500 cursor-pointer ${
-																themeMode === "dark" ? "text-slate-300" : "text-gray-600"
-															}`}>
-															Services
-														</button>
-														<button
-															type="button"
-															onClick={() => scrollToPreviewSection("preview-reviews")}
-															className={`transition-colors hover:text-blue-500 cursor-pointer ${
-																themeMode === "dark" ? "text-slate-300" : "text-gray-600"
-															}`}>
-															Reviews
-														</button>
-														<button
-															type="button"
-															onClick={() => scrollToPreviewSection("preview-faqs")}
-															className={`transition-colors hover:text-blue-500 cursor-pointer ${
-																themeMode === "dark" ? "text-slate-300" : "text-gray-600"
-															}`}>
-															FAQs
-														</button>
-													</>
-												)}
-
-												{activePlan === "SALES_FUNNEL" && (
-													<>
-														<button
-															type="button"
-															onClick={() => scrollToPreviewSection("preview-vsl")}
-															className={`transition-colors hover:text-blue-500 cursor-pointer ${
-																themeMode === "dark" ? "text-slate-300" : "text-gray-600"
-															}`}>
-															Masterclass
-														</button>
-														<button
-															type="button"
-															onClick={() => scrollToPreviewSection("preview-value-stack")}
-															className={`transition-colors hover:text-blue-500 cursor-pointer ${
-																themeMode === "dark" ? "text-slate-300" : "text-gray-600"
-															}`}>
-															What's Inside
-														</button>
-														<button
-															type="button"
-															onClick={() => scrollToPreviewSection("preview-guarantee")}
-															className={`transition-colors hover:text-blue-500 cursor-pointer ${
-																themeMode === "dark" ? "text-slate-300" : "text-gray-600"
-															}`}>
-															Guarantee
-														</button>
-													</>
-												)}
-
-												{activePlan === "E_COMMERCE" && (
-													<>
-														<button
-															type="button"
-															onClick={() => scrollToPreviewSection("preview-products")}
-															className={`transition-colors hover:text-blue-500 cursor-pointer ${
-																themeMode === "dark" ? "text-slate-300" : "text-gray-600"
-															}`}>
-															Products ({products.length})
-														</button>
-														<button
-															type="button"
-															onClick={() => scrollToPreviewSection("preview-shipping")}
-															className={`transition-colors hover:text-blue-500 cursor-pointer ${
-																themeMode === "dark" ? "text-slate-300" : "text-gray-600"
-															}`}>
-															Shipping
-														</button>
-													</>
-												)}
-
-												<button
-													type="button"
-													onClick={() => scrollToPreviewSection("preview-contact")}
-													className={`transition-colors hover:text-blue-500 cursor-pointer ${
-														themeMode === "dark" ? "text-slate-300" : "text-gray-600"
-													}`}>
-													Contact
-												</button>
-											</nav>
-
-											{/* Action Controls & Mobile Menu Trigger */}
-											<div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-												{activePlan === "E_COMMERCE" && (
-													<button
-														type="button"
-														onClick={() => setIsPreviewCartOpen(true)}
-														className={`relative px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 border cursor-pointer ${
-															themeMode === "dark"
-																? "bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700"
-																: "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200"
-														}`}>
-														<ShoppingCart className="w-3.5 h-3.5" />
-														<span className="hidden sm:inline">Cart</span>
-														{previewCart.reduce((sum, item) => sum + item.quantity, 0) > 0 && (
-															<span className="w-4 h-4 rounded-full bg-blue-600 text-white font-extrabold text-[9px] flex items-center justify-center animate-in zoom-in-50 duration-150">
-																{previewCart.reduce((sum, item) => sum + item.quantity, 0)}
-															</span>
-														)}
-													</button>
-												)}
-
-												<button
-													type="button"
-													onClick={() => {
-														if (whatsappLink) {
-															const waUrl = whatsappLink.startsWith("http")
-																? whatsappLink
-																: `https://wa.me/${whatsappLink.replace(/[^0-9]/g, "")}`;
-															window.open(waUrl, "_blank");
-														} else if (contactEmail) {
-															window.location.href = `mailto:${contactEmail}`;
-														} else {
-															setIsContactModalOpen(true);
-														}
-													}}
-													className="px-3 sm:px-4 py-1.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-[11px] sm:text-xs font-bold transition-colors shadow-xs cursor-pointer">
-													{activePlan === "E_COMMERCE" ? "Order Now" : activePlan === "SALES_FUNNEL" ? "Get Offer" : "Contact"}
-												</button>
-
-												{/* Mobile Hamburger Toggle Button */}
-												<button
-													type="button"
-													onClick={() => setIsPreviewMobileMenuOpen(!isPreviewMobileMenuOpen)}
-													aria-label="Toggle navigation menu"
-													className={`p-1.5 rounded-lg md:hidden border transition-colors cursor-pointer ${
-														themeMode === "dark"
-															? "border-slate-800 text-slate-300 hover:bg-slate-800"
-															: "border-gray-200 text-gray-700 hover:bg-gray-100"
-													}`}>
-													{isPreviewMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-												</button>
-											</div>
-										</div>
-
-										{/* Mobile Navigation Dropdown Drawer */}
-										{isPreviewMobileMenuOpen && (
-											<div
-												className={`md:hidden pt-3 pb-2 mt-2 border-t space-y-1.5 animate-in slide-in-from-top-2 duration-150 ${
-													themeMode === "dark" ? "border-slate-800 text-slate-200" : "border-gray-100 text-gray-800"
-												}`}>
-												<button
-													type="button"
-													onClick={() => scrollToPreviewSection("preview-hero")}
-													className="w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-600/10 hover:text-blue-500 transition-colors">
-													Home
-												</button>
-
-												{activePlan === "LANDING_PAGE" && (
-													<>
-														<button
-															type="button"
-															onClick={() => scrollToPreviewSection("preview-services")}
-															className="w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-600/10 hover:text-blue-500 transition-colors">
-															Services & Solutions
-														</button>
-														<button
-															type="button"
-															onClick={() => scrollToPreviewSection("preview-reviews")}
-															className="w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-600/10 hover:text-blue-500 transition-colors">
-															Client Reviews
-														</button>
-														<button
-															type="button"
-															onClick={() => scrollToPreviewSection("preview-faqs")}
-															className="w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-600/10 hover:text-blue-500 transition-colors">
-															Frequently Asked Questions
-														</button>
-													</>
-												)}
-
-												{activePlan === "SALES_FUNNEL" && (
-													<>
-														<button
-															type="button"
-															onClick={() => scrollToPreviewSection("preview-vsl")}
-															className="w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-600/10 hover:text-blue-500 transition-colors">
-															Video Masterclass
-														</button>
-														<button
-															type="button"
-															onClick={() => scrollToPreviewSection("preview-value-stack")}
-															className="w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-600/10 hover:text-blue-500 transition-colors">
-															Value Stack & Bonuses
-														</button>
-														<button
-															type="button"
-															onClick={() => scrollToPreviewSection("preview-guarantee")}
-															className="w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-600/10 hover:text-blue-500 transition-colors">
-															Risk-Free Guarantee
-														</button>
-													</>
-												)}
-
-												{activePlan === "E_COMMERCE" && (
-													<>
-														<button
-															type="button"
-															onClick={() => scrollToPreviewSection("preview-products")}
-															className="w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-600/10 hover:text-blue-500 transition-colors">
-															Store Products ({products.length})
-														</button>
-														<button
-															type="button"
-															onClick={() => scrollToPreviewSection("preview-shipping")}
-															className="w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-600/10 hover:text-blue-500 transition-colors">
-															Shipping & Policies
-														</button>
-													</>
-												)}
-
-												<button
-													type="button"
-													onClick={() => scrollToPreviewSection("preview-contact")}
-													className="w-full text-left px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-600/10 hover:text-blue-500 transition-colors">
-													Contact & Socials
-												</button>
-											</div>
-										)}
-									</header>
-
-									{/* RENDER: Toast Notification when Item Added */}
-									{cartNotification && (
-										<div className="bg-emerald-600 text-white text-xs font-bold py-2 px-4 text-center sticky top-12 sm:top-14 z-30 flex items-center justify-center gap-2 animate-in slide-in-from-top duration-200">
-											<CheckCircle2 className="w-3.5 h-3.5" />
-											<span>{cartNotification}</span>
-										</div>
-									)}
-
-									{/* RENDER: Hero Section */}
-									<div
-										id="preview-hero"
-										className={`py-12 px-4 sm:py-20 sm:px-12 text-center border-b transition-colors relative ${
-											themeMode === "dark"
-												? "bg-slate-950 text-white border-slate-800"
-												: "bg-slate-900 text-white border-slate-800"
-										}`}>
-										{heroImage && (
-											<div className="absolute inset-0 z-0 overflow-hidden">
-												<img
-													src={heroImage}
-													alt="Hero Background"
-													className="w-full h-full object-cover opacity-20"
-												/>
-											</div>
-										)}
-
-										<div className="relative z-10 max-w-2xl mx-auto space-y-4 sm:space-y-5">
-											<span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 text-[10px] sm:text-[11px] font-semibold tracking-wide uppercase">
-												{activePlan.replace("_", " ")}
-											</span>
-
-											<h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight font-nohemi leading-tight text-white">
-												{tagline || "Your Custom Business Tagline & Headline"}
-											</h1>
-
-											<p className="text-xs sm:text-sm text-slate-300 font-normal leading-relaxed max-w-lg mx-auto">
-												{aboutText || "Enter your value proposition and business summary above."}
-											</p>
-
-											<div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3 w-full sm:w-auto">
-												<button
-													type="button"
-													onClick={() => {
-														if (activePlan === "E_COMMERCE") {
-															setIsPreviewCartOpen(true);
-														} else if (activePlan === "SALES_FUNNEL") {
-															setIsFunnelOrderSuccess(true);
-														} else {
-															setIsContactModalOpen(true);
-														}
-													}}
-													className="w-full sm:w-auto px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-colors shadow-xs cursor-pointer">
-													{ctaText || (activePlan === "E_COMMERCE" ? "Explore Catalog" : activePlan === "SALES_FUNNEL" ? "Claim Offer" : "Get Started")}
-												</button>
-
-												<button
-													type="button"
-													onClick={() => {
-														if (contactEmail) window.location.href = `mailto:${contactEmail}`;
-														else alert("Contact trigger simulated!");
-													}}
-													className="w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-colors cursor-pointer">
-													Contact Us
-												</button>
-											</div>
-										</div>
-									</div>
-
-								{/* RENDER: Plan Specific Section */}
-								{activePlan === "LANDING_PAGE" && (
-									<div
-										className={`space-y-16 py-14 px-6 sm:px-12 transition-colors ${
-											themeMode === "dark" ? "bg-[#070d1d] text-slate-100" : "bg-[#fcfcfd] text-slate-900"
-										}`}>
-										{/* Authority & Stats Bar */}
-										{stats.length > 0 && (
-											<div id="preview-stats" className="max-w-4xl mx-auto">
-												<div
-													className={`grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x rounded-2xl border p-2 transition-colors ${
-														themeMode === "dark"
-															? "bg-[#0d162a] border-slate-800 divide-slate-800"
-															: "bg-white border-gray-200/80 divide-gray-100 shadow-xs"
-													}`}>
-													{stats.map((st) => (
-														<div key={st.id} className="p-6 text-center space-y-1">
-															<p className="text-3xl font-extrabold font-nohemi text-blue-500">
-																{st.value || "0"}
-															</p>
-															<p
-																className={`text-xs font-medium uppercase tracking-wider ${
-																	themeMode === "dark" ? "text-slate-400" : "text-gray-500"
-																}`}>
-																{st.label || "Metric"}
-															</p>
-														</div>
-													))}
-												</div>
-											</div>
-										)}
-
-										{/* Core Services Section */}
-										<div id="preview-services" className="max-w-4xl mx-auto space-y-8">
-											<div className="text-center max-w-md mx-auto space-y-2">
-												<span
-													className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
-														themeMode === "dark"
-															? "bg-[#0d162a] text-slate-300 border-slate-800"
-															: "bg-slate-100 text-slate-700 border-slate-200"
-													}`}>
-													Services & Solutions
-												</span>
-												<h2
-													className={`text-2xl font-bold font-nohemi ${
-														themeMode === "dark" ? "text-white" : "text-gray-900"
-													}`}>
-													Bespoke Offerings
-												</h2>
-											</div>
-
-											<div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-												{services.map((srv) => (
-													<div
-														key={srv.id}
-														className={`p-6 rounded-2xl border transition-all duration-150 flex flex-col justify-between ${
-															themeMode === "dark"
-																? "bg-[#0d162a] border-slate-800 hover:border-slate-700"
-																: "bg-white border-gray-200/80 hover:border-gray-300 shadow-xs"
-														}`}>
-														<div className="space-y-3">
-															<div
-																className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold border ${
-																	themeMode === "dark"
-																		? "bg-slate-800 border-slate-700 text-blue-400"
-																		: "bg-slate-50 border-gray-200 text-blue-600"
-																}`}>
-																<TrendingUp className="w-5 h-5" />
-															</div>
-															<h3
-																className={`text-sm font-bold font-nohemi ${
-																	themeMode === "dark" ? "text-white" : "text-gray-900"
-																}`}>
-																{srv.title || "Service Title"}
-															</h3>
-															<p
-																className={`text-xs font-normal leading-relaxed ${
-																	themeMode === "dark" ? "text-slate-400" : "text-gray-500"
-																}`}>
-																{srv.description || "Comprehensive service delivered by certified professionals."}
-															</p>
-														</div>
-
-														<div
-															className={`pt-4 mt-5 border-t flex items-center justify-between ${
-																themeMode === "dark" ? "border-slate-800" : "border-gray-100"
-															}`}>
-															<span className="text-xs font-bold text-blue-500 font-mono">
-																{srv.price || "Contact Us"}
-															</span>
-															<button
-																type="button"
-																onClick={() => setIsContactModalOpen(true)}
-																className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-colors cursor-pointer ${
-																	themeMode === "dark"
-																		? "bg-slate-800 hover:bg-slate-700 text-white border border-slate-700"
-																		: "bg-slate-900 hover:bg-slate-800 text-white"
-																}`}>
-																Inquire →
-															</button>
-														</div>
-													</div>
-												))}
-											</div>
-										</div>
-
-										{/* Testimonials & Social Proof */}
-										{testimonialsList.length > 0 && (
-											<div id="preview-reviews" className="max-w-4xl mx-auto space-y-8 pt-4">
-												<div className="text-center max-w-md mx-auto space-y-2">
-													<span
-														className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
-															themeMode === "dark"
-																? "bg-[#0d162a] text-slate-300 border-slate-800"
-																: "bg-slate-100 text-slate-700 border-slate-200"
-													}`}>
-														Client Endorsements
-													</span>
-													<h2
-														className={`text-2xl font-bold font-nohemi ${
-															themeMode === "dark" ? "text-white" : "text-gray-900"
-														}`}>
-														What Clients Say
-													</h2>
-												</div>
-
-												<div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-													{testimonialsList.map((t) => (
-														<div
-															key={t.id}
-															className={`p-6 rounded-2xl border space-y-4 ${
-																themeMode === "dark"
-																	? "bg-[#0d162a] border-slate-800 text-slate-200"
-																	: "bg-white border-gray-200/80 text-gray-800 shadow-xs"
-															}`}>
-															<div className="flex items-center gap-1 text-amber-500">
-																{[...Array(t.rating || 5)].map((_, i) => (
-																	<Star key={i} className="w-3.5 h-3.5 fill-current" />
-																))}
-															</div>
-															<p className="text-xs font-normal leading-relaxed italic">
-																&quot;{t.review || "Outstanding service and results!"}&quot;
-															</p>
-															<div
-																className={`pt-3 border-t flex items-center gap-3 ${
-																	themeMode === "dark" ? "border-slate-800" : "border-gray-100"
-																}`}>
-																<div className="w-8 h-8 rounded-full bg-slate-800 text-white font-bold text-xs flex items-center justify-center border border-slate-700">
-																	{t.name ? t.name[0].toUpperCase() : "C"}
-																</div>
-																<div>
-																	<p
-																		className={`text-xs font-bold ${
-																			themeMode === "dark" ? "text-white" : "text-gray-900"
-																		}`}>
-																		{t.name || "Client Name"}
-																	</p>
-																	{t.role && (
-																		<p
-																			className={`text-[10px] ${
-																				themeMode === "dark" ? "text-slate-400" : "text-gray-400"
-																			}`}>
-																			{t.role}
-																		</p>
-																	)}
-																</div>
-															</div>
-														</div>
-													))}
-												</div>
-											</div>
-										)}
-
-										{/* Interactive FAQ Accordion */}
-										{faqs.length > 0 && (
-											<div id="preview-faqs" className="max-w-2xl mx-auto space-y-4 pt-4">
-												<div className="text-center space-y-2 mb-6">
-													<span
-														className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
-															themeMode === "dark"
-																? "bg-[#0d162a] text-slate-300 border-slate-800"
-																: "bg-slate-100 text-slate-700 border-slate-200"
-														}`}>
-														Q&A
-													</span>
-													<h2
-														className={`text-2xl font-bold font-nohemi ${
-															themeMode === "dark" ? "text-white" : "text-gray-900"
-														}`}>
-														Frequently Asked Questions
-													</h2>
-												</div>
-
-												<div className="space-y-3">
-													{faqs.map((faq, idx) => {
-														const isOpen = activeFaqIndex === idx;
-														return (
-															<div
-																key={faq.id}
-																className={`rounded-xl border overflow-hidden transition-colors ${
-																	themeMode === "dark"
-																		? "bg-[#0d162a] border-slate-800"
-																		: "bg-white border-gray-200/80 shadow-xs"
-																}`}>
-																<button
-																	type="button"
-																	onClick={() => setActiveFaqIndex(isOpen ? null : idx)}
-																	className={`w-full p-4 text-left flex items-center justify-between gap-3 text-xs font-bold cursor-pointer ${
-																		themeMode === "dark"
-																			? "text-white hover:bg-slate-800/50"
-																			: "text-gray-900 hover:bg-gray-50/50"
-																	}`}>
-																	<span>{faq.question || "Frequently Asked Question"}</span>
-																	{isOpen ? (
-																		<ChevronUp className="w-4 h-4 text-blue-400 shrink-0" />
-																	) : (
-																		<ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />
-																	)}
-																</button>
-																{isOpen && (
-																	<div
-																		className={`p-4 pt-0 text-xs font-normal leading-relaxed border-t ${
-																			themeMode === "dark"
-																				? "border-slate-800 text-slate-300 bg-[#070d1d]"
-																				: "border-gray-100 text-gray-600 bg-gray-50/40"
-																		}`}>
-																		{faq.answer || "Answer details will appear here."}
-																	</div>
-																)}
-															</div>
-														);
-													})}
-												</div>
-											</div>
-										)}
-
-										{/* Direct Bottom CTA Box */}
-										<div
-											className={`max-w-3xl mx-auto p-10 rounded-2xl text-center space-y-4 border ${
-												themeMode === "dark"
-													? "bg-[#0d162a] border-slate-800 text-white"
-													: "bg-slate-900 border-slate-800 text-white"
-											}`}>
-											<h3 className="text-2xl font-bold font-nohemi text-white">
-												Ready to Transform Your Business?
-											</h3>
-											<p className="text-xs text-slate-300 max-w-md mx-auto leading-relaxed">
-												Speak with our dedicated specialists today and receive a personalized strategy session.
-											</p>
-											<div className="pt-2">
-												<button
-													type="button"
-													onClick={() => setIsContactModalOpen(true)}
-													className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-colors shadow-sm cursor-pointer">
-													{ctaText || "Claim Free Consultation"}
-												</button>
-											</div>
-										</div>
-
-										{/* INTERACTIVE LEAD / CONSULTATION MODAL */}
-										{isContactModalOpen && (
-											<div className="absolute inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-												<div
-													className={`w-full max-w-md rounded-2xl p-5 sm:p-8 space-y-4 sm:space-y-5 border shadow-2xl animate-in zoom-in-95 duration-200 relative max-h-[90%] overflow-y-auto ${
-														themeMode === "dark"
-															? "bg-[#0d162a] border-slate-800 text-white"
-															: "bg-white border-gray-200 text-gray-900"
-													}`}>
-													<button
-														type="button"
-														onClick={() => {
-															setIsContactModalOpen(false);
-															setContactFormSubmitted(false);
-														}}
-														className="absolute top-5 right-5 p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer">
-														<X className="w-4 h-4" />
-													</button>
-
-													{contactFormSubmitted ? (
-														<div className="text-center py-8 space-y-3">
-															<CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto" />
-															<h3
-																className={`text-lg font-bold font-nohemi ${
-																	themeMode === "dark" ? "text-white" : "text-gray-900"
-																}`}>
-																Inquiry Received!
-															</h3>
-															<p className="text-xs text-gray-400 max-w-xs mx-auto">
-																Thank you for reaching out. We will contact you at your email address shortly.
-															</p>
-															<button
-																type="button"
-																onClick={() => {
-																	setIsContactModalOpen(false);
-																	setContactFormSubmitted(false);
-																}}
-																className="px-5 py-2 rounded-xl bg-slate-800 text-white text-xs font-bold">
-																Close
-															</button>
-														</div>
-													) : (
-														<div className="space-y-4">
-															<div>
-																<span
-																	className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
-																		themeMode === "dark"
-																			? "bg-slate-800 text-slate-300 border-slate-700"
-																			: "bg-slate-100 text-slate-700 border-slate-200"
-																	}`}>
-																	Interactive Form
-																</span>
-																<h3
-																	className={`text-lg font-bold font-nohemi mt-1 ${
-																		themeMode === "dark" ? "text-white" : "text-gray-900"
-																	}`}>
-																	{ctaText || "Get In Touch"}
-																</h3>
-																<p className="text-xs text-gray-400 font-normal">
-																	Fill in the simulated form below to test client lead intake.
-																</p>
-															</div>
-
-															<form
-																onSubmit={(e) => {
-																	e.preventDefault();
-																	setContactFormSubmitted(true);
-																}}
-																className="space-y-3">
-																<div>
-																	<label
-																		className={`block text-[11px] font-bold mb-1 ${
-																			themeMode === "dark" ? "text-slate-300" : "text-gray-700"
-																		}`}>
-																		Your Name
-																	</label>
-																	<input
-																		type="text"
-																		required
-																		defaultValue="Jane Doe"
-																		className={`w-full px-3.5 py-2.5 rounded-xl border text-xs font-medium focus:outline-none focus:border-blue-600 ${
-																			themeMode === "dark"
-																				? "bg-slate-800 border-slate-700 text-white"
-																				: "bg-gray-50 border-gray-200 text-gray-900"
-																		}`}
-																	/>
-																</div>
-																<div>
-																	<label
-																		className={`block text-[11px] font-bold mb-1 ${
-																			themeMode === "dark" ? "text-slate-300" : "text-gray-700"
-																		}`}>
-																		Email Address
-																	</label>
-																	<input
-																		type="email"
-																		required
-																		defaultValue="jane@company.com"
-																		className={`w-full px-3.5 py-2.5 rounded-xl border text-xs font-medium focus:outline-none focus:border-blue-600 ${
-																			themeMode === "dark"
-																				? "bg-slate-800 border-slate-700 text-white"
-																				: "bg-gray-50 border-gray-200 text-gray-900"
-																		}`}
-																	/>
-																</div>
-																<div>
-																	<label
-																		className={`block text-[11px] font-bold mb-1 ${
-																			themeMode === "dark" ? "text-slate-300" : "text-gray-700"
-																		}`}>
-																		Project Inquiries
-																	</label>
-																	<textarea
-																		rows={2}
-																		defaultValue="I am interested in scaling my business."
-																		className={`w-full px-3.5 py-2.5 rounded-xl border text-xs font-medium focus:outline-none focus:border-blue-600 ${
-																			themeMode === "dark"
-																				? "bg-slate-800 border-slate-700 text-white"
-																				: "bg-gray-50 border-gray-200 text-gray-900"
-																		}`}
-																	/>
-																</div>
-
-																<button
-																	type="submit"
-																	className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors shadow-sm cursor-pointer">
-																	Submit Test Inquiry
-																</button>
-															</form>
-														</div>
-													)}
-												</div>
-											</div>
-										)}
-									</div>
-								)}
-
-								{activePlan === "SALES_FUNNEL" && (
-									<div
-										className={`py-10 px-4 sm:py-14 sm:px-12 space-y-8 sm:space-y-12 transition-colors ${
-											themeMode === "dark" ? "bg-[#070d1d] text-white" : "bg-[#fafbfc] text-slate-900"
-										}`}>
-										{/* Clean Urgency Countdown Bar */}
-										<div
-											className={`p-3.5 rounded-xl border flex flex-col sm:flex-row items-center justify-between gap-2.5 text-center sm:text-left text-xs font-bold max-w-3xl mx-auto ${
-												themeMode === "dark"
-													? "bg-[#0d162a] border-slate-800 text-slate-200"
-													: "bg-slate-900 border-slate-800 text-white"
-											}`}>
-											<div className="flex items-center gap-2">
-												<Clock className="w-4 h-4 text-amber-400" />
-												<span className="text-[11px] sm:text-xs">SPECIAL OFFER RESERVED FOR:</span>
-											</div>
-											<div className="font-mono text-xs sm:text-sm tracking-widest bg-black/50 px-3 py-1 rounded-lg border border-slate-700 text-amber-400">
-												{Math.floor(funnelSecondsLeft / 60)
-													.toString()
-													.padStart(2, "0")}
-												:
-												{(funnelSecondsLeft % 60).toString().padStart(2, "0")}
-											</div>
-										</div>
-
-										{/* VSL Video Header & Player */}
-										<div id="preview-vsl" className="max-w-3xl mx-auto text-center space-y-6">
-											<div className="space-y-3">
-												<span
-													className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
-														themeMode === "dark"
-															? "bg-[#0d162a] text-slate-300 border-slate-800"
-															: "bg-slate-100 text-slate-700 border-slate-200"
-													}`}>
-													Video Presentation
-												</span>
-												<h2
-													className={`text-2xl sm:text-4xl font-extrabold font-nohemi leading-tight ${
-														themeMode === "dark" ? "text-white" : "text-gray-900"
-													}`}>
-													{leadMagnetTitle || "Exclusive Free Training & Breakthrough Presentation"}
-												</h2>
-											</div>
-
-											{/* Video Player Box */}
-											<div
-												className={`relative aspect-video rounded-2xl overflow-hidden border shadow-lg flex items-center justify-center ${
-													themeMode === "dark"
-														? "bg-[#0d162a] border-slate-800"
-														: "bg-slate-900 border-slate-800"
-												}`}>
-												{videoUrl && videoUrl.includes("youtube.com") ? (
-													<iframe
-														src={videoUrl}
-														title="VSL Video"
-														className="w-full h-full"
-														allowFullScreen
-													/>
-												) : (
-													<div className="text-center space-y-3 p-6">
-														<div className="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center mx-auto shadow-md hover:bg-blue-500 transition-colors cursor-pointer">
-															<Play className="w-6 h-6 fill-current ml-0.5" />
-														</div>
-														<p className="text-xs font-semibold text-slate-300">Click to Play Video Presentation</p>
-													</div>
-												)}
-											</div>
-										</div>
-
-										{/* Value Stack Breakdown Presentation */}
-										<div
-											id="preview-value-stack"
-											className={`max-w-3xl mx-auto rounded-2xl p-6 sm:p-8 space-y-6 border ${
-												themeMode === "dark"
-													? "bg-[#0d162a] border-slate-800 text-white"
-													: "bg-white border-gray-200/90 text-gray-900 shadow-xs"
-											}`}>
-											<div className="text-center space-y-1">
-												<span
-													className={`text-[10px] font-bold uppercase tracking-wider ${
-														themeMode === "dark" ? "text-slate-400" : "text-gray-500"
-													}`}>
-													Deliverables Breakdown
-												</span>
-												<h3
-													className={`text-xl font-bold font-nohemi ${
-														themeMode === "dark" ? "text-white" : "text-gray-900"
-													}`}>
-													Complete System Value Stack
-												</h3>
-											</div>
-
-											<div className="space-y-3">
-												{valueStackItems.map((item, i) => (
-													<div
-														key={item.id}
-														className={`p-4 rounded-xl border flex items-start justify-between gap-4 transition-colors ${
-															themeMode === "dark"
-																? "bg-[#111c33] border-slate-800"
-																: "bg-gray-50/80 border-gray-200/80"
-														}`}>
-														<div className="flex items-start gap-3">
-															<div className="w-5 h-5 rounded-md bg-emerald-500/20 text-emerald-500 flex items-center justify-center font-bold shrink-0 mt-0.5">
-																<Check className="w-3.5 h-3.5" />
-															</div>
-															<div>
-																<div className="flex items-center gap-2">
-																	<p
-																		className={`text-xs font-bold ${
-																			themeMode === "dark" ? "text-white" : "text-gray-900"
-																		}`}>
-																		{item.title || `Item #${i + 1}`}
-																	</p>
-																	{item.isBonus && (
-																		<span className="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-400 text-[9px] font-bold">
-																			BONUS
-																		</span>
-																	)}
-																</div>
-																{item.description && (
-																	<p
-																		className={`text-[11px] font-normal mt-0.5 ${
-																			themeMode === "dark" ? "text-slate-400" : "text-gray-500"
-																		}`}>
-																		{item.description}
-																	</p>
-																)}
-															</div>
-														</div>
-
-														<span
-															className={`text-xs font-mono font-bold shrink-0 ${
-																themeMode === "dark" ? "text-blue-400" : "text-gray-700"
-															}`}>
-															{item.value || "$197 Value"}
-														</span>
-													</div>
-												))}
-											</div>
-
-											{/* Clean Order Bump Box */}
-											{orderBumpTitle && (
-												<div
-													className={`p-4 rounded-xl border-2 border-dashed flex items-start gap-3 ${
-														themeMode === "dark"
-															? "bg-blue-950/30 border-blue-500/40 text-slate-200"
-															: "bg-blue-50/50 border-blue-200 text-gray-800"
-													}`}>
-													<input
-														type="checkbox"
-														id="bumpCheck"
-														checked={isOrderBumpChecked}
-														onChange={(e) => setIsOrderBumpChecked(e.target.checked)}
-														className="w-4 h-4 rounded text-blue-600 mt-0.5 cursor-pointer accent-blue-600"
-													/>
-													<label htmlFor="bumpCheck" className="text-xs cursor-pointer select-none space-y-0.5">
-														<p
-															className={`font-bold ${
-																themeMode === "dark" ? "text-white" : "text-gray-900"
-															}`}>
-															OPTIONAL UPGRADE: {orderBumpTitle} (+${orderBumpPrice || 27})
-														</p>
-														<p
-															className={`text-[11px] font-normal ${
-																themeMode === "dark" ? "text-slate-400" : "text-gray-500"
-															}`}>
-															{orderBumpDescription || "Instant masterclass upgrade and bonus tools."}
-														</p>
-													</label>
-												</div>
-											)}
-
-											{/* Price Breakdown & Instant Claim CTA */}
-											<div
-												className={`pt-4 border-t text-center space-y-4 ${
-													themeMode === "dark" ? "border-slate-800" : "border-gray-100"
-												}`}>
-												<div className="flex items-center justify-center gap-3 text-sm">
-													<span
-														className={`line-through font-mono ${
-															themeMode === "dark" ? "text-slate-500" : "text-gray-400"
-														}`}>
-														Total Value: ${regularPrice || 497}
-													</span>
-													<span className="text-xl font-extrabold text-blue-500 font-mono">
-														Today: ${discountPrice + (isOrderBumpChecked ? (Number(orderBumpPrice) || 0) : 0)}
-													</span>
-												</div>
-
-												<button
-													type="button"
-													onClick={() => setIsFunnelOrderSuccess(true)}
-													className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition-colors shadow-sm cursor-pointer flex items-center justify-center gap-2">
-													<span>Claim Special Offer Now →</span>
-												</button>
-
-												{/* Guarantee Seal */}
-												<div
-													id="preview-guarantee"
-													className={`flex items-center justify-center gap-2 text-xs pt-2 ${
-														themeMode === "dark" ? "text-slate-400" : "text-gray-500"
-													}`}>
-													<ShieldCheck className="w-4 h-4 text-emerald-500" />
-													<span>{guaranteeText || "30-Day 100% Risk-Free Money Back Guarantee"}</span>
-												</div>
-											</div>
-										</div>
-
-										{/* INTERACTIVE FUNNEL SUCCESS MODAL */}
-										{isFunnelOrderSuccess && (
-											<div className="absolute inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-												<div
-													className={`w-full max-w-md rounded-2xl p-5 sm:p-8 text-center space-y-4 border shadow-2xl animate-in zoom-in-95 duration-200 max-h-[90%] overflow-y-auto ${
-														themeMode === "dark"
-															? "bg-[#0d162a] border-slate-800 text-white"
-															: "bg-white border-gray-200 text-gray-900"
-													}`}>
-													<CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
-													<h3
-														className={`text-xl font-bold font-nohemi ${
-															themeMode === "dark" ? "text-white" : "text-gray-900"
-														}`}>
-														Order Successfully Completed!
-													</h3>
-													<p className="text-xs text-gray-400 font-normal leading-relaxed">
-														Your access passes have been generated. Total charged:{" "}
-														<span className="font-bold font-mono text-blue-500">
-															${discountPrice + (isOrderBumpChecked ? (Number(orderBumpPrice) || 0) : 0)}
-														</span>
-													</p>
-													<div
-														className={`p-3 rounded-xl text-left text-xs font-mono space-y-1 border ${
-															themeMode === "dark"
-																? "bg-[#111c33] border-slate-700 text-slate-300"
-																: "bg-gray-50 border-gray-200 text-gray-700"
-														}`}>
-														<p>Order ID: #FNL-{Date.now().toString().slice(-6)}</p>
-														<p>Status: CONFIRMED & ACTIVE</p>
-													</div>
-													<button
-														type="button"
-														onClick={() => setIsFunnelOrderSuccess(false)}
-														className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition-colors">
-														Close Confirmation
-													</button>
-												</div>
-											</div>
-										)}
-									</div>
-								)}
-
-								{activePlan === "E_COMMERCE" && (
-									<div
-										id="preview-products"
-										className={`py-14 px-6 sm:px-12 transition-colors ${
-											themeMode === "dark" ? "bg-[#070d1d] text-white" : "bg-[#fbfcfd] text-slate-900"
-										}`}>
-										<div className="max-w-md mx-auto text-center mb-10 space-y-2">
-											<span
-												className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
-													themeMode === "dark"
-														? "bg-[#0d162a] text-slate-300 border-slate-800"
-														: "bg-slate-100 text-slate-700 border-slate-200"
-												}`}>
-												Product Catalog
-											</span>
-											<h2
-												className={`text-2xl font-bold font-nohemi ${
-													themeMode === "dark" ? "text-white" : "text-gray-900"
-												}`}>
-												Featured Products
-											</h2>
-											{shippingInfo && (
-												<p
-													id="preview-shipping"
-													className={`text-xs font-semibold flex items-center justify-center gap-1.5 ${
-														themeMode === "dark" ? "text-slate-400" : "text-gray-600"
-													}`}>
-													<Truck className="w-3.5 h-3.5 text-blue-500" />
-													<span>{shippingInfo}</span>
-												</p>
-											)}
-										</div>
-
-										{/* Interactive Products Grid */}
-										{products.length > 0 ? (
-											<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
-												{products.map((prod) => (
-													<div
-														key={prod.id}
-														className={`rounded-2xl border overflow-hidden transition-all duration-150 flex flex-col justify-between ${
-															themeMode === "dark"
-																? "bg-[#0d162a] border-slate-800 hover:border-slate-700"
-																: "bg-white border-gray-200/80 hover:border-gray-300 shadow-xs"
-														}`}>
-														<div>
-															{/* Product Thumbnail Box */}
-															<div
-																className={`relative w-full h-48 flex items-center justify-center overflow-hidden border-b ${
-																	themeMode === "dark"
-																		? "bg-[#070d1d] border-slate-800"
-																		: "bg-gray-50 border-gray-100"
-																}`}>
-																{prod.imageUrl ? (
-																	<img
-																		src={prod.imageUrl}
-																		alt={prod.name || "Product"}
-																		className="w-full h-full object-cover"
-																	/>
-																) : (
-																	<div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
-																		<ShoppingBag className="w-8 h-8 mb-1 opacity-50" />
-																		<span className="text-[10px] font-semibold">Product Image</span>
-																	</div>
-																)}
-
-																{prod.badge && (
-																	<span className="absolute top-3 left-3 px-2.5 py-0.5 rounded-md bg-blue-600 text-white text-[9px] font-bold uppercase tracking-wider shadow-xs">
-																		{prod.badge}
-																	</span>
-																)}
-
-																{prod.category && (
-																	<span
-																		className={`absolute bottom-3 left-3 px-2 py-0.5 rounded-md text-[9px] font-bold border ${
-																			themeMode === "dark"
-																				? "bg-[#0d162a]/95 text-slate-200 border-slate-700"
-																				: "bg-white/95 text-gray-800 border-gray-200"
-																		}`}>
-																		{prod.category}
-																	</span>
-																)}
-															</div>
-
-															{/* Product Details */}
-															<div className="p-5 space-y-1.5">
-																<h3
-																	className={`text-sm font-bold font-nohemi ${
-																		themeMode === "dark" ? "text-white" : "text-gray-900"
-																	}`}>
-																	{prod.name || "Untitled Item"}
-																</h3>
-																<p
-																	className={`text-xs font-normal line-clamp-2 leading-relaxed ${
-																		themeMode === "dark" ? "text-slate-400" : "text-gray-500"
-																	}`}>
-																	{prod.description || "High quality item ready for instant delivery."}
-																</p>
-															</div>
-														</div>
-
-														{/* Price & Add to Cart Footer */}
-														<div
-															className={`p-5 pt-3 flex items-center justify-between gap-3 border-t ${
-																themeMode === "dark" ? "border-slate-800" : "border-gray-100"
-															}`}>
-															<span
-																className={`text-sm font-extrabold font-mono ${
-																	themeMode === "dark" ? "text-white" : "text-gray-900"
-																}`}>
-																{CURRENCY_SYMBOLS[currency] || "$"}{prod.price ? Number(prod.price).toFixed(2) : "0.00"}
-															</span>
-
-															<button
-																type="button"
-																onClick={() => addToPreviewCart(prod)}
-																className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs">
-																<ShoppingCart className="w-3.5 h-3.5" />
-																<span>Add to Cart</span>
-															</button>
-														</div>
-													</div>
-												))}
-											</div>
-										) : (
-											<div className="text-center py-10 text-xs text-gray-400">
-												No products configured yet. Add products in Section 3 above.
-											</div>
-										)}
-									</div>
-								)}
-
-								{/* INTERACTIVE SLIDE-OUT CART DRAWER */}
-								{isPreviewCartOpen && (
-									<div className="absolute inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex justify-end animate-in fade-in duration-200">
-										<div
-											className={`w-full max-w-sm sm:max-w-md h-full shadow-2xl p-4 sm:p-6 flex flex-col justify-between animate-in slide-in-from-right duration-300 z-50 border-l ${
-												themeMode === "dark"
-													? "bg-[#0d162a] border-slate-800 text-white"
-													: "bg-white border-gray-200 text-gray-900"
-											}`}>
-											<div className="space-y-5 overflow-y-auto flex-1 pr-1">
-												{/* Cart Header */}
-												<div
-													className={`flex items-center justify-between pb-4 border-b ${
-														themeMode === "dark" ? "border-slate-800" : "border-gray-100"
-													}`}>
-													<div className="flex items-center gap-2">
-														<div
-															className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold border ${
-																themeMode === "dark"
-																	? "bg-slate-800 border-slate-700 text-blue-400"
-																	: "bg-slate-50 border-gray-200 text-blue-600"
-															}`}>
-															<ShoppingCart className="w-4 h-4" />
-														</div>
-														<div>
-															<h3
-																className={`text-sm font-bold font-nohemi ${
-																	themeMode === "dark" ? "text-white" : "text-gray-900"
-																}`}>
-																Shopping Cart
-															</h3>
-															<p className="text-[10px] text-gray-400 font-medium">
-																{previewCart.reduce((sum, item) => sum + item.quantity, 0)} item(s) selected
-															</p>
-														</div>
-													</div>
-
-													<button
-														type="button"
-														onClick={() => setIsPreviewCartOpen(false)}
-														className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-															themeMode === "dark"
-																? "text-gray-400 hover:text-white hover:bg-slate-800"
-																: "text-gray-400 hover:text-gray-700 hover:bg-gray-100"
-														}`}>
-														<X className="w-4 h-4" />
-													</button>
-												</div>
-
-												{/* Items List */}
-												{previewCart.length === 0 ? (
-													<div className="text-center py-16 space-y-2">
-														<ShoppingBag className="w-10 h-10 text-gray-400 opacity-40 mx-auto" />
-														<p
-															className={`text-xs font-bold ${
-																themeMode === "dark" ? "text-white" : "text-gray-700"
-															}`}>
-															Your cart is empty
-														</p>
-														<p className="text-[11px] text-gray-400">Click &quot;Add to Cart&quot; on any product to test ordering.</p>
-													</div>
-												) : (
-													<div className="space-y-3">
-														{previewCart.map((item) => (
-															<div
-																key={item.product.id}
-																className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 text-xs ${
-																	themeMode === "dark"
-																		? "bg-[#111c33] border-slate-800"
-																		: "bg-gray-50/80 border-gray-200/80"
-																}`}>
-																<div className="flex items-center gap-3 min-w-0">
-																	{item.product.imageUrl ? (
-																		<img
-																			src={item.product.imageUrl}
-																			alt={item.product.name}
-																			className="w-12 h-12 rounded-lg object-cover border border-gray-200 shrink-0"
-																		/>
-																	) : (
-																		<div className="w-12 h-12 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold shrink-0">
-																			<Package className="w-5 h-5" />
-																		</div>
-																	)}
-
-																	<div className="min-w-0">
-																		<p
-																			className={`font-bold truncate ${
-																				themeMode === "dark" ? "text-white" : "text-gray-900"
-																			}`}>
-																			{item.product.name || "Item"}
-																		</p>
-																		<p className="text-[11px] text-gray-400 font-mono">
-																			{CURRENCY_SYMBOLS[currency] || "$"}{Number(item.product.price || 0).toFixed(2)} each
-																		</p>
-																	</div>
-																</div>
-
-																{/* Quantity Controls & Remove */}
-																<div className="flex items-center gap-3 shrink-0">
-																	<div
-																		className={`flex items-center rounded-lg border p-0.5 ${
-																			themeMode === "dark"
-																				? "bg-[#0d162a] border-slate-700"
-																				: "bg-white border-gray-200"
-																		}`}>
-																		<button
-																			type="button"
-																			onClick={() => updatePreviewCartQty(item.product.id, -1)}
-																			className="w-6 h-6 rounded text-gray-400 hover:text-white hover:bg-slate-800 flex items-center justify-center cursor-pointer">
-																			<Minus className="w-3 h-3" />
-																		</button>
-																		<input
-																			type="number"
-																			min="1"
-																			value={item.quantity}
-																			onChange={(e) => setPreviewCartQty(item.product.id, parseInt(e.target.value) || 1)}
-																			className={`w-8 text-center text-xs font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
-																				themeMode === "dark" ? "text-white bg-transparent" : "text-gray-900 bg-transparent"
-																			}`}
-																		/>
-																		<button
-																			type="button"
-																			onClick={() => updatePreviewCartQty(item.product.id, 1)}
-																			className="w-6 h-6 rounded text-gray-400 hover:text-white hover:bg-slate-800 flex items-center justify-center cursor-pointer">
-																			<Plus className="w-3 h-3" />
-																		</button>
-																	</div>
-
-																	<button
-																		type="button"
-																		onClick={() => removeFromPreviewCart(item.product.id)}
-																		title="Remove from Cart"
-																		className="p-1 text-gray-400 hover:text-red-400 transition-colors cursor-pointer">
-																		<Trash2 className="w-4 h-4" />
-																	</button>
-																</div>
-															</div>
-														))}
-													</div>
-												)}
-											</div>
-
-											{/* Cart Summary & Order Actions */}
-											{previewCart.length > 0 && (
-												<div
-													className={`pt-4 border-t space-y-3 ${
-														themeMode === "dark" ? "border-slate-800" : "border-gray-100"
-													}`}>
-													<div className="space-y-1.5 text-xs text-gray-400">
-														<div className="flex items-center justify-between">
-															<span>Subtotal</span>
-															<span
-																className={`font-mono font-bold ${
-																	themeMode === "dark" ? "text-white" : "text-gray-900"
-																}`}>
-																{CURRENCY_SYMBOLS[currency] || "$"}
-																{previewCart
-																	.reduce((sum, item) => sum + (Number(item.product.price) || 0) * item.quantity, 0)
-																	.toFixed(2)}
-															</span>
-														</div>
-														{shippingInfo && (
-															<div className="flex items-center justify-between text-[11px] text-blue-400 font-medium">
-																<span>Shipping</span>
-																<span>Included</span>
-															</div>
-														)}
-														<div
-															className={`flex items-center justify-between text-sm font-extrabold pt-2 border-t ${
-																themeMode === "dark"
-																	? "border-slate-800 text-white"
-																	: "border-gray-100 text-gray-900"
-															}`}>
-															<span>Estimated Total</span>
-															<span className="font-mono text-blue-400">
-																{CURRENCY_SYMBOLS[currency] || "$"}
-																{previewCart
-																	.reduce((sum, item) => sum + (Number(item.product.price) || 0) * item.quantity, 0)
-																	.toFixed(2)}
-															</span>
-														</div>
-													</div>
-
-													<div className="space-y-2 pt-2">
-														{/* WhatsApp Direct Order Button */}
-														{whatsappLink ? (
-															<button
-																type="button"
-																onClick={() => {
-																	const total = previewCart
-																		.reduce((sum, item) => sum + (Number(item.product.price) || 0) * item.quantity, 0)
-																		.toFixed(2);
-																	const itemsText = previewCart
-																		.map((i) => `• ${i.product.name} (x${i.quantity}) - ${CURRENCY_SYMBOLS[currency] || "$"}${(i.product.price * i.quantity).toFixed(2)}`)
-																		.join("\n");
-																	const message = `Hello! I would like to place an order from *${businessName || "your store"}*:\n\n${itemsText}\n\n*Total:* ${CURRENCY_SYMBOLS[currency] || "$"}${total}`;
-																	const phoneClean = whatsappLink.replace(/[^0-9]/g, "");
-																	const waUrl = whatsappLink.startsWith("http")
-																		? `${whatsappLink}?text=${encodeURIComponent(message)}`
-																		: `https://wa.me/${phoneClean}?text=${encodeURIComponent(message)}`;
-																	window.open(waUrl, "_blank");
-																}}
-																className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-xs cursor-pointer">
-																<svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-																	<path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.062-2.18-.553-1.636-.677-2.73-2.316-2.812-2.425-.082-.109-.665-.883-.665-1.684 0-.8.419-1.196.568-1.356.149-.16.326-.201.435-.201.109 0 .217.001.312.006.1.005.234-.038.366.28.138.334.472 1.15.513 1.234.041.084.069.183.014.293-.055.109-.082.178-.163.272-.082.095-.172.212-.246.285-.082.08-.168.167-.072.332.096.165.426.703.914 1.138.629.561 1.159.734 1.324.816.165.082.261.071.358-.041.096-.112.414-.482.525-.647.111-.165.221-.138.371-.082.15.055.952.449 1.115.531.163.082.272.123.312.191.041.069.041.399-.103.804z" />
-																</svg>
-																<span>Order via WhatsApp Chat</span>
-															</button>
-														) : null}
-
-														<button
-															type="button"
-															onClick={() => {
-																alert(`Simulated Order Placed!\nTotal: ${CURRENCY_SYMBOLS[currency] || "$"}${previewCart.reduce((sum, item) => sum + (Number(item.product.price) || 0) * item.quantity, 0).toFixed(2)}\nYour customer receipt has been generated.`);
-																setPreviewCart([]);
-																setIsPreviewCartOpen(false);
-															}}
-															className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-xs cursor-pointer">
-															<CreditCard className="w-3.5 h-3.5" />
-															<span>Test Gateway Checkout</span>
-														</button>
-													</div>
-												</div>
-											)}
-										</div>
-									</div>
-								)}
-
-								{/* RENDER: Contact & Social Footer */}
-								<footer
-									id="preview-contact"
-									className={`py-8 px-6 border-t text-center text-xs space-y-3 transition-colors ${
-										themeMode === "dark"
-											? "bg-[#070d1d] border-slate-800 text-slate-400"
-											: "bg-white border-gray-100 text-gray-500"
-									}`}>
-									{logoImage?.url ? (
-										<div className="flex justify-center mb-1">
-											<img
-												src={logoImage.url}
-												alt={businessName || "Brand Logo"}
-												className="h-8 w-auto max-w-[140px] object-contain"
-											/>
-										</div>
-									) : (
-										<p className={`font-bold text-sm font-nohemi ${themeMode === "dark" ? "text-white" : "text-gray-900"}`}>
-											{businessName || "Your Business Name"}
-										</p>
-									)}
-									<p className={`text-[11px] ${themeMode === "dark" ? "text-slate-300" : "text-gray-600"}`}>
-										Email: {contactEmail || "contact@kioosk.online"} | Phone: {contactPhone || "+1 (555) 019-2834"}
-									</p>
-									{contactAddress && (
-										<p className={`text-[11px] ${themeMode === "dark" ? "text-slate-400" : "text-gray-500"}`}>{contactAddress}</p>
-									)}
-
-									{/* Social Badges Row */}
-									{(whatsappLink || xLink || instagramLink || facebookLink || linkedinLink || youtubeLink || tiktokLink || bookingLink || customLink) && (
-										<div className="flex items-center justify-center gap-2 pt-2 flex-wrap">
-											{whatsappLink && (
-												<span
-													className={`px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 border ${
-														themeMode === "dark"
-															? "bg-[#111c33] border-slate-700 text-emerald-400"
-															: "bg-emerald-50 text-emerald-700 border-emerald-200"
-													}`}>
-													<svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24">
-														<path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.062-2.18-.553-1.636-.677-2.73-2.316-2.812-2.425-.082-.109-.665-.883-.665-1.684 0-.8.419-1.196.568-1.356.149-.16.326-.201.435-.201.109 0 .217.001.312.006.1.005.234-.038.366.28.138.334.472 1.15.513 1.234.041.084.069.183.014.293-.055.109-.082.178-.163.272-.082.095-.172.212-.246.285-.082.08-.168.167-.072.332.096.165.426.703.914 1.138.629.561 1.159.734 1.324.816.165.082.261.071.358-.041.096-.112.414-.482.525-.647.111-.165.221-.138.371-.082.15.055.952.449 1.115.531.163.082.272.123.312.191.041.069.041.399-.103.804z" />
-													</svg>
-													<span>WhatsApp</span>
-												</span>
-											)}
-											{xLink && (
-												<span
-													className={`px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 border ${
-														themeMode === "dark"
-															? "bg-[#111c33] border-slate-700 text-slate-200"
-															: "bg-gray-100 text-gray-900 border-gray-200"
-													}`}>
-													<svg className="w-2 h-2 fill-current" viewBox="0 0 24 24">
-														<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-													</svg>
-													<span>X</span>
-												</span>
-											)}
-											{instagramLink && (
-												<span
-													className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-														themeMode === "dark"
-															? "bg-[#111c33] border-slate-700 text-pink-400"
-															: "bg-pink-50 text-pink-700 border-pink-200"
-													}`}>
-													Instagram
-												</span>
-											)}
-											{facebookLink && (
-												<span
-													className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-														themeMode === "dark"
-															? "bg-[#111c33] border-slate-700 text-blue-400"
-															: "bg-blue-50 text-blue-700 border-blue-200"
-													}`}>
-													Facebook
-												</span>
-											)}
-											{linkedinLink && (
-												<span
-													className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-														themeMode === "dark"
-															? "bg-[#111c33] border-slate-700 text-sky-400"
-															: "bg-sky-50 text-sky-700 border-sky-200"
-													}`}>
-													LinkedIn
-												</span>
-											)}
-											{youtubeLink && (
-												<span
-													className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-														themeMode === "dark"
-															? "bg-[#111c33] border-slate-700 text-red-400"
-															: "bg-red-50 text-red-700 border-red-200"
-													}`}>
-													YouTube
-												</span>
-											)}
-											{tiktokLink && (
-												<span
-													className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-														themeMode === "dark"
-															? "bg-[#111c33] border-slate-700 text-slate-200"
-															: "bg-gray-100 text-gray-900 border-gray-200"
-													}`}>
-													TikTok
-												</span>
-											)}
-											{bookingLink && (
-												<span
-													className={`px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 border ${
-														themeMode === "dark"
-															? "bg-[#111c33] border-slate-700 text-blue-400"
-															: "bg-blue-50 text-blue-700 border-blue-200"
-													}`}>
-													<Calendar className="w-3 h-3" />
-													<span>Book Meeting</span>
-												</span>
-											)}
-											{customLink && (
-												<span
-													className={`px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 border ${
-														themeMode === "dark"
-															? "bg-[#111c33] border-slate-700 text-purple-400"
-															: "bg-purple-50 text-purple-700 border-purple-200"
-													}`}>
-													<Globe className="w-3 h-3" />
-													<span>Custom Link</span>
-												</span>
-											)}
-										</div>
-									)}
-								</footer>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			)}
 		</div>
 	);
 }
