@@ -20,7 +20,7 @@ export default async function AdminLayout({
 	}
 
 	return (
-		<div className="relative min-h-screen bg-[#f1f5f9] text-slate-900 flex flex-col">
+		<div className="relative min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col">
 			{/* Main Content Area (Navigation is powered exclusively by floating bottom AdminDock) */}
 			<main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-32">
 				{children}

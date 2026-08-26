@@ -200,7 +200,7 @@ export default function AdminUsersPage() {
 											{/* User Column */}
 											<td className="py-4 pr-4">
 												<div className="flex items-center gap-3">
-													<div className="w-9 h-9 rounded-full bg-slate-900 text-white font-extrabold flex items-center justify-center text-xs shrink-0">
+													<div className="w-9 h-9 rounded-2xl bg-blue-50 border border-blue-200 text-blue-700 font-extrabold flex items-center justify-center text-xs shrink-0">
 														{u.name ? u.name.charAt(0).toUpperCase() : "U"}
 													</div>
 													<div>
