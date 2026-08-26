@@ -312,18 +312,18 @@ export default function AdminProjectReviewPage({
 				</div>
 			)}
 
-			{/* ACTION COMMAND CENTER: STATUS & PUBLISH CONTROLS - SOLID SLATE 900 */}
-			<div className="bg-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl space-y-6 border border-slate-800">
-				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
-					<div className="flex items-center gap-3">
-						<div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-extrabold shadow-md">
-							<Sparkles className="w-5 h-5 text-white" />
+			{/* ACTION COMMAND CENTER: STATUS & PUBLISH CONTROLS - CLEAN LIGHT THEME */}
+			<div className="bg-white rounded-3xl p-6 sm:p-8 text-gray-900 shadow-2xs space-y-6 border border-gray-200/90">
+				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-100">
+					<div className="flex items-center gap-3.5">
+						<div className="w-11 h-11 rounded-2xl bg-blue-50 border border-blue-200/80 text-blue-600 flex items-center justify-center font-extrabold shadow-2xs">
+							<Sparkles className="w-5 h-5 text-blue-600" />
 						</div>
 						<div>
-							<h3 className="font-extrabold font-nohemi text-lg tracking-tight">
+							<h3 className="font-extrabold font-nohemi text-lg tracking-tight text-gray-900">
 								Fulfillment & Launch Control Center
 							</h3>
-							<p className="text-xs text-slate-400 font-medium">
+							<p className="text-xs text-gray-500 font-medium mt-0.5">
 								Update deployment status, assign published URL, or trigger automated client launch email.
 							</p>
 						</div>
@@ -334,7 +334,7 @@ export default function AdminProjectReviewPage({
 						type="button"
 						disabled={isSaving}
 						onClick={() => handleSaveProject(true)}
-						className="px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer group">
+						className="px-6 py-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-sm hover:shadow-md hover:scale-105 active:scale-95 flex items-center justify-center gap-2 cursor-pointer group">
 						<Send className="w-4 h-4 transition-transform group-hover:translate-x-1" />
 						<span>Publish Website & Email Client Launch Notification</span>
 					</button>
@@ -343,11 +343,11 @@ export default function AdminProjectReviewPage({
 				<div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
 					{/* Status Selector */}
 					<div className="space-y-1.5">
-						<label className="text-xs font-bold text-slate-300">Project Status</label>
+						<label className="text-xs font-bold text-gray-700">Project Status</label>
 						<select
 							value={status}
 							onChange={(e) => setStatus(e.target.value)}
-							className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-white focus:outline-none focus:border-blue-500 cursor-pointer">
+							className="w-full px-4 py-2.5 rounded-full bg-gray-50 border border-gray-200 text-xs font-bold text-gray-900 focus:outline-none focus:border-blue-600 cursor-pointer shadow-2xs">
 							<option value="In Review">In Review (Awaiting QA)</option>
 							<option value="In Progress">In Progress (Design & Template)</option>
 							<option value="Live">Live (Published to Internet)</option>
@@ -357,9 +357,9 @@ export default function AdminProjectReviewPage({
 
 					{/* Progress Slider */}
 					<div className="space-y-1.5">
-						<div className="flex items-center justify-between text-xs font-bold text-slate-300">
+						<div className="flex items-center justify-between text-xs font-bold text-gray-700">
 							<span>Progress Percentage</span>
-							<span className="text-blue-400">{progress}%</span>
+							<span className="text-blue-600 font-extrabold">{progress}%</span>
 						</div>
 						<input
 							type="range"
@@ -368,35 +368,35 @@ export default function AdminProjectReviewPage({
 							step="5"
 							value={progress}
 							onChange={(e) => setProgress(Number(e.target.value))}
-							className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-500 mt-2"
+							className="w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-blue-600 mt-2"
 						/>
 					</div>
 
 					{/* Published URL */}
 					<div className="space-y-1.5">
-						<label className="text-xs font-bold text-slate-300">Published Live Domain URL</label>
+						<label className="text-xs font-bold text-gray-700">Published Live Domain URL</label>
 						<input
 							type="text"
 							placeholder="https://brand.kioosk.online"
 							value={publishedUrl}
 							onChange={(e) => setPublishedUrl(e.target.value)}
-							className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs font-medium text-white focus:outline-none focus:border-blue-500 placeholder:text-slate-500"
+							className="w-full px-4 py-2.5 rounded-full bg-gray-50 border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 placeholder:text-gray-400 shadow-2xs"
 						/>
 					</div>
 				</div>
 
 				{/* Admin Internal Notes */}
-				<div className="space-y-2 pt-2 border-t border-slate-800/80">
+				<div className="space-y-2 pt-2 border-t border-gray-100">
 					<div className="flex items-center justify-between">
-						<label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-							<MessageSquare className="w-3.5 h-3.5 text-blue-400" />
+						<label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
+							<MessageSquare className="w-3.5 h-3.5 text-blue-600" />
 							<span>Internal Fulfillment Team Notes</span>
 						</label>
 						<button
 							type="button"
 							disabled={isSaving}
 							onClick={() => handleSaveProject(false)}
-							className="px-4 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold transition-colors flex items-center gap-1 cursor-pointer">
+							className="px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold transition-all shadow-sm hover:scale-105 active:scale-95 flex items-center gap-1.5 cursor-pointer">
 							{isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
 							<span>Save Progress</span>
 						</button>
@@ -406,7 +406,7 @@ export default function AdminProjectReviewPage({
 						placeholder="Add internal notes for team QA, domain DNS status, custom requests..."
 						value={adminNotes}
 						onChange={(e) => setAdminNotes(e.target.value)}
-						className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/90 border border-slate-700 text-xs font-medium text-slate-200 focus:outline-none focus:border-blue-500 placeholder:text-slate-500 leading-relaxed"
+						className="w-full px-4 py-3 rounded-2xl bg-gray-50 border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 placeholder:text-gray-400 leading-relaxed shadow-2xs"
 					/>
 				</div>
 			</div>
