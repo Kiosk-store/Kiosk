@@ -2,8 +2,9 @@
 
 import { cookies } from "next/headers";
 import { db } from "@/db";
-import { users, sessions, invoices } from "@/db/schema";
+import { users, sessions, invoices, tenants } from "@/db/schema";
 import { eq, and, lt, gt } from "drizzle-orm";
+import { auth } from "@/auth";
 
 export const SESSION_COOKIE_NAME = "kiosk_session";
 
@@ -88,136 +89,82 @@ export async function destroySession(): Promise<void> {
  * except if the user is currently in the process of making a payment.
  */
 export async function getAuthenticatedUser(): Promise<SessionUser | null> {
-	const cookieStore = await cookies();
-	const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+	try {
+		const cookieStore = await cookies();
+		const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
-	if (!sessionToken) return null;
+		if (!sessionToken) return null;
 
-	const sessionRecord = await db.query.sessions.findFirst({
-		where: eq(sessions.sessionToken, sessionToken),
-	});
+		const sessionRecord = await db.query.sessions.findFirst({
+			where: eq(sessions.sessionToken, sessionToken),
+		});
 
-	// If session doesn't exist or is expired
-	if (!sessionRecord || new Date(sessionRecord.expires).getTime() < Date.now()) {
-		if (sessionRecord) {
-			// Check if user is actively in the middle of making a payment
-			// (e.g. has a pending invoice created within the last 1 hour)
-			try {
-				const activePendingInvoice = await db.query.invoices.findFirst({
-					where: and(
-						eq(invoices.userId, sessionRecord.userId),
-						eq(invoices.status, "PENDING"),
-						gt(invoices.createdAt, new Date(Date.now() - 60 * 60 * 1000)),
-					),
-				});
-
-				if (activePendingInvoice) {
-					// User is currently making a payment — extend session grace window to complete payment
-					const graceExpires = new Date(Date.now() + 60 * 60 * 1000); // 1-hour grace window
-					await db
-						.update(sessions)
-						.set({ expires: graceExpires })
-						.where(eq(sessions.sessionToken, sessionToken));
-
-					try {
-						cookieStore.set(SESSION_COOKIE_NAME, sessionToken, {
-							httpOnly: true,
-							secure: process.env.NODE_ENV === "production",
-							sameSite: "lax",
-							path: "/",
-							maxAge: 60 * 60,
-							expires: graceExpires,
-						});
-					} catch (e) {
-						// Non-blocking in RSC context
-					}
-
-					const userRecord = await db.query.users.findFirst({
-						where: eq(users.id, sessionRecord.userId),
+		// If session doesn't exist or is expired
+		if (!sessionRecord || new Date(sessionRecord.expires).getTime() < Date.now()) {
+			if (sessionRecord) {
+				try {
+					const activePendingInvoice = await db.query.invoices.findFirst({
+						where: and(
+							eq(invoices.userId, sessionRecord.userId),
+							eq(invoices.status, "PENDING"),
+							gt(invoices.createdAt, new Date(Date.now() - 60 * 60 * 1000)),
+						),
 					});
 
-					if (userRecord) {
-						return {
-							id: userRecord.id,
-							name: userRecord.name,
-							email: userRecord.email,
-							image: userRecord.image,
-							phone: userRecord.phone,
-							role: userRecord.role,
-							emailNotifications: userRecord.emailNotifications,
-							projectUpdates: userRecord.projectUpdates,
-						};
+					if (activePendingInvoice) {
+						const graceExpires = new Date(Date.now() + 60 * 60 * 1000);
+						await db
+							.update(sessions)
+							.set({ expires: graceExpires })
+							.where(eq(sessions.sessionToken, sessionToken));
+
+						const userRecord = await db.query.users.findFirst({
+							where: eq(users.id, sessionRecord.userId),
+						});
+
+						if (userRecord) {
+							return {
+								id: userRecord.id,
+								name: userRecord.name,
+								email: userRecord.email,
+								image: userRecord.image,
+								phone: userRecord.phone,
+								role: userRecord.role,
+								emailNotifications: userRecord.emailNotifications,
+								projectUpdates: userRecord.projectUpdates,
+							};
+						}
 					}
-				}
-			} catch (err) {
-				// If check fails, proceed to standard expiration purge
+				} catch (err) {}
+
+				try {
+					await db.delete(sessions).where(eq(sessions.sessionToken, sessionToken));
+				} catch (e) {}
 			}
 
-			// Purge expired session from DB (logs user out)
-			try {
-				await db.delete(sessions).where(eq(sessions.sessionToken, sessionToken));
-			} catch (e) {
-				// Non-blocking
-			}
+			return null;
 		}
 
-		// Clear stale cookie
-		try {
-			cookieStore.set(SESSION_COOKIE_NAME, "", {
-				httpOnly: true,
-				secure: process.env.NODE_ENV === "production",
-				sameSite: "lax",
-				path: "/",
-				maxAge: 0,
-				expires: new Date(0),
-			});
-		} catch (e) {
-			// In Server Components cookies may be read-only
-		}
+		const userRecord = await db.query.users.findFirst({
+			where: eq(users.id, sessionRecord.userId),
+		});
 
+		if (!userRecord) return null;
+
+		return {
+			id: userRecord.id,
+			name: userRecord.name,
+			email: userRecord.email,
+			image: userRecord.image,
+			phone: userRecord.phone,
+			role: userRecord.role,
+			emailNotifications: userRecord.emailNotifications,
+			projectUpdates: userRecord.projectUpdates,
+		};
+	} catch (e) {
+		console.error("[GET_AUTH_USER_ERROR]", e);
 		return null;
 	}
-
-	// Sliding Session Refresh:
-	// If the active session is more than halfway through its lifespan, extend it
-	const timeRemaining = new Date(sessionRecord.expires).getTime() - Date.now();
-	if (timeRemaining < SESSION_REFRESH_THRESHOLD_MS) {
-		const newExpires = new Date(Date.now() + SESSION_MAX_AGE_MS);
-		try {
-			await db
-				.update(sessions)
-				.set({ expires: newExpires })
-				.where(eq(sessions.sessionToken, sessionToken));
-
-			cookieStore.set(SESSION_COOKIE_NAME, sessionToken, {
-				httpOnly: true,
-				secure: process.env.NODE_ENV === "production",
-				sameSite: "lax",
-				path: "/",
-				maxAge: SESSION_MAX_AGE_SECONDS,
-				expires: newExpires,
-			});
-		} catch (e) {
-			// In read-only RSC contexts, cookie update will occur on next API route
-		}
-	}
-
-	const userRecord = await db.query.users.findFirst({
-		where: eq(users.id, sessionRecord.userId),
-	});
-
-	if (!userRecord) return null;
-
-	return {
-		id: userRecord.id,
-		name: userRecord.name,
-		email: userRecord.email,
-		image: userRecord.image,
-		phone: userRecord.phone,
-		role: userRecord.role,
-		emailNotifications: userRecord.emailNotifications,
-		projectUpdates: userRecord.projectUpdates,
-	};
 }
 
 /**
@@ -225,60 +172,66 @@ export async function getAuthenticatedUser(): Promise<SessionUser | null> {
  * supporting both custom session cookies and NextAuth / Google OAuth sessions.
  */
 export async function getAuthenticatedTenantContext() {
-	// 1. Try custom session cookie
-	const customUser = await getAuthenticatedUser();
-	let dbUser: any = null;
+	try {
+		// 1. Try custom session cookie
+		const customUser = await getAuthenticatedUser();
+		let dbUser: any = null;
 
-	if (customUser) {
-		dbUser = await db.query.users.findFirst({
-			where: eq(users.id, customUser.id),
-		});
-	}
+		if (customUser) {
+			dbUser = await db.query.users.findFirst({
+				where: eq(users.id, customUser.id),
+			});
+		}
 
-	// 2. Fallback to NextAuth Google OAuth
-	if (!dbUser) {
-		const { auth } = await import("@/auth");
-		const authSession = await auth();
-		if (authSession?.user) {
-			const email = authSession.user.email?.toLowerCase().trim();
-			if (email) {
-				dbUser = await db.query.users.findFirst({
-					where: eq(users.email, email),
-				});
-			}
-			if (!dbUser && authSession.user.id) {
-				dbUser = await db.query.users.findFirst({
-					where: eq(users.id, authSession.user.id),
-				});
+		// 2. Fallback to NextAuth Google OAuth
+		if (!dbUser) {
+			try {
+				const authSession = await auth();
+				if (authSession?.user) {
+					const email = authSession.user.email?.toLowerCase().trim();
+					if (email) {
+						dbUser = await db.query.users.findFirst({
+							where: eq(users.email, email),
+						});
+					}
+					if (!dbUser && authSession.user.id) {
+						dbUser = await db.query.users.findFirst({
+							where: eq(users.id, authSession.user.id),
+						});
+					}
+				}
+			} catch (oauthErr) {
+				console.error("[OAUTH_AUTH_CHECK_ERROR]", oauthErr);
 			}
 		}
-	}
 
-	if (!dbUser) {
+		if (!dbUser) {
+			return { user: null, tenant: null };
+		}
+
+		// 3. Find or auto-provision tenant for this user
+		let tenant = await db.query.tenants.findFirst({
+			where: eq(tenants.ownerId, dbUser.id),
+		});
+
+		if (!tenant) {
+			const cleanSlug = `${(dbUser.name || "workspace").toLowerCase().replace(/[^a-z0-9]/g, "")}-${crypto.randomUUID().slice(0, 6)}`;
+			const [newTenant] = await db
+				.insert(tenants)
+				.values({
+					ownerId: dbUser.id,
+					name: `${dbUser.name || "User"}'s Workspace`,
+					slug: cleanSlug,
+					plan: "NONE",
+					billingStatus: "ACTIVE",
+				})
+				.returning();
+			tenant = newTenant;
+		}
+
+		return { user: dbUser, tenant };
+	} catch (err) {
+		console.error("[GET_AUTH_TENANT_CONTEXT_ERROR]", err);
 		return { user: null, tenant: null };
 	}
-
-	// 3. Find or auto-provision tenant for this user
-	const { tenants } = await import("@/db/schema");
-	let tenant = await db.query.tenants.findFirst({
-		where: eq(tenants.ownerId, dbUser.id),
-	});
-
-	if (!tenant) {
-		const cleanSlug = `${(dbUser.name || "workspace").toLowerCase().replace(/[^a-z0-9]/g, "")}-${crypto.randomUUID().slice(0, 6)}`;
-		const [newTenant] = await db
-			.insert(tenants)
-			.values({
-				ownerId: dbUser.id,
-				name: `${dbUser.name || "User"}'s Workspace`,
-				slug: cleanSlug,
-				plan: "NONE",
-				billingStatus: "ACTIVE",
-			})
-			.returning();
-		tenant = newTenant;
-	}
-
-	return { user: dbUser, tenant };
 }
-
