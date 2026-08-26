@@ -40,7 +40,10 @@ const ROOT_DOMAINS = [
  */
 export async function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl;
-	const hostname = request.headers.get("host") || "localhost:3000";
+	const hostname =
+		request.headers.get("x-forwarded-host") ||
+		request.headers.get("host") ||
+		"localhost:3000";
 	const ip = request.headers.get("x-forwarded-for")?.split(",")[0] || "127.0.0.1";
 
 	// ---------------------------------------------------------------------------
