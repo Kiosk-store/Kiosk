@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push",
+    "scaffold": "node scripts/scaffold-client.cjs"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.3",
