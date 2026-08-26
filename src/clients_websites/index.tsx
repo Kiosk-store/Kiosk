@@ -14,6 +14,7 @@ export interface CustomClientTemplateProps {
 // Import custom client-specific website components here
 // ---------------------------------------------------------------------------
 import VictorJeremiahStore from "./VictorJeremiahStore";
+import MaiksVisualsStudio from "./MaiksVisualsStudio";
 
 /**
  * Custom Client Websites Registry
@@ -25,6 +26,9 @@ export const customTemplateRegistry: Record<
 	React.ComponentType<CustomClientTemplateProps>
 > = {
 	"victorjeremiah-2e6925": VictorJeremiahStore,
+	"maiksvisuals-b0c561": MaiksVisualsStudio,
+	"maiks-visuals": MaiksVisualsStudio,
+	"maiksvisuals": MaiksVisualsStudio,
 	// Add new custom client sites here:
 	// "bella-bakery": BellaBakeryCustom,
 	// "tech-solutions": TechSolutionsCustom,
