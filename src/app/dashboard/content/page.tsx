@@ -1041,14 +1041,14 @@ function ContentForm() {
 				)}
 
 				{/* Header Title & Plan Selector */}
-				<div className="pb-6 border-b border-gray-200/80 mb-8 space-y-4">
+				<div className="pb-6 border-b border-gray-200/80 mb-6 space-y-4">
 					<div className="flex items-center justify-between gap-4">
 						<div>
 							<h1 className="text-2xl sm:text-3xl font-bold font-nohemi text-gray-900 tracking-tight mb-1">
-								Submit Your Business Copy & Images
+								Submit Your Business Details & Content
 							</h1>
 							<p className="text-gray-500 text-sm font-medium">
-								Tailored form fields generated for your active plan:{" "}
+								Step 2 of 2 • Tailored intake form for your{" "}
 								<span className="font-bold text-blue-600">
 									{activePlan === "LANDING_PAGE"
 										? `Landing Page (${isCurrencyLoading ? "…" : formatPlanPrice("landing", "monthly")}/mo)`
@@ -1058,6 +1058,28 @@ function ContentForm() {
 								</span>
 							</p>
 						</div>
+					</div>
+
+					{/* Done-For-You Model Guarantee Banner */}
+					<div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+						<div className="flex items-start sm:items-center gap-3">
+							<div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+								<Sparkles className="w-4 h-4" />
+							</div>
+							<div>
+								<h4 className="font-bold text-gray-900">Done-For-You Website Personalization</h4>
+								<p className="text-gray-600 text-[11px] font-medium mt-0.5">
+									No builder or design skill needed. Fill in your business details below — our team personalizes your template and launches your live site in 3-5 days.
+								</p>
+							</div>
+						</div>
+						<button
+							type="button"
+							onClick={() => setIsPreviewOpen(true)}
+							className="shrink-0 px-3.5 py-1.5 rounded-full bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 font-bold text-xs shadow-2xs flex items-center gap-1.5 transition-colors cursor-pointer">
+							<Eye className="w-3.5 h-3.5" />
+							<span>Live Mockup Preview</span>
+						</button>
 					</div>
 
 					{/* Interactive Plan Selector Switcher */}
@@ -2420,7 +2442,11 @@ function ContentForm() {
 						</div>
 
 						{/* Action Buttons */}
-						<div className="pt-6 border-t border-gray-100 flex items-center justify-end">
+						<div className="pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+							<p className="text-gray-500 text-xs font-medium text-center sm:text-left">
+								✨ Our engineers will QA-review, customize, and publish your site in 3-5 days.
+							</p>
+
 							<PillButton
 								type="submit"
 								disabled={isSubmitting}
@@ -2433,12 +2459,12 @@ function ContentForm() {
 								{isSubmitting ? (
 									<span className="inline-flex items-center gap-2">
 										<Loader2 className="w-4 h-4 animate-spin" />
-										<span>Saving Business Details...</span>
+										<span>Submitting to Fulfillment Team...</span>
 									</span>
 								) : (
 									<span className="inline-flex items-center gap-2">
 										<Sparkles className="w-4 h-4" />
-										<span>Submit Custom Content</span>
+										<span>Submit For QA & Launch →</span>
 									</span>
 								)}
 							</PillButton>

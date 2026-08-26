@@ -8,19 +8,21 @@ Kiosk is a multi-tenant SaaS platform that makes it simple for small businesses 
 
 **Mission:** Remove the technical barrier between small business owners and a great website by personalizing proven, pre-built pages for them — combining the speed and affordability of templated tools with the polish and hands-on support of a dedicated team.
 
-Most small business owners don't have the time, design skill, or desire to learn a website builder — and they shouldn't have to. Kiosk exists to remove that barrier entirely: you tell us about your business, configure your brand and catalog in our intuitive Content Studio, and our team personalizes a proven, professionally designed page for you.
+## Core Philosophy: Submit Info, Not a Website Builder
 
-## Multi-Tenant Platform Model
+A website builder forces the customer to do the heavy lifting: drag-and-drop canvases, choosing columns, tweaking padding, and debugging responsive layouts. That directly contradicts the problem Kiosk solves.
 
-Kiosk is engineered from the ground up as a multi-tenant platform:
-- **Tenant Isolation**: Every client business operates within an isolated tenant workspace (`tenants` table) with dedicated project spaces, custom domains, and subdomains (e.g. `business.kioosk.online` or `customdomain.com`).
-- **Subdomain Routing**: Next.js Edge Middleware dynamically routes incoming requests to the client's tenant environment.
-- **Pooled PostgreSQL Database**: Row-level tenant isolation using strict `tenant_id` foreign key scoping across all projects, billing subscriptions, and asset records.
+Small business owners choose Kiosk over Wix, Shopify, or Bumpa specifically because they **do not want to sit down and build a website themselves**.
 
-With Kiosk, clients choose the subscription package that fits their business:
-- **Landing Page ($20/mo, $192/yr)** — A single, high-converting custom page perfect for a first professional presence with services grid, social proof, FAQs, and WhatsApp lead capture. Delivered in 3-5 days.
-- **Sales Funnel ($30/mo, $288/yr)** — Up to 5 custom conversion pages with VSL video header, countdown timer, value stack breakdown, order bumps, and CRM integration. Delivered in 5-7 days.
-- **E-commerce Store ($43/mo, $408/yr)** — A full product catalog, item badges, multi-currency support, slide-out cart drawer, direct WhatsApp ordering, and payment gateways. Delivered in 7-10 days.
+### The Kiosk Workflow:
+1. **Submit Info (5 Minutes)**: The business owner fills out a structured intake form (Business Name, Tagline, Offerings/Products, Logo, Brand Photos, Contact, Socials).
+2. **Instant Template Mapping**: That structured data populates a proven, conversion-optimized template with automatic formatting.
+3. **Dedicated Team Customization & QA**: Kiosk engineers and designers perform a hands-on customization, polish, and QA pass.
+4. **Instant Launch**: The site goes live on `<business>.kioosk.online` or a custom domain within 3-5 days.
+
+**No live builder. No canvas complexity. No steep learning curve.**
+
+---
 
 Everything is hosted, isolated, and managed for you. No technical setup. No complicated builders. 
 

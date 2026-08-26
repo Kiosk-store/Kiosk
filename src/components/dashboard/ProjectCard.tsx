@@ -165,7 +165,13 @@ export default function ProjectCard({
 						</a>
 					)}
 					<span className="text-[11px] text-blue-600 font-bold group-hover:text-blue-700 transition-colors duration-200 flex items-center gap-1">
-						<span>Continue Editing</span>
+						<span>
+							{status === "Live"
+								? "Manage Website Info"
+								: status === "In Review"
+								? "View / Update Info"
+								: "Submit Website Info"}
+						</span>
 						<span className="material-symbols-outlined text-[14px] group-hover:translate-x-0.5 transition-transform">
 							arrow_forward
 						</span>
