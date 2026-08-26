@@ -1,15 +1,14 @@
 /** @format */
 
 import React from "react";
-import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { db } from "@/db";
 import { tenants, projects } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, ilike, or } from "drizzle-orm";
 import TenantLiveSite from "@/components/tenant/TenantLiveSite";
 import type { TenantContentData } from "@/components/tenant/TenantLiveSite";
 import Link from "next/link";
-import { Clock, Globe, Sparkles } from "lucide-react";
+import { Globe, Sparkles } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -19,19 +18,48 @@ interface PageProps {
 	}>;
 }
 
+async function resolveTenantAndProject(slug: string) {
+	const cleanSlug = slug.toLowerCase().trim();
+
+	// 1. Match directly by tenant slug
+	let tenant = await db.query.tenants.findFirst({
+		where: eq(tenants.slug, cleanSlug),
+	});
+
+	let project: typeof projects.$inferSelect | undefined;
+
+	if (tenant) {
+		project = await db.query.projects.findFirst({
+			where: eq(projects.tenantId, tenant.id),
+			orderBy: (p, { desc }) => [desc(p.updatedAt)],
+		});
+	} else {
+		// 2. Match by project publishedUrl (e.g. "https://my-store.kioosk.online")
+		project = await db.query.projects.findFirst({
+			where: or(
+				ilike(projects.publishedUrl, `%://${cleanSlug}.%`),
+				ilike(projects.publishedUrl, `%/${cleanSlug}`),
+			),
+			orderBy: (p, { desc }) => [desc(p.updatedAt)],
+		});
+
+		if (project) {
+			tenant = await db.query.tenants.findFirst({
+				where: eq(tenants.id, project.tenantId),
+			});
+		}
+	}
+
+	return { tenant, project, cleanSlug };
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
 	const { slug } = await params;
-	const tenant = await db.query.tenants.findFirst({
-		where: eq(tenants.slug, slug.toLowerCase().trim()),
-	});
+	const { tenant, project } = await resolveTenantAndProject(slug);
 
 	if (!tenant) {
 		return { title: "Website Not Found | Kiosk" };
 	}
-
-	const project = await db.query.projects.findFirst({
-		where: eq(projects.tenantId, tenant.id),
-	});
 
 	let parsed: TenantContentData = {};
 	if (project?.content) {
@@ -56,12 +84,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function TenantSubdomainPage({ params }: PageProps) {
 	const { slug } = await params;
-	const cleanSlug = slug.toLowerCase().trim();
-
-	// 1. Fetch Tenant from database
-	const tenant = await db.query.tenants.findFirst({
-		where: eq(tenants.slug, cleanSlug),
-	});
+	const { tenant, project, cleanSlug } = await resolveTenantAndProject(slug);
 
 	if (!tenant) {
 		return (
@@ -84,11 +107,6 @@ export default async function TenantSubdomainPage({ params }: PageProps) {
 		);
 	}
 
-	// 2. Fetch Project & Content
-	const project = await db.query.projects.findFirst({
-		where: eq(projects.tenantId, tenant.id),
-	});
-
 	let parsedContent: TenantContentData = {};
 	if (project?.content) {
 		try {
@@ -96,7 +114,6 @@ export default async function TenantSubdomainPage({ params }: PageProps) {
 		} catch (e) {}
 	}
 
-	// 3. If project is not live or published yet, show launching soon state
 	const isLive = project?.status === "Live" || project?.status === "Published";
 
 	if (!isLive) {
@@ -143,13 +160,12 @@ export default async function TenantSubdomainPage({ params }: PageProps) {
 		);
 	}
 
-	// 4. Render Full Live Dynamic Website
 	return (
 		<TenantLiveSite
-			tenantSlug={cleanSlug}
+			tenantSlug={tenant.slug}
 			plan={tenant.plan}
 			content={parsedContent}
-			publishedUrl={project?.publishedUrl || `https://${cleanSlug}.kioosk.online`}
+			publishedUrl={project?.publishedUrl || `https://${tenant.slug}.kioosk.online`}
 		/>
 	);
 }
