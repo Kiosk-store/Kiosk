@@ -7,6 +7,7 @@ import { tenants, projects } from "@/db/schema";
 import { eq, ilike, or } from "drizzle-orm";
 import TenantLiveSite from "@/components/tenant/TenantLiveSite";
 import type { TenantContentData } from "@/components/tenant/TenantLiveSite";
+import { getCustomClientTemplate } from "@/components/templates/custom";
 import Link from "next/link";
 import { Globe, Sparkles } from "lucide-react";
 
@@ -160,12 +161,30 @@ export default async function TenantSubdomainPage({ params }: PageProps) {
 		);
 	}
 
+	const publishedUrl = project?.publishedUrl || `https://${tenant.slug}.kioosk.online`;
+
+	// 4. Check for bespoke custom React template component
+	const CustomComponent =
+		getCustomClientTemplate(cleanSlug) || getCustomClientTemplate(tenant.slug);
+
+	if (CustomComponent) {
+		return (
+			<CustomComponent
+				tenantSlug={tenant.slug}
+				plan={tenant.plan}
+				content={parsedContent}
+				publishedUrl={publishedUrl}
+			/>
+		);
+	}
+
+	// 5. Default dynamic multi-tenant template renderer
 	return (
 		<TenantLiveSite
 			tenantSlug={tenant.slug}
 			plan={tenant.plan}
 			content={parsedContent}
-			publishedUrl={project?.publishedUrl || `https://${tenant.slug}.kioosk.online`}
+			publishedUrl={publishedUrl}
 		/>
 	);
 }

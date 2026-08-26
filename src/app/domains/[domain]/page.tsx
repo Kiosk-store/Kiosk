@@ -1,13 +1,13 @@
 /** @format */
 
 import React from "react";
-import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { db } from "@/db";
 import { tenants, projects } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import TenantLiveSite from "@/components/tenant/TenantLiveSite";
 import type { TenantContentData } from "@/components/tenant/TenantLiveSite";
+import { getCustomClientTemplate } from "@/components/templates/custom";
 import Link from "next/link";
 import { Globe, Sparkles } from "lucide-react";
 
@@ -132,12 +132,30 @@ export default async function CustomDomainPage({ params }: PageProps) {
 		);
 	}
 
+	const publishedUrl = `https://${cleanDomain}`;
+
+	// 3. Check for bespoke custom React template component
+	const CustomComponent =
+		getCustomClientTemplate(cleanDomain) || getCustomClientTemplate(tenant.slug);
+
+	if (CustomComponent) {
+		return (
+			<CustomComponent
+				tenantSlug={tenant.slug}
+				plan={tenant.plan}
+				content={parsedContent}
+				publishedUrl={publishedUrl}
+			/>
+		);
+	}
+
+	// 4. Default dynamic multi-tenant template renderer
 	return (
 		<TenantLiveSite
 			tenantSlug={tenant.slug}
 			plan={tenant.plan}
 			content={parsedContent}
-			publishedUrl={`https://${cleanDomain}`}
+			publishedUrl={publishedUrl}
 		/>
 	);
 }
