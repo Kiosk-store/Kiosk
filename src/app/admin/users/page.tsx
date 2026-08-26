@@ -13,6 +13,9 @@ import {
 	ArrowLeft,
 	Globe,
 	UserCheck,
+	CreditCard,
+	ShoppingBag,
+	Sparkles,
 } from "lucide-react";
 
 interface UserItem {
@@ -80,13 +83,41 @@ export default function AdminUsersPage() {
 		}
 	};
 
+	const formatPlanName = (rawPlan?: string) => {
+		if (!rawPlan) return "No Plan";
+		const p = rawPlan.toUpperCase();
+		if (p.includes("COMMERCE") || p.includes("STORE")) return "E-Commerce Store";
+		if (p.includes("FUNNEL")) return "Sales Funnel";
+		if (p.includes("LANDING")) return "Landing Page";
+		return "Free / None";
+	};
+
+	const getPlanBadgeStyle = (rawPlan?: string) => {
+		if (!rawPlan) return "bg-gray-100 text-gray-600 border-gray-200";
+		const p = rawPlan.toUpperCase();
+		if (p.includes("COMMERCE") || p.includes("STORE")) {
+			return "bg-purple-100 text-purple-800 border-purple-200";
+		}
+		if (p.includes("FUNNEL")) {
+			return "bg-indigo-100 text-indigo-800 border-indigo-200";
+		}
+		if (p.includes("LANDING")) {
+			return "bg-blue-100 text-blue-800 border-blue-200";
+		}
+		return "bg-gray-100 text-gray-600 border-gray-200";
+	};
+
 	const filteredUsers = usersList.filter((u) => {
 		if (!searchQuery.trim()) return true;
 		const q = searchQuery.toLowerCase().trim();
 		return (
 			u.name?.toLowerCase().includes(q) ||
 			u.email?.toLowerCase().includes(q) ||
-			u.tenants?.some((t) => t.slug?.toLowerCase().includes(q) || t.name?.toLowerCase().includes(q))
+			u.tenants?.some((t) => 
+				t.slug?.toLowerCase().includes(q) || 
+				t.name?.toLowerCase().includes(q) ||
+				t.plan?.toLowerCase().includes(q)
+			)
 		);
 	});
 
@@ -109,7 +140,7 @@ export default function AdminUsersPage() {
 						Customer Accounts & Tenant Directory
 					</h1>
 					<p className="text-xs text-gray-500 font-medium">
-						Manage platform accounts, grant admin privileges, and inspect workspace setups.
+						Manage platform accounts, grant admin privileges, and inspect workspace subscription plans.
 					</p>
 				</div>
 			</div>
@@ -120,7 +151,7 @@ export default function AdminUsersPage() {
 					<Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
 					<input
 						type="text"
-						placeholder="Search by customer name, email, or tenant slug..."
+						placeholder="Search by customer name, email, plan, or slug..."
 						value={searchQuery}
 						onChange={(e) => setSearchQuery(e.target.value)}
 						className="w-full pl-9 pr-3 py-2 rounded-xl border border-gray-200 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 bg-gray-50/50"
@@ -150,6 +181,7 @@ export default function AdminUsersPage() {
 							<thead>
 								<tr className="border-b border-gray-100 text-[11px] font-extrabold text-gray-400 uppercase tracking-wider">
 									<th className="pb-3">Customer User</th>
+									<th className="pb-3">Subscription Plan</th>
 									<th className="pb-3">Workspaces</th>
 									<th className="pb-3">Access Role</th>
 									<th className="pb-3">Registered On</th>
@@ -159,9 +191,13 @@ export default function AdminUsersPage() {
 							<tbody className="divide-y divide-gray-50 font-medium">
 								{filteredUsers.map((u) => {
 									const isAdminRole = u.role === "ADMIN" || u.role === "SUPERADMIN";
+									const primaryTenant = u.tenants.length > 0 ? u.tenants[0] : null;
+									const planName = formatPlanName(primaryTenant?.plan);
+									const planStyle = getPlanBadgeStyle(primaryTenant?.plan);
 
 									return (
 										<tr key={u.id} className="hover:bg-gray-50/80 transition-colors">
+											{/* User Column */}
 											<td className="py-4 pr-4">
 												<div className="flex items-center gap-3">
 													<div className="w-9 h-9 rounded-full bg-slate-900 text-white font-extrabold flex items-center justify-center text-xs shrink-0">
@@ -174,6 +210,22 @@ export default function AdminUsersPage() {
 												</div>
 											</td>
 
+											{/* Subscription Plan Column */}
+											<td className="py-4 pr-4">
+												<div className="flex flex-col items-start gap-1">
+													<span
+														className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold border ${planStyle}`}>
+														{planName}
+													</span>
+													{primaryTenant?.billingStatus && (
+														<span className="text-[9px] text-gray-400 font-semibold uppercase">
+															Status: {primaryTenant.billingStatus}
+														</span>
+													)}
+												</div>
+											</td>
+
+											{/* Workspaces Column */}
 											<td className="py-4 pr-4">
 												<div className="flex flex-wrap gap-1.5">
 													{u.tenants.length > 0 ? (
@@ -190,6 +242,7 @@ export default function AdminUsersPage() {
 												</div>
 											</td>
 
+											{/* Access Role */}
 											<td className="py-4 pr-4">
 												<span
 													className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold ${
@@ -201,6 +254,7 @@ export default function AdminUsersPage() {
 												</span>
 											</td>
 
+											{/* Registered On */}
 											<td className="py-4 pr-4 text-gray-500 text-[11px]">
 												{new Date(u.createdAt).toLocaleDateString("en-US", {
 													month: "short",
@@ -209,6 +263,7 @@ export default function AdminUsersPage() {
 												})}
 											</td>
 
+											{/* Role Actions */}
 											<td className="py-4 text-right">
 												<select
 													disabled={updatingUserId === u.id}
