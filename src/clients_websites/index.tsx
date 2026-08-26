@@ -11,15 +11,13 @@ export interface CustomClientTemplateProps {
 }
 
 // ---------------------------------------------------------------------------
-// Import custom client-specific template components here
-// Example: import VictorJeremiahStore from "./VictorJeremiahStore";
+// Import custom client-specific website components here
 // ---------------------------------------------------------------------------
-
 import VictorJeremiahStore from "./VictorJeremiahStore";
 
 /**
- * Custom Template Registry
- * Map any client subdomain slug to their custom bespoke React component.
+ * Custom Client Websites Registry
+ * Map any client subdomain slug to their custom bespoke React website component.
  * Slugs should be in lowercase.
  */
 export const customTemplateRegistry: Record<
@@ -33,7 +31,7 @@ export const customTemplateRegistry: Record<
 };
 
 /**
- * Helper to check if a tenant has a custom hand-crafted React template
+ * Helper to check if a tenant has a custom hand-crafted React website
  */
 export function getCustomClientTemplate(
 	slugOrSubdomain: string,

@@ -7,7 +7,7 @@ import { tenants, projects } from "@/db/schema";
 import { eq, ilike, or } from "drizzle-orm";
 import TenantLiveSite from "@/components/tenant/TenantLiveSite";
 import type { TenantContentData } from "@/components/tenant/TenantLiveSite";
-import { getCustomClientTemplate } from "@/components/templates/custom";
+import { getCustomClientTemplate } from "@/clients_websites";
 import Link from "next/link";
 import { Globe, Sparkles } from "lucide-react";
 

@@ -28,8 +28,6 @@ export default function VictorJeremiahStore({
 	const whatsapp = content.whatsappNumber || "08116062226";
 	const cleanPhone = whatsapp.replace(/[^0-9]/g, "");
 
-	const [selectedCategory, setSelectedCategory] = useState("All");
-
 	const defaultProducts = [
 		{
 			id: "1",
