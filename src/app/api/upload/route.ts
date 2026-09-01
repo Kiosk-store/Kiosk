@@ -38,7 +38,7 @@ export async function POST(request: Request) {
 		}
 
 		// Resolve Multi-Tenant Workspace for folder partitioning
-		let tenant = await db.query.tenants.findFirst({
+		const tenant = await db.query.tenants.findFirst({
 			where: eq(tenants.ownerId, userId),
 		});
 
