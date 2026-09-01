@@ -1,0 +1,43 @@
+name: Kiosk CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, master, dev]
+  pull_request:
+    branches: [main, master, dev]
+
+jobs:
+  build-and-test:
+    name: Build, Lint & Test Suite
+    runs-on: ubuntu-latest
+
+    env:
+      NEXT_PUBLIC_APP_URL: "http://localhost:3000"
+      DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/kiosk_test"
+      AUTH_SECRET: "ci_pipeline_dummy_auth_secret_minimum_32_characters_long_2026"
+      FLUTTERWAVE_SECRET_HASH: "kiosk_flutterwave_secret_hash"
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Type Check (tsc --noEmit)
+        run: npx tsc --noEmit
+
+      - name: Lint Code
+        run: npm run lint
+
+      - name: Run Core Test Suite
+        run: npm test
+
+      - name: Next.js Production Build
+        run: npm run build

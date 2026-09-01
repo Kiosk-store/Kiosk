@@ -71,14 +71,14 @@ This technical TODO roadmap outlines the high-priority engineering tasks, design
 
 ## 5. E2E Testing, TDD & CI/CD Automation
 
-- [ ] **Playwright Test Environment**: Configure Playwright (`playwright.config.ts`) for API and integration testing.
-- [ ] **API Endpoint Tests (`*.e2e-spec.ts`)**:
+- [x] **Playwright Test Environment**: Configure Playwright (`playwright.config.ts`) for API and integration testing.
+- [x] **API Endpoint Tests (`*.e2e-spec.ts`)**:
   - `POST /api/auth/register` & `POST /api/auth/login` (validation, rate-limiting, error responses).
   - `POST /api/payments/initialize` (atomic lock `SETNX` double-charge protection).
   - `POST /api/webhooks/flutterwave` (secret hash verification and event deduplication).
-- [ ] **GitHub Actions CI/CD Pipeline (`.github/workflows/ci.yml`)**:
+- [x] **GitHub Actions CI/CD Pipeline (`.github/workflows/ci.yml`)**:
   - Automated `tsc --noEmit` and ESLint checks on every PR.
-  - Automatic Vitest suite execution on merges.
+  - Automatic Vitest / Playwright suite execution on merges.
 
 ---
 
@@ -99,9 +99,9 @@ This technical TODO roadmap outlines the high-priority engineering tasks, design
 | **Templates** | Templates Directory with Live Modals | Completed | `src/app/dashboard/templates/` |
 | **Auth** | 6-Hour Session Token & Checkout Grace Window | Completed | `src/lib/auth/session.ts` |
 | **E-Commerce** | Multi-Currency Catalog & WhatsApp Ordering | Completed | Content Studio & Preview |
-| **Async Bus** | Upstash QStash Event Bus Setup | In Progress | `src/lib/events/` |
-| **Testing** | Playwright E2E Test Suite | In Progress | `*.e2e-spec.ts` |
-| **DevOps** | GitHub Actions CI/CD Pipeline | In Progress | `.github/workflows/` |
+| **Async Bus** | Upstash QStash Event Bus Setup | Completed | `src/lib/events/` |
+| **Testing** | Playwright E2E Test Suite | Completed | `*.e2e-spec.ts` |
+| **DevOps** | GitHub Actions CI/CD Pipeline | Completed | `.github/workflows/` |
 | **Deploy** | Production Pre-Flight Audit | Ready | Vercel & Neon Setup |
 
 ---

@@ -129,9 +129,28 @@ export class EmailNotificationObserver implements Observer {
 	public name = "EmailNotificationObserver";
 
 	public async update(event: ProjectEvent): Promise<void> {
-		if (event.type === "PROJECT_CREATED" && event.payload) {
-			const project = event.payload;
-			console.log(`[EMAIL_EVENT] Queued welcome status notice for project: ${project.name}`);
+		try {
+			if (event.type === "PROJECT_CREATED" && event.payload) {
+				const project = event.payload;
+				console.log(`[EMAIL_EVENT] Queued welcome status notice for project: ${project.name}`);
+			} else if (
+				(event.type === "PROJECT_UPDATED" || event.type === "PROJECT_PUBLISHED") &&
+				event.payload?.toEmail
+			) {
+				await sendProjectStatusEmail(
+					event.payload.toEmail,
+					event.payload.userName || "Subscriber",
+					event.payload.projectName || "Kiosk Website",
+					event.payload.status || (event.type === "PROJECT_PUBLISHED" ? "PUBLISHED" : "UPDATED"),
+					event.payload.publishedUrl,
+				);
+				console.log(
+					`[EMAIL_EVENT] Dispatched project status update email to ${event.payload.toEmail}`,
+				);
+			}
+		} catch (err) {
+			console.error("[EMAIL_OBSERVER_ERROR]", err);
 		}
 	}
 }
+
