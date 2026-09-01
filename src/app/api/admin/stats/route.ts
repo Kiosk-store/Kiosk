@@ -5,6 +5,7 @@ import { getAuthenticatedAdmin } from "@/lib/auth/admin";
 import { db } from "@/db";
 import { users, tenants, projects, invoices } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
+import { CURRENCIES } from "@/lib/currency";
 import { Logger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
@@ -30,10 +31,15 @@ export async function GET() {
 		const allUsers = await db.query.users.findMany();
 		const allTenants = await db.query.tenants.findMany();
 
-		// 3. Revenue Metrics from Invoices
+		// 3. Revenue Metrics from Invoices (Normalized to USD)
 		const allInvoices = await db.query.invoices.findMany();
 		const paidInvoices = allInvoices.filter((inv) => inv.status === "PAID");
-		const totalRevenue = paidInvoices.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+		const totalRevenue = paidInvoices.reduce((acc, curr) => {
+			const currencyKey = curr.currency?.toUpperCase() || "USD";
+			const rate = CURRENCIES[currencyKey]?.rateFromUSD || 1;
+			const usdVal = (curr.amount || 0) / rate;
+			return acc + Math.round(usdVal);
+		}, 0);
 		const pendingInvoices = allInvoices.filter((inv) => inv.status === "PENDING").length;
 
 		return NextResponse.json({

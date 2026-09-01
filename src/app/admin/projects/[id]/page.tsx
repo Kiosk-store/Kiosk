@@ -33,6 +33,7 @@ import {
 	ShieldCheck,
 	Image as ImageIcon,
 } from "lucide-react";
+import { CURRENCIES } from "@/lib/currency";
 
 interface ProjectDetail {
 	id: string;
@@ -585,11 +586,17 @@ export default function AdminProjectReviewPage({
 							<div className="grid grid-cols-2 gap-3 text-xs">
 								<div className="p-3 rounded-xl bg-purple-50 border border-purple-100">
 									<span className="text-[10px] text-purple-600 font-bold uppercase">Retail Price</span>
-									<p className="text-base font-extrabold text-purple-950">${content.regularPrice || 0}</p>
+									<p className="text-base font-extrabold text-purple-950">
+										{CURRENCIES[content.currency?.toUpperCase() || "USD"]?.symbol || "$"}
+										{(content.regularPrice || 0).toLocaleString()}
+									</p>
 								</div>
 								<div className="p-3 rounded-xl bg-purple-100 border border-purple-200">
 									<span className="text-[10px] text-purple-700 font-bold uppercase">Special Funnel Price</span>
-									<p className="text-base font-extrabold text-purple-900">${content.discountPrice || 0}</p>
+									<p className="text-base font-extrabold text-purple-900">
+										{CURRENCIES[content.currency?.toUpperCase() || "USD"]?.symbol || "$"}
+										{(content.discountPrice || 0).toLocaleString()}
+									</p>
 								</div>
 							</div>
 
@@ -629,7 +636,10 @@ export default function AdminProjectReviewPage({
 										)}
 										<div className="min-w-0 flex-1">
 											<p className="text-xs font-bold text-gray-900 truncate">{prod.name}</p>
-											<p className="text-[11px] font-extrabold text-emerald-600">${prod.price}</p>
+											<p className="text-[11px] font-extrabold text-emerald-600">
+												{CURRENCIES[content.currency?.toUpperCase() || "USD"]?.symbol || "$"}
+												{(prod.price || 0).toLocaleString()}
+											</p>
 											{prod.badge && (
 												<span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-100 text-amber-800">
 													{prod.badge}

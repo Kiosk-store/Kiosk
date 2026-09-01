@@ -17,6 +17,8 @@ import {
 	DollarSign,
 } from "lucide-react";
 
+import { CURRENCIES } from "@/lib/currency";
+
 interface InvoiceItem {
 	id: string;
 	invoiceNumber: string;
@@ -78,17 +80,33 @@ export default function AdminBillingPage() {
 
 	const revenueStats = useMemo(() => {
 		const paid = invoices.filter((i) => i.status === "PAID");
-		const totalPaid = paid.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+		const totalPaidUsd = paid.reduce((acc, curr) => {
+			const code = curr.currency?.toUpperCase() || "USD";
+			const rate = CURRENCIES[code]?.rateFromUSD || 1;
+			return acc + (curr.amount || 0) / rate;
+		}, 0);
+
 		const pending = invoices.filter((i) => i.status === "PENDING");
-		const totalPending = pending.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+		const totalPendingUsd = pending.reduce((acc, curr) => {
+			const code = curr.currency?.toUpperCase() || "USD";
+			const rate = CURRENCIES[code]?.rateFromUSD || 1;
+			return acc + (curr.amount || 0) / rate;
+		}, 0);
 
 		return {
-			totalPaid,
+			totalPaid: Math.round(totalPaidUsd),
 			paidCount: paid.length,
-			totalPending,
+			totalPending: Math.round(totalPendingUsd),
 			pendingCount: pending.length,
 		};
 	}, [invoices]);
+
+	const formatInvoiceAmount = (amount: number, currencyCode?: string) => {
+		const code = currencyCode?.toUpperCase() || "USD";
+		const currencyConfig = CURRENCIES[code] || CURRENCIES.USD;
+		const symbol = currencyConfig.symbol || "$";
+		return `${symbol}${amount.toLocaleString()} ${code}`;
+	};
 
 	return (
 		<div className="space-y-6 animate-in fade-in duration-200">
@@ -252,7 +270,7 @@ export default function AdminBillingPage() {
 
 											<td className="py-4 pr-4">
 												<span className="font-extrabold text-gray-900">
-													${inv.amount} {inv.currency}
+													{formatInvoiceAmount(inv.amount, inv.currency)}
 												</span>
 											</td>
 
