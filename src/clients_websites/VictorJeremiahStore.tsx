@@ -562,7 +562,7 @@ export default function VictorJeremiahStore({
 								))}
 							</div>
 							<p className="text-xs text-slate-600 leading-relaxed font-medium">
-								"Ordered the Sovereign Chronograph on WhatsApp and received it within 24 hours in Lagos. The build quality and packaging exceeded my expectations."
+								&quot;Ordered the Sovereign Chronograph on WhatsApp and received it within 24 hours in Lagos. The build quality and packaging exceeded my expectations.&quot;
 							</p>
 							<div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
 								<span className="font-extrabold text-slate-900">Adeola M.</span>
@@ -579,7 +579,7 @@ export default function VictorJeremiahStore({
 								))}
 							</div>
 							<p className="text-xs text-slate-600 leading-relaxed font-medium">
-								"The leather briefcase has exceptional craftsmanship. You can tell real attention went into the stitching and hardware. 10/10 recommendation!"
+								&quot;The leather briefcase has exceptional craftsmanship. You can tell real attention went into the stitching and hardware. 10/10 recommendation!&quot;
 							</p>
 							<div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
 								<span className="font-extrabold text-slate-900">Chukwudi E.</span>
@@ -596,7 +596,7 @@ export default function VictorJeremiahStore({
 								))}
 							</div>
 							<p className="text-xs text-slate-600 leading-relaxed font-medium">
-								"Customer service on WhatsApp is super fast and polite. They helped me choose the exact gift piece for my partner. Will definitely buy again."
+								&quot;Customer service on WhatsApp is super fast and polite. They helped me choose the exact gift piece for my partner. Will definitely buy again.&quot;
 							</p>
 							<div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
 								<span className="font-extrabold text-slate-900">Folake A.</span>
