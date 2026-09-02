@@ -81,7 +81,7 @@ export default function CustomServicesCTA() {
 						{/* CTA buttons */}
 						<div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-stretch sm:items-center max-w-md sm:max-w-none mx-auto">
 							<PillButton
-								href="mailto:support@kiosk.site"
+								href="mailto:kioskonline3@gmail.com"
 								baseColor="#7c3aed"
 								circleColor="#ffffff"
 								textColor="#ffffff"
@@ -91,9 +91,9 @@ export default function CustomServicesCTA() {
 								Get in Touch
 							</PillButton>
 							<a
-								href="mailto:support@kiosk.site"
+								href="mailto:kioskonline3@gmail.com"
 								className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-white hover:bg-purple-50 border border-purple-200 text-xs sm:text-sm font-bold text-purple-700 transition-all text-center inline-flex items-center justify-center gap-2 shadow-xs cursor-pointer">
-								<span>support@kiosk.site</span>
+								<span>kioskonline3@gmail.com</span>
 								<ArrowRight className="w-3.5 h-3.5 text-purple-500" />
 							</a>
 						</div>
