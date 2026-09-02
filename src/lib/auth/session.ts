@@ -93,15 +93,30 @@ export async function getAuthenticatedUser(): Promise<SessionUser | null> {
 		const cookieStore = await cookies();
 		const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
-		if (!sessionToken) return null;
+		if (sessionToken) {
+			const sessionRecord = await db.query.sessions.findFirst({
+				where: eq(sessions.sessionToken, sessionToken),
+			});
 
-		const sessionRecord = await db.query.sessions.findFirst({
-			where: eq(sessions.sessionToken, sessionToken),
-		});
+			// If session doesn't exist or is expired
+			if (sessionRecord && new Date(sessionRecord.expires).getTime() >= Date.now()) {
+				const userRecord = await db.query.users.findFirst({
+					where: eq(users.id, sessionRecord.userId),
+				});
 
-		// If session doesn't exist or is expired
-		if (!sessionRecord || new Date(sessionRecord.expires).getTime() < Date.now()) {
-			if (sessionRecord) {
+				if (userRecord) {
+					return {
+						id: userRecord.id,
+						name: userRecord.name,
+						email: userRecord.email,
+						image: userRecord.image,
+						phone: userRecord.phone,
+						role: userRecord.role,
+						emailNotifications: userRecord.emailNotifications,
+						projectUpdates: userRecord.projectUpdates,
+					};
+				}
+			} else if (sessionRecord) {
 				try {
 					const activePendingInvoice = await db.query.invoices.findFirst({
 						where: and(
@@ -141,26 +156,53 @@ export async function getAuthenticatedUser(): Promise<SessionUser | null> {
 					await db.delete(sessions).where(eq(sessions.sessionToken, sessionToken));
 				} catch (e) {}
 			}
-
-			return null;
 		}
 
-		const userRecord = await db.query.users.findFirst({
-			where: eq(users.id, sessionRecord.userId),
-		});
+		// Fallback: Check NextAuth Google OAuth session
+		try {
+			const authSession = await auth();
+			if (authSession?.user) {
+				const email = authSession.user.email?.toLowerCase().trim();
+				let userRecord = null;
+				if (email) {
+					userRecord = await db.query.users.findFirst({
+						where: eq(users.email, email),
+					});
+				}
+				if (!userRecord && authSession.user.id) {
+					userRecord = await db.query.users.findFirst({
+						where: eq(users.id, authSession.user.id),
+					});
+				}
 
-		if (!userRecord) return null;
+				if (userRecord) {
+					return {
+						id: userRecord.id,
+						name: userRecord.name,
+						email: userRecord.email,
+						image: userRecord.image,
+						phone: userRecord.phone,
+						role: userRecord.role,
+						emailNotifications: userRecord.emailNotifications,
+						projectUpdates: userRecord.projectUpdates,
+					};
+				} else if (authSession.user.email) {
+					return {
+						id: authSession.user.id || "oauth-user",
+						name: authSession.user.name || null,
+						email: authSession.user.email,
+						image: authSession.user.image || null,
+						role: (authSession.user as any).role || "USER",
+						emailNotifications: true,
+						projectUpdates: true,
+					};
+				}
+			}
+		} catch (oauthErr) {
+			// Non-blocking OAuth session check
+		}
 
-		return {
-			id: userRecord.id,
-			name: userRecord.name,
-			email: userRecord.email,
-			image: userRecord.image,
-			phone: userRecord.phone,
-			role: userRecord.role,
-			emailNotifications: userRecord.emailNotifications,
-			projectUpdates: userRecord.projectUpdates,
-		};
+		return null;
 	} catch (e) {
 		console.error("[GET_AUTH_USER_ERROR]", e);
 		return null;

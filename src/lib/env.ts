@@ -15,6 +15,13 @@ const envSchema = z.object({
 	NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
 	DATABASE_URL: z.string().min(1, "DATABASE_URL is required for PostgreSQL connection"),
 	AUTH_SECRET: z.string().min(1, "AUTH_SECRET is required for Auth.js session signing"),
+	NEXTAUTH_SECRET: z.string().optional(),
+	AUTH_URL: z.string().optional(),
+	NEXTAUTH_URL: z.string().optional(),
+	AUTH_GOOGLE_ID: z.string().optional(),
+	AUTH_GOOGLE_SECRET: z.string().optional(),
+	GOOGLE_CLIENT_ID: z.string().optional(),
+	GOOGLE_CLIENT_SECRET: z.string().optional(),
 	BACHS_SECRET_KEY: z.string().optional(),
 	BACHS_WEBHOOK_SECRET: z.string().optional(),
 	FLUTTERWAVE_PUBLIC_KEY: z.string().optional(),
@@ -45,13 +52,9 @@ export function validateEnv(): Env {
 
 	if (!parsed.success) {
 		console.error("[ENVIRONMENT_VALIDATION_ERROR]", parsed.error.flatten().fieldErrors);
-		// Return defaulted schema in development mode to prevent local dev blocking
-		return envSchema.parse({
-			NODE_ENV: process.env.NODE_ENV || "development",
-			NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
-			DATABASE_URL: process.env.DATABASE_URL || "postgres://localhost:5432/kiosk",
-			AUTH_SECRET: process.env.AUTH_SECRET || "dev_auth_secret_kiosk_2026",
-		});
+		throw new Error(
+			`Invalid environment variables: ${JSON.stringify(parsed.error.flatten().fieldErrors)}`,
+		);
 	}
 
 	return parsed.data;
