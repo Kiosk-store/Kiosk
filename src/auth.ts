@@ -10,6 +10,9 @@ import { eq } from "drizzle-orm";
 import { verifyPassword } from "@/lib/auth/password";
 import { sendWelcomeEmail } from "@/lib/email";
 
+const googleClientId = process.env.AUTH_GOOGLE_ID || process.env.GOOGLE_CLIENT_ID;
+const googleClientSecret = process.env.AUTH_GOOGLE_SECRET || process.env.GOOGLE_CLIENT_SECRET;
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
 	trustHost: true,
 	adapter: DrizzleAdapter(db, {
@@ -27,15 +30,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 		error: "/get-started",
 	},
 	providers: [
-		Google({
-			clientId:
-				process.env.AUTH_GOOGLE_ID || process.env.GOOGLE_CLIENT_ID || "",
-			clientSecret:
-				process.env.AUTH_GOOGLE_SECRET ||
-				process.env.GOOGLE_CLIENT_SECRET ||
-				"",
-			allowDangerousEmailAccountLinking: true,
-		}),
+		...(googleClientId && googleClientSecret
+			? [
+					Google({
+						clientId: googleClientId,
+						clientSecret: googleClientSecret,
+						allowDangerousEmailAccountLinking: true,
+					}),
+			  ]
+			: []),
 		Credentials({
 			name: "Credentials",
 			credentials: {
@@ -50,26 +53,31 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 				const email = (credentials.email as string).toLowerCase();
 				const password = credentials.password as string;
 
-				const user = await db.query.users.findFirst({
-					where: eq(users.email, email),
-				});
+				try {
+					const user = await db.query.users.findFirst({
+						where: eq(users.email, email),
+					});
 
-				if (!user || !user.passwordHash) {
+					if (!user || !user.passwordHash) {
+						return null;
+					}
+
+					const isValid = await verifyPassword(password, user.passwordHash);
+					if (!isValid) {
+						return null;
+					}
+
+					return {
+						id: user.id,
+						name: user.name,
+						email: user.email,
+						image: user.image,
+						role: user.role,
+					};
+				} catch (dbErr) {
+					console.error("[AUTH_CREDENTIALS_DB_ERROR]", dbErr);
 					return null;
 				}
-
-				const isValid = await verifyPassword(password, user.passwordHash);
-				if (!isValid) {
-					return null;
-				}
-
-				return {
-					id: user.id,
-					name: user.name,
-					email: user.email,
-					image: user.image,
-					role: user.role,
-				};
 			},
 		}),
 	],
@@ -98,5 +106,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 			}
 		},
 	},
-	secret: process.env.AUTH_SECRET,
+	secret:
+		process.env.AUTH_SECRET ||
+		process.env.NEXTAUTH_SECRET ||
+		"kiosk_super_secret_jwt_key_2026_change_in_production",
 });

@@ -227,11 +227,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 	// OAuth Logins
 	const loginWithGoogle = async (): Promise<void> => {
-		await nextAuthSignIn("google", { callbackUrl: "/dashboard" });
+		try {
+			setError(null);
+			const result = await nextAuthSignIn("google", { callbackUrl: "/dashboard", redirect: false });
+			if (result?.error) {
+				if (result.error === "Configuration") {
+					setError("Google Sign-In is not configured for this environment. Please sign in with your email and password.");
+				} else {
+					setError("Google login could not be completed. Please use email and password.");
+				}
+			}
+		} catch (e: any) {
+			console.error("[GOOGLE_AUTH_ERROR]", e);
+			setError("Google Sign-In is not configured in this environment. Please sign in with your email and password.");
+		}
 	};
 
 	const loginWithGithub = async (): Promise<void> => {
-		await nextAuthSignIn("github", { callbackUrl: "/dashboard" });
+		try {
+			setError(null);
+			const result = await nextAuthSignIn("github", { callbackUrl: "/dashboard", redirect: false });
+			if (result?.error) {
+				setError("GitHub login could not be completed. Please use email and password.");
+			}
+		} catch (e: any) {
+			console.error("[GITHUB_AUTH_ERROR]", e);
+			setError("GitHub Sign-In is not configured in this environment. Please sign in with your email and password.");
+		}
 	};
 
 	return (
