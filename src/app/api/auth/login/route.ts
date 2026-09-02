@@ -87,8 +87,21 @@ export async function POST(request: Request) {
 				},
 			},
 		);
-	} catch (error) {
+	} catch (error: any) {
 		console.error("[LOGIN_ERROR]", error);
+		const isDbError =
+			error?.code === "CONNECT_TIMEOUT" ||
+			error?.code === "ECONNREFUSED" ||
+			error?.message?.includes("CONNECT_TIMEOUT") ||
+			error?.message?.includes("DATABASE_URL");
+
+		if (isDbError) {
+			return NextResponse.json(
+				{ error: "Database connection unavailable. Please check your DATABASE_URL configuration in .env." },
+				{ status: 503 },
+			);
+		}
+
 		return NextResponse.json(
 			{ error: "An unexpected error occurred during login." },
 			{ status: 500 },

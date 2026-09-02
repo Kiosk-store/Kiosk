@@ -8,9 +8,9 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
 	Mail,
 	Lock,
@@ -27,14 +27,41 @@ import PillButton from "@/components/PillButton";
 import LottiePlayer from "@/components/LottiePlayer";
 import { useAuth } from "@/context/AuthContext";
 
-export default function GetStartedPage() {
+function GetStartedContent() {
 	const router = useRouter();
+	const searchParams = useSearchParams();
 	const { login, signup, loginWithGoogle, error, clearError } = useAuth();
+
+	const urlError = searchParams?.get("error");
+	const urlTab = searchParams?.get("tab");
 
 	const [activeTab, setActiveTab] = useState<"signup" | "login">("signup");
 	const [showPassword, setShowPassword] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
+
+	useEffect(() => {
+		if (urlTab === "login") {
+			setActiveTab("login");
+		}
+	}, [urlTab]);
+
+	const displayError = useMemo(() => {
+		if (error) return error;
+		if (urlError === "Configuration") {
+			return "Google Sign-In is not configured for this environment. Please sign in with your email and password below.";
+		}
+		if (urlError === "OAuthSignin" || urlError === "OAuthCallback") {
+			return "Could not complete social sign-in. Please use your email and password.";
+		}
+		if (urlError === "AccessDenied") {
+			return "Access denied. Please check your credentials.";
+		}
+		if (urlError) {
+			return "An unexpected error occurred. Please sign in with email and password.";
+		}
+		return null;
+	}, [error, urlError]);
 
 	// Forgot Password state
 	const [isForgotPassword, setIsForgotPassword] = useState(false);
@@ -193,10 +220,10 @@ export default function GetStartedPage() {
 							}`}>
 							<div className="w-full max-w-md px-1 sm:px-4">
 								{/* Error Banner */}
-								{error && (
+								{displayError && (
 									<div className="mb-4 p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-start gap-2.5 animate-in fade-in duration-200">
 										<AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-										<span>{error}</span>
+										<span>{displayError}</span>
 									</div>
 								)}
 
@@ -592,5 +619,18 @@ export default function GetStartedPage() {
 				<p>© {new Date().getFullYear()} Kiosk</p>
 			</footer>
 		</div>
+	);
+}
+
+export default function GetStartedPage() {
+	return (
+		<Suspense
+			fallback={
+				<div className="min-h-screen flex items-center justify-center bg-[#f8fafc]">
+					<Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+				</div>
+			}>
+			<GetStartedContent />
+		</Suspense>
 	);
 }

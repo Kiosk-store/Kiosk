@@ -13,6 +13,7 @@ import ServiceTiers from "@/components/services/ServiceTiers";
 import StandardGuarantee from "@/components/services/StandardGuarantee";
 import ServiceAddOns from "@/components/services/ServiceAddOns";
 import ServicesDecisionHelper from "@/components/services/ServicesDecisionHelper";
+import CustomServicesCTA from "@/components/services/CustomServicesCTA";
 
 export default function ServicesPage() {
 	return (
@@ -24,6 +25,7 @@ export default function ServicesPage() {
 			<StandardGuarantee />
 			<ServiceAddOns />
 			<ServicesDecisionHelper />
+			<CustomServicesCTA />
 			<CTA />
 			<Footer />
 		</main>

@@ -32,7 +32,9 @@ const TIERS = [
 			"Free Kiosk subdomain hosting",
 		],
 		panel: {
-			bg: "bg-[#0f172a] border-white/5",
+			bg: "bg-gradient-to-br from-blue-50 via-indigo-50 to-sky-100 border-blue-200",
+			accent: "text-blue-600",
+			orb: "bg-blue-400/20",
 			label: "LIVE OUTPUT PREVIEW",
 			title: "Modern Service Business",
 			body: "Clean hero section, customer social proof, call-to-action button, and instant WhatsApp chat integration.",
@@ -61,7 +63,9 @@ const TIERS = [
 			"A/B Ready funnel structure",
 		],
 		panel: {
-			bg: "bg-[#18112c] border-purple-900/40",
+			bg: "bg-gradient-to-br from-purple-50 via-violet-50 to-fuchsia-100 border-purple-200",
+			accent: "text-purple-600",
+			orb: "bg-purple-400/20",
 			label: "MULTI-STEP FUNNEL FLOW",
 			title: null,
 			body: null,
@@ -95,7 +99,9 @@ const TIERS = [
 			"Product search & category tags",
 		],
 		panel: {
-			bg: "bg-[#062016] border-emerald-900/40",
+			bg: "bg-gradient-to-br from-emerald-50 via-teal-50 to-green-100 border-emerald-200",
+			accent: "text-emerald-600",
+			orb: "bg-emerald-400/20",
 			label: "E-COMMERCE STOREFRONT",
 			title: null,
 			body: null,
@@ -295,21 +301,23 @@ export default function ServiceTiers() {
 							viewport={{ once: true }}
 							transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
 							className="lg:col-span-5 flex flex-col">
-							<div className={`rounded-2xl p-6 sm:p-7 text-white flex flex-col h-full min-h-[320px] shadow-xl border justify-between transition-transform duration-300 group-hover:scale-[1.01] ${tier.panel.bg}`}>
+							<div className={`relative rounded-2xl p-6 sm:p-7 flex flex-col h-full min-h-[320px] shadow-md border-2 justify-between transition-all duration-300 group-hover:scale-[1.01] group-hover:shadow-lg overflow-hidden ${tier.panel.bg}`}>
+								{/* Decorative background orb */}
+								<div className={`absolute -top-10 -right-10 w-48 h-48 rounded-full blur-2xl pointer-events-none ${tier.panel.orb}`} />
 								{/* Panel Header */}
-								<div className="flex items-center justify-between border-b border-white/10 pb-3.5 mb-4 shrink-0">
+								<div className="relative z-10 flex items-center justify-between border-b border-black/8 pb-3.5 mb-4 shrink-0">
 									<div className="flex items-center gap-1.5">
-										<span className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
-										<span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
-										<span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+										<span className="w-2.5 h-2.5 rounded-full bg-rose-400 shadow-sm" />
+										<span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-sm" />
+										<span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-sm" />
 									</div>
-									<span className="text-[10px] font-mono text-white/40 uppercase tracking-wider font-bold">
+									<span className={`text-[10px] font-mono uppercase tracking-wider font-bold ${tier.panel.accent}`}>
 										{tier.panel.label}
 									</span>
 								</div>
 
 								{/* Panel Body */}
-								<div className="flex-1 flex flex-col justify-center gap-3">
+								<div className="relative z-10 flex-1 flex flex-col justify-center gap-3">
 									{/* Funnel Steps */}
 									{"steps" in tier.panel && tier.panel.steps && (
 										<div className="space-y-2.5">
@@ -320,14 +328,14 @@ export default function ServiceTiers() {
 														whileInView={{ opacity: 1, x: 0 }}
 														viewport={{ once: true }}
 														transition={{ delay: 0.3 + i * 0.08, duration: 0.4 }}
-														className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between text-xs font-medium">
-														<span className="text-white/90">{step.label}</span>
-														<span className="text-purple-300 font-mono text-[10px] shrink-0 ml-3 bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 rounded-md font-bold">
+														className="p-3.5 rounded-xl bg-white/80 border border-white shadow-sm flex items-center justify-between text-xs font-medium backdrop-blur-sm">
+														<span className="text-gray-700 font-semibold">{step.label}</span>
+														<span className="text-purple-600 font-mono text-[10px] shrink-0 ml-3 bg-purple-100 border border-purple-200 px-2 py-0.5 rounded-md font-bold shadow-sm">
 															{step.tag}
 														</span>
 													</motion.div>
 													{tier.panel.steps && i < tier.panel.steps.length - 1 && (
-														<div className="w-px h-3 bg-white/10 mx-auto" />
+														<div className="w-px h-3 bg-purple-200 mx-auto" />
 													)}
 												</React.Fragment>
 											))}
@@ -344,14 +352,15 @@ export default function ServiceTiers() {
 													whileInView={{ opacity: 1, y: 0 }}
 													viewport={{ once: true }}
 													transition={{ delay: 0.25 + i * 0.08, duration: 0.4 }}
-													className="bg-white/5 border border-white/10 rounded-xl p-3.5 text-center">
-													<div className="w-full h-20 bg-white/5 border border-white/10 rounded-lg mb-2.5 flex items-center justify-center">
-														<span className="text-[10px] text-white/30 font-mono tracking-wider font-bold">
+													className="bg-white/80 border border-white shadow-sm rounded-xl p-3.5 text-center backdrop-blur-sm hover:scale-[1.02] transition-transform duration-200">
+													<div className="w-full h-20 bg-gradient-to-br from-gray-50 to-gray-100 border border-emerald-100 rounded-lg mb-2.5 flex items-center justify-center">
+														<span className="text-[10px] text-gray-300 font-mono tracking-wider font-bold">
 															PHOTO
 														</span>
 													</div>
-													<p className="text-xs font-bold text-white/90 mb-0.5">{p.name}</p>
-													<p className="text-[11px] text-emerald-400 font-mono font-bold">{p.price}</p>
+													<p className="text-xs font-bold text-gray-800 mb-0.5">{p.name}</p>
+													<p className="text-[11px] text-emerald-600 font-mono font-bold">{p.price}</p>
+													<button type="button" className="mt-2 w-full text-[10px] font-bold text-white bg-emerald-500 hover:bg-emerald-600 rounded-md py-1 transition-colors cursor-pointer">Add to Cart</button>
 												</motion.div>
 											))}
 										</div>
@@ -364,26 +373,24 @@ export default function ServiceTiers() {
 											whileInView={{ opacity: 1, scale: 1 }}
 											viewport={{ once: true }}
 											transition={{ delay: 0.25, duration: 0.45 }}
-											className="bg-white/5 border border-white/10 rounded-xl p-5 space-y-3">
-											<div className="flex items-center gap-1.5 pb-2.5 border-b border-white/10">
-												<span className="w-2 h-2 rounded-full bg-white/20" />
-												<span className="w-2 h-2 rounded-full bg-white/20" />
-												<span className="w-2 h-2 rounded-full bg-white/20" />
-												<div className="ml-2 flex-1 bg-white/5 border border-white/10 rounded-md px-2.5 py-0.5">
-													<span className="text-[9px] font-mono text-white/30">mybusiness.kioosk.online</span>
+											className="bg-white/80 border border-white shadow-sm rounded-xl p-5 space-y-3 backdrop-blur-sm">
+											<div className="flex items-center gap-1.5 pb-2.5 border-b border-blue-100">
+												<span className="w-2 h-2 rounded-full bg-rose-400" />
+												<span className="w-2 h-2 rounded-full bg-amber-400" />
+												<span className="w-2 h-2 rounded-full bg-emerald-400" />
+												<div className="ml-2 flex-1 bg-white border border-blue-100 rounded-md px-2.5 py-0.5">
+													<span className="text-[9px] font-mono text-gray-400">mybusiness.kioosk.online</span>
 												</div>
 											</div>
-											<p className="text-sm font-bold text-white/90">{tier.panel.title}</p>
-											<p className="text-xs text-white/50 leading-relaxed">
-												{tier.panel.body}
-											</p>
+											<p className="text-sm font-bold text-gray-800">{tier.panel.title}</p>
+											<p className="text-xs text-gray-500 leading-relaxed">{tier.panel.body}</p>
 											<div className="pt-1 flex items-center justify-between text-[11px] font-medium">
-												<span className="flex items-center gap-1.5 text-white/40">
-													<Zap className="w-3.5 h-3.5 text-amber-400" />
+												<span className="flex items-center gap-1.5 text-gray-500">
+													<Zap className="w-3.5 h-3.5 text-amber-500" />
 													<span>Delivery: {tier.deliveryLabel}</span>
 												</span>
 												{tier.panel.stat && (
-													<span className="text-blue-400 font-semibold text-[10px]">
+													<span className="text-blue-600 font-bold text-[10px] bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full">
 														{tier.panel.stat}
 													</span>
 												)}
@@ -393,12 +400,12 @@ export default function ServiceTiers() {
 								</div>
 
 								{/* Panel Footer */}
-								<div className="pt-3 mt-4 border-t border-white/10 flex items-center justify-between text-[10px] font-mono text-white/40 uppercase tracking-wider shrink-0">
+								<div className="relative z-10 pt-3 mt-4 border-t border-black/8 flex items-center justify-between text-[10px] font-mono text-gray-400 uppercase tracking-wider shrink-0">
 									<span className="flex items-center gap-2">
-										<span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-										<span>Ready for Onboarding</span>
+										<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-sm shadow-emerald-400" />
+										<span className={`font-bold ${tier.panel.accent}`}>Ready for Onboarding</span>
 									</span>
-									<span>Turnkey Delivery</span>
+									<span className="text-gray-400">Turnkey Delivery</span>
 								</div>
 							</div>
 						</motion.div>
