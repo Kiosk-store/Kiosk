@@ -176,111 +176,192 @@ export default function AdminUsersPage() {
 						<h4 className="text-sm font-bold text-gray-900">No users found</h4>
 					</div>
 				) : (
-					<div className="overflow-x-auto">
-						<table className="w-full text-left text-xs">
-							<thead>
-								<tr className="border-b border-gray-100 text-[11px] font-extrabold text-gray-400 uppercase tracking-wider">
-									<th className="pb-3">Customer User</th>
-									<th className="pb-3">Subscription Plan</th>
-									<th className="pb-3">Workspaces</th>
-									<th className="pb-3">Access Role</th>
-									<th className="pb-3">Registered On</th>
-									<th className="pb-3 text-right">Role Actions</th>
-								</tr>
-							</thead>
-							<tbody className="divide-y divide-gray-50 font-medium">
-								{filteredUsers.map((u) => {
-									const isAdminRole = u.role === "ADMIN" || u.role === "SUPERADMIN";
-									const primaryTenant = u.tenants.length > 0 ? u.tenants[0] : null;
-									const planName = formatPlanName(primaryTenant?.plan);
-									const planStyle = getPlanBadgeStyle(primaryTenant?.plan);
+					<>
+						{/* MOBILE CARD VIEW: Visible only on mobile/phone screens */}
+						<div className="block md:hidden space-y-3">
+							{filteredUsers.map((u) => {
+								const isAdminRole = u.role === "ADMIN" || u.role === "SUPERADMIN";
+								const primaryTenant = u.tenants.length > 0 ? u.tenants[0] : null;
+								const planName = formatPlanName(primaryTenant?.plan);
+								const planStyle = getPlanBadgeStyle(primaryTenant?.plan);
 
-									return (
-										<tr key={u.id} className="hover:bg-gray-50/80 transition-colors">
-											{/* User Column */}
-											<td className="py-4 pr-4">
-												<div className="flex items-center gap-3">
-													<div className="w-9 h-9 rounded-2xl bg-blue-50 border border-blue-200 text-blue-700 font-extrabold flex items-center justify-center text-xs shrink-0">
-														{u.name ? u.name.charAt(0).toUpperCase() : "U"}
-													</div>
-													<div>
-														<p className="font-bold text-gray-900">{u.name || "Client"}</p>
-														<p className="text-[10px] text-gray-400">{u.email}</p>
-													</div>
+								return (
+									<div
+										key={u.id}
+										className="p-4 rounded-2xl bg-gray-50/70 border border-gray-150 space-y-3">
+										<div className="flex items-start justify-between gap-2">
+											<div className="flex items-center gap-2.5 min-w-0">
+												<div className="w-9 h-9 rounded-2xl bg-blue-50 border border-blue-200 text-blue-700 font-extrabold flex items-center justify-center text-xs shrink-0">
+													{u.name ? u.name.charAt(0).toUpperCase() : "U"}
 												</div>
-											</td>
-
-											{/* Subscription Plan Column */}
-											<td className="py-4 pr-4">
-												<div className="flex flex-col items-start gap-1">
-													<span
-														className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold border ${planStyle}`}>
-														{planName}
-													</span>
-													{primaryTenant?.billingStatus && (
-														<span className="text-[9px] text-gray-400 font-semibold uppercase">
-															Status: {primaryTenant.billingStatus}
-														</span>
-													)}
+												<div className="min-w-0">
+													<p className="font-bold text-xs text-gray-900 truncate">{u.name || "Client"}</p>
+													<p className="text-[10px] text-gray-500 truncate">{u.email}</p>
 												</div>
-											</td>
+											</div>
 
-											{/* Workspaces Column */}
-											<td className="py-4 pr-4">
-												<div className="flex flex-wrap gap-1.5">
-													{u.tenants.length > 0 ? (
-														u.tenants.map((t) => (
-															<span
-																key={t.id}
-																className="px-2 py-0.5 rounded-lg bg-gray-100 text-gray-800 text-[10px] font-bold border border-gray-200">
-																{t.slug}.kioosk.online
-															</span>
-														))
-													) : (
-														<span className="text-[10px] text-gray-400 italic">No workspace</span>
-													)}
-												</div>
-											</td>
+											<span
+												className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold shrink-0 ${
+													isAdminRole
+														? "bg-blue-100 text-blue-800 border border-blue-200"
+														: "bg-gray-100 text-gray-700"
+												}`}>
+												{u.role}
+											</span>
+										</div>
 
-											{/* Access Role */}
-											<td className="py-4 pr-4">
-												<span
-													className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold ${
-														isAdminRole
-															? "bg-blue-100 text-blue-800 border border-blue-200"
-															: "bg-gray-100 text-gray-700"
-													}`}>
-													{u.role}
+										<div className="grid grid-cols-2 gap-2 text-[11px] pt-2 border-t border-gray-200/60">
+											<div>
+												<span className="text-[10px] text-gray-400 font-bold block uppercase">Subscription</span>
+												<span className={`inline-block mt-0.5 px-2 py-0.5 rounded-full text-[10px] font-extrabold border ${planStyle}`}>
+													{planName}
 												</span>
-											</td>
+											</div>
+											<div>
+												<span className="text-[10px] text-gray-400 font-bold block uppercase">Registered</span>
+												<span className="text-gray-700 text-[11px] font-medium block mt-0.5">
+													{new Date(u.createdAt).toLocaleDateString("en-US", {
+														month: "short",
+														day: "numeric",
+														year: "numeric",
+													})}
+												</span>
+											</div>
+										</div>
 
-											{/* Registered On */}
-											<td className="py-4 pr-4 text-gray-500 text-[11px]">
-												{new Date(u.createdAt).toLocaleDateString("en-US", {
-													month: "short",
-													day: "numeric",
-													year: "numeric",
-												})}
-											</td>
+										<div className="pt-2 border-t border-gray-200/60 flex items-center justify-between gap-2">
+											<div className="flex-1 min-w-0">
+												{u.tenants.length > 0 ? (
+													<span className="text-[10px] font-mono text-gray-600 truncate block">
+														{u.tenants[0].slug}.kioosk.online
+													</span>
+												) : (
+													<span className="text-[10px] text-gray-400 italic">No workspace</span>
+												)}
+											</div>
 
-											{/* Role Actions */}
-											<td className="py-4 text-right">
-												<select
-													disabled={updatingUserId === u.id}
-													value={u.role}
-													onChange={(e) => handleRoleChange(u.id, e.target.value)}
-													className="px-2.5 py-1 rounded-lg border border-gray-200 text-xs font-bold text-gray-800 bg-white focus:outline-none focus:border-blue-600 cursor-pointer">
-													<option value="USER">USER (Customer)</option>
-													<option value="ADMIN">ADMIN (Fulfillment)</option>
-													<option value="SUPERADMIN">SUPERADMIN</option>
-												</select>
-											</td>
-										</tr>
-									);
-								})}
-							</tbody>
-						</table>
-					</div>
+											<select
+												disabled={updatingUserId === u.id}
+												value={u.role}
+												onChange={(e) => handleRoleChange(u.id, e.target.value)}
+												className="px-2.5 py-1 rounded-lg border border-gray-200 text-xs font-bold text-gray-800 bg-white focus:outline-none focus:border-blue-600 cursor-pointer shrink-0">
+												<option value="USER">USER</option>
+												<option value="ADMIN">ADMIN</option>
+												<option value="SUPERADMIN">SUPERADMIN</option>
+											</select>
+										</div>
+									</div>
+								);
+							})}
+						</div>
+
+						{/* DESKTOP TABLE VIEW: Visible on medium+ screens */}
+						<div className="hidden md:block overflow-x-auto">
+							<table className="w-full text-left text-xs">
+								<thead>
+									<tr className="border-b border-gray-100 text-[11px] font-extrabold text-gray-400 uppercase tracking-wider">
+										<th className="pb-3">Customer User</th>
+										<th className="pb-3">Subscription Plan</th>
+										<th className="pb-3">Workspaces</th>
+										<th className="pb-3">Access Role</th>
+										<th className="pb-3">Registered On</th>
+										<th className="pb-3 text-right">Role Actions</th>
+									</tr>
+								</thead>
+								<tbody className="divide-y divide-gray-50 font-medium">
+									{filteredUsers.map((u) => {
+										const isAdminRole = u.role === "ADMIN" || u.role === "SUPERADMIN";
+										const primaryTenant = u.tenants.length > 0 ? u.tenants[0] : null;
+										const planName = formatPlanName(primaryTenant?.plan);
+										const planStyle = getPlanBadgeStyle(primaryTenant?.plan);
+
+										return (
+											<tr key={u.id} className="hover:bg-gray-50/80 transition-colors">
+												{/* User Column */}
+												<td className="py-4 pr-4">
+													<div className="flex items-center gap-3">
+														<div className="w-9 h-9 rounded-2xl bg-blue-50 border border-blue-200 text-blue-700 font-extrabold flex items-center justify-center text-xs shrink-0">
+															{u.name ? u.name.charAt(0).toUpperCase() : "U"}
+														</div>
+														<div>
+															<p className="font-bold text-gray-900">{u.name || "Client"}</p>
+															<p className="text-[10px] text-gray-400">{u.email}</p>
+														</div>
+													</div>
+												</td>
+
+												{/* Subscription Plan Column */}
+												<td className="py-4 pr-4">
+													<div className="flex flex-col items-start gap-1">
+														<span
+															className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold border ${planStyle}`}>
+															{planName}
+														</span>
+														{primaryTenant?.billingStatus && (
+															<span className="text-[9px] text-gray-400 font-semibold uppercase">
+																Status: {primaryTenant.billingStatus}
+															</span>
+														)}
+													</div>
+												</td>
+
+												{/* Workspaces Column */}
+												<td className="py-4 pr-4">
+													<div className="flex flex-wrap gap-1.5">
+														{u.tenants.length > 0 ? (
+															u.tenants.map((t) => (
+																<span
+																	key={t.id}
+																	className="px-2 py-0.5 rounded-lg bg-gray-100 text-gray-800 text-[10px] font-bold border border-gray-200">
+																	{t.slug}.kioosk.online
+																</span>
+															))
+														) : (
+															<span className="text-[10px] text-gray-400 italic">No workspace</span>
+														)}
+													</div>
+												</td>
+
+												{/* Access Role */}
+												<td className="py-4 pr-4">
+													<span
+														className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold ${
+															isAdminRole
+																? "bg-blue-100 text-blue-800 border border-blue-200"
+																: "bg-gray-100 text-gray-700"
+														}`}>
+														{u.role}
+													</span>
+												</td>
+
+												{/* Registered On */}
+												<td className="py-4 pr-4 text-gray-500 text-[11px]">
+													{new Date(u.createdAt).toLocaleDateString("en-US", {
+														month: "short",
+														day: "numeric",
+														year: "numeric",
+													})}
+												</td>
+
+												{/* Role Actions */}
+												<td className="py-4 text-right">
+													<select
+														disabled={updatingUserId === u.id}
+														value={u.role}
+														onChange={(e) => handleRoleChange(u.id, e.target.value)}
+														className="px-2.5 py-1 rounded-lg border border-gray-200 text-xs font-bold text-gray-800 bg-white focus:outline-none focus:border-blue-600 cursor-pointer">
+														<option value="USER">USER (Customer)</option>
+														<option value="ADMIN">ADMIN (Fulfillment)</option>
+														<option value="SUPERADMIN">SUPERADMIN</option>
+													</select>
+												</td>
+											</tr>
+										);
+									})}
+								</tbody>
+							</table>
+						</div>
+					</>
 				)}
 			</div>
 		</div>

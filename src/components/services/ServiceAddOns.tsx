@@ -27,16 +27,16 @@ const ADDONS: AddOn[] = [
 		desc: "Add extra custom subpages (e.g. Portfolio, Terms, Gallery) beyond tier limits.",
 		badge: "ADDITIONAL PAGE",
 		renderVisual: () => (
-			<div className="relative w-full h-20 rounded-xl bg-slate-900 border border-slate-800 p-3 flex flex-col justify-between overflow-hidden shadow-inner group-hover:border-blue-500/40 transition-colors">
+			<div className="relative w-full h-20 rounded-xl bg-blue-50/70 border border-blue-100 p-3 flex flex-col justify-between overflow-hidden shadow-2xs group-hover:border-blue-300 transition-colors">
 				<div className="flex items-center justify-between z-10">
-					<span className="text-[10px] font-mono font-bold text-blue-400 bg-blue-500/10 border border-blue-500/30 px-2 py-0.5 rounded-md">
+					<span className="text-[10px] font-mono font-bold text-blue-700 bg-blue-100 border border-blue-200 px-2 py-0.5 rounded-md">
 						+1 CUSTOM PAGE
 					</span>
-					<span className="text-[9px] font-mono text-slate-400">UNLIMITED SUBPAGES</span>
+					<span className="text-[9px] font-mono text-gray-500 font-medium">UNLIMITED SUBPAGES</span>
 				</div>
-				<div className="z-10 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 flex items-center justify-between">
-					<div className="w-1/2 h-1.5 bg-blue-400/60 rounded-full" />
-					<span className="text-[9px] font-mono text-emerald-400 font-bold">READY</span>
+				<div className="z-10 bg-white border border-blue-100 rounded-lg px-2.5 py-1 flex items-center justify-between shadow-2xs">
+					<div className="w-1/2 h-1.5 bg-blue-500/60 rounded-full" />
+					<span className="text-[9px] font-mono text-emerald-600 font-bold">READY</span>
 				</div>
 			</div>
 		),
@@ -49,16 +49,16 @@ const ADDONS: AddOn[] = [
 		desc: "We register your custom domain (.com) and configure DNS records for you.",
 		badge: "DOMAINS & DNS",
 		renderVisual: () => (
-			<div className="relative w-full h-20 rounded-xl bg-slate-900 border border-slate-800 p-3 flex flex-col justify-between overflow-hidden shadow-inner group-hover:border-blue-500/40 transition-colors">
+			<div className="relative w-full h-20 rounded-xl bg-emerald-50/70 border border-emerald-100 p-3 flex flex-col justify-between overflow-hidden shadow-2xs group-hover:border-emerald-300 transition-colors">
 				<div className="flex items-center justify-between z-10">
-					<span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-md">
+					<span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-md">
 						.COM REGISTRATION
 					</span>
-					<span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+					<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
 				</div>
-				<div className="z-10 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 flex items-center justify-between text-[10px] font-mono text-slate-300">
+				<div className="z-10 bg-white border border-emerald-100 rounded-lg px-2.5 py-1 flex items-center justify-between text-[10px] font-mono text-gray-700 shadow-2xs">
 					<span>A-Record + CNAME</span>
-					<span className="text-emerald-400 font-bold">CONFIGURED</span>
+					<span className="text-emerald-600 font-bold">CONFIGURED</span>
 				</div>
 			</div>
 		),
@@ -71,16 +71,16 @@ const ADDONS: AddOn[] = [
 		desc: "Our copywriters draft high-converting headlines and sales copy for your offer.",
 		badge: "SALES COPYWRITING",
 		renderVisual: () => (
-			<div className="relative w-full h-20 rounded-xl bg-slate-900 border border-slate-800 p-3 flex flex-col justify-between overflow-hidden shadow-inner group-hover:border-blue-500/40 transition-colors">
+			<div className="relative w-full h-20 rounded-xl bg-purple-50/70 border border-purple-100 p-3 flex flex-col justify-between overflow-hidden shadow-2xs group-hover:border-purple-300 transition-colors">
 				<div className="flex items-center justify-between z-10">
-					<span className="text-[10px] font-mono font-bold text-blue-400 bg-blue-500/10 border border-blue-500/30 px-2 py-0.5 rounded-md">
+					<span className="text-[10px] font-mono font-bold text-purple-700 bg-purple-100 border border-purple-200 px-2 py-0.5 rounded-md">
 						HEADLINES & COPY
 					</span>
-					<span className="text-[9px] font-mono text-slate-400">HIGH CONVERTING</span>
+					<span className="text-[9px] font-mono text-gray-500 font-medium">HIGH CONVERTING</span>
 				</div>
-				<div className="z-10 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 flex items-center justify-between">
-					<div className="w-2/3 h-1.5 bg-slate-400 rounded-full" />
-					<span className="text-[9px] font-mono text-blue-400 font-bold">DRAFTED</span>
+				<div className="z-10 bg-white border border-purple-100 rounded-lg px-2.5 py-1 flex items-center justify-between shadow-2xs">
+					<div className="w-2/3 h-1.5 bg-purple-400 rounded-full" />
+					<span className="text-[9px] font-mono text-purple-600 font-bold">DRAFTED</span>
 				</div>
 			</div>
 		),
@@ -93,16 +93,16 @@ const ADDONS: AddOn[] = [
 		desc: "Post-launch content edits, text changes, and image updates handled by our team.",
 		badge: "MANAGED SERVICE",
 		renderVisual: () => (
-			<div className="relative w-full h-20 rounded-xl bg-slate-900 border border-slate-800 p-3 flex flex-col justify-between overflow-hidden shadow-inner group-hover:border-blue-500/40 transition-colors">
+			<div className="relative w-full h-20 rounded-xl bg-indigo-50/70 border border-indigo-100 p-3 flex flex-col justify-between overflow-hidden shadow-2xs group-hover:border-indigo-300 transition-colors">
 				<div className="flex items-center justify-between z-10">
-					<span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-md">
+					<span className="text-[10px] font-mono font-bold text-indigo-700 bg-indigo-100 border border-indigo-200 px-2 py-0.5 rounded-md">
 						POST-LAUNCH EDITS
 					</span>
-					<span className="text-[9px] font-mono text-slate-400">MONTHLY</span>
+					<span className="text-[9px] font-mono text-gray-500 font-medium">MONTHLY</span>
 				</div>
-				<div className="z-10 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 flex items-center justify-between text-[10px] font-mono text-slate-300">
+				<div className="z-10 bg-white border border-indigo-100 rounded-lg px-2.5 py-1 flex items-center justify-between text-[10px] font-mono text-gray-700 shadow-2xs">
 					<span>Text & Image Edits</span>
-					<span className="text-emerald-400 font-bold">ACTIVE</span>
+					<span className="text-emerald-600 font-bold">ACTIVE</span>
 				</div>
 			</div>
 		),
@@ -115,16 +115,16 @@ const ADDONS: AddOn[] = [
 		suffix: "one-off",
 		desc: "Fast-track your project into our top priority 48-hour build queue.",
 		renderVisual: () => (
-			<div className="relative w-full h-20 rounded-xl bg-slate-900 border border-slate-800 p-3 flex flex-col justify-between overflow-hidden shadow-inner group-hover:border-blue-500/40 transition-colors">
+			<div className="relative w-full h-20 rounded-xl bg-amber-50/70 border border-amber-100 p-3 flex flex-col justify-between overflow-hidden shadow-2xs group-hover:border-amber-300 transition-colors">
 				<div className="flex items-center justify-between z-10">
-					<span className="text-[10px] font-mono font-bold text-blue-400 bg-blue-500/10 border border-blue-500/30 px-2 py-0.5 rounded-md">
+					<span className="text-[10px] font-mono font-bold text-amber-800 bg-amber-100 border border-amber-200 px-2 py-0.5 rounded-md">
 						PRIORITY QUEUE
 					</span>
-					<span className="text-[9px] font-mono text-blue-300 font-bold">48 HOURS</span>
+					<span className="text-[9px] font-mono text-amber-700 font-bold">48 HOURS</span>
 				</div>
-				<div className="z-10 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 flex items-center justify-between">
-					<div className="w-full h-1.5 bg-blue-500/40 rounded-full overflow-hidden relative">
-						<div className="w-3/4 h-full bg-blue-500 rounded-full" />
+				<div className="z-10 bg-white border border-amber-100 rounded-lg px-2.5 py-1 flex items-center justify-between shadow-2xs">
+					<div className="w-full h-1.5 bg-amber-100 rounded-full overflow-hidden relative">
+						<div className="w-3/4 h-full bg-amber-500 rounded-full" />
 					</div>
 				</div>
 			</div>

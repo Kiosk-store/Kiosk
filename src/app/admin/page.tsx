@@ -20,6 +20,8 @@ import {
 	ExternalLink,
 	ShieldCheck,
 } from "lucide-react";
+import { useCurrency } from "@/context/CurrencyContext";
+import { formatPrice } from "@/lib/currency";
 
 interface AdminStats {
 	totalProjects: number;
@@ -60,6 +62,7 @@ interface ProjectSummary {
 }
 
 export default function AdminDashboardPage() {
+	const { currency, isLoading: isCurrencyLoading } = useCurrency();
 	const [stats, setStats] = useState<AdminStats | null>(null);
 	const [projects, setProjects] = useState<ProjectSummary[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
@@ -205,11 +208,17 @@ export default function AdminDashboardPage() {
 					</div>
 
 					<div>
-						<div className="flex items-baseline gap-2">
+						<div className="flex items-baseline gap-2 flex-wrap">
 							<h3 className="text-3xl font-extrabold font-nohemi text-purple-700">
-								${(stats?.totalRevenue || 0).toLocaleString()}
+								{isCurrencyLoading
+									? "…"
+									: formatPrice(stats?.totalRevenue || 0, currency)}
 							</h3>
-							<span className="text-xs font-bold text-gray-400">USD</span>
+							{!isCurrencyLoading && (
+								<span className="text-[11px] font-mono font-bold text-purple-700 bg-purple-100/80 px-2 py-0.5 rounded-full border border-purple-200 uppercase">
+									{currency.code}
+								</span>
+							)}
 						</div>
 						<p className="text-xs text-gray-500 font-medium mt-1">
 							{stats?.paidInvoicesCount || 0} paid • {stats?.pendingInvoicesCount || 0} pending
@@ -331,78 +340,63 @@ export default function AdminDashboardPage() {
 						</p>
 					</div>
 				) : (
-					<div className="overflow-x-auto">
-						<table className="w-full text-left text-xs">
-							<thead>
-								<tr className="border-b border-gray-100 text-[11px] font-extrabold text-gray-400 uppercase tracking-wider">
-									<th className="pb-3">Business & Assets</th>
-									<th className="pb-3">Plan</th>
-									<th className="pb-3">Customer Account</th>
-									<th className="pb-3">Status</th>
-									<th className="pb-3">Progress</th>
-									<th className="pb-3 text-right">Action</th>
-								</tr>
-							</thead>
-							<tbody className="divide-y divide-gray-50 font-medium">
-								{filteredProjects.map((p) => {
-									const isReview = p.status === "In Review";
-									const isLive = p.status === "Live" || p.status === "Published";
+					<>
+						{/* MOBILE CARDS: Visible on phone screens */}
+						<div className="block md:hidden space-y-3">
+							{filteredProjects.map((p) => {
+								const isReview = p.status === "In Review";
+								const isLive = p.status === "Live" || p.status === "Published";
 
-									return (
-										<tr key={p.id} className="hover:bg-gray-50/80 transition-colors">
-											<td className="py-4 pr-4">
-												<div className="flex items-center gap-3">
-													{p.logoUrl ? (
-														<img
-															src={p.logoUrl}
-															alt={p.name}
-															className="w-10 h-10 rounded-2xl object-contain border border-gray-200 bg-white p-1 shrink-0 shadow-2xs"
-														/>
-													) : (
-														<div className="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-200 text-blue-700 font-extrabold flex items-center justify-center shrink-0">
-															{p.name.charAt(0).toUpperCase()}
-														</div>
-													)}
-													<div>
-														<p className="font-bold text-gray-900">
-															{p.businessName || p.name}
-														</p>
-														<p className="text-[10px] text-gray-400">
-															{p.tenant?.slug ? `${p.tenant.slug}.kioosk.online` : "Workspace"}
-														</p>
+								return (
+									<div
+										key={p.id}
+										className="p-4 rounded-2xl bg-gray-50/70 border border-gray-150 space-y-3">
+										<div className="flex items-start justify-between gap-2">
+											<div className="flex items-center gap-2.5 min-w-0">
+												{p.logoUrl ? (
+													<img
+														src={p.logoUrl}
+														alt={p.name}
+														className="w-10 h-10 rounded-xl object-contain border border-gray-200 bg-white p-1 shrink-0 shadow-2xs"
+													/>
+												) : (
+													<div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 font-extrabold flex items-center justify-center shrink-0 text-sm">
+														{p.name.charAt(0).toUpperCase()}
 													</div>
+												)}
+												<div className="min-w-0">
+													<p className="font-bold text-xs text-gray-900 truncate">
+														{p.businessName || p.name}
+													</p>
+													<p className="text-[10px] text-gray-500 truncate">
+														{p.tenant?.slug ? `${p.tenant.slug}.kioosk.online` : "Workspace"}
+													</p>
 												</div>
-											</td>
+											</div>
 
-											<td className="py-4 pr-4">
-												<span className="px-3 py-1 rounded-full text-[10px] font-bold bg-gray-100 text-gray-800 border border-gray-200">
-													{p.type}
-												</span>
-											</td>
+											<span
+												className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold shrink-0 ${
+													isReview
+														? "bg-amber-100 text-amber-800 border border-amber-200"
+														: isLive
+														? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+														: "bg-blue-100 text-blue-800 border border-blue-200"
+												}`}>
+												{p.status}
+											</span>
+										</div>
 
-											<td className="py-4 pr-4">
-												<div>
-													<p className="font-bold text-gray-900">{p.owner?.name || "Customer"}</p>
-													<p className="text-[10px] text-gray-400">{p.owner?.email}</p>
-												</div>
-											</td>
-
-											<td className="py-4 pr-4">
-												<span
-													className={`px-3 py-1 rounded-full text-[10px] font-extrabold ${
-														isReview
-															? "bg-amber-50 text-amber-800 border border-amber-200"
-															: isLive
-															? "bg-emerald-50 text-emerald-800 border border-emerald-200"
-															: "bg-blue-50 text-blue-800 border border-blue-200"
-													}`}>
-													{p.status}
-												</span>
-											</td>
-
-											<td className="py-4 pr-4">
-												<div className="flex items-center gap-2">
-													<div className="w-16 bg-gray-100 rounded-full h-1.5 overflow-hidden">
+										<div className="grid grid-cols-2 gap-2 text-[11px] pt-2 border-t border-gray-200/60">
+											<div>
+												<span className="text-[10px] text-gray-400 font-bold block uppercase">Customer</span>
+												<span className="text-gray-800 font-medium truncate block">{p.owner?.name || "Customer"}</span>
+												<span className="text-[10px] text-gray-500 truncate block">{p.owner?.email}</span>
+											</div>
+											<div>
+												<span className="text-[10px] text-gray-400 font-bold block uppercase">Plan & Progress</span>
+												<span className="text-blue-700 font-bold block">{p.type}</span>
+												<div className="flex items-center gap-1.5 mt-1">
+													<div className="flex-1 bg-gray-200 rounded-full h-1.5 overflow-hidden">
 														<div
 															className={`h-full rounded-full ${
 																isLive ? "bg-emerald-500" : "bg-blue-600"
@@ -410,26 +404,125 @@ export default function AdminDashboardPage() {
 															style={{ width: `${p.progress}%` }}
 														/>
 													</div>
-													<span className="text-[11px] font-bold text-gray-600">
-														{p.progress}%
-													</span>
+													<span className="text-[10px] font-bold text-gray-600">{p.progress}%</span>
 												</div>
-											</td>
+											</div>
+										</div>
 
-											<td className="py-4 text-right">
-												<Link
-													href={`/admin/projects/${p.id}`}
-													className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold transition-all shadow-sm hover:shadow-md hover:scale-105 active:scale-95">
-													<span>Review Studio</span>
-													<ArrowRight className="w-3 h-3 ml-0.5" />
-												</Link>
-											</td>
-										</tr>
-									);
-								})}
-							</tbody>
-						</table>
-					</div>
+										<div className="pt-2 border-t border-gray-200/60 flex items-center justify-end">
+											<Link
+												href={`/admin/projects/${p.id}`}
+												className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs">
+												<span>Review Studio</span>
+												<ArrowRight className="w-3 h-3" />
+											</Link>
+										</div>
+									</div>
+								);
+							})}
+						</div>
+
+						{/* DESKTOP TABLE: Visible on medium+ screens */}
+						<div className="hidden md:block overflow-x-auto">
+							<table className="w-full text-left text-xs">
+								<thead>
+									<tr className="border-b border-gray-100 text-[11px] font-extrabold text-gray-400 uppercase tracking-wider">
+										<th className="pb-3">Business & Assets</th>
+										<th className="pb-3">Plan</th>
+										<th className="pb-3">Customer Account</th>
+										<th className="pb-3">Status</th>
+										<th className="pb-3">Progress</th>
+										<th className="pb-3 text-right">Action</th>
+									</tr>
+								</thead>
+								<tbody className="divide-y divide-gray-50 font-medium">
+									{filteredProjects.map((p) => {
+										const isReview = p.status === "In Review";
+										const isLive = p.status === "Live" || p.status === "Published";
+
+										return (
+											<tr key={p.id} className="hover:bg-gray-50/80 transition-colors">
+												<td className="py-4 pr-4">
+													<div className="flex items-center gap-3">
+														{p.logoUrl ? (
+															<img
+																src={p.logoUrl}
+																alt={p.name}
+																className="w-10 h-10 rounded-2xl object-contain border border-gray-200 bg-white p-1 shrink-0 shadow-2xs"
+															/>
+														) : (
+															<div className="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-200 text-blue-700 font-extrabold flex items-center justify-center shrink-0">
+																{p.name.charAt(0).toUpperCase()}
+															</div>
+														)}
+														<div>
+															<p className="font-bold text-gray-900">
+																{p.businessName || p.name}
+															</p>
+															<p className="text-[10px] text-gray-400">
+																{p.tenant?.slug ? `${p.tenant.slug}.kioosk.online` : "Workspace"}
+															</p>
+														</div>
+													</div>
+												</td>
+
+												<td className="py-4 pr-4">
+													<span className="px-3 py-1 rounded-full text-[10px] font-bold bg-gray-100 text-gray-800 border border-gray-200">
+														{p.type}
+													</span>
+												</td>
+
+												<td className="py-4 pr-4">
+													<div>
+														<p className="font-bold text-gray-900">{p.owner?.name || "Customer"}</p>
+														<p className="text-[10px] text-gray-400">{p.owner?.email}</p>
+													</div>
+												</td>
+
+												<td className="py-4 pr-4">
+													<span
+														className={`px-3 py-1 rounded-full text-[10px] font-extrabold ${
+															isReview
+																? "bg-amber-50 text-amber-800 border border-amber-200"
+																: isLive
+																? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+																: "bg-blue-50 text-blue-800 border border-blue-200"
+														}`}>
+														{p.status}
+													</span>
+												</td>
+
+												<td className="py-4 pr-4">
+													<div className="flex items-center gap-2">
+														<div className="w-16 bg-gray-100 rounded-full h-1.5 overflow-hidden">
+															<div
+																className={`h-full rounded-full ${
+																	isLive ? "bg-emerald-500" : "bg-blue-600"
+																}`}
+																style={{ width: `${p.progress}%` }}
+															/>
+														</div>
+														<span className="text-[11px] font-bold text-gray-600">
+															{p.progress}%
+														</span>
+													</div>
+												</td>
+
+												<td className="py-4 text-right">
+													<Link
+														href={`/admin/projects/${p.id}`}
+														className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold transition-all shadow-sm hover:shadow-md hover:scale-105 active:scale-95">
+														<span>Review Studio</span>
+														<ArrowRight className="w-3 h-3 ml-0.5" />
+													</Link>
+												</td>
+											</tr>
+										);
+									})}
+								</tbody>
+							</table>
+						</div>
+					</>
 				)}
 			</div>
 		</div>
