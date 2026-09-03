@@ -37,9 +37,13 @@ export default function Footer() {
 			<div className="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-10 mb-16 md:mb-32 relative z-10">
 				{/* Brand Info */}
 				<div className="col-span-2 md:col-span-1 space-y-5 pr-4 md:pr-0">
-					<span className="font-card-title text-2xl font-bold tracking-tight text-white block">
-						Kiosk
-					</span>
+					<a href="/" className="inline-block">
+						<img
+							src="/logo-dark.png"
+							alt="Kiosk"
+							className="h-10 sm:h-11 md:h-12 lg:h-13 w-auto max-w-[220px] sm:max-w-none object-contain"
+						/>
+					</a>
 					<p className="text-white/60 text-sm md:text-[15px] leading-relaxed max-w-xs font-medium">
 						Building professional digital presences for small business owners
 						who mean business. Fast, affordable, and fully managed.

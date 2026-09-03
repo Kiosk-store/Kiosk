@@ -13,7 +13,10 @@ import { sendWelcomeEmail } from "@/lib/email";
 // Resolve authentication environment variables purely from process.env (.env.local / .env)
 const googleClientId = process.env.AUTH_GOOGLE_ID || process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.AUTH_GOOGLE_SECRET || process.env.GOOGLE_CLIENT_SECRET;
-const authSecret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
+const authSecret =
+	process.env.AUTH_SECRET ||
+	process.env.NEXTAUTH_SECRET ||
+	"kiosk_super_secret_jwt_key_2026_change_in_production";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
 	trustHost: true,
@@ -32,11 +35,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 		error: "/get-started",
 	},
 	providers: [
-		Google({
-			clientId: googleClientId,
-			clientSecret: googleClientSecret,
-			allowDangerousEmailAccountLinking: true,
-		}),
+		...(googleClientId && googleClientSecret
+			? [
+					Google({
+						clientId: googleClientId,
+						clientSecret: googleClientSecret,
+						allowDangerousEmailAccountLinking: true,
+					}),
+			  ]
+			: []),
 		Credentials({
 			name: "Credentials",
 			credentials: {
