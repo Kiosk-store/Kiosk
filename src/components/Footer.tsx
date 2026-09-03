@@ -41,7 +41,7 @@ export default function Footer() {
 						<img
 							src="/logo-dark.png"
 							alt="Kiosk"
-							className="h-8 md:h-9 w-auto object-contain"
+							className="h-11 md:h-13 w-auto object-contain"
 						/>
 					</a>
 					<p className="text-white/60 text-sm md:text-[15px] leading-relaxed max-w-xs font-medium">

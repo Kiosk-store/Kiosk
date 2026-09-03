@@ -16,20 +16,15 @@ async function generate() {
   <path d="${pathMatches[3]}" fill="#2563eb" />
 </svg>`;
   fs.writeFileSync('public/kiosk_logo.svg', cleanEmblemSvg);
-  console.log('Updated public/kiosk_logo.svg with clean vector paths');
 
-  // 2. Build full brand logo SVG (Emblem + "KIOSK" + Tagline)
-  // Dimensions: 520 x 120
-  // Left: Emblem scaled to 100x108 at x=10, y=6
-  // Right: Wordmark "KIOSK" at x=125, y=72
-  // Bottom: Tagline at x=128, y=100
+  // 2. Build prominent brand logo SVG with zero wasted padding and bold typography
   function buildLogoSvg(isDark) {
-    const textColor = isDark ? '#ffffff' : '#0f172a';
-    const taglineColor = isDark ? '#93c5fd' : '#2563eb';
+    const textColor = isDark ? '#ffffff' : '#090d16';
+    const taglineColor = isDark ? '#60a5fa' : '#2563eb';
     
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 120" width="520" height="120" fill="none">
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 96" width="460" height="96" fill="none">
   <!-- Brand Emblem -->
-  <g transform="translate(10, 6) scale(0.92)">
+  <g transform="translate(0, 0) scale(0.835)">
     <path d="${pathMatches[0]}" fill="#2563eb" />
     <path d="${pathMatches[1]}" fill="#2563eb" />
     <path d="${pathMatches[2]}" fill="#2563eb" />
@@ -37,10 +32,10 @@ async function generate() {
   </g>
   
   <!-- Wordmark 'KIOSK' -->
-  <text x="126" y="74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-weight="900" font-size="64" letter-spacing="-0.03em" fill="${textColor}">KIOSK</text>
+  <text x="100" y="61" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-weight="900" font-size="68" letter-spacing="-0.035em" fill="${textColor}">KIOSK</text>
   
   <!-- Tagline -->
-  <text x="128" y="102" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-weight="600" font-size="16" letter-spacing="0.02em" fill="${taglineColor}">we help build your digital success story</text>
+  <text x="102" y="87" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-weight="700" font-size="17" letter-spacing="0.01em" fill="${taglineColor}">we help build your digital success story</text>
 </svg>`;
   }
 
@@ -49,9 +44,8 @@ async function generate() {
 
   fs.writeFileSync('public/logo.svg', logoLightSvg);
   fs.writeFileSync('public/logo-dark.svg', logoDarkSvg);
-  console.log('Generated public/logo.svg and public/logo-dark.svg');
 
-  // 3. Render 4x Retina PNG from the vector SVG (1560 x 360) so it is 100% crystal-sharp on Retina displays
+  // 3. Render 4x Retina PNG from the vector SVG
   await sharp(Buffer.from(logoLightSvg), { density: 300 })
     .png()
     .toFile('public/logo.png');
@@ -60,7 +54,7 @@ async function generate() {
     .png()
     .toFile('public/logo-dark.png');
 
-  console.log('Successfully generated razor-sharp Retina public/logo.png and public/logo-dark.png');
+  console.log('Successfully generated bold prominent Retina public/logo.png and public/logo-dark.png');
 }
 
 generate();
