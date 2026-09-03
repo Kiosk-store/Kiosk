@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "playwright test",
-    "test:e2e": "playwright test",
+    "test": "node node_modules/@playwright/test/cli.js test",
+    "test:e2e": "node node_modules/@playwright/test/cli.js test",
     "db:push": "drizzle-kit push",
     "scaffold": "node scripts/scaffold-client.cjs"
   },

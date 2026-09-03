@@ -229,30 +229,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 	const loginWithGoogle = async (): Promise<void> => {
 		try {
 			setError(null);
-			const result = await nextAuthSignIn("google", { callbackUrl: "/dashboard", redirect: false });
-			if (result?.error) {
-				if (result.error === "Configuration") {
-					setError("Google Sign-In is not configured for this environment. Please sign in with your email and password.");
-				} else {
-					setError("Google login could not be completed. Please use email and password.");
-				}
-			}
+			setIsLoading(true);
+			await nextAuthSignIn("google", { callbackUrl: "/dashboard" });
 		} catch (e: any) {
 			console.error("[GOOGLE_AUTH_ERROR]", e);
-			setError("Google Sign-In is not configured in this environment. Please sign in with your email and password.");
+			setError("Could not initiate Google Sign-In. Please check your connection or try again.");
+			setIsLoading(false);
 		}
 	};
 
 	const loginWithGithub = async (): Promise<void> => {
 		try {
 			setError(null);
-			const result = await nextAuthSignIn("github", { callbackUrl: "/dashboard", redirect: false });
-			if (result?.error) {
-				setError("GitHub login could not be completed. Please use email and password.");
-			}
+			setIsLoading(true);
+			await nextAuthSignIn("github", { callbackUrl: "/dashboard" });
 		} catch (e: any) {
 			console.error("[GITHUB_AUTH_ERROR]", e);
-			setError("GitHub Sign-In is not configured in this environment. Please sign in with your email and password.");
+			setError("Could not initiate GitHub Sign-In. Please check your connection or try again.");
+			setIsLoading(false);
 		}
 	};
 
