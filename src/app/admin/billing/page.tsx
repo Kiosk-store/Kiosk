@@ -7,13 +7,9 @@ import Link from "next/link";
 import {
 	Receipt,
 	Search,
-	TrendingUp,
-	CheckCircle2,
 	Clock,
-	AlertCircle,
 	Loader2,
 	ArrowLeft,
-	CreditCard,
 	DollarSign,
 } from "lucide-react";
 
@@ -203,16 +199,18 @@ export default function AdminBillingPage() {
 			{/* Filters & Search */}
 			<div className="p-3 sm:p-4 bg-white border border-gray-200/90 rounded-2xl sm:rounded-3xl shadow-2xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
 				<div className="flex items-center gap-1.5 p-1 bg-gray-100 rounded-xl sm:rounded-2xl overflow-x-auto scrollbar-none">
-					{[
-						{ id: "ALL", label: "All Invoices" },
-						{ id: "PAID", label: "Paid" },
-						{ id: "PENDING", label: "Pending" },
-						{ id: "PAST_DUE", label: "Past Due" },
-					].map((tab) => (
+					{(
+						[
+							{ id: "ALL", label: "All Invoices" },
+							{ id: "PAID", label: "Paid" },
+							{ id: "PENDING", label: "Pending" },
+							{ id: "PAST_DUE", label: "Past Due" },
+						] as const
+					).map((tab) => (
 						<button
 							key={tab.id}
 							type="button"
-							onClick={() => setStatusFilter(tab.id as any)}
+							onClick={() => setStatusFilter(tab.id)}
 							className={`px-3 py-1.5 rounded-lg sm:rounded-xl text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
 								statusFilter === tab.id
 									? "bg-white text-blue-600 shadow-xs"

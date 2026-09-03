@@ -5,20 +5,14 @@
 import React, { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import {
-	Layers,
 	Clock,
 	CheckCircle2,
 	Users,
-	Receipt,
 	ArrowRight,
 	Loader2,
 	Search,
-	Globe,
 	TrendingUp,
 	RefreshCw,
-	Sparkles,
-	ExternalLink,
-	ShieldCheck,
 } from "lucide-react";
 import { useCurrency } from "@/context/CurrencyContext";
 import { formatPrice } from "@/lib/currency";

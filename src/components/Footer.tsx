@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 const footerLinks = {
 	company: [
 		{ label: "Services", href: "/services" },
@@ -37,13 +39,13 @@ export default function Footer() {
 			<div className="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-10 mb-16 md:mb-32 relative z-10">
 				{/* Brand Info */}
 				<div className="col-span-2 md:col-span-1 space-y-5 pr-4 md:pr-0">
-					<a href="/" className="inline-block group" aria-label="Kiosk Home">
+					<Link href="/" className="inline-block group" aria-label="Kiosk Home">
 						<img
 							src="/KIOSK PNG2-dark.png"
 							alt="Kiosk"
 							className="h-10 sm:h-12 md:h-13 lg:h-14 w-auto max-w-[200px] sm:max-w-[240px] md:max-w-[280px] object-contain transition-transform duration-200 group-hover:scale-105"
 						/>
-					</a>
+					</Link>
 					<p className="text-white/60 text-sm md:text-[15px] leading-relaxed max-w-xs font-medium">
 						Building professional digital presences for small business owners
 						who mean business. Fast, affordable, and fully managed.
@@ -56,11 +58,11 @@ export default function Footer() {
 					<ul className="space-y-4 text-[15px]">
 						{footerLinks.company.map((link) => (
 							<li key={link.label}>
-								<a
+								<Link
 									href={link.href}
 									className="text-white/70 hover:text-white transition-colors duration-300">
 									{link.label}
-								</a>
+								</Link>
 							</li>
 						))}
 					</ul>
@@ -72,11 +74,11 @@ export default function Footer() {
 					<ul className="space-y-4 text-[15px]">
 						{footerLinks.legal.map((link) => (
 							<li key={link.label}>
-								<a
+								<Link
 									href={link.href}
 									className="text-white/70 hover:text-white transition-colors duration-300">
 									{link.label}
-								</a>
+								</Link>
 							</li>
 						))}
 					</ul>
