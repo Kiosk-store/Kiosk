@@ -37,11 +37,11 @@ export default function Footer() {
 			<div className="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-10 mb-16 md:mb-32 relative z-10">
 				{/* Brand Info */}
 				<div className="col-span-2 md:col-span-1 space-y-5 pr-4 md:pr-0">
-					<a href="/" className="inline-block">
+					<a href="/" className="inline-block group" aria-label="Kiosk Home">
 						<img
-							src="/logo-dark.png"
+							src="/KIOSK PNG2-dark.png"
 							alt="Kiosk"
-							className="h-10 sm:h-11 md:h-12 lg:h-13 w-auto max-w-[220px] sm:max-w-none object-contain"
+							className="h-10 sm:h-12 md:h-13 lg:h-14 w-auto max-w-[200px] sm:max-w-[240px] md:max-w-[280px] object-contain transition-transform duration-200 group-hover:scale-105"
 						/>
 					</a>
 					<p className="text-white/60 text-sm md:text-[15px] leading-relaxed max-w-xs font-medium">

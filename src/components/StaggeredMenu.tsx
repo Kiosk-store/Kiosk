@@ -67,6 +67,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 	actionTitle,
 	displayItemNumbering = true,
 	className,
+	logoUrl = "/KIOSK PNG2.png",
 	menuButtonColor = "#fff",
 	openMenuButtonColor = "#fff",
 	changeMenuColorOnOpen = true,
@@ -548,9 +549,9 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 						className="sm-logo flex items-center select-none pointer-events-auto group py-0.5"
 						aria-label="Kiosk Home">
 						<img
-							src="/logo.png"
+							src={logoUrl || "/KIOSK PNG2.png"}
 							alt="Kiosk"
-							className="h-8 sm:h-10 md:h-11 lg:h-12 w-auto max-w-[160px] sm:max-w-none object-contain transition-transform group-hover:scale-105"
+							className="sm-logo-img h-9 sm:h-11 lg:h-12 w-auto max-w-[190px] sm:max-w-[240px] lg:max-w-[280px] object-contain transition-transform duration-200 group-hover:scale-105"
 						/>
 					</Link>
 
@@ -709,7 +710,13 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 .sm-scope .staggered-menu-header { position: fixed; top: 0; left: 0; width: 100%; display: flex; align-items: center; justify-content: space-between; pointer-events: none; z-index: 30; }
 .sm-scope .staggered-menu-header > * { pointer-events: auto; }
 .sm-scope .sm-logo { display: flex; align-items: center; user-select: none; }
-.sm-scope .sm-logo-img { display: block; height: 32px; width: auto; object-fit: contain; }
+.sm-scope .sm-logo-img { display: block; height: 36px; width: auto; max-width: 190px; object-fit: contain; }
+@media (min-width: 640px) {
+  .sm-scope .sm-logo-img { height: 42px; max-width: 240px; }
+}
+@media (min-width: 1024px) {
+  .sm-scope .sm-logo-img { height: 48px; max-width: 280px; }
+}
 .sm-scope .sm-toggle { position: relative; display: inline-flex; align-items: center; gap: 0.3rem; background: transparent; border: none; cursor: pointer; color: #e9e9ef; font-weight: 500; line-height: 1; overflow: visible; }
 .sm-scope .sm-toggle:focus-visible { outline: 2px solid #ffffffaa; outline-offset: 4px; border-radius: 4px; }
 .sm-scope .sm-line:last-of-type { margin-top: 6px; }

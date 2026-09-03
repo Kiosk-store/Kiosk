@@ -56,7 +56,7 @@ export default function Navbar() {
 				openMenuButtonColor="#0a0a0a"
 				changeMenuColorOnOpen={true}
 				colors={["#B497CF", "#5227FF"]}
-				logoUrl="/logo.svg"
+				logoUrl="/KIOSK PNG2.png"
 				accentColor="#2563eb"
 				isFixed={true}
 				showMenuText={false}

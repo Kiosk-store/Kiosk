@@ -11,7 +11,7 @@ export type PillNavItem = {
 };
 
 export interface PillNavProps {
-	logo: string;
+	logo?: string;
 	logoAlt?: string;
 	items: PillNavItem[];
 	activeHref?: string;
@@ -26,7 +26,7 @@ export interface PillNavProps {
 }
 
 const PillNav: React.FC<PillNavProps> = ({
-	logo,
+	logo = "/KIOSK PNG2.png",
 	logoAlt = "Logo",
 	items,
 	activeHref,
