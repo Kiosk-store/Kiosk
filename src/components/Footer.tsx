@@ -39,7 +39,7 @@ export default function Footer() {
 				<div className="col-span-2 md:col-span-1 space-y-5 pr-4 md:pr-0">
 					<a href="/" className="inline-block">
 						<img
-							src="/logo.png"
+							src="/logo-dark.png"
 							alt="Kiosk"
 							className="h-8 md:h-9 w-auto object-contain"
 						/>
