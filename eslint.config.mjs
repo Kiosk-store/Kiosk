@@ -13,6 +13,7 @@ const eslintConfig = defineConfig([
     rules: {
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-require-imports": "off",
+      "@next/next/no-img-element": "off",
       "react-hooks/immutability": "warn",
       "react-hooks/purity": "warn",
       "react-hooks/set-state-in-effect": "warn",

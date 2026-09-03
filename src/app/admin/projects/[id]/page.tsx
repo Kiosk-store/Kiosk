@@ -4,16 +4,12 @@
 
 import React, { useEffect, useState, use } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
 	ArrowLeft,
 	Globe,
 	CheckCircle2,
-	Clock,
 	Sparkles,
-	Upload,
 	ExternalLink,
-	Download,
 	Copy,
 	Check,
 	Save,
@@ -24,13 +20,9 @@ import {
 	Zap,
 	Layers,
 	Phone,
-	Mail,
-	Share2,
 	Sun,
 	Moon,
-	Trash2,
 	MessageSquare,
-	ShieldCheck,
 	Image as ImageIcon,
 } from "lucide-react";
 import { CURRENCIES } from "@/lib/currency";
@@ -148,7 +140,6 @@ export default function AdminProjectReviewPage({
 }: {
 	params: Promise<{ id: string }>;
 }) {
-	const router = useRouter();
 	const { id: projectId } = use(params);
 
 	const [project, setProject] = useState<ProjectDetail | null>(null);

@@ -171,7 +171,6 @@ export default function RootLayout({
 					<CurrencyProvider>
 						<NavbarWrapper />
 						{children}
-						{/* <CookieConsent /> */}
 					</CurrencyProvider>
 				</AuthProvider>
 				<Analytics />

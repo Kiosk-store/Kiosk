@@ -28,7 +28,6 @@ export interface AuthContextType {
 	signup: (name: string, email: string, password: string) => Promise<boolean>;
 	logout: () => Promise<void>;
 	loginWithGoogle: () => Promise<void>;
-	loginWithGithub: () => Promise<void>;
 	refreshUser: () => Promise<void>;
 }
 
@@ -238,18 +237,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 		}
 	};
 
-	const loginWithGithub = async (): Promise<void> => {
-		try {
-			setError(null);
-			setIsLoading(true);
-			await nextAuthSignIn("github", { callbackUrl: "/dashboard" });
-		} catch (e: any) {
-			console.error("[GITHUB_AUTH_ERROR]", e);
-			setError("Could not initiate GitHub Sign-In. Please check your connection or try again.");
-			setIsLoading(false);
-		}
-	};
-
 	return (
 		<AuthContext.Provider
 			value={{
@@ -263,7 +250,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 				signup,
 				logout,
 				loginWithGoogle,
-				loginWithGithub,
 				refreshUser,
 			}}>
 			{children}
