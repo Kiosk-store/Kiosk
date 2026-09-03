@@ -545,12 +545,13 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 					aria-label="Main navigation header">
 					<Link
 						href="/"
-						className="sm-logo flex items-center gap-2 select-none pointer-events-auto group"
+						className="sm-logo flex items-center select-none pointer-events-auto group"
 						aria-label="Kiosk Home">
-						<span className="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block transition-transform group-hover:scale-125" />
-						<span className="sm-logo-text block h-8 align-middle font-nohemi font-bold text-xl tracking-tight text-slate-900">
-							Kiosk
-						</span>
+						<img
+							src="/logo.png"
+							alt="Kiosk"
+							className="h-7 sm:h-8 w-auto object-contain transition-transform group-hover:scale-105"
+						/>
 					</Link>
 
 					<button

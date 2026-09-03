@@ -143,6 +143,11 @@ export const metadata: Metadata = {
 	title: "Kiosk | Modern Websites for Small Businesses",
 	description:
 		"Professional custom sites, sales funnels, and online stores hosted on our platform with easy custom domain upgrades. Built for small businesses.",
+	icons: {
+		icon: "/kiosk_logo.svg",
+		shortcut: "/kiosk_logo.svg",
+		apple: "/kiosk_logo.svg",
+	},
 };
 
 export default function RootLayout({

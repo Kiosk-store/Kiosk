@@ -181,6 +181,15 @@ function GetStartedContent() {
 
 				{/* Title Section */}
 				<div className="text-center max-w-xl mx-auto mb-6 sm:mb-12 flex flex-col items-center">
+					<Link href="/" className="mb-3 inline-block group" aria-label="Kiosk Home">
+						<div className="w-12 h-12 rounded-2xl bg-[#030712] border border-slate-800 shadow-md p-2 flex items-center justify-center transition-transform group-hover:scale-105">
+							<img
+								src="/kiosk_logo.svg"
+								alt="Kiosk"
+								className="w-full h-full object-contain"
+							/>
+						</div>
+					</Link>
 					<h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold font-thunder-lc tracking-tight text-slate-900 uppercase leading-none mb-6">
 						GET STARTED
 					</h1>
