@@ -31,6 +31,7 @@ export async function GET() {
 				id: u.id,
 				name: u.name,
 				email: u.email,
+				image: u.image,
 				phone: u.phone,
 				role: u.role,
 				createdAt: u.createdAt,

@@ -22,6 +22,7 @@ interface UserItem {
 	id: string;
 	name: string;
 	email: string;
+	image?: string | null;
 	phone?: string;
 	role: string;
 	createdAt: string;
@@ -33,6 +34,27 @@ interface UserItem {
 		billingStatus: string;
 	}>;
 }
+
+function UserAvatar({ name, image }: { name?: string; image?: string | null }) {
+	const [imgError, setImgError] = useState(false);
+	const initial = name?.trim() ? name.trim().charAt(0).toUpperCase() : "U";
+
+	return (
+		<div className="w-9 h-9 rounded-2xl bg-blue-50 border border-blue-200 text-blue-700 font-extrabold flex items-center justify-center text-xs shrink-0 overflow-hidden">
+			{image && !imgError ? (
+				<img
+					src={image}
+					alt={name || "User"}
+					onError={() => setImgError(true)}
+					className="w-full h-full object-cover"
+				/>
+			) : (
+				initial
+			)}
+		</div>
+	);
+}
+
 
 export default function AdminUsersPage() {
 	const [usersList, setUsersList] = useState<UserItem[]>([]);
@@ -191,9 +213,7 @@ export default function AdminUsersPage() {
 										className="p-4 rounded-2xl bg-gray-50/70 border border-gray-150 space-y-3">
 										<div className="flex items-start justify-between gap-2">
 											<div className="flex items-center gap-2.5 min-w-0">
-												<div className="w-9 h-9 rounded-2xl bg-blue-50 border border-blue-200 text-blue-700 font-extrabold flex items-center justify-center text-xs shrink-0">
-													{u.name ? u.name.charAt(0).toUpperCase() : "U"}
-												</div>
+												<UserAvatar name={u.name} image={u.image} />
 												<div className="min-w-0">
 													<p className="font-bold text-xs text-gray-900 truncate">{u.name || "Client"}</p>
 													<p className="text-[10px] text-gray-500 truncate">{u.email}</p>
@@ -280,9 +300,7 @@ export default function AdminUsersPage() {
 												{/* User Column */}
 												<td className="py-4 pr-4">
 													<div className="flex items-center gap-3">
-														<div className="w-9 h-9 rounded-2xl bg-blue-50 border border-blue-200 text-blue-700 font-extrabold flex items-center justify-center text-xs shrink-0">
-															{u.name ? u.name.charAt(0).toUpperCase() : "U"}
-														</div>
+														<UserAvatar name={u.name} image={u.image} />
 														<div>
 															<p className="font-bold text-gray-900">{u.name || "Client"}</p>
 															<p className="text-[10px] text-gray-400">{u.email}</p>
