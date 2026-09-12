@@ -23,6 +23,20 @@ import { processPdfInvoiceJob } from "@/inngest/functions/pdfInvoice";
  *
  * Primary event handled: `charge.success`
  */
+interface PaymentMetadata {
+	userId?: string;
+	tenantId?: string;
+	plan?: string;
+	billingCycle?: string;
+	invoiceNumber?: string;
+	custom_fields?: Array<{
+		display_name?: string;
+		variable_name?: string;
+		value?: string;
+	}>;
+	[key: string]: unknown;
+}
+
 interface PaystackWebhookEvent {
 	event?: string;
 	data?: {
@@ -39,19 +53,7 @@ interface PaystackWebhookEvent {
 			first_name?: string;
 			name?: string;
 		};
-		metadata?: {
-			userId?: string;
-			tenantId?: string;
-			plan?: string;
-			billingCycle?: string;
-			invoiceNumber?: string;
-			custom_fields?: Array<{
-				display_name?: string;
-				variable_name?: string;
-				value?: string;
-			}>;
-			[key: string]: unknown;
-		};
+		metadata?: PaymentMetadata;
 	};
 }
 
@@ -86,7 +88,10 @@ export async function POST(request: Request) {
 			);
 		}
 
-		const reference: string = data.reference || data.id;
+		const reference: string = String(data.reference || data.id || "");
+		if (!reference) {
+			return NextResponse.json({ message: "Missing transaction reference" }, { status: 400 });
+		}
 
 		// 2. Webhook Event Deduplication via Upstash Redis
 		if (reference && redis) {
@@ -108,8 +113,8 @@ export async function POST(request: Request) {
 				return NextResponse.json({ error: "Transaction verification failed" }, { status: 400 });
 			}
 
-			const meta = data.metadata || verifiedTx.metadata || {};
-			const userId: string = meta.userId;
+			const meta: PaymentMetadata = (data.metadata || verifiedTx.metadata || {}) as PaymentMetadata;
+			const userId: string | undefined = meta.userId;
 			const plan: string = meta.plan || "LANDING_PAGE";
 			const billingCycle: string = meta.billingCycle || "monthly";
 			const invoiceNumber: string | undefined = meta.invoiceNumber;
@@ -199,7 +204,7 @@ export async function POST(request: Request) {
 				// 3. Dispatch Async PDF Receipt Email Job
 				const recipientEmail = data.customer?.email || verifiedTx.customer?.email;
 				const recipientName =
-					data.metadata?.custom_fields?.[0]?.value ||
+					meta.custom_fields?.[0]?.value ||
 					data.customer?.first_name ||
 					"Kiosk Subscriber";
 
