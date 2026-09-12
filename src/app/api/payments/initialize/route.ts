@@ -5,7 +5,7 @@ import { z } from "zod";
 import { getAuthenticatedUser } from "@/lib/auth/session";
 import { auth } from "@/auth";
 import { checkRateLimit, redis } from "@/lib/ratelimit";
-import { initializeFlutterwavePayment } from "@/lib/payments/flutterwave";
+import { initializePaystackPayment } from "@/lib/payments/paystack";
 import { BASE_PRICES_USD, CURRENCIES, PlanKey } from "@/lib/currency";
 
 import { db } from "@/db";
@@ -108,18 +108,15 @@ export async function POST(request: Request) {
 		const dueDate = new Date();
 		const gracePeriodEnd = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7-day grace period
 
-		// 5. Initialize Multi-Method Flutterwave Payment Link (Card, Transfer, USSD, Mobile Money)
-		const paymentResult = await initializeFlutterwavePayment({
+		// 5. Initialize Multi-Method Paystack Payment Link (Card, Transfer, USSD, Mobile Money)
+		const paymentResult = await initializePaystackPayment({
 			amount,
 			currency: targetCurrency.code,
 			email: userEmail,
 			name: userName,
-			tx_ref,
-			redirect_url: `${appUrl}/dashboard/content?plan=${plan}`,
-			payment_options: "card,banktransfer,ussd,mobilemoney",
-			title: "Kiosk",
-			description: `Kiosk ${planKey.toUpperCase()} - Setup & ${billingCycle} Hosting`,
-			meta: {
+			reference: tx_ref,
+			callback_url: `${appUrl}/dashboard/content?plan=${plan}`,
+			metadata: {
 				userId,
 				tenantId: tenant.id,
 				invoiceNumber,

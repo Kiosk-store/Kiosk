@@ -1,19 +1,20 @@
 import { test, expect } from "@playwright/test";
 import {
-	verifyFlutterwaveWebhookHash,
-	verifyFlutterwaveTransaction,
-} from "../../src/lib/payments/flutterwave";
+	verifyPaystackWebhookSignature,
+	verifyPaystackTransaction,
+} from "../../src/lib/payments/paystack";
 
-test.describe("Flutterwave Webhook Security & Transaction Verification", () => {
-	test("verifyFlutterwaveWebhookHash - Validates secret hash matching", () => {
-		// When env variable is empty or matches
-		const isValid = verifyFlutterwaveWebhookHash("kiosk_flutterwave_secret_hash");
+test.describe("Paystack Webhook Security & Transaction Verification", () => {
+	test("verifyPaystackWebhookSignature - Validates webhook signature handling", () => {
+		// In dev/mock mode or with valid secret
+		const isValid = verifyPaystackWebhookSignature("mock_signature", JSON.stringify({ event: "charge.success" }));
 		expect(typeof isValid).toBe("boolean");
 	});
 
-	test("verifyFlutterwaveTransaction - Returns mock verification when secret key is unset", async () => {
-		const verified = await verifyFlutterwaveTransaction("123456");
+	test("verifyPaystackTransaction - Returns verification when checked", async () => {
+		const verified = await verifyPaystackTransaction("kiosk_tx_123456");
 		expect(verified).toBeDefined();
-		expect(verified?.status).toBe("successful");
+		expect(verified?.status).toBe("success");
+		expect(verified?.reference).toBe("kiosk_tx_123456");
 	});
 });

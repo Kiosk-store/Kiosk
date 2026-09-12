@@ -162,8 +162,11 @@ export interface WebsiteReviewEmailPayload {
  * 2. Admin Submission Alert
  */
 export async function sendWebsiteReviewNotificationToAdmin(payload: WebsiteReviewEmailPayload) {
-	const adminEmail =
-		process.env.ADMIN_EMAIL || process.env.NOTIFICATION_EMAIL || "kioskonline3@gmail.com";
+	const adminEmail = process.env.ADMIN_EMAIL || process.env.NOTIFICATION_EMAIL;
+	if (!adminEmail) {
+		console.warn("[EMAIL_ADMIN_NOTICE] ADMIN_EMAIL or NOTIFICATION_EMAIL is not configured.");
+		return { success: false, error: "Admin email not configured" };
+	}
 	const appUrl = getAppUrl();
 	const reviewUrl = payload.projectId
 		? `${appUrl}/admin/projects/${payload.projectId}`

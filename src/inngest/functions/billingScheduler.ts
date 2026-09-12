@@ -12,8 +12,7 @@
 
 import { db } from "@/db";
 import { tenants, users, invoices, subscriptions } from "@/db/schema";
-import { eq, and, lte, gt, or, inArray } from "drizzle-orm";
-import { initializeFlutterwavePayment } from "@/lib/payments/flutterwave";
+import { initializePaystackPayment } from "@/lib/payments/paystack";
 import { BASE_PRICES_USD, PlanKey } from "@/lib/currency";
 import {
 	sendPaymentRequestEmail,
@@ -89,18 +88,15 @@ export async function processScheduledBillingJob() {
 			const dueDate = tenant.currentPeriodEnd || now;
 			const gracePeriodEnd = new Date(dueDate.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-			// Generate fresh multi-channel payment link (Card, Bank Transfer, USSD, Mobile Money)
-			const paymentResult = await initializeFlutterwavePayment({
+			// Generate fresh multi-channel payment link (Card, Bank Transfer, USSD, Mobile Money) via Paystack
+			const paymentResult = await initializePaystackPayment({
 				amount,
 				currency,
 				email: owner.email,
 				name: owner.name || "Kiosk Subscriber",
-				tx_ref,
-				redirect_url: `${appUrl}/dashboard/billing?payment=success&invoice=${invoiceNumber}`,
-				payment_options: "card,banktransfer,ussd,mobilemoney",
-				title: "Kiosk",
-				description: `Kiosk ${planKey.toUpperCase()} - Hosting Renewal (${billingCycle})`,
-				meta: {
+				reference: tx_ref,
+				callback_url: `${appUrl}/dashboard/billing?payment=success&invoice=${invoiceNumber}`,
+				metadata: {
 					userId: owner.id,
 					tenantId: tenant.id,
 					invoiceNumber,
