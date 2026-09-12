@@ -9,11 +9,6 @@ import {
 	Search,
 	Loader2,
 	ArrowLeft,
-	Globe,
-	UserCheck,
-	CreditCard,
-	ShoppingBag,
-	Sparkles,
 } from "lucide-react";
 
 interface UserItem {

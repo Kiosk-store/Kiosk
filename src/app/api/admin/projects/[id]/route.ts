@@ -46,12 +46,12 @@ export async function GET(
 
 		// Fetch submitted content from Cache first, then fallback to database snapshot
 		const cacheKey = `tenant:content:${project.tenantId}:${project.id}`;
-		let content: any = await CacheService.get(cacheKey);
+		let content: unknown = await CacheService.get(cacheKey);
 
 		if (!content && project.content) {
 			try {
 				content = JSON.parse(project.content);
-			} catch (e) {
+			} catch {
 				// Fallback
 			}
 		}
@@ -104,7 +104,7 @@ export async function PATCH(
 			return NextResponse.json({ error: "Project not found" }, { status: 404 });
 		}
 
-		const updatePayload: Record<string, any> = {
+		const updatePayload: Record<string, unknown> = {
 			updatedAt: new Date(),
 		};
 

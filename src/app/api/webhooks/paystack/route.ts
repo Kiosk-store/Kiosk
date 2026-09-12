@@ -23,6 +23,38 @@ import { processPdfInvoiceJob } from "@/inngest/functions/pdfInvoice";
  *
  * Primary event handled: `charge.success`
  */
+interface PaystackWebhookEvent {
+	event?: string;
+	data?: {
+		id?: string | number;
+		reference?: string;
+		status?: string;
+		amount?: number;
+		currency?: string;
+		channel?: string;
+		customer?: {
+			id?: string | number;
+			customer_code?: string;
+			email?: string;
+			first_name?: string;
+			name?: string;
+		};
+		metadata?: {
+			userId?: string;
+			tenantId?: string;
+			plan?: string;
+			billingCycle?: string;
+			invoiceNumber?: string;
+			custom_fields?: Array<{
+				display_name?: string;
+				variable_name?: string;
+				value?: string;
+			}>;
+			[key: string]: unknown;
+		};
+	};
+}
+
 export async function POST(request: Request) {
 	try {
 		const rawBody = await request.text();
@@ -37,7 +69,7 @@ export async function POST(request: Request) {
 			);
 		}
 
-		let body: { event?: string; data?: any };
+		let body: PaystackWebhookEvent;
 		try {
 			body = JSON.parse(rawBody);
 		} catch (parseErr) {

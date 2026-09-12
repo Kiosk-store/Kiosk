@@ -23,7 +23,7 @@ export interface InitializePaystackInput {
 	reference: string;
 	callback_url: string;
 	channels?: string[];
-	metadata?: Record<string, any>;
+	metadata?: Record<string, unknown>;
 }
 
 export interface PaystackInitResponse {
@@ -51,7 +51,7 @@ export interface PaystackVerifyResponse {
 		channel: string;
 		currency: string;
 		ip_address: string;
-		metadata: Record<string, any>;
+		metadata: Record<string, unknown>;
 		customer: {
 			id: number;
 			first_name?: string;
@@ -227,14 +227,25 @@ export async function verifyPaystackTransaction(reference: string) {
  * Legacy compatibility alias for existing callers
  * @deprecated Use initializePaystackPayment instead
  */
-export const initializeFlutterwavePayment = (input: any) => {
+export const initializeFlutterwavePayment = (input: {
+	amount: number;
+	currency: string;
+	email: string;
+	name: string;
+	tx_ref?: string;
+	reference?: string;
+	redirect_url?: string;
+	callback_url?: string;
+	meta?: Record<string, unknown>;
+	metadata?: Record<string, unknown>;
+}) => {
 	return initializePaystackPayment({
 		amount: input.amount,
 		currency: input.currency,
 		email: input.email,
 		name: input.name,
-		reference: input.tx_ref || input.reference,
-		callback_url: input.redirect_url || input.callback_url,
+		reference: (input.tx_ref || input.reference) ?? "",
+		callback_url: (input.redirect_url || input.callback_url) ?? "",
 		metadata: input.meta || input.metadata,
 	});
 };
