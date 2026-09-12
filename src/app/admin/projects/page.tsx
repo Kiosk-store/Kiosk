@@ -5,17 +5,11 @@
 import React, { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import {
-	Layers,
 	Search,
-	Filter,
-	Clock,
 	CheckCircle2,
 	Globe,
 	Loader2,
 	Sparkles,
-	ExternalLink,
-	Phone,
-	Mail,
 	ArrowLeft,
 } from "lucide-react";
 
@@ -136,17 +130,19 @@ export default function AdminProjectsQueuePage() {
 				<div className="flex flex-col sm:flex-row items-center justify-between gap-3">
 					{/* Status Tabs */}
 					<div className="flex items-center gap-1.5 p-1 bg-gray-100 rounded-2xl overflow-x-auto w-full sm:w-auto">
-						{[
-							{ id: "ALL", label: `All (${counts.all})` },
-							{ id: "IN_REVIEW", label: `In Review (${counts.inReview})` },
-							{ id: "IN_PROGRESS", label: `In Progress (${counts.inProgress})` },
-							{ id: "LIVE", label: `Live (${counts.live})` },
-							{ id: "DRAFT", label: `Draft (${counts.draft})` },
-						].map((tab) => (
+						{(
+							[
+								{ id: "ALL", label: `All (${counts.all})` },
+								{ id: "IN_REVIEW", label: `In Review (${counts.inReview})` },
+								{ id: "IN_PROGRESS", label: `In Progress (${counts.inProgress})` },
+								{ id: "LIVE", label: `Live (${counts.live})` },
+								{ id: "DRAFT", label: `Draft (${counts.draft})` },
+							] as const
+						).map((tab) => (
 							<button
 								key={tab.id}
 								type="button"
-								onClick={() => setActiveTab(tab.id as any)}
+								onClick={() => setActiveTab(tab.id)}
 								className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
 									activeTab === tab.id
 										? "bg-white text-blue-600 shadow-xs"

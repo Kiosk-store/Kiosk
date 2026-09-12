@@ -209,7 +209,7 @@ export default function AdminProjectReviewPage({
 			});
 
 			if (res.ok) {
-				const data = await res.json();
+				await res.json();
 				if (notifyClient) {
 					setStatus("Live");
 					setProgress(100);

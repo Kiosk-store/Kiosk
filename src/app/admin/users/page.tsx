@@ -7,8 +7,6 @@ import Link from "next/link";
 import {
 	Users,
 	Search,
-	ShieldCheck,
-	CheckCircle2,
 	Loader2,
 	ArrowLeft,
 	Globe,
