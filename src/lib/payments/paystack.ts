@@ -100,12 +100,8 @@ export function verifyPaystackWebhookSignature(
 export async function initializePaystackPayment(
 	input: InitializePaystackInput,
 ): Promise<{ success: boolean; link?: string; reference?: string; access_code?: string; error?: string }> {
-	const isDevMock = !PAYSTACK_SECRET_KEY || process.env.NODE_ENV === "test";
-
-	if (isDevMock) {
-		console.log(
-			`[PAYSTACK_DEV_MOCK] Initialized mock checkout for ${input.email} | Amount: ${input.currency} ${input.amount} (Ref: ${input.reference})`,
-		);
+	// Only use mock redirect during automated unit testing
+	if (process.env.NODE_ENV === "test") {
 		const separator = input.callback_url.includes("?") ? "&" : "?";
 		return {
 			success: true,
@@ -114,24 +110,24 @@ export async function initializePaystackPayment(
 		};
 	}
 
+	if (!PAYSTACK_SECRET_KEY) {
+		console.error("[PAYSTACK_INIT_ERROR] PAYSTACK_SECRET_KEY is not configured.");
+		return {
+			success: false,
+			error: "Paystack is not configured. Please add PAYSTACK_SECRET_KEY to your environment variables in Vercel.",
+		};
+	}
+
 	try {
 		// Paystack expects amount in lowest currency subunit (kobo for NGN, cents for USD/GHS/ZAR)
 		const amountInSubunit = Math.round(input.amount * 100);
 
-		const payload = {
+		const payload: Record<string, any> = {
 			email: input.email,
 			amount: amountInSubunit,
 			currency: input.currency.toUpperCase(),
 			reference: input.reference,
 			callback_url: input.callback_url,
-			channels: input.channels || [
-				"card",
-				"bank",
-				"ussd",
-				"qr",
-				"mobile_money",
-				"bank_transfer",
-			],
 			metadata: {
 				...input.metadata,
 				custom_fields: [
@@ -143,6 +139,10 @@ export async function initializePaystackPayment(
 				],
 			},
 		};
+
+		if (input.channels && input.channels.length > 0) {
+			payload.channels = input.channels;
+		}
 
 		const response = await fetch(`${PAYSTACK_BASE_URL}/transaction/initialize`, {
 			method: "POST",
