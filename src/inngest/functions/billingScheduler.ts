@@ -12,6 +12,7 @@
 
 import { db } from "@/db";
 import { tenants, users, invoices, subscriptions } from "@/db/schema";
+import { eq, and, lte, gt, or, inArray } from "drizzle-orm";
 import { initializePaystackPayment } from "@/lib/payments/paystack";
 import { BASE_PRICES_USD, PlanKey } from "@/lib/currency";
 import {
