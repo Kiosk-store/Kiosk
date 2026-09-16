@@ -67,6 +67,7 @@ export async function GET(
 							email: owner.email,
 							phone: owner.phone,
 							role: owner.role,
+							image: owner.image || null,
 					  }
 					: null,
 				content,

@@ -38,9 +38,45 @@ interface ProjectItem {
 		name: string;
 		email: string;
 		phone: string;
+		image?: string | null;
 	};
 	createdAt: string;
 	updatedAt: string;
+}
+
+function ClientAvatar({
+	image,
+	name,
+	size = "w-10 h-10",
+	rounded = "rounded-xl",
+	textSize = "text-xs",
+}: {
+	image?: string | null;
+	name?: string;
+	size?: string;
+	rounded?: string;
+	textSize?: string;
+}) {
+	const [imgError, setImgError] = useState(false);
+	const initial = name?.trim() ? name.trim().charAt(0).toUpperCase() : "U";
+
+	if (image && !imgError) {
+		return (
+			<img
+				src={image}
+				alt={name || "Client"}
+				onError={() => setImgError(true)}
+				className={`${size} ${rounded} object-cover border border-gray-200 bg-white p-0.5 shrink-0 shadow-2xs`}
+			/>
+		);
+	}
+
+	return (
+		<div
+			className={`${size} ${rounded} bg-blue-100 text-blue-700 font-extrabold flex items-center justify-center shrink-0 ${textSize}`}>
+			{initial}
+		</div>
+	);
 }
 
 export default function AdminProjectsQueuePage() {
@@ -198,17 +234,13 @@ export default function AdminProjectsQueuePage() {
 										className="p-4 rounded-2xl bg-gray-50/70 border border-gray-150 space-y-3">
 										<div className="flex items-start justify-between gap-2">
 											<div className="flex items-center gap-2.5 min-w-0">
-												{p.logoUrl ? (
-													<img
-														src={p.logoUrl}
-														alt={p.name}
-														className="w-10 h-10 rounded-xl object-contain border border-gray-200 bg-white p-1 shrink-0 shadow-2xs"
-													/>
-												) : (
-													<div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 font-extrabold flex items-center justify-center shrink-0 text-sm">
-														{p.name.charAt(0).toUpperCase()}
-													</div>
-												)}
+												<ClientAvatar
+													image={p.owner?.image || p.logoUrl}
+													name={p.businessName || p.name}
+													size="w-10 h-10"
+													rounded="rounded-xl"
+													textSize="text-sm"
+												/>
 												<div className="min-w-0">
 													<p className="font-bold text-xs text-gray-900 truncate">
 														{p.businessName || p.name}
@@ -232,10 +264,19 @@ export default function AdminProjectsQueuePage() {
 										</div>
 
 										<div className="grid grid-cols-2 gap-2 text-[11px] pt-2 border-t border-gray-200/60">
-											<div>
-												<span className="text-[10px] text-gray-400 font-bold block uppercase">Client</span>
-												<span className="text-gray-800 font-medium truncate block">{p.owner?.name || "Client"}</span>
-												<span className="text-[10px] text-gray-500 truncate block">{p.owner?.email}</span>
+											<div className="flex items-center gap-2 min-w-0">
+												<ClientAvatar
+													image={p.owner?.image}
+													name={p.owner?.name}
+													size="w-7 h-7"
+													rounded="rounded-full"
+													textSize="text-[10px]"
+												/>
+												<div className="min-w-0">
+													<span className="text-[10px] text-gray-400 font-bold block uppercase">Client</span>
+													<span className="text-gray-800 font-medium truncate block">{p.owner?.name || "Client"}</span>
+													<span className="text-[10px] text-gray-500 truncate block">{p.owner?.email}</span>
+												</div>
 											</div>
 											<div>
 												<span className="text-[10px] text-gray-400 font-bold block uppercase">Plan & Progress</span>
@@ -304,17 +345,13 @@ export default function AdminProjectsQueuePage() {
 												{/* Business & Assets */}
 												<td className="py-4 pr-4">
 													<div className="flex items-center gap-3">
-														{p.logoUrl ? (
-															<img
-																src={p.logoUrl}
-																alt={p.name}
-																className="w-10 h-10 rounded-xl object-contain border border-gray-200 bg-white p-1 shrink-0 shadow-2xs"
-															/>
-														) : (
-															<div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 font-extrabold flex items-center justify-center shrink-0">
-																{p.name.charAt(0).toUpperCase()}
-															</div>
-														)}
+														<ClientAvatar
+															image={p.owner?.image || p.logoUrl}
+															name={p.businessName || p.name}
+															size="w-10 h-10"
+															rounded="rounded-xl"
+															textSize="text-sm"
+														/>
 														<div>
 															<p className="font-bold text-gray-900">
 																{p.businessName || p.name}
@@ -337,11 +374,20 @@ export default function AdminProjectsQueuePage() {
 
 												{/* Client Contact */}
 												<td className="py-4 pr-4">
-													<div>
-														<p className="font-bold text-gray-900">{p.owner?.name || "Client"}</p>
-														<div className="flex flex-col gap-0.5 text-[10px] text-gray-400 mt-0.5">
-															<span className="truncate max-w-[160px]">{p.owner?.email}</span>
-															{p.owner?.phone && <span>{p.owner.phone}</span>}
+													<div className="flex items-center gap-2.5">
+														<ClientAvatar
+															image={p.owner?.image}
+															name={p.owner?.name}
+															size="w-8 h-8"
+															rounded="rounded-full"
+															textSize="text-[10px]"
+														/>
+														<div className="min-w-0">
+															<p className="font-bold text-gray-900 truncate max-w-[150px]">{p.owner?.name || "Client"}</p>
+															<div className="flex flex-col gap-0.5 text-[10px] text-gray-400 mt-0.5">
+																<span className="truncate max-w-[160px]">{p.owner?.email}</span>
+																{p.owner?.phone && <span>{p.owner.phone}</span>}
+															</div>
 														</div>
 													</div>
 												</td>

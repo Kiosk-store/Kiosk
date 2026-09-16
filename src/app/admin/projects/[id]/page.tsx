@@ -51,6 +51,7 @@ interface ProjectDetail {
 		email: string;
 		phone?: string;
 		role: string;
+		image?: string | null;
 	};
 	content?: {
 		businessName?: string;
@@ -654,9 +655,22 @@ export default function AdminProjectReviewPage({
 						</h3>
 
 						<div className="space-y-3 text-xs">
-							<div>
-								<span className="text-[10px] font-bold text-gray-400 uppercase block">Client Name</span>
-								<p className="font-bold text-gray-900">{project.owner?.name || "Client"}</p>
+							<div className="flex items-center gap-3 pb-3 border-b border-gray-100">
+								{project.owner?.image ? (
+									<img
+										src={project.owner.image}
+										alt={project.owner?.name || "Client"}
+										className="w-12 h-12 rounded-2xl object-cover border border-gray-200 bg-white p-0.5 shrink-0 shadow-2xs"
+									/>
+								) : (
+									<div className="w-12 h-12 rounded-2xl bg-blue-100 text-blue-700 font-extrabold flex items-center justify-center shrink-0 text-base">
+										{project.owner?.name?.trim() ? project.owner.name.trim().charAt(0).toUpperCase() : "C"}
+									</div>
+								)}
+								<div className="min-w-0">
+									<span className="text-[10px] font-bold text-gray-400 uppercase block">Client Name</span>
+									<p className="font-bold text-gray-900 text-sm truncate">{project.owner?.name || "Client"}</p>
+								</div>
 							</div>
 
 							<div>

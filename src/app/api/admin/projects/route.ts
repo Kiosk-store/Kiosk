@@ -73,6 +73,7 @@ export async function GET(request: Request) {
 							name: owner.name,
 							email: owner.email,
 							phone: owner.phone,
+							image: owner.image || null,
 					  }
 					: null,
 				businessName: parsedContent?.businessName || p.name,
