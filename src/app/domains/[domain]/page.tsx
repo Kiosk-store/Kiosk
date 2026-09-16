@@ -7,6 +7,7 @@ import { tenants, projects } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import TenantLiveSite from "@/components/tenant/TenantLiveSite";
 import type { TenantContentData } from "@/components/tenant/TenantLiveSite";
+import UnderConstructionView from "@/components/tenant/UnderConstructionView";
 import { getCustomClientTemplate } from "@/clients_websites";
 import Link from "next/link";
 import { Globe, Sparkles } from "lucide-react";
@@ -109,34 +110,29 @@ export default async function CustomDomainPage({ params }: PageProps) {
 	const isLive = project?.status === "Live" || project?.status === "Published";
 
 	if (!isLive) {
-		const businessName = parsedContent.businessName || tenant.name;
+		const businessName = parsedContent.businessName || tenant.name || cleanDomain;
+		const faviconUrl =
+			parsedContent.logoImage?.url ||
+			`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23004ac6'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='18' font-weight='bold' font-family='sans-serif'>${encodeURIComponent(businessName.trim().charAt(0).toUpperCase() || "W")}</text></svg>`;
+
 		return (
-			<div className="min-h-screen bg-slate-900 text-white flex items-center justify-center p-4">
-				<div className="max-w-lg w-full bg-slate-800 border border-slate-700 rounded-3xl p-8 sm:p-10 text-center space-y-6 shadow-2xl">
-					<div className="w-14 h-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center mx-auto shadow-md">
-						<Sparkles className="w-7 h-7" />
-					</div>
-
-					<div className="space-y-2">
-						<span className="px-3 py-1 rounded-full text-[10px] font-extrabold bg-blue-500/20 text-blue-300 border border-blue-500/30 uppercase tracking-wider">
-							Under Construction
-						</span>
-						<h1 className="text-2xl sm:text-3xl font-extrabold font-nohemi tracking-tight">
-							{businessName}
-						</h1>
-						<p className="text-xs sm:text-sm text-slate-400 max-w-sm mx-auto">
-							We are currently preparing our official website and offerings. Check back very soon!
-						</p>
-					</div>
-
-					<div className="pt-4 border-t border-slate-700 text-[11px] text-slate-500">
-						<span>Powered by </span>
-						<a href="https://kioosk.online" className="text-blue-400 hover:underline">
-							Kiosk
-						</a>
-					</div>
-				</div>
-			</div>
+			<>
+				<link rel="icon" href={faviconUrl} />
+				<link rel="shortcut icon" href={faviconUrl} />
+				<link rel="apple-touch-icon" href={faviconUrl} />
+				{parsedContent.logoImage?.url && <meta name="client-logo" content={parsedContent.logoImage.url} />}
+				<meta name="client-business-name" content={businessName} />
+				<UnderConstructionView
+					businessName={businessName}
+					tagline={parsedContent.tagline}
+					logoUrl={parsedContent.logoImage?.url}
+					progress={project?.progress || 85}
+					whatsapp={parsedContent.whatsappNumber || parsedContent.whatsappLink}
+					contactEmail={parsedContent.contactEmail}
+					contactPhone={parsedContent.contactPhone}
+					tenantSlug={tenant.slug}
+				/>
+			</>
 		);
 	}
 

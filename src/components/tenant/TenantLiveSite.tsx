@@ -30,6 +30,7 @@ export interface TenantContentData {
 	contactEmail?: string;
 	contactPhone?: string;
 	whatsappNumber?: string;
+	whatsappLink?: string;
 	locationAddress?: string;
 	instagramUrl?: string;
 	twitterUrl?: string;
