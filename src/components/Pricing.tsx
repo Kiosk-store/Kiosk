@@ -164,6 +164,25 @@ export default function Pricing() {
 		}
 	};
 
+	const touchStartXRef = useRef<number | null>(null);
+
+	const handleTouchStart = (e: React.TouchEvent) => {
+		touchStartXRef.current = e.touches[0].clientX;
+	};
+
+	const handleTouchEnd = (e: React.TouchEvent) => {
+		if (touchStartXRef.current === null) return;
+		const touchEndX = e.changedTouches[0].clientX;
+		const diff = touchStartXRef.current - touchEndX;
+		// Minimum 45px swipe distance
+		if (diff > 45 && activeIndex < tiers.length - 1) {
+			handleSelectTier(activeIndex + 1);
+		} else if (diff < -45 && activeIndex > 0) {
+			handleSelectTier(activeIndex - 1);
+		}
+		touchStartXRef.current = null;
+	};
+
 	return (
 		<div className="pricing-wrapper">
 			<section
@@ -234,10 +253,16 @@ export default function Pricing() {
 					</div>
 
 					{/* Interactive Tier Quick Tabs (Synced on both desktop and mobile) */}
-					<div className="flex items-center justify-center gap-2 pt-3 sm:pt-4 shrink-0 z-20">
+					<div
+						role="tablist"
+						aria-label="Pricing plan tiers"
+						className="flex items-center justify-center gap-2 pt-3 sm:pt-4 shrink-0 z-20">
 						{tiers.map((t, i) => (
 							<button
 								key={t.id}
+								role="tab"
+								aria-selected={i === activeIndex}
+								aria-controls={`tier-panel-${t.id}`}
 								type="button"
 								onClick={() => handleSelectTier(i)}
 								className={`px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 cursor-pointer flex items-center gap-1.5 ${
@@ -255,8 +280,11 @@ export default function Pricing() {
 						))}
 					</div>
 
-					{/* Main Stage: 1 Lottie Showcase + 1 Pricing Card */}
-					<div className="w-full flex-1 relative flex items-center justify-center my-3 sm:my-6 min-h-[440px] sm:min-h-[500px]">
+					{/* Main Stage: 1 Lottie Showcase + 1 Pricing Card with Touch Swiping */}
+					<div
+						onTouchStart={handleTouchStart}
+						onTouchEnd={handleTouchEnd}
+						className="w-full flex-1 relative flex items-center justify-center my-3 sm:my-6 min-h-[440px] sm:min-h-[500px]">
 						{tiers.map((tier, idx) => {
 							const isVisible = idx === activeIndex;
 							const price = formatPlanPrice(tier.planKey, billingCycle);
@@ -375,6 +403,23 @@ export default function Pricing() {
 								</div>
 							);
 						})}
+					</div>
+
+					{/* Mobile Swipe Pagination Dots */}
+					<div className="flex lg:hidden items-center justify-center gap-2 pt-2 pb-1 shrink-0 z-20">
+						{tiers.map((t, i) => (
+							<button
+								key={`dot-${t.id}`}
+								type="button"
+								onClick={() => handleSelectTier(i)}
+								aria-label={`Go to ${t.name}`}
+								className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+									i === activeIndex
+										? "w-7 bg-blue-500 shadow-sm shadow-blue-500/50"
+										: "w-2 bg-white/25 hover:bg-white/40"
+								}`}
+							/>
+						))}
 					</div>
 				</div>
 			</section>
