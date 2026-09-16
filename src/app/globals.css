@@ -496,7 +496,6 @@ body {
 }
 
 /* Hardware accelerated layer promotion to prevent WebKit redraw stutter */
-.pricing-wrapper,
 [data-scroll],
 nav,
 aside,
