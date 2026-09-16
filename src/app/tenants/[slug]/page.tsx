@@ -163,28 +163,30 @@ export default async function TenantSubdomainPage({ params }: PageProps) {
 
 	const publishedUrl = project?.publishedUrl || `https://${tenant.slug}.kioosk.online`;
 
-	// 4. Check for bespoke custom React template component
+	const clientLogo = parsedContent.logoImage?.url || "";
+	const businessName = parsedContent.businessName || tenant.name || cleanSlug;
 	const CustomComponent =
 		getCustomClientTemplate(cleanSlug) || getCustomClientTemplate(tenant.slug);
 
-	if (CustomComponent) {
-		return (
-			<CustomComponent
-				tenantSlug={tenant.slug}
-				plan={tenant.plan}
-				content={parsedContent}
-				publishedUrl={publishedUrl}
-			/>
-		);
-	}
-
-	// 5. Default dynamic multi-tenant template renderer
 	return (
-		<TenantLiveSite
-			tenantSlug={tenant.slug}
-			plan={tenant.plan}
-			content={parsedContent}
-			publishedUrl={publishedUrl}
-		/>
+		<>
+			{clientLogo && <meta name="client-logo" content={clientLogo} />}
+			<meta name="client-business-name" content={businessName} />
+			{CustomComponent ? (
+				<CustomComponent
+					tenantSlug={tenant.slug}
+					plan={tenant.plan}
+					content={parsedContent}
+					publishedUrl={publishedUrl}
+				/>
+			) : (
+				<TenantLiveSite
+					tenantSlug={tenant.slug}
+					plan={tenant.plan}
+					content={parsedContent}
+					publishedUrl={publishedUrl}
+				/>
+			)}
+		</>
 	);
 }

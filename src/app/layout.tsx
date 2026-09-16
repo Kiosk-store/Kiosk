@@ -10,6 +10,8 @@ import PageLoader from "@/components/PageLoader";
 import { AuthProvider } from "@/context/AuthContext";
 import { CurrencyProvider } from "@/context/CurrencyContext";
 import { Analytics } from "@vercel/analytics/next";
+import { headers } from "next/headers";
+import { resolveTenantBranding } from "@/lib/tenantBranding";
 
 const montserrat = Montserrat({
 	subsets: ["latin"],
@@ -171,11 +173,31 @@ export const metadata: Metadata = {
 	},
 };
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	let initialClientLogo: string | null = null;
+	let initialBusinessName: string | null = null;
+	let isClientSite = false;
+
+	try {
+		const headerList = await headers();
+		const host =
+			headerList.get("x-forwarded-host") ||
+			headerList.get("host") ||
+			"";
+		if (host) {
+			const branding = await resolveTenantBranding(host);
+			isClientSite = branding.isClientSite;
+			initialClientLogo = branding.logoUrl || null;
+			initialBusinessName = branding.businessName || null;
+		}
+	} catch (e) {
+		// Non-blocking fallback
+	}
+
 	return (
 		<html
 			lang="en"
@@ -194,7 +216,11 @@ export default function RootLayout({
 				/>
 			</head>
 			<body className={`${montserrat.className} font-montserrat antialiased`}>
-				<PageLoader />
+				<PageLoader
+					initialClientLogo={initialClientLogo}
+					initialBusinessName={initialBusinessName}
+					isClientSite={isClientSite}
+				/>
 				<AuthProvider>
 					<CurrencyProvider>
 						<NavbarWrapper />

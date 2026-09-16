@@ -134,28 +134,30 @@ export default async function CustomDomainPage({ params }: PageProps) {
 
 	const publishedUrl = `https://${cleanDomain}`;
 
-	// 3. Check for bespoke custom React template component
+	const clientLogo = parsedContent.logoImage?.url || "";
+	const businessName = parsedContent.businessName || tenant.name || cleanDomain;
 	const CustomComponent =
 		getCustomClientTemplate(cleanDomain) || getCustomClientTemplate(tenant.slug);
 
-	if (CustomComponent) {
-		return (
-			<CustomComponent
-				tenantSlug={tenant.slug}
-				plan={tenant.plan}
-				content={parsedContent}
-				publishedUrl={publishedUrl}
-			/>
-		);
-	}
-
-	// 4. Default dynamic multi-tenant template renderer
 	return (
-		<TenantLiveSite
-			tenantSlug={tenant.slug}
-			plan={tenant.plan}
-			content={parsedContent}
-			publishedUrl={publishedUrl}
-		/>
+		<>
+			{clientLogo && <meta name="client-logo" content={clientLogo} />}
+			<meta name="client-business-name" content={businessName} />
+			{CustomComponent ? (
+				<CustomComponent
+					tenantSlug={tenant.slug}
+					plan={tenant.plan}
+					content={parsedContent}
+					publishedUrl={publishedUrl}
+				/>
+			) : (
+				<TenantLiveSite
+					tenantSlug={tenant.slug}
+					plan={tenant.plan}
+					content={parsedContent}
+					publishedUrl={publishedUrl}
+				/>
+			)}
+		</>
 	);
 }

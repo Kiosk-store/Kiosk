@@ -3,12 +3,66 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
-export default function PageLoader() {
+export interface PageLoaderProps {
+	initialClientLogo?: string | null;
+	initialBusinessName?: string | null;
+	isClientSite?: boolean;
+}
+
+const ROOT_HOSTS = [
+	"kioosk.online",
+	"www.kioosk.online",
+	"kiosk.site",
+	"www.kiosk.site",
+	"localhost",
+	"127.0.0.1",
+	"0.0.0.0",
+];
+
+export default function PageLoader({
+	initialClientLogo = null,
+	initialBusinessName = null,
+	isClientSite = false,
+}: PageLoaderProps) {
+	const pathname = usePathname();
 	const [isLoading, setIsLoading] = useState(true);
 	const [isMounted, setIsMounted] = useState(true);
 
+	const [isClient, setIsClient] = useState(isClientSite);
+	const [clientLogo, setClientLogo] = useState<string | null>(initialClientLogo);
+	const [businessName, setBusinessName] = useState<string | null>(initialBusinessName);
+
 	useEffect(() => {
+		// Client-side detection safety net
+		if (typeof window !== "undefined") {
+			const host = window.location.hostname.toLowerCase().replace(/:\d+$/, "");
+			const isSub =
+				!ROOT_HOSTS.includes(host) ||
+				pathname.startsWith("/tenants") ||
+				pathname.startsWith("/domains");
+
+			if (isSub) {
+				setIsClient(true);
+			}
+
+			// Check for in-page meta tag if initialClientLogo wasn't passed directly
+			if (!clientLogo) {
+				const metaLogo = document.querySelector('meta[name="client-logo"]')?.getAttribute("content");
+				if (metaLogo) {
+					setClientLogo(metaLogo);
+				}
+			}
+
+			if (!businessName) {
+				const metaTitle = document.querySelector('meta[name="client-business-name"]')?.getAttribute("content");
+				if (metaTitle) {
+					setBusinessName(metaTitle);
+				}
+			}
+		}
+
 		const hideLoader = () => {
 			setIsLoading(false);
 			// Remove from DOM after fade-out transition completes
@@ -30,7 +84,7 @@ export default function PageLoader() {
 				clearTimeout(safetyTimer);
 			};
 		}
-	}, []);
+	}, [pathname, clientLogo, businessName]);
 
 	if (!isMounted) return null;
 
@@ -41,11 +95,33 @@ export default function PageLoader() {
 				isLoading ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
 			}`}>
 			<div className="flex flex-col items-center justify-center p-4">
-				<img
-					src="/KIOSK PNG2.png"
-					alt="Kiosk"
-					className="h-10 sm:h-12 md:h-14 w-auto max-w-[220px] object-contain animate-pulse"
-				/>
+				{isClient ? (
+					clientLogo ? (
+						<img
+							src={clientLogo}
+							alt={businessName || "Client Logo"}
+							className="h-14 sm:h-18 md:h-20 w-auto max-w-[240px] max-h-[100px] object-contain animate-pulse"
+						/>
+					) : (
+						<div className="flex flex-col items-center gap-3 animate-pulse">
+							<div className="w-14 h-14 rounded-2xl bg-blue-600 text-white font-extrabold flex items-center justify-center text-xl shadow-md">
+								{businessName ? businessName.trim().charAt(0).toUpperCase() : "★"}
+							</div>
+							{businessName && (
+								<p className="font-bold text-sm text-gray-900 tracking-tight text-center max-w-xs">
+									{businessName}
+								</p>
+							)}
+						</div>
+					)
+				) : (
+					/* Kiosk platform loader for main marketing site */
+					<img
+						src="/KIOSK PNG2.png"
+						alt="Kiosk"
+						className="h-10 sm:h-12 md:h-14 w-auto max-w-[220px] object-contain animate-pulse"
+					/>
+				)}
 			</div>
 		</div>
 	);
