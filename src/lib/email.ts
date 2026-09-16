@@ -85,6 +85,10 @@ function renderEmailShell({
 	title: string;
 	contentHtml: string;
 }) {
+	const appUrl = getAppUrl();
+	const logoBaseUrl = appUrl.includes("localhost") ? "https://kioosk.online" : appUrl;
+	const logoUrl = `${logoBaseUrl}/KIOSK%20PNG2.png`;
+
 	return `
 		<!DOCTYPE html>
 		<html lang="en">
@@ -95,6 +99,13 @@ function renderEmailShell({
 			</head>
 			<body style="margin: 0; padding: 24px 16px; background-color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #111827; font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased;">
 				<div style="max-width: 580px; margin: 0 auto;">
+					<!-- Brand Logo Header -->
+					<div style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #f3f4f6;">
+						<a href="${appUrl}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: inline-block;">
+							<img src="${logoUrl}" alt="Kiosk" width="130" style="display: block; width: 130px; max-width: 130px; height: auto; border: 0; outline: none; text-decoration: none;" />
+						</a>
+					</div>
+
 					${contentHtml}
 
 					<div style="margin-top: 36px; padding-top: 20px; border-top: 1px solid #e5e7eb; font-size: 13px; color: #6b7280; line-height: 1.5;">
