@@ -61,6 +61,31 @@ export default function PageLoader({
 					setBusinessName(metaTitle);
 				}
 			}
+
+			// Dynamically ensure browser tab favicon uses client branding and never Kiosk logo
+			if (isSub || isClient) {
+				const activeLogo =
+					clientLogo || document.querySelector('meta[name="client-logo"]')?.getAttribute("content");
+				const activeName =
+					businessName ||
+					document.querySelector('meta[name="client-business-name"]')?.getAttribute("content") ||
+					"";
+				const targetFavicon =
+					activeLogo ||
+					`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23004ac6'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='18' font-weight='bold' font-family='sans-serif'>${encodeURIComponent(activeName.trim().charAt(0).toUpperCase() || "W")}</text></svg>`;
+
+				const existingIcons = document.querySelectorAll("link[rel*='icon']");
+				if (existingIcons.length > 0) {
+					existingIcons.forEach((el) => {
+						(el as HTMLLinkElement).href = targetFavicon;
+					});
+				} else {
+					const link = document.createElement("link");
+					link.rel = "icon";
+					link.href = targetFavicon;
+					document.head.appendChild(link);
+				}
+			}
 		}
 
 		const hideLoader = () => {

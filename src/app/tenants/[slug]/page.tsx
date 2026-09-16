@@ -71,10 +71,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 	const businessName = parsed.businessName || tenant.name || "Business Website";
 	const tagline = parsed.tagline || "Official Online Store & Services";
+	const faviconUrl =
+		parsed.logoImage?.url ||
+		`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23004ac6'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='18' font-weight='bold' font-family='sans-serif'>${encodeURIComponent(businessName.trim().charAt(0).toUpperCase() || "W")}</text></svg>`;
 
 	return {
 		title: `${businessName} | ${tagline}`,
 		description: parsed.aboutText || tagline,
+		icons: {
+			icon: [{ url: faviconUrl }],
+			shortcut: [{ url: faviconUrl }],
+			apple: [{ url: faviconUrl }],
+		},
 		openGraph: {
 			title: businessName,
 			description: tagline,
@@ -168,8 +176,15 @@ export default async function TenantSubdomainPage({ params }: PageProps) {
 	const CustomComponent =
 		getCustomClientTemplate(cleanSlug) || getCustomClientTemplate(tenant.slug);
 
+	const faviconUrl =
+		clientLogo ||
+		`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23004ac6'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='18' font-weight='bold' font-family='sans-serif'>${encodeURIComponent(businessName.trim().charAt(0).toUpperCase() || "W")}</text></svg>`;
+
 	return (
 		<>
+			<link rel="icon" href={faviconUrl} />
+			<link rel="shortcut icon" href={faviconUrl} />
+			<link rel="apple-touch-icon" href={faviconUrl} />
 			{clientLogo && <meta name="client-logo" content={clientLogo} />}
 			<meta name="client-business-name" content={businessName} />
 			{CustomComponent ? (

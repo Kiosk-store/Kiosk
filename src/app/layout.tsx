@@ -166,11 +166,6 @@ export const metadata: Metadata = {
 	formatDetection: {
 		telephone: false,
 	},
-	icons: {
-		icon: "/kiosk_logo.svg",
-		shortcut: "/kiosk_logo.svg",
-		apple: "/kiosk_logo.svg",
-	},
 };
 
 export default async function RootLayout({
@@ -198,11 +193,30 @@ export default async function RootLayout({
 		// Non-blocking fallback
 	}
 
+	const clientFavicon =
+		initialClientLogo ||
+		`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23004ac6'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='18' font-weight='bold' font-family='sans-serif'>${encodeURIComponent(initialBusinessName?.trim()?.charAt(0).toUpperCase() || "W")}</text></svg>`;
+
 	return (
 		<html
 			lang="en"
 			className={`scroll-smooth ${montserrat.variable} ${thunderLC.variable} ${thunderHC.variable} ${nohemi.variable} ${dirtyline.variable}`}>
 			<head>
+				{/* Favicons: Use client branding on subdomains, Kiosk logo on marketing platform */}
+				{isClientSite ? (
+					<>
+						<link rel="icon" href={clientFavicon} />
+						<link rel="shortcut icon" href={clientFavicon} />
+						<link rel="apple-touch-icon" href={clientFavicon} />
+					</>
+				) : (
+					<>
+						<link rel="icon" href="/kiosk_logo.svg" />
+						<link rel="shortcut icon" href="/kiosk_logo.svg" />
+						<link rel="apple-touch-icon" href="/kiosk_logo.svg" />
+					</>
+				)}
+
 				{/* Apple / iOS Web App Meta */}
 				<meta name="apple-mobile-web-app-capable" content="yes" />
 				<meta name="apple-mobile-web-app-status-bar-style" content="default" />
