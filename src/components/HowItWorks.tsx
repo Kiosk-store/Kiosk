@@ -95,7 +95,7 @@ export default function HowItWorks() {
 										overflow: "visible",
 										borderRadius: 0,
 										position: "relative",
-										willChange: "transform, filter, opacity",
+										willChange: "transform, opacity",
 										marginBottom: "24px",
 										border: "1px solid rgba(255,255,255,0.08)",
 									}}>

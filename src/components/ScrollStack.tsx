@@ -96,14 +96,27 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
 		};
 	}, []);
 
-	// Return the element's top offset relative to the document
-	const getElementOffset = useCallback((element: HTMLElement) => {
-		const rect = element.getBoundingClientRect();
-		return rect.top + window.scrollY;
+	const cardTopsRef = useRef<number[]>([]);
+	const endElementTopRef = useRef<number>(0);
+
+	// Measure and cache card document offsets once (and on resize) to prevent layout thrashing on scroll
+	const measureOffsets = useCallback(() => {
+		if (!cardsRef.current.length) return;
+		const scrollY = window.scrollY;
+		cardTopsRef.current = cardsRef.current.map((card) => {
+			const rect = card.getBoundingClientRect();
+			return rect.top + scrollY;
+		});
+		const endElement = document.querySelector(
+			".scroll-stack-end",
+		) as HTMLElement | null;
+		endElementTopRef.current = endElement
+			? endElement.getBoundingClientRect().top + scrollY
+			: 0;
 	}, []);
 
-	// Update per-card transforms (translate, scale, rotation, blur)
-	// This is called on scroll via RAF for smooth, composited updates.
+	// Update per-card transforms (translate, scale, rotation, opacity)
+	// Completely avoids forced synchronous layout queries and eliminates expensive Gaussian blur on mobile.
 	const updateCardTransforms = useCallback(() => {
 		if (!cardsRef.current.length) return;
 
@@ -114,24 +127,26 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
 			containerHeight,
 		);
 
-		const endElement = document.querySelector(
-			".scroll-stack-end",
-		) as HTMLElement | null;
-		const endElementTop = endElement ? getElementOffset(endElement) : 0;
+		const isMobile =
+			typeof window !== "undefined" &&
+			(window.innerWidth < 768 || "ontouchstart" in window);
+
+		const cardTops = cardTopsRef.current;
+		const endElementTop = endElementTopRef.current;
 
 		let topCardIndex = 0;
-		cardsRef.current.forEach((card, i) => {
-			const cardTop = getElementOffset(card);
+		for (let i = 0; i < cardsRef.current.length; i++) {
+			const cardTop = cardTops[i] ?? 0;
 			const triggerStart = cardTop - stackPositionPx - itemStackDistance * i;
 			if (scrollTop >= triggerStart) {
 				topCardIndex = i;
 			}
-		});
+		}
 
 		cardsRef.current.forEach((card, i) => {
 			if (!card) return;
 
-			const cardTop = getElementOffset(card);
+			const cardTop = cardTops[i] ?? 0;
 			const triggerStart = cardTop - stackPositionPx - itemStackDistance * i;
 			const triggerEnd = cardTop - scaleEndPositionPx;
 
@@ -144,28 +159,33 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
 			const scale = 1 - scaleProgress * (1 - targetScale);
 			const rotation = rotationAmount ? i * rotationAmount * scaleProgress : 0;
 
-			// Smooth blur based on position in stack
-			let blur = 0;
 			const isBlurred = i < topCardIndex;
 			const depthInStack = topCardIndex - i;
 
-			if (isBlurred) {
-				// Progressive blur with smooth easing
-				const maxBlur = Math.min(depthInStack * 0.8, blurAmount);
-				// Use sine easing for smoother transition
-				const easeInOut = (t: number) => t * t * (3 - 2 * t);
-				const blurProgress = Math.min(scaleProgress * 1.2, 1);
-				blur = maxBlur * easeInOut(blurProgress);
+			// On iOS/mobile, skip filter: blur(...) entirely to avoid severe GPU texture reallocation lag.
+			// Pure opacity fading delivers identical depth aesthetics at 60/120fps compositor speed.
+			let blur = 0;
+			let opacity = 1;
+
+			if (isMobile) {
+				opacity = isBlurred ? Math.max(0.45, 1 - depthInStack * 0.15) : 1;
 			} else {
-				// Gradually unblur when scrolling up
-				const unblurProgress = Math.max(
-					0,
-					1 - (scrollTop - triggerStart) / 300,
-				);
-				blur = blurAmount * 0.3 * (1 - unblurProgress);
+				if (isBlurred) {
+					const maxBlur = Math.min(depthInStack * 0.8, blurAmount);
+					const easeInOut = (t: number) => t * t * (3 - 2 * t);
+					const blurProgress = Math.min(scaleProgress * 1.2, 1);
+					blur = maxBlur * easeInOut(blurProgress);
+				} else {
+					const unblurProgress = Math.max(
+						0,
+						1 - (scrollTop - triggerStart) / 300,
+					);
+					blur = blurAmount * 0.3 * (1 - unblurProgress);
+				}
+				opacity = blur > 0.1 ? 1 - blur / 12 : 1;
 			}
 
-			// Calculate translateY with smoother motion
+			// Calculate translateY with smooth clamping
 			let translateY = 0;
 			const pinStart = cardTop - stackPositionPx - itemStackDistance * i;
 			const pinEnd = endElementTop - containerHeight * 0.6;
@@ -177,27 +197,19 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
 				translateY = pinEnd - cardTop + stackPositionPx + itemStackDistance * i;
 			}
 
-			// Clamp translateY to prevent overshoot
 			translateY = Math.max(0, translateY);
 
-			const newTransform = {
-				translateY: Math.round(translateY * 10) / 10,
-				scale: Math.round(scale * 1000) / 1000,
-				rotation: Math.round(rotation * 10) / 10,
-				blur: Math.round(blur * 10) / 10,
-			};
+			const roundedY = Math.round(translateY * 10) / 10;
+			const roundedScale = Math.round(scale * 1000) / 1000;
+			const roundedRotation = Math.round(rotation * 10) / 10;
 
-			// Apply transform with smoother transitions
-			const transform = `translate3d(0, ${newTransform.translateY}px, 0) scale(${newTransform.scale}) rotate(${newTransform.rotation}deg)`;
-			const filter =
-				newTransform.blur > 0.1 ? `blur(${newTransform.blur}px)` : "";
-			const opacity = newTransform.blur > 0.1 ? 1 - newTransform.blur / 12 : 1;
-
-			card.style.transform = transform;
-			card.style.filter = filter;
-			card.style.opacity = String(opacity);
-			card.style.transition =
-				"transform 0.1s ease-out, filter 0.1s ease-out, opacity 0.1s ease-out";
+			card.style.transform = `translate3d(0, ${roundedY}px, 0) scale(${roundedScale}) rotate(${roundedRotation}deg)`;
+			if (!isMobile && blur > 0.1) {
+				card.style.filter = `blur(${Math.round(blur * 10) / 10}px)`;
+			} else {
+				card.style.filter = "none";
+			}
+			card.style.opacity = String(Math.round(opacity * 100) / 100);
 
 			// Check if last card is fully revealed
 			if (i === cardsRef.current.length - 1) {
@@ -222,7 +234,6 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
 		calculateProgress,
 		parsePercentage,
 		getScrollData,
-		getElementOffset,
 	]);
 
 	// Use requestAnimationFrame for smooth updates and avoid layout thrashing
@@ -263,19 +274,25 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
 			if (i < cards.length - 1) {
 				card.style.marginBottom = `${itemDistance}px`;
 			}
-			card.style.willChange = "transform, filter, opacity";
+			card.style.willChange = "transform, opacity";
 			card.style.transformOrigin = "top center";
 			card.style.backfaceVisibility = "hidden";
 			card.style.transform = "translateZ(0)";
-			card.style.filter = "blur(0px)";
 			card.style.opacity = "1";
-			card.style.transition =
-				"transform 0.15s ease-out, filter 0.15s ease-out, opacity 0.15s ease-out";
 		});
 
+		measureOffsets();
 		updateCardTransforms();
 
+		const handleResize = () => {
+			measureOffsets();
+			updateCardTransforms();
+		};
+
+		window.addEventListener("resize", handleResize, { passive: true });
+
 		return () => {
+			window.removeEventListener("resize", handleResize);
 			cardsRef.current = [];
 			isUpdatingRef.current = false;
 		};
@@ -290,6 +307,7 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
 		rotationAmount,
 		blurAmount,
 		onStackComplete,
+		measureOffsets,
 		updateCardTransforms,
 	]);
 

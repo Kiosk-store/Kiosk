@@ -25,8 +25,8 @@ export default function ScrollReveal({
 	className = "",
 	direction = "up",
 	delay = 0,
-	duration = 800,
-	threshold = 0.05,
+	duration = 500,
+	threshold = 0.02,
 }: ScrollRevealProps) {
 	const ref = useRef<HTMLDivElement>(null);
 	const [isVisible, setIsVisible] = useState(false);
@@ -43,7 +43,7 @@ export default function ScrollReveal({
 			},
 			{
 				threshold,
-				rootMargin: "0px 0px -80px 0px", // Triggers just before coming into view
+				rootMargin: "0px 0px 60px 0px", // Eager trigger so elements don't feel delayed on mobile
 			}
 		);
 
@@ -62,13 +62,13 @@ export default function ScrollReveal({
 	const getDirectionStyles = () => {
 		switch (direction) {
 			case "up":
-				return isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4";
+				return isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3";
 			case "down":
-				return isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4";
+				return isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3";
 			case "left":
-				return isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4";
+				return isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-3";
 			case "right":
-				return isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4";
+				return isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-3";
 			case "fade":
 				return isVisible ? "opacity-100" : "opacity-0";
 			default:
@@ -79,10 +79,13 @@ export default function ScrollReveal({
 	return (
 		<div
 			ref={ref}
-			className={`${className} transition-all ease-[cubic-bezier(0.16,1,0.3,1)] ${getDirectionStyles()}`}
+			className={`${className} transition-[opacity,transform] ease-[cubic-bezier(0.16,1,0.3,1)] ${getDirectionStyles()}`}
 			style={{
 				transitionDuration: `${duration}ms`,
 				transitionDelay: `${delay}ms`,
+				willChange: "transform, opacity",
+				transform: "translateZ(0)",
+				WebkitTransform: "translateZ(0)",
 			}}
 		>
 			{children}

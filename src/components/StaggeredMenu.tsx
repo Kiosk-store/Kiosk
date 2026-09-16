@@ -103,22 +103,52 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
 	const itemEntranceTweenRef = useRef<gsap.core.Tween | null>(null);
 
-	const [atTop, setAtTop] = useState(true);
+	const [headerVisible, setHeaderVisible] = useState(true);
+	const headerVisibleRef = useRef(true);
+	const lastScrollYRef = useRef(0);
+	const scrollRafRef = useRef<number | null>(null);
 
 	React.useEffect(() => {
 		const handleScroll = () => {
-			const currentScrollY = window.scrollY;
-			// Only show staggered menu header when at the hero section top
-			if (currentScrollY <= 80) {
-				setAtTop(true);
-			} else {
-				setAtTop(false);
-			}
+			if (scrollRafRef.current !== null) return;
+
+			scrollRafRef.current = requestAnimationFrame(() => {
+				scrollRafRef.current = null;
+				const currentScrollY = Math.max(0, window.scrollY);
+				const prevScrollY = lastScrollYRef.current;
+				const diff = currentScrollY - prevScrollY;
+
+				// At the very top (hero area): always show
+				if (currentScrollY <= 50) {
+					if (!headerVisibleRef.current) {
+						headerVisibleRef.current = true;
+						setHeaderVisible(true);
+					}
+				} else if (diff > 8 && currentScrollY > 70) {
+					// Scrolling down past threshold: hide
+					if (headerVisibleRef.current) {
+						headerVisibleRef.current = false;
+						setHeaderVisible(false);
+					}
+				} else if (diff < -8) {
+					// Scrolling up: reveal
+					if (!headerVisibleRef.current) {
+						headerVisibleRef.current = true;
+						setHeaderVisible(true);
+					}
+				}
+
+				lastScrollYRef.current = currentScrollY;
+			});
 		};
 
-		handleScroll();
 		window.addEventListener("scroll", handleScroll, { passive: true });
-		return () => window.removeEventListener("scroll", handleScroll);
+		return () => {
+			window.removeEventListener("scroll", handleScroll);
+			if (scrollRafRef.current !== null) {
+				cancelAnimationFrame(scrollRafRef.current);
+			}
+		};
 	}, []);
 
 
@@ -538,11 +568,17 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 				</div>
 
 				<header
-					className={`staggered-menu-header fixed top-0 left-0 right-0 max-w-[100vw] box-border flex items-center justify-between px-4 sm:px-10 py-3.5 sm:py-5 bg-transparent transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] z-[1001] ${
-						open || atTop
-							? "translate-y-0 opacity-100 pointer-events-auto"
-							: "-translate-y-full opacity-0 pointer-events-none"
-					}`}
+					data-hidden={!open && !headerVisible}
+					className="staggered-menu-header fixed top-0 left-0 right-0 max-w-[100vw] box-border flex items-center justify-between px-4 sm:px-10 py-3.5 sm:py-5 bg-transparent z-[1001]"
+					style={{
+						transform: open || headerVisible ? "translate3d(0, 0, 0)" : "translate3d(0, -110%, 0)",
+						WebkitTransform: open || headerVisible ? "translate3d(0, 0, 0)" : "translate3d(0, -110%, 0)",
+						opacity: open || headerVisible ? 1 : 0,
+						pointerEvents: open || headerVisible ? "auto" : "none",
+						transition: "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease-out",
+						WebkitTransition: "-webkit-transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease-out",
+						willChange: "transform, opacity",
+					}}
 					aria-label="Main navigation header">
 					<Link
 						href="/"
@@ -707,8 +743,10 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
 			<style>{`
 .sm-scope .staggered-menu-wrapper { position: relative; width: 100%; height: 100%; z-index: 40; pointer-events: none; }
-.sm-scope .staggered-menu-header { position: fixed; top: 0; left: 0; width: 100%; display: flex; align-items: center; justify-content: space-between; pointer-events: none; z-index: 30; padding-top: max(0.875rem, env(safe-area-inset-top, 0px)); padding-left: max(1rem, env(safe-area-inset-left, 0px)); padding-right: max(1rem, env(safe-area-inset-right, 0px)); }
+.sm-scope .staggered-menu-header { position: fixed; top: 0; left: 0; width: 100%; display: flex; align-items: center; justify-content: space-between; z-index: 30; padding-top: max(0.875rem, env(safe-area-inset-top, 0px)); padding-left: max(1rem, env(safe-area-inset-left, 0px)); padding-right: max(1rem, env(safe-area-inset-right, 0px)); }
 .sm-scope .staggered-menu-header > * { pointer-events: auto; }
+.sm-scope .staggered-menu-header[data-hidden="true"] { pointer-events: none !important; }
+.sm-scope .staggered-menu-header[data-hidden="true"] > * { pointer-events: none !important; }
 .sm-scope .sm-logo { display: flex; align-items: center; user-select: none; }
 .sm-scope .sm-logo-img { display: block; height: 36px; width: auto; max-width: 190px; object-fit: contain; }
 @media (min-width: 640px) {

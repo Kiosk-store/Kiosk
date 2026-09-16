@@ -510,8 +510,9 @@ header {
 
 /* Specific iOS Safari Touch & Viewport Stability */
 @supports (-webkit-touch-callout: none) {
+	html,
 	body {
-		overscroll-behavior-y: none;
+		-webkit-overflow-scrolling: touch;
 	}
 
 	.h-screen {

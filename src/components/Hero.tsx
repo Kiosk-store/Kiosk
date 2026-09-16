@@ -176,9 +176,9 @@ export default function Hero() {
 			<div
 				aria-hidden
 				className="pointer-events-none absolute inset-0 z-0 overflow-hidden select-none">
-				{/* 1. Ambient Shopfront Watermark (Left side) */}
+				{/* 1. Ambient Shopfront Watermark (Left side - desktop only) */}
 				<div
-					className="absolute -top-8 -left-8 sm:left-4 md:left-8 w-72 h-72 sm:w-96 sm:h-96 opacity-[0.08] [mask-image:radial-gradient(ellipse_75%_75%_at_50%_50%,#000_60%,transparent_100%)] pointer-events-none"
+					className="absolute -top-8 -left-8 sm:left-4 md:left-8 w-72 h-72 sm:w-96 sm:h-96 opacity-[0.08] [mask-image:radial-gradient(ellipse_75%_75%_at_50%_50%,#000_60%,transparent_100%)] pointer-events-none hidden md:block"
 					style={{ animation: "watermarkFloat 12s ease-in-out infinite" }}>
 					<LottiePlayer
 						src="/lotties/A small shop.json"
@@ -189,9 +189,9 @@ export default function Hero() {
 					/>
 				</div>
 
-				{/* 2. Ambient Ecommerce & Shopping Watermark (Center / Right Background) */}
+				{/* 2. Ambient Ecommerce & Shopping Watermark (Center / Right Background - desktop only) */}
 				<div
-					className="absolute top-1/4 right-6 sm:right-20 md:right-36 w-64 h-64 sm:w-80 sm:h-80 opacity-[0.06] [mask-image:radial-gradient(ellipse_75%_75%_at_50%_50%,#000_60%,transparent_100%)] pointer-events-none"
+					className="absolute top-1/4 right-6 sm:right-20 md:right-36 w-64 h-64 sm:w-80 sm:h-80 opacity-[0.06] [mask-image:radial-gradient(ellipse_75%_75%_at_50%_50%,#000_60%,transparent_100%)] pointer-events-none hidden md:block"
 					style={{
 						animation: "watermarkFloatRev 14s ease-in-out infinite",
 						animationDelay: "2s",

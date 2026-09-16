@@ -8,18 +8,30 @@ import { ArrowUp } from "lucide-react";
 export default function BackToTop() {
 	const [visible, setVisible] = useState(false);
 
+	const visibleRef = React.useRef(false);
+	const rafRef = React.useRef<number | null>(null);
+
 	useEffect(() => {
 		const toggleVisibility = () => {
-			if (window.scrollY > 300) {
-				setVisible(true);
-			} else {
-				setVisible(false);
-			}
+			if (rafRef.current !== null) return;
+			rafRef.current = requestAnimationFrame(() => {
+				rafRef.current = null;
+				const shouldShow = window.scrollY > 300;
+				if (shouldShow !== visibleRef.current) {
+					visibleRef.current = shouldShow;
+					setVisible(shouldShow);
+				}
+			});
 		};
 
 		toggleVisibility();
 		window.addEventListener("scroll", toggleVisibility, { passive: true });
-		return () => window.removeEventListener("scroll", toggleVisibility);
+		return () => {
+			window.removeEventListener("scroll", toggleVisibility);
+			if (rafRef.current !== null) {
+				cancelAnimationFrame(rafRef.current);
+			}
+		};
 	}, []);
 
 	const scrollToTop = () => {

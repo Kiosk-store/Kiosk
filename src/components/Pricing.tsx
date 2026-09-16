@@ -129,7 +129,7 @@ export default function Pricing() {
 						total - 1,
 						Math.floor(progress * total),
 					);
-					setActiveIndex(newIndex);
+					setActiveIndex((prev) => (prev === newIndex ? prev : newIndex));
 				},
 			});
 		}, section);
