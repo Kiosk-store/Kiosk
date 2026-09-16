@@ -8,6 +8,7 @@ const footerLinks = {
 		{ label: "About Us", href: "/#about" },
 		{ label: "Portfolio", href: "/#portfolio" },
 		{ label: "Pricing", href: "/#pricing" },
+		{ label: "Contact Support", href: "/contact" },
 	],
 	legal: [
 		{ label: "Privacy Policy", href: "/privacy" },
@@ -81,6 +82,18 @@ export default function Footer() {
 								</Link>
 							</li>
 						))}
+						<li>
+							<button
+								type="button"
+								onClick={() => {
+									if (typeof window !== "undefined") {
+										window.dispatchEvent(new CustomEvent("open-cookie-preferences"));
+									}
+								}}
+								className="text-white/70 hover:text-white transition-colors duration-300 text-left cursor-pointer">
+								Cookie Preferences
+							</button>
+						</li>
 					</ul>
 				</div>
 
@@ -94,6 +107,13 @@ export default function Footer() {
 								className="text-white/70 hover:text-white transition-colors duration-300">
 								hello@kioosk.online
 							</a>
+						</li>
+						<li>
+							<Link
+								href="/contact"
+								className="text-blue-400 hover:text-white transition-colors duration-300 font-medium">
+								Support Desk &rarr;
+							</Link>
 						</li>
 						<li className="flex gap-3 mt-6">
 							<a
@@ -114,7 +134,7 @@ export default function Footer() {
 			</div>
 
 			{/* Bottom Section & Massive Typography */}
-			<div className="relative w-full flex flex-col items-center justify-end overflow-hidden pt-6 md:pt-10">
+			<div className="relative w-full max-w-full flex flex-col items-center justify-end overflow-hidden pt-6 md:pt-10 pb-[max(1rem,env(safe-area-inset-bottom,0px))]">
 				{/* Copyright & Socials */}
 				<div className="w-full max-w-7xl mx-auto px-6 lg:px-8 flex flex-col-reverse md:flex-row justify-between items-center gap-8 md:gap-4 text-white/50 text-xs md:text-sm mb-10 md:mb-2 relative z-10">
 					<p className="font-medium tracking-wide text-center md:text-left">&copy; {new Date().getFullYear()} Kiosk. All rights reserved.</p>
@@ -152,7 +172,7 @@ export default function Footer() {
 				</div>
 
 				{/* Massive Edge-to-Edge Typography */}
-				<div className="w-full flex justify-center leading-[0.75] select-none pointer-events-none translate-y-[12%] mt-2 md:mt-0">
+				<div className="w-full max-w-full overflow-hidden flex justify-center leading-[0.75] select-none pointer-events-none translate-y-[12%] mt-2 md:mt-0">
 					<span 
 						className="font-thunder-lc uppercase text-[24vw] md:text-[25vw] font-bold tracking-[-0.02em] whitespace-nowrap"
 						style={{

@@ -1,10 +1,11 @@
 /** @format */
 
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
 import NavbarWrapper from "@/components/NavbarWrapper";
+import CookieConsent from "@/components/CookieConsent";
 import { AuthProvider } from "@/context/AuthContext";
 import { CurrencyProvider } from "@/context/CurrencyContext";
 import { Analytics } from "@vercel/analytics/next";
@@ -139,10 +140,29 @@ const dirtyline = localFont({
 	display: "swap",
 });
 
+export const viewport: Viewport = {
+	width: "device-width",
+	initialScale: 1,
+	maximumScale: 5,
+	viewportFit: "cover",
+	themeColor: [
+		{ media: "(prefers-color-scheme: light)", color: "#ffffff" },
+		{ media: "(prefers-color-scheme: dark)", color: "#03152c" },
+	],
+};
+
 export const metadata: Metadata = {
 	title: "Kiosk | Modern Websites for Small Businesses",
 	description:
 		"Professional custom sites, sales funnels, and online stores hosted on our platform with easy custom domain upgrades. Built for small businesses.",
+	appleWebApp: {
+		capable: true,
+		statusBarStyle: "default",
+		title: "Kiosk",
+	},
+	formatDetection: {
+		telephone: false,
+	},
 	icons: {
 		icon: "/kiosk_logo.svg",
 		shortcut: "/kiosk_logo.svg",
@@ -160,6 +180,12 @@ export default function RootLayout({
 			lang="en"
 			className={`scroll-smooth ${montserrat.variable} ${thunderLC.variable} ${thunderHC.variable} ${nohemi.variable} ${dirtyline.variable}`}>
 			<head>
+				{/* Apple / iOS Web App Meta */}
+				<meta name="apple-mobile-web-app-capable" content="yes" />
+				<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+				<meta name="format-detection" content="telephone=no" />
+				<meta name="mobile-web-app-capable" content="yes" />
+
 				{/* Material Symbols Outlined */}
 				<link
 					href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
@@ -171,6 +197,7 @@ export default function RootLayout({
 					<CurrencyProvider>
 						<NavbarWrapper />
 						{children}
+						<CookieConsent />
 					</CurrencyProvider>
 				</AuthProvider>
 				<Analytics />

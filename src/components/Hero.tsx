@@ -219,7 +219,7 @@ export default function Hero() {
 						{/* Main Headline */}
 						<ScrollReveal direction="up" delay={80}>
 							<div className="relative">
-								<h1 className="text-3.5xl xs:text-4xl sm:text-5xl md:text-5.5xl lg:text-6xl font-bold font-nohemi tracking-tight text-gray-900 leading-[1.12] sm:leading-[1.08]">
+								<h1 className="text-3xl xs:text-3.5xl sm:text-5xl md:text-5.5xl lg:text-6xl font-bold font-nohemi tracking-tight text-gray-900 leading-[1.15] sm:leading-[1.08] break-words">
 									WE BUILD YOUR <StaggerText text="WEBSITE." delay={0} staggerDuration={0.07} />{" "}
 									<span className="text-blue-600">
 										YOU GROW YOUR{" "}
@@ -305,18 +305,18 @@ export default function Hero() {
 					<div className="lg:col-span-7 flex items-center justify-center relative mt-4 lg:mt-0">
 						{/* Ambient Rotating Dashed Orbit Ring */}
 						<div
-							className="absolute w-[360px] h-[360px] sm:w-[480px] sm:h-[480px] md:w-[540px] md:h-[540px] rounded-full border border-dashed border-blue-200/50 pointer-events-none"
+							className="absolute w-[260px] h-[260px] sm:w-[480px] sm:h-[480px] md:w-[540px] md:h-[540px] rounded-full border border-dashed border-blue-200/50 pointer-events-none"
 							style={{ animation: "spinDashed 40s linear infinite" }}
 						/>
 
 						{/* Secondary Concentric Dashed Ring */}
 						<div
-							className="absolute w-[280px] h-[280px] sm:w-[380px] sm:h-[380px] rounded-full border border-dashed border-indigo-200/35 pointer-events-none"
+							className="absolute w-[200px] h-[200px] sm:w-[380px] sm:h-[380px] rounded-full border border-dashed border-indigo-200/35 pointer-events-none"
 							style={{ animation: "spinDashed 30s linear infinite reverse" }}
 						/>
 
 						<ScrollReveal direction="up" delay={150}>
-							<div className="relative w-full max-w-[620px] lg:max-w-none h-[340px] xs:h-[380px] sm:h-[460px] md:h-[520px] lg:h-[580px] flex items-center justify-center overflow-visible">
+							<div className="relative w-full max-w-[620px] lg:max-w-none h-[280px] xs:h-[340px] sm:h-[460px] md:h-[520px] lg:h-[580px] flex items-center justify-center overflow-visible">
 								<LottiePlayer
 									src="/lotties/Business Analysis.json"
 									className="w-full h-full object-contain scale-110 sm:scale-120 md:scale-125 lg:scale-130"

@@ -513,3 +513,86 @@ export async function sendPasswordResetEmail({
 
 	return sendEmail({ to: toEmail, subject, html });
 }
+
+/**
+ * 10. Support Ticket Notification & Customer Confirmation Emails
+ */
+export interface SupportTicketPayload {
+	ticketId: string;
+	name: string;
+	email: string;
+	phone?: string;
+	category: string;
+	priority: string;
+	subject: string;
+	message: string;
+	websiteUrl?: string;
+}
+
+export async function sendSupportTicketEmail(payload: SupportTicketPayload) {
+	const adminEmail = process.env.ADMIN_EMAIL || "support@kioosk.online";
+
+	// 1. Send alert notification to Support Admin
+	const adminSubject = `[Support Ticket #${payload.ticketId}] ${payload.priority.toUpperCase()}: ${payload.subject}`;
+	const adminContentHtml = `
+		<p style="margin: 0 0 16px 0;"><strong>New Support Ticket #${payload.ticketId}</strong></p>
+		<div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+			<p style="margin: 0 0 8px 0;"><strong>Name:</strong> ${payload.name}</p>
+			<p style="margin: 0 0 8px 0;"><strong>Email:</strong> <a href="mailto:${payload.email}" style="color: #004ac6;">${payload.email}</a></p>
+			${payload.phone ? `<p style="margin: 0 0 8px 0;"><strong>Phone/WhatsApp:</strong> ${payload.phone}</p>` : ""}
+			<p style="margin: 0 0 8px 0;"><strong>Category:</strong> ${payload.category}</p>
+			<p style="margin: 0 0 8px 0;"><strong>Priority:</strong> ${payload.priority.toUpperCase()}</p>
+			${payload.websiteUrl ? `<p style="margin: 0 0 8px 0;"><strong>Website/URL:</strong> <a href="${payload.websiteUrl}" style="color: #004ac6;">${payload.websiteUrl}</a></p>` : ""}
+		</div>
+
+		<p style="margin: 0 0 8px 0; font-weight: 700;">Message Content:</p>
+		<div style="background-color: #ffffff; border-left: 3px solid #004ac6; padding: 12px 16px; margin-bottom: 24px; font-family: monospace; font-size: 14px; white-space: pre-wrap; color: #1f2937;">
+			${payload.message.replace(/</g, "&lt;").replace(/>/g, "&gt;")}
+		</div>
+
+		<p style="margin: 0; font-size: 13px; color: #6b7280;">
+			Reply directly to <a href="mailto:${payload.email}" style="color: #004ac6;">${payload.email}</a> to assist this customer.
+		</p>
+	`;
+
+	const adminHtml = renderEmailShell({
+		title: adminSubject,
+		contentHtml: adminContentHtml,
+	});
+
+	await sendEmail({
+		to: adminEmail,
+		subject: adminSubject,
+		html: adminHtml,
+	});
+
+	// 2. Send automated confirmation receipt to customer
+	const clientSubject = `We received your inquiry: #${payload.ticketId} - Kiosk Support`;
+	const clientContentHtml = `
+		<p style="margin: 0 0 16px 0;">Hi ${payload.name},</p>
+		<p style="margin: 0 0 16px 0;">
+			Thank you for reaching out to Kiosk Support. We have received your inquiry regarding <strong>"${payload.subject}"</strong>.
+		</p>
+		<div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px; margin: 18px 0;">
+			<p style="margin: 0 0 6px 0; font-size: 13px; color: #64748b;">Ticket Reference ID:</p>
+			<p style="margin: 0; font-size: 16px; font-weight: 700; color: #004ac6;">#${payload.ticketId}</p>
+		</div>
+		<p style="margin: 0 0 16px 0;">
+			Our team has been notified and will review your request. Our typical response time is within <strong>2 to 4 hours</strong> during regular business operations.
+		</p>
+		<p style="margin: 0 0 16px 0;">
+			If you need urgent real-time updates, you can also reach us directly on WhatsApp or reply to this email with any additional details.
+		</p>
+	`;
+
+	const clientHtml = renderEmailShell({
+		title: clientSubject,
+		contentHtml: clientContentHtml,
+	});
+
+	return sendEmail({
+		to: payload.email,
+		subject: clientSubject,
+		html: clientHtml,
+	});
+}

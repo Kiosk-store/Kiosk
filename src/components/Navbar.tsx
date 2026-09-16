@@ -20,6 +20,7 @@ const navItems = [
 	{ label: "Pricing", href: "/#pricing" },
 	{ label: "Portfolio", href: "/#portfolio" },
 	{ label: "FAQ", href: "/#faq" },
+	{ label: "Contact", href: "/contact" },
 ];
 
 export default function Navbar() {

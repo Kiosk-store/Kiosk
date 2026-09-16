@@ -545,6 +545,23 @@ export function BillingPageContent() {
 							</div>
 						)}
 					</div>
+
+					{/* Billing Support Banner */}
+					<div className="mt-8 bg-blue-50/70 border border-blue-200/80 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+						<div>
+							<h3 className="text-sm font-bold text-gray-900">
+								Questions about your subscription or invoices?
+							</h3>
+							<p className="text-xs text-gray-600 mt-0.5">
+								Our support team can assist you with payment confirmation, invoices, or custom billing cycles.
+							</p>
+						</div>
+						<Link
+							href="/contact?category=billing"
+							className="px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors shrink-0 shadow-xs">
+							Contact Billing Support
+						</Link>
+					</div>
 				</div>
 			</div>
 		</div>

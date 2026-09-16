@@ -171,7 +171,7 @@ function CheckoutContent() {
 	};
 
 	return (
-		<div className="max-w-3xl mx-auto pt-24 pb-20 px-4 sm:px-6">
+		<div className="max-w-3xl mx-auto pt-[max(6rem,calc(env(safe-area-inset-top,0px)+4.5rem))] pb-[max(5rem,calc(env(safe-area-inset-bottom,0px)+3rem))] px-4 sm:px-6">
 			{/* Back Link & Security Badge */}
 			<div className="flex items-center justify-between gap-4 mb-6">
 				<Link

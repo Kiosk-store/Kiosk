@@ -168,7 +168,7 @@ function GetStartedContent() {
 			</div>
 
 			{/* Main Content Area */}
-			<main className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-8 pt-20 sm:pt-32 pb-12 flex-1 flex flex-col justify-center">
+			<main className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-8 pt-[max(5rem,calc(env(safe-area-inset-top,0px)+3rem))] pb-[max(3rem,calc(env(safe-area-inset-bottom,0px)+2rem))] flex-1 flex flex-col justify-center">
 				{/* Back link */}
 				<div className="mb-4">
 					<Link

@@ -201,8 +201,25 @@ export default function Pricing() {
 					</div>
 				</div>
 
+				{/* Mobile Tier Quick Tabs */}
+				<div className="flex lg:hidden items-center justify-center gap-1.5 pt-2 shrink-0 z-20">
+					{tiers.map((t, i) => (
+						<button
+							key={t.id}
+							type="button"
+							onClick={() => setActiveIndex(i)}
+							className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
+								i === activeIndex
+									? "bg-blue-600 text-white shadow-xs scale-105"
+									: "bg-white/10 text-white/60 hover:text-white"
+							}`}>
+							{t.name}
+						</button>
+					))}
+				</div>
+
 				{/* Main Stage: 1 Lottie Showcase + 1 Pricing Card */}
-				<div className="w-full flex-1 relative flex items-center justify-center my-3 sm:my-6 min-h-[480px] sm:min-h-[520px]">
+				<div className="w-full flex-1 relative flex items-center justify-center my-2 sm:my-6 min-h-[440px] sm:min-h-[520px]">
 					{tiers.map((tier, idx) => {
 						const isVisible = idx === activeIndex;
 						const price = formatPlanPrice(tier.planKey, billingCycle);
@@ -224,12 +241,12 @@ export default function Pricing() {
 									transition:
 										"opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
 								}}
-								className={`absolute inset-0 w-full h-full flex flex-col items-center justify-center gap-4 sm:gap-8 lg:gap-16 ${
+								className={`absolute inset-0 w-full h-full flex flex-col items-center justify-center gap-2 sm:gap-8 lg:gap-16 ${
 									idx === 1 ? "lg:flex-row-reverse" : "lg:flex-row"
 								}`}>
 								{/* Left: Extra Large Borderless Lottie Animation Showcase */}
 								<div className="w-full lg:w-1/2 flex items-center justify-center shrink-0">
-									<div className="w-full max-w-[280px] sm:max-w-[480px] md:max-w-[580px] lg:max-w-[680px] xl:max-w-[760px] h-[220px] sm:h-[300px] md:h-[400px] lg:h-[520px] xl:h-[580px] flex items-center justify-center p-1 sm:p-2">
+									<div className="w-full max-w-[240px] sm:max-w-[480px] md:max-w-[580px] lg:max-w-[680px] xl:max-w-[760px] h-[130px] xs:h-[160px] sm:h-[300px] md:h-[400px] lg:h-[520px] xl:h-[580px] flex items-center justify-center p-1 sm:p-2">
 										<LottiePlayer
 											src={tier.lottieSrc}
 											className="w-full h-full object-contain flex items-center justify-center [&>svg]:w-full [&>svg]:h-full [&>svg]:max-h-full"

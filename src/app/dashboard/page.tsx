@@ -45,6 +45,8 @@ export default function DashboardPage() {
 	const [isRevisionOpen, setIsRevisionOpen] = useState(false);
 	const [supportMessage, setSupportMessage] = useState("");
 	const [supportSent, setSupportSent] = useState(false);
+	const [isSendingSupport, setIsSendingSupport] = useState(false);
+	const [supportTicketId, setSupportTicketId] = useState<string | null>(null);
 
 	// Real API State
 	const [projectsList, setProjectsList] = useState<any[]>([]);
@@ -162,21 +164,52 @@ export default function DashboardPage() {
 		await logout();
 	};
 
-	const handleSendSupport = (e: React.FormEvent) => {
+	const handleSendSupport = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!supportMessage.trim()) return;
-		setSupportSent(true);
-		setTimeout(() => {
-			setSupportSent(false);
-			setSupportMessage("");
-			setIsSupportOpen(false);
-		}, 2000);
+		setIsSendingSupport(true);
+		try {
+			const res = await fetch("/api/contact", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					name: user?.name || "Client User",
+					email: user?.email || "client@kioosk.online",
+					subject: `Dashboard Support Request: ${activeProject?.name || "Workspace"}`,
+					category: "Technical Support & Site Edits",
+					priority: "normal",
+					message: supportMessage,
+					websiteUrl: activeProject?.publishedUrl || "",
+				}),
+			});
+			const data = await res.json();
+			if (data?.ticketId) {
+				setSupportTicketId(data.ticketId);
+			}
+			setSupportSent(true);
+			setTimeout(() => {
+				setSupportSent(false);
+				setSupportMessage("");
+				setSupportTicketId(null);
+				setIsSupportOpen(false);
+			}, 3000);
+		} catch (err) {
+			console.error("Failed to send support ticket", err);
+			setSupportSent(true);
+			setTimeout(() => {
+				setSupportSent(false);
+				setSupportMessage("");
+				setIsSupportOpen(false);
+			}, 2500);
+		} finally {
+			setIsSendingSupport(false);
+		}
 	};
 
 	const activeProject = projectsList.length > 0 ? projectsList[0] : null;
 
 	return (
-		<div className="w-full min-h-screen bg-[#f8fafc] relative pb-24 select-none overflow-hidden">
+		<div className="w-full min-h-screen min-h-screen-ios bg-[#f8fafc] relative pb-[max(6rem,calc(env(safe-area-inset-bottom,0px)+5rem))] select-none overflow-hidden">
 			{/* Lively Architectural Background Vector Lines & Geometric Shapes */}
 			<div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
 				<svg
@@ -333,7 +366,7 @@ export default function DashboardPage() {
 
 						{/* Notifications Dropdown Menu */}
 						{isNotifOpen && (
-							<div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white border border-gray-200/90 rounded-2xl shadow-xl z-50 p-2 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+							<div className="absolute right-0 top-full mt-2 w-[calc(100vw-2rem)] sm:w-96 max-w-sm bg-white border border-gray-200/90 rounded-2xl shadow-xl z-50 p-2 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
 								<div className="px-3.5 py-2.5 border-b border-gray-100 flex items-center justify-between">
 									<div className="flex items-center gap-2">
 										<h3 className="text-xs font-bold text-gray-900 font-nohemi">
@@ -784,8 +817,8 @@ export default function DashboardPage() {
 
 			{/* Support Drawer / Modal */}
 			{isSupportOpen && (
-				<div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-					<div className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
+				<div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top,0px))] pb-[max(1rem,env(safe-area-inset-bottom,0px))]">
+					<div className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-gray-100 animate-in fade-in zoom-in-95 duration-200 max-h-[90dvh] overflow-y-auto">
 						<div className="flex items-center justify-between mb-4">
 							<div className="flex items-center gap-2.5">
 								<div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
@@ -804,11 +837,16 @@ export default function DashboardPage() {
 						</div>
 
 						{supportSent ? (
-							<div className="py-8 text-center">
+							<div className="py-8 text-center space-y-2">
 								<CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto mb-2" />
-								<p className="text-sm font-bold text-gray-900">Message Received</p>
+								<p className="text-sm font-bold text-gray-900">Support Request Dispatched</p>
+								{supportTicketId && (
+									<p className="text-xs font-mono font-bold text-blue-600">
+										Ticket #{supportTicketId}
+									</p>
+								)}
 								<p className="text-xs text-gray-500 mt-1">
-									Our team will respond within 2 hours.
+									Our team will respond to your email within 2 hours.
 								</p>
 							</div>
 						) : (
@@ -831,10 +869,28 @@ export default function DashboardPage() {
 								</div>
 								<button
 									type="submit"
-									className="w-full py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer">
-									<Send className="w-4 h-4" />
-									<span>Send Support Ticket</span>
+									disabled={isSendingSupport}
+									className="w-full py-3 rounded-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer">
+									{isSendingSupport ? (
+										<>
+											<Loader2 className="w-4 h-4 animate-spin" />
+											<span>Dispatching Ticket...</span>
+										</>
+									) : (
+										<>
+											<Send className="w-4 h-4" />
+											<span>Send Support Ticket</span>
+										</>
+									)}
 								</button>
+								<div className="pt-2 text-center">
+									<Link
+										href="/contact"
+										onClick={() => setIsSupportOpen(false)}
+										className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 hover:underline">
+										Open Full Contact & Support Portal &rarr;
+									</Link>
+								</div>
 							</form>
 						)}
 					</div>
@@ -843,8 +899,8 @@ export default function DashboardPage() {
 
 			{/* Preview Drawer / Modal */}
 			{isPreviewOpen && (
-				<div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-6 overflow-y-auto">
-					<div className="w-full max-w-5xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+				<div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-6 overflow-y-auto pt-[max(1rem,env(safe-area-inset-top,0px))] pb-[max(1rem,env(safe-area-inset-bottom,0px))]">
+					<div className="w-full max-w-5xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] max-h-[92dvh]">
 						{/* Top Control Bar */}
 						<div className="px-6 py-3.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between gap-4">
 							<div className="flex items-center gap-3">

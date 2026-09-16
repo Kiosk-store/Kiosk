@@ -366,3 +366,104 @@ body {
 		--color-sage: #2a2a2a;
 	}
 }
+
+/* ============================
+   Mobile & iOS Optimization Core
+   ============================ */
+
+/* 1. Touch & Tap Optimizations */
+* {
+	-webkit-tap-highlight-color: transparent;
+}
+
+button,
+a,
+input[type="button"],
+input[type="submit"] {
+	touch-action: manipulation;
+}
+
+/* 2. iOS Safe Area Custom Properties & Utilities */
+:root {
+	--sat: env(safe-area-inset-top, 0px);
+	--sar: env(safe-area-inset-right, 0px);
+	--sab: env(safe-area-inset-bottom, 0px);
+	--sal: env(safe-area-inset-left, 0px);
+}
+
+.pt-safe {
+	padding-top: max(1rem, env(safe-area-inset-top, 0px));
+}
+
+.pb-safe {
+	padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+}
+
+.pl-safe {
+	padding-left: max(1rem, env(safe-area-inset-left, 0px));
+}
+
+.pr-safe {
+	padding-right: max(1rem, env(safe-area-inset-right, 0px));
+}
+
+.mb-safe {
+	margin-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* 3. iOS Momentum Scrolling */
+.overflow-y-auto,
+.overflow-x-auto,
+.overflow-auto,
+aside,
+dialog {
+	-webkit-overflow-scrolling: touch;
+}
+
+/* 4. Critical iOS Safari Auto-Zoom Fix */
+/* Prevents iOS from zooming in and breaking viewport when tapping input fields */
+@media screen and (max-width: 768px) {
+	input[type="text"],
+	input[type="email"],
+	input[type="password"],
+	input[type="tel"],
+	input[type="number"],
+	input[type="url"],
+	input[type="search"],
+	select,
+	textarea {
+		font-size: 16px !important;
+	}
+}
+
+/* 5. Mobile Typography & Viewport Stability */
+@media (max-width: 640px) {
+	.font-display-hero {
+		font-size: clamp(2rem, 8vw, 2.75rem);
+		line-height: 1.1;
+		letter-spacing: -0.02em;
+	}
+
+	.font-section-heading {
+		font-size: clamp(1.65rem, 6vw, 2.15rem);
+		line-height: 1.15;
+		letter-spacing: -0.015em;
+	}
+
+	.font-card-title {
+		font-size: clamp(1.15rem, 4.5vw, 1.35rem);
+		line-height: 1.25;
+	}
+}
+
+/* 6. Dynamic Viewport Height (dvh) Helpers for iOS Safari */
+.min-h-screen-ios {
+	min-height: 100vh;
+	min-height: 100dvh;
+}
+
+.h-screen-ios {
+	height: 100vh;
+	height: 100dvh;
+}
+

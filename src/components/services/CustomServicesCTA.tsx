@@ -81,7 +81,7 @@ export default function CustomServicesCTA() {
 						{/* CTA buttons */}
 						<div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-stretch sm:items-center max-w-md sm:max-w-none mx-auto">
 							<PillButton
-								href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@kioosk.online"}`}
+								href="/contact?category=sales"
 								baseColor="#7c3aed"
 								circleColor="#ffffff"
 								textColor="#ffffff"

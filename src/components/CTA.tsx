@@ -36,7 +36,7 @@ export default function CTA() {
 							Get Started Now
 						</PillButton>
 						<PillButton
-							href="/services"
+							href="/contact"
 							baseColor="rgba(255, 255, 255, 0.15)"
 							circleColor="#ffffff"
 							textColor="#ffffff"
