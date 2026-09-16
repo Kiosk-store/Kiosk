@@ -6,6 +6,7 @@ import { Montserrat } from "next/font/google";
 import "./globals.css";
 import NavbarWrapper from "@/components/NavbarWrapper";
 import CookieConsent from "@/components/CookieConsent";
+import PageLoader from "@/components/PageLoader";
 import { AuthProvider } from "@/context/AuthContext";
 import { CurrencyProvider } from "@/context/CurrencyContext";
 import { Analytics } from "@vercel/analytics/next";
@@ -193,6 +194,7 @@ export default function RootLayout({
 				/>
 			</head>
 			<body className={`${montserrat.className} font-montserrat antialiased`}>
+				<PageLoader />
 				<AuthProvider>
 					<CurrencyProvider>
 						<NavbarWrapper />

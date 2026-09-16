@@ -114,7 +114,12 @@ export default function Portfolio() {
 				style={{ maskImage: "linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)" }}>
 				<div
 					className="flex gap-8 w-max group-hover/marquee:[animation-play-state:paused]"
-					style={{ animation: "marquee 30s linear infinite" }}>
+					style={{
+						animation: "marquee 30s linear infinite",
+						willChange: "transform",
+						WebkitTransform: "translateZ(0)",
+						transform: "translateZ(0)",
+					}}>
 					{items.map((project, i) => (
 						<ProjectCard key={`${project.title}-${i}`} project={project} />
 					))}

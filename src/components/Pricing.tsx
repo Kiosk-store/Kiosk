@@ -103,6 +103,12 @@ export default function Pricing() {
 		if (typeof window === "undefined") return;
 		gsap.registerPlugin(ScrollTrigger);
 
+		// Prevent iOS Safari address bar resize jumping
+		ScrollTrigger.config({
+			ignoreMobileResize: true,
+			autoRefreshEvents: "visibilitychange,DOMContentLoaded,load",
+		});
+
 		const section = sectionRef.current;
 		if (!section) return;
 
@@ -110,6 +116,7 @@ export default function Pricing() {
 			ScrollTrigger.create({
 				trigger: section,
 				pin: true,
+				anticipatePin: 1,
 				start: "top top",
 				end: () => `+=${Math.max(window.innerHeight * 2.2, 1800)}`,
 				scrub: 0.8,
@@ -295,12 +302,6 @@ export default function Pricing() {
 														{period}
 													</span>
 												</div>
-												{!isLoading && currency.code !== "USD" && (
-													<span className="inline-flex items-center gap-1 mt-1 text-[10px] font-semibold text-blue-400/80 uppercase tracking-wider">
-														<span className="w-1.5 h-1.5 rounded-full bg-blue-400 inline-block" />
-														Showing {currency.label} prices
-													</span>
-												)}
 											</div>
 
 											{/* Feature Checklist */}

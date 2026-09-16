@@ -319,11 +319,17 @@ body {
 
 html {
 	font-size: 18px;
-	scroll-behavior: smooth;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	overflow-x: hidden;
 	width: 100%;
+}
+
+/* Enable smooth scrolling on pointer devices without conflicting with iOS touch inertia */
+@media (hover: hover) and (pointer: fine) {
+	html {
+		scroll-behavior: smooth;
+	}
 }
 
 @media (max-width: 640px) {
@@ -344,14 +350,16 @@ body {
 }
 
 /* ============================
-   Marquee Animation
+   Marquee Animation (GPU Accelerated)
    ============================ */
 @keyframes marquee {
 	0% {
-		transform: translateX(0);
+		-webkit-transform: translate3d(0, 0, 0);
+		transform: translate3d(0, 0, 0);
 	}
 	100% {
-		transform: translateX(-50%);
+		-webkit-transform: translate3d(-50%, 0, 0);
+		transform: translate3d(-50%, 0, 0);
 	}
 }
 
@@ -465,5 +473,53 @@ dialog {
 .h-screen-ios {
 	height: 100vh;
 	height: 100dvh;
+}
+
+/* 7. iOS & Safari WebKit Engine Optimizations */
+* {
+	-webkit-tap-highlight-color: transparent;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+	touch-action: manipulation;
+}
+
+html,
+body {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-rendering: optimizeLegibility;
+}
+
+/* Hardware accelerated layer promotion to prevent WebKit redraw stutter */
+.pricing-wrapper,
+[data-scroll],
+nav,
+aside,
+dialog,
+header {
+	-webkit-transform: translateZ(0);
+	transform: translateZ(0);
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+}
+
+/* Specific iOS Safari Touch & Viewport Stability */
+@supports (-webkit-touch-callout: none) {
+	body {
+		overscroll-behavior-y: none;
+	}
+
+	.h-screen {
+		height: 100dvh !important;
+	}
+
+	.min-h-screen {
+		min-height: 100dvh !important;
+	}
 }
 

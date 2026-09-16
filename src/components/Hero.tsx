@@ -78,42 +78,52 @@ export default function Hero() {
 					__html: `
 						@keyframes staggerWave {
 							0%, 45%, 100% {
-								transform: translateY(0px);
+								-webkit-transform: translate3d(0, 0px, 0);
+								transform: translate3d(0, 0px, 0);
 							}
 							20% {
-								transform: translateY(-7px);
+								-webkit-transform: translate3d(0, -7px, 0);
+								transform: translate3d(0, -7px, 0);
 							}
 						}
 						@keyframes watermarkFloat {
 							0%, 100% {
-								transform: translateY(0px) rotate(0deg);
+								-webkit-transform: translate3d(0, 0px, 0) rotate(0deg);
+								transform: translate3d(0, 0px, 0) rotate(0deg);
 							}
 							50% {
-								transform: translateY(-12px) rotate(0.8deg);
+								-webkit-transform: translate3d(0, -12px, 0) rotate(0.8deg);
+								transform: translate3d(0, -12px, 0) rotate(0.8deg);
 							}
 						}
 						@keyframes watermarkFloatRev {
 							0%, 100% {
-								transform: translateY(0px) rotate(0deg);
+								-webkit-transform: translate3d(0, 0px, 0) rotate(0deg);
+								transform: translate3d(0, 0px, 0) rotate(0deg);
 							}
 							50% {
-								transform: translateY(12px) rotate(-0.8deg);
+								-webkit-transform: translate3d(0, 12px, 0) rotate(-0.8deg);
+								transform: translate3d(0, 12px, 0) rotate(-0.8deg);
 							}
 						}
 						@keyframes spinDashed {
 							from {
+								-webkit-transform: rotate(0deg);
 								transform: rotate(0deg);
 							}
 							to {
+								-webkit-transform: rotate(360deg);
 								transform: rotate(360deg);
 							}
 						}
 						@keyframes pulseSparkle {
 							0%, 100% {
+								-webkit-transform: scale(0.85) rotate(0deg);
 								transform: scale(0.85) rotate(0deg);
 								opacity: 0.4;
 							}
 							50% {
+								-webkit-transform: scale(1.15) rotate(15deg);
 								transform: scale(1.15) rotate(15deg);
 								opacity: 0.9;
 							}
