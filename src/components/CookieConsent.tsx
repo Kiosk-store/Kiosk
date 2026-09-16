@@ -110,7 +110,7 @@ export default function CookieConsent() {
 				<button
 					type="button"
 					onClick={() => setShowCustomize(!showCustomize)}
-					className="text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors">
+					className="px-3 py-1.5 rounded-full text-xs font-semibold text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer">
 					{showCustomize ? "Simple View" : "Manage"}
 				</button>
 
@@ -119,7 +119,7 @@ export default function CookieConsent() {
 						<button
 							type="button"
 							onClick={() => saveConsent(analyticsConsent)}
-							className="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-colors">
+							className="px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-colors shadow-xs cursor-pointer">
 							Save Choices
 						</button>
 					) : (
@@ -127,13 +127,13 @@ export default function CookieConsent() {
 							<button
 								type="button"
 								onClick={() => saveConsent(false)}
-								className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-colors">
+								className="px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-colors cursor-pointer">
 								Decline
 							</button>
 							<button
 								type="button"
 								onClick={() => saveConsent(true)}
-								className="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-colors">
+								className="px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-colors shadow-xs cursor-pointer">
 								Accept
 							</button>
 						</>
