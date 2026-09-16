@@ -128,12 +128,12 @@ export default function FAQ() {
 															{item.icon}
 														</span>
 													</div>
-													<span
+													<h3
 														className={`font-card-title text-lg md:text-xl transition-colors duration-300 leading-tight ${
 															isOpen ? "text-primary" : "text-on-surface"
 														}`}>
 														{item.question}
-													</span>
+													</h3>
 												</div>
 
 												<span
