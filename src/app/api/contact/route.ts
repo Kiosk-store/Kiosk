@@ -37,8 +37,15 @@ export async function POST(request: Request) {
 		const parseResult = contactSchema.safeParse(body);
 
 		if (!parseResult.success) {
-			const errorMsg = parseResult.error.errors.map((e) => e.message).join(" ");
-			return NextResponse.json({ error: errorMsg }, { status: 400 });
+			const issues = parseResult.error.issues || [];
+			const errorMsg =
+				issues.length > 0
+					? issues.map((i: { message: string }) => i.message).join(" ")
+					: "Please check all required fields and provide valid information.";
+			return NextResponse.json(
+				{ error: errorMsg, details: parseResult.error.flatten() },
+				{ status: 400 },
+			);
 		}
 
 		const { name, email, phone, category, priority, subject, message, websiteUrl } =
