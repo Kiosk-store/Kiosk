@@ -7,6 +7,8 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PillButton from "@/components/PillButton";
+import { Send, Loader2 } from "lucide-react";
 
 interface FormState {
 	name: string;
@@ -339,12 +341,27 @@ function ContactContent() {
 						</div>
 
 						<div className="pt-2">
-							<button
+							<PillButton
 								type="submit"
 								disabled={isSubmitting}
-								className="px-6 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-semibold transition-colors shadow-xs cursor-pointer">
-								{isSubmitting ? "Sending..." : "Send Message"}
-							</button>
+								baseColor="#004ac6"
+								circleColor="#ffffff"
+								textColor="#ffffff"
+								hoverTextColor="#004ac6"
+								useThunderFont={true}
+								className="w-full sm:w-auto px-8 py-3 rounded-full font-bold text-xs sm:text-sm border border-blue-600 shadow-md">
+								{isSubmitting ? (
+									<span className="inline-flex items-center gap-2">
+										<Loader2 className="w-4 h-4 animate-spin" />
+										<span>Sending Message...</span>
+									</span>
+								) : (
+									<span className="inline-flex items-center gap-2">
+										<Send className="w-3.5 h-3.5" />
+										<span>Send Message</span>
+									</span>
+								)}
+							</PillButton>
 						</div>
 					</form>
 				)}
