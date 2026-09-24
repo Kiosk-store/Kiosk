@@ -337,11 +337,13 @@ export default function DashboardPage() {
 				{/* Logo */}
 				<Link
 					href="/"
-					className="flex items-center gap-2.5 text-gray-900 font-nohemi font-bold text-xl tracking-tight hover:opacity-85 transition-opacity">
-					<div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-black text-sm shadow-xs">
-						K
-					</div>
-					<span>Kiosk</span>
+					className="flex items-center select-none group py-0.5"
+					aria-label="Kiosk Home">
+					<img
+						src="/KIOSK PNG2.png"
+						alt="Kiosk"
+						className="h-8 sm:h-9 w-auto max-w-[160px] sm:max-w-[190px] object-contain transition-transform duration-200 group-hover:scale-105"
+					/>
 				</Link>
 
 				{/* Header Actions: Notifications & User Profile */}
