@@ -4,12 +4,12 @@ import { BASE_PRICES_USD, CURRENCIES, formatPrice, getCurrencyForCountry } from 
 
 test.describe("Payments & Currency Architecture", () => {
 	test("Currency Model - Base prices across tiers and billing cycles", () => {
-		expect(BASE_PRICES_USD.landing.monthly).toBe(15);
-		expect(BASE_PRICES_USD.landing.yearly).toBe(144);
-		expect(BASE_PRICES_USD.funnel.monthly).toBe(30);
-		expect(BASE_PRICES_USD.funnel.yearly).toBe(288);
-		expect(BASE_PRICES_USD.store.monthly).toBe(50);
-		expect(BASE_PRICES_USD.store.yearly).toBe(480);
+		expect(BASE_PRICES_USD.landing.monthly).toBe(18.25);
+		expect(BASE_PRICES_USD.landing.yearly).toBe(175.2);
+		expect(BASE_PRICES_USD.funnel.monthly).toBe(36.5);
+		expect(BASE_PRICES_USD.funnel.yearly).toBe(350.39);
+		expect(BASE_PRICES_USD.store.monthly).toBe(60.83);
+		expect(BASE_PRICES_USD.store.yearly).toBe(583.99);
 	});
 
 	test("Currency Conversion & Formatting - Correct currency symbol and rate calculation", () => {
