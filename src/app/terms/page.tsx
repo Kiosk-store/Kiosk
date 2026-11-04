@@ -38,7 +38,7 @@ export default function TermsOfServicePage() {
 					{/* Summary */}
 					<div className="p-5 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-800 text-xs sm:text-sm leading-relaxed">
 						<strong>Summary:</strong> These Terms outline your rights and responsibilities
-						when using Kiosk. We provide turnkey website development, hosting, and
+						when using Kioosk. We provide turnkey website development, hosting, and
 						maintenance. You own your content, enjoy a 30-day money-back guarantee, and
 						can cancel anytime with no lock-in.
 					</div>
@@ -49,7 +49,7 @@ export default function TermsOfServicePage() {
 							1. Services & Delivery
 						</h3>
 						<p>
-							Kiosk delivers full-service website design, development, cloud hosting, and
+							Kioosk delivers full-service website design, development, cloud hosting, and
 							routine site updates under our active subscription plans.
 						</p>
 						<ul className="list-disc pl-5 space-y-2 text-slate-600">
@@ -107,7 +107,7 @@ export default function TermsOfServicePage() {
 								<strong>Website Assets:</strong> Once account balances are settled, you own the website design and custom assets created for your business. You can request an export of your site files at any time.
 							</li>
 							<li>
-								<strong>Platform Code:</strong> Kiosk retains ownership of the underlying proprietary hosting infrastructure, dashboard software, and core templates.
+								<strong>Platform Code:</strong> Kioosk retains ownership of the underlying proprietary hosting infrastructure, dashboard software, and core templates.
 							</li>
 						</ul>
 					</div>
@@ -130,7 +130,7 @@ export default function TermsOfServicePage() {
 							6. Acceptable Use
 						</h3>
 						<p>
-							You agree not to use Kiosk services to publish unlawful, fraudulent, defamatory,
+							You agree not to use Kioosk services to publish unlawful, fraudulent, defamatory,
 							or infringing material, or to transmit malicious software. We reserve the right
 							to suspend sites that violate this policy or engage in illegal activities.
 						</p>
@@ -143,7 +143,7 @@ export default function TermsOfServicePage() {
 						</h3>
 						<p>
 							Services are provided on an &quot;as is&quot; and &quot;as available&quot; basis. To the maximum
-							extent permitted by applicable law, Kiosk shall not be liable for indirect,
+							extent permitted by applicable law, Kioosk shall not be liable for indirect,
 							incidental, or consequential damages. Our total liability for any claim arising
 							out of these Terms is limited to the amount paid by you in the preceding 12 months.
 						</p>

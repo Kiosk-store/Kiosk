@@ -155,13 +155,13 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-	title: "Kiosk | Modern Websites for Small Businesses",
+	title: "Kioosk | Modern Websites for Small Businesses",
 	description:
 		"Professional custom sites, sales funnels, and online stores hosted on our platform with easy custom domain upgrades. Built for small businesses.",
 	appleWebApp: {
 		capable: true,
 		statusBarStyle: "default",
-		title: "Kiosk",
+		title: "Kioosk",
 	},
 	formatDetection: {
 		telephone: false,

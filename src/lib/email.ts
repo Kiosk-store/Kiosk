@@ -15,7 +15,7 @@
  */
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
-const EMAIL_FROM = process.env.EMAIL_FROM || "Kiosk <noreply@kioosk.online>";
+const EMAIL_FROM = process.env.EMAIL_FROM || "Kioosk <noreply@kioosk.online>";
 
 /**
  * Resolves the active base application URL across local dev, preview branches, and production.
@@ -82,7 +82,7 @@ export async function sendEmail({
 					Authorization: `Bearer ${apiKey}`,
 				},
 				body: JSON.stringify({
-					from: "Kiosk <onboarding@resend.dev>",
+					from: "Kioosk <onboarding@resend.dev>",
 					to: [to],
 					subject,
 					html,
@@ -130,7 +130,7 @@ function renderEmailShell({
 					<!-- Brand Logo Header -->
 					<div style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #f3f4f6;">
 						<a href="${appUrl}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: inline-block;">
-							<img src="${logoUrl}" alt="Kiosk" width="130" style="display: block; width: 130px; max-width: 130px; height: auto; border: 0; outline: none; text-decoration: none;" />
+							<img src="${logoUrl}" alt="Kioosk" width="130" style="display: block; width: 130px; max-width: 130px; height: auto; border: 0; outline: none; text-decoration: none;" />
 						</a>
 					</div>
 
@@ -138,7 +138,7 @@ function renderEmailShell({
 
 					<div style="margin-top: 36px; padding-top: 20px; border-top: 1px solid #e5e7eb; font-size: 13px; color: #6b7280; line-height: 1.5;">
 						<p style="margin: 0 0 4px 0;">Best regards,</p>
-						<p style="margin: 0 0 8px 0; font-weight: 700; color: #111827;">The Kiosk Team</p>
+						<p style="margin: 0 0 8px 0; font-weight: 700; color: #111827;">The Kioosk Team</p>
 						<p style="margin: 0;">
 							<a href="https://kioosk.online" style="color: #004ac6; text-decoration: none;">kioosk.online</a> &bull; <a href="https://wa.me/2348116062226" style="color: #004ac6; text-decoration: none;">WhatsApp: +234 811 606 2226</a>
 						</p>
@@ -154,7 +154,7 @@ function renderEmailShell({
  */
 export async function sendWelcomeEmail(toEmail: string, userName: string) {
 	const appUrl = getAppUrl();
-	const subject = "Welcome to Kiosk - Your Workspace is Ready";
+	const subject = "Welcome to Kioosk - Your Workspace is Ready";
 	const contentHtml = `
 		<p style="margin: 0 0 16px 0;">Hi ${userName},</p>
 		<p style="margin: 0 0 16px 0;">
@@ -164,7 +164,7 @@ export async function sendWelcomeEmail(toEmail: string, userName: string) {
 			You can log in to your dashboard to submit your business details, view live website builds, and manage your online store:
 		</p>
 		<p style="margin: 0 0 24px 0;">
-			👉 <a href="${appUrl}/dashboard" style="color: #004ac6; font-weight: 700; text-decoration: underline;">Open Your Kiosk Dashboard</a> (${appUrl}/dashboard)
+			👉 <a href="${appUrl}/dashboard" style="color: #004ac6; font-weight: 700; text-decoration: underline;">Open Your Kioosk Dashboard</a> (${appUrl}/dashboard)
 		</p>
 		<p style="margin: 0 0 16px 0;">
 			If you need any help getting started, simply reply directly to this email and our team will assist you.

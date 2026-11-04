@@ -37,7 +37,7 @@ export default function PrivacyPolicyPage() {
 				<div className="space-y-10 text-slate-700 text-sm leading-relaxed">
 					{/* Summary */}
 					<div className="p-5 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-800 text-xs sm:text-sm leading-relaxed">
-						<strong>Summary:</strong> Kiosk provides turnkey website creation, hosting,
+						<strong>Summary:</strong> Kioosk provides turnkey website creation, hosting,
 						and ongoing maintenance. We respect your privacy and never sell your personal
 						data. We only collect the information necessary to design, build, host, and
 						support your web presence.
