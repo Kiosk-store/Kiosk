@@ -41,10 +41,10 @@ export default function Footer() {
 			<div className="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-10 mb-16 md:mb-32 relative z-10">
 				{/* Brand Info */}
 				<div className="col-span-2 md:col-span-1 space-y-5 pr-4 md:pr-0">
-					<Link href="/" className="inline-block group" aria-label="Kiosk Home">
+					<Link href="/" className="inline-block group" aria-label="Kioosk Home">
 						<img
 							src="/KIOSK PNG2-dark.png"
-							alt="Kiosk"
+							alt="Kioosk"
 							className="h-10 sm:h-12 md:h-13 lg:h-14 w-auto max-w-[200px] sm:max-w-[240px] md:max-w-[280px] object-contain transition-transform duration-200 group-hover:scale-105"
 						/>
 					</Link>
@@ -111,7 +111,7 @@ export default function Footer() {
 						</li>
 						<li>
 							<a
-								href="https://wa.me/2348116062226?text=Hi%20Kiosk%2C%20I%20have%20an%20inquiry%20about%20your%20services"
+								href="https://wa.me/2348116062226?text=Hi%20Kioosk%2C%20I%20have%20an%20inquiry%20about%20your%20services"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="text-white/70 hover:text-white transition-colors duration-300">
@@ -133,7 +133,7 @@ export default function Footer() {
 			<div className="relative w-full max-w-full flex flex-col items-center justify-end overflow-hidden pt-6 md:pt-10 pb-[max(1rem,env(safe-area-inset-bottom,0px))]">
 				{/* Copyright & Socials */}
 				<div className="w-full max-w-7xl mx-auto px-6 lg:px-8 flex flex-col-reverse md:flex-row justify-between items-center gap-8 md:gap-4 text-white/50 text-xs md:text-sm mb-10 md:mb-2 relative z-10">
-					<p className="font-medium tracking-wide text-center md:text-left">&copy; {new Date().getFullYear()} Kiosk. All rights reserved.</p>
+					<p className="font-medium tracking-wide text-center md:text-left">&copy; {new Date().getFullYear()} Kioosk. All rights reserved.</p>
 					
 					<div className="flex flex-wrap items-center justify-center gap-5 md:gap-7">
 						{/* TikTok */}
@@ -221,7 +221,7 @@ export default function Footer() {
 							backgroundClip: "text",
 							color: "transparent"
 						}}>
-						KIOSK
+						KIOOSK
 					</span>
 				</div>
 			</div>

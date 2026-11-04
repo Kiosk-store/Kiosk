@@ -155,13 +155,16 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-	title: "Kiosk | Modern Websites for Small Businesses",
+	title: "Kioosk | Modern Websites for Small Businesses",
 	description:
 		"Professional custom sites, sales funnels, and online stores hosted on our platform with easy custom domain upgrades. Built for small businesses.",
+	verification: {
+		google: "bKNxJT8mp29T-_zzK5wAwGPr0nxdDt4TOU8j_tbvjoo",
+	},
 	appleWebApp: {
 		capable: true,
 		statusBarStyle: "default",
-		title: "Kiosk",
+		title: "Kioosk",
 	},
 	formatDetection: {
 		telephone: false,
@@ -216,6 +219,9 @@ export default async function RootLayout({
 						<link rel="apple-touch-icon" href="/kiosk_logo.svg" />
 					</>
 				)}
+
+				{/* Google Search Console Ownership Verification */}
+				<meta name="google-site-verification" content="bKNxJT8mp29T-_zzK5wAwGPr0nxdDt4TOU8j_tbvjoo" />
 
 				{/* Apple / iOS Web App Meta */}
 				<meta name="apple-mobile-web-app-capable" content="yes" />

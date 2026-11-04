@@ -181,11 +181,11 @@ function GetStartedContent() {
 
 				{/* Title Section */}
 				<div className="text-center max-w-xl mx-auto mb-6 sm:mb-12 flex flex-col items-center">
-					<Link href="/" className="mb-3 inline-block group" aria-label="Kiosk Home">
+					<Link href="/" className="mb-3 inline-block group" aria-label="Kioosk Home">
 						<div className="w-12 h-12 rounded-2xl bg-blue-50/80 border border-blue-200/80 shadow-xs p-2.5 flex items-center justify-center transition-transform group-hover:scale-105">
 							<img
 								src="/kiosk_logo.svg"
-								alt="Kiosk"
+								alt="Kioosk"
 								className="w-full h-full object-contain"
 							/>
 						</div>
@@ -601,8 +601,8 @@ function GetStartedContent() {
 							</div>
 							<p className="text-xs text-slate-500 font-medium mt-1">
 								{activeTab === "signup"
-									? "Create your Kiosk workspace"
-									: "Welcome back to Kiosk"}
+									? "Create your Kioosk workspace"
+									: "Welcome back to Kioosk"}
 							</p>
 							<div className="mt-4">
 								<button
@@ -625,7 +625,7 @@ function GetStartedContent() {
 
 			{/* Minimal Footer */}
 			<footer className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-8 py-6 text-center text-xs text-slate-400">
-				<p>© {new Date().getFullYear()} Kiosk</p>
+				<p>© {new Date().getFullYear()} Kioosk</p>
 			</footer>
 		</div>
 	);

@@ -583,10 +583,10 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 					<Link
 						href="/"
 						className="sm-logo flex items-center select-none pointer-events-auto group py-0.5"
-						aria-label="Kiosk Home">
+						aria-label="Kioosk Home">
 						<img
 							src={logoUrl || "/KIOSK PNG2.png"}
-							alt="Kiosk"
+							alt="Kioosk"
 							className="sm-logo-img h-9 sm:h-11 lg:h-12 w-auto max-w-[190px] sm:max-w-[240px] lg:max-w-[280px] object-contain transition-transform duration-200 group-hover:scale-105"
 						/>
 					</Link>

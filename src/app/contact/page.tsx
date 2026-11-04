@@ -160,7 +160,7 @@ function ContactContent() {
 							+234 811 606 2226
 						</p>
 						<a
-							href="https://wa.me/2348116062226?text=Hi%20Kiosk%20Support%2C%20I%20need%20assistance%20with%20my%20website"
+							href="https://wa.me/2348116062226?text=Hi%20Kioosk%20Support%2C%20I%20need%20assistance%20with%20my%20website"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="text-[11px] text-blue-600 hover:underline inline-block font-medium">

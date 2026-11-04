@@ -59,6 +59,20 @@ export async function processScheduledBillingJob() {
 		for (const tenant of dueRecurringTenants) {
 			if (tenant.plan === "NONE") continue;
 
+			// Idempotency: avoid creating duplicate pending renewal invoices if one was already issued recently
+			const existingInvoice = await db.query.invoices.findFirst({
+				where: and(
+					eq(invoices.tenantId, tenant.id),
+					or(
+						eq(invoices.status, "PENDING"),
+						eq(invoices.status, "GRACE_PERIOD"),
+						gt(invoices.createdAt, new Date(now.getTime() - 20 * 24 * 60 * 60 * 1000)),
+					),
+				),
+			});
+
+			if (existingInvoice) continue;
+
 			const owner = await db.query.users.findFirst({
 				where: eq(users.id, tenant.ownerId),
 			});

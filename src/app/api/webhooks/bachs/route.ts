@@ -77,6 +77,12 @@ export async function POST(request: Request) {
 				});
 			}
 
+			// Idempotency: If invoice is already settled, safely acknowledge duplicate delivery
+			if (matchedInvoice && matchedInvoice.status === "PAID") {
+				console.log(`[BACHS_WEBHOOK_IDEMPOTENT] Invoice ${matchedInvoice.id} (${matchedInvoice.invoiceNumber}) already marked PAID.`);
+				return NextResponse.json({ status: "success", message: "Invoice already settled (idempotent)" }, { status: 200 });
+			}
+
 			const now = new Date();
 			const days = billingCycle === "yearly" ? 365 : 30;
 			const newPeriodEnd = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
@@ -139,6 +145,16 @@ export async function POST(request: Request) {
 						currentPeriodEnd: newPeriodEnd,
 					});
 				} else {
+					// Idempotency: If subscription is active and period already extended, skip duplicate extension
+					if (
+						existingSub.status === "active" &&
+						existingSub.currentPeriodEnd &&
+						existingSub.currentPeriodEnd.getTime() >= newPeriodEnd.getTime() - 86400000
+					) {
+						console.log(`[BACHS_WEBHOOK_IDEMPOTENT] Subscription ${subId} already active and up to date.`);
+						return NextResponse.json({ status: "success", message: "Subscription already active (idempotent)" }, { status: 200 });
+					}
+
 					await db
 						.update(subscriptions)
 						.set({
