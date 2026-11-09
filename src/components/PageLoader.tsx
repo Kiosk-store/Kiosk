@@ -140,10 +140,10 @@ export default function PageLoader({
 						</div>
 					)
 				) : (
-					/* Kiosk platform loader for main marketing site */
+					/* Kioosk platform loader for main marketing site */
 					<img
 						src="/KIOSK PNG2.png"
-						alt="Kiosk"
+						alt="Kioosk"
 						className="h-10 sm:h-12 md:h-14 w-auto max-w-[220px] object-contain animate-pulse"
 					/>
 				)}

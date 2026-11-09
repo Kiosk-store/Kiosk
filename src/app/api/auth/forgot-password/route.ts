@@ -83,7 +83,7 @@ export async function POST(request: Request) {
 			try {
 				const emailResult = await sendPasswordResetEmail({
 					toEmail: email,
-					userName: user.name || "Kiosk User",
+					userName: user.name || "Kioosk User",
 					resetUrl,
 				});
 				if (!emailResult.success) {

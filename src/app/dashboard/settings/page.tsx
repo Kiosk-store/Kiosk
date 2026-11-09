@@ -428,7 +428,7 @@ export default function SettingsPage() {
 										type="text"
 										value={company}
 										onChange={(e) => setCompany(e.target.value)}
-										placeholder="e.g. Kiosk Enterprise Store"
+										placeholder="e.g. Kioosk Enterprise Store"
 										className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200/90 text-xs font-medium text-gray-900 focus:outline-none focus:border-blue-600 transition-colors placeholder:text-gray-400"
 									/>
 								</div>

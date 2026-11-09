@@ -172,7 +172,7 @@ function ContentForm() {
 			id: "t-1",
 			name: "David Kendrick",
 			role: "Founder, Apex Scaling",
-			review: "Kiosk delivered exceptional execution. Our conversion rates doubled in the first 30 days alone!",
+			review: "Kioosk delivered exceptional execution. Our conversion rates doubled in the first 30 days alone!",
 			rating: 5,
 			avatarUrl: "",
 		},
@@ -913,7 +913,7 @@ function ContentForm() {
 						<div className="flex items-center gap-2.5">
 							<CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
 							<span>
-								Payment Confirmed! Welcome to your Kiosk workspace. Fill in your business details below to generate your site.
+								Payment Confirmed! Welcome to your Kioosk workspace. Fill in your business details below to generate your site.
 							</span>
 						</div>
 					</div>

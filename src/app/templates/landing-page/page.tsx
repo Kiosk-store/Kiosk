@@ -90,7 +90,7 @@ export default function LandingPageTemplate() {
 								<div className="w-2.5 h-2.5 rounded-full bg-amber-500" />
 								<div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
 							</div>
-							<span className="text-[10px] text-slate-400 font-mono">mybusiness.kiosk.site</span>
+							<span className="text-[10px] text-slate-400 font-mono">mybusiness.kioosk.online</span>
 						</div>
 
 						<div className="bg-slate-800/80 rounded-xl p-5 space-y-3">

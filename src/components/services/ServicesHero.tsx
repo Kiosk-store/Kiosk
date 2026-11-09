@@ -62,8 +62,7 @@ export default function ServicesHero() {
 					{/* Headline word-by-word stagger animation */}
 					<motion.h1
 						initial="hidden"
-						whileInView="visible"
-						viewport={{ once: true }}
+						animate="visible"
 						variants={{
 							hidden: { opacity: 0 },
 							visible: {
@@ -115,7 +114,7 @@ export default function ServicesHero() {
 
 					<ScrollReveal direction="up" delay={200}>
 						<p className="text-xs sm:text-base md:text-lg text-gray-600 font-medium leading-relaxed max-w-2xl">
-							Kiosk doesn&apos;t hand you a complicated editor and wish you luck.
+							Kioosk doesn&apos;t hand you a complicated editor and wish you luck.
 							We take your business details, pick the right pre-built design,
 							personalize it with your content and branding, and hand you a live site,{" "}
 							<strong className="text-gray-900 font-bold">ready to take customers in days.</strong>

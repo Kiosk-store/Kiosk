@@ -140,7 +140,7 @@ export class EmailNotificationObserver implements Observer {
 				await sendProjectStatusEmail(
 					event.payload.toEmail,
 					event.payload.userName || "Subscriber",
-					event.payload.projectName || "Kiosk Website",
+					event.payload.projectName || "Kioosk Website",
 					event.payload.status || (event.type === "PROJECT_PUBLISHED" ? "PUBLISHED" : "UPDATED"),
 					event.payload.publishedUrl,
 				);
