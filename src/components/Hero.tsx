@@ -26,7 +26,7 @@ function StaggerText({
 			{text.split("").map((char, index) => (
 				<span
 					key={`${char}-${index}`}
-					className="inline-block will-change-transform"
+					className="inline-block"
 					style={{
 						animation: "staggerWave 3s cubic-bezier(0.45, 0, 0.55, 1) infinite",
 						animationDelay: `${delay + index * staggerDuration}s`,

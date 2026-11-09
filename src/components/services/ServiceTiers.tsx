@@ -180,18 +180,18 @@ export default function ServiceTiers() {
 				return (
 					<motion.div
 						key={tier.id}
-						initial={{ opacity: 0, x: isEven ? -80 : 80 }}
+						initial={{ opacity: 0, x: isEven ? -24 : 24 }}
 						whileInView={{ opacity: 1, x: 0 }}
-						viewport={{ once: true, amount: 0.15 }}
-						transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+						viewport={{ once: true, amount: 0.05, margin: "400px 0px" }}
+						transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
 						className="bg-white border border-gray-200/90 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-2xs grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch relative overflow-hidden group">
 						
 						{/* Left Column: Details & Features */}
 						<motion.div
-							initial={{ opacity: 0, x: isEven ? -40 : 40 }}
+							initial={{ opacity: 0, x: isEven ? -16 : 16 }}
 							whileInView={{ opacity: 1, x: 0 }}
-							viewport={{ once: true }}
-							transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
+							viewport={{ once: true, margin: "400px 0px" }}
+							transition={{ duration: 0.4, delay: 0.05, ease: "easeOut" }}
 							className="lg:col-span-7 flex flex-col justify-between space-y-6">
 							<div>
 								{/* Tier Title Header */}
@@ -296,10 +296,10 @@ export default function ServiceTiers() {
 
 						{/* Right Column: Dark Preview Panel */}
 						<motion.div
-							initial={{ opacity: 0, x: isEven ? 40 : -40 }}
+							initial={{ opacity: 0, x: isEven ? 16 : -16 }}
 							whileInView={{ opacity: 1, x: 0 }}
-							viewport={{ once: true }}
-							transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+							viewport={{ once: true, margin: "400px 0px" }}
+							transition={{ duration: 0.4, delay: 0.1, ease: "easeOut" }}
 							className="lg:col-span-5 flex flex-col">
 							<div className={`relative rounded-2xl p-6 sm:p-7 flex flex-col h-full min-h-[320px] shadow-md border-2 justify-between transition-all duration-300 group-hover:scale-[1.01] group-hover:shadow-lg overflow-hidden ${tier.panel.bg}`}>
 								{/* Decorative background orb */}

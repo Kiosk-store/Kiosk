@@ -62,8 +62,7 @@ export default function ServicesHero() {
 					{/* Headline word-by-word stagger animation */}
 					<motion.h1
 						initial="hidden"
-						whileInView="visible"
-						viewport={{ once: true }}
+						animate="visible"
 						variants={{
 							hidden: { opacity: 0 },
 							visible: {

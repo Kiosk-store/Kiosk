@@ -2,7 +2,8 @@
  * ScrollReveal Component
  *
  * Smooth scroll-driven entry animations using IntersectionObserver.
- * Triggers fade & slide transforms when elements enter the viewport.
+ * Optimized with eager rootMargin (500px pre-trigger) to prevent any
+ * white/blank screen flashes during fast scrolls on all devices.
  *
  * @format
  */
@@ -25,50 +26,55 @@ export default function ScrollReveal({
 	className = "",
 	direction = "up",
 	delay = 0,
-	duration = 500,
-	threshold = 0.02,
+	duration = 350,
+	threshold = 0.01,
 }: ScrollRevealProps) {
 	const ref = useRef<HTMLDivElement>(null);
 	const [isVisible, setIsVisible] = useState(false);
 
 	useEffect(() => {
+		const currentRef = ref.current;
+		if (!currentRef) return;
+
+		// Immediately mark visible if already within or near the visible screen on mount
+		const rect = currentRef.getBoundingClientRect();
+		if (rect.top < window.innerHeight + 500 && rect.bottom > -300) {
+			setIsVisible(true);
+			return;
+		}
+
 		const observer = new IntersectionObserver(
 			([entry]) => {
 				if (entry.isIntersecting) {
 					setIsVisible(true);
-					if (ref.current) {
-						observer.unobserve(ref.current);
-					}
+					observer.unobserve(currentRef);
 				}
 			},
 			{
 				threshold,
-				rootMargin: "0px 0px 60px 0px", // Eager trigger so elements don't feel delayed on mobile
+				// Eager 500px pre-trigger: renders and fades content in 500px before
+				// entering viewport so high-speed scrolling never reveals blank white space.
+				rootMargin: "200px 0px 500px 0px",
 			}
 		);
 
-		const currentRef = ref.current;
-		if (currentRef) {
-			observer.observe(currentRef);
-		}
+		observer.observe(currentRef);
 
 		return () => {
-			if (currentRef) {
-				observer.unobserve(currentRef);
-			}
+			observer.unobserve(currentRef);
 		};
 	}, [threshold]);
 
 	const getDirectionStyles = () => {
 		switch (direction) {
 			case "up":
-				return isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3";
+				return isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1.5";
 			case "down":
-				return isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3";
+				return isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-1.5";
 			case "left":
-				return isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-3";
+				return isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-1.5";
 			case "right":
-				return isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-3";
+				return isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-1.5";
 			case "fade":
 				return isVisible ? "opacity-100" : "opacity-0";
 			default:
@@ -79,13 +85,10 @@ export default function ScrollReveal({
 	return (
 		<div
 			ref={ref}
-			className={`${className} transition-[opacity,transform] ease-[cubic-bezier(0.16,1,0.3,1)] ${getDirectionStyles()}`}
+			className={`${className} transition-[opacity,transform] ease-out ${getDirectionStyles()}`}
 			style={{
 				transitionDuration: `${duration}ms`,
-				transitionDelay: `${delay}ms`,
-				willChange: "transform, opacity",
-				transform: "translateZ(0)",
-				WebkitTransform: "translateZ(0)",
+				transitionDelay: isVisible && delay > 0 ? `${delay}ms` : "0ms",
 			}}
 		>
 			{children}

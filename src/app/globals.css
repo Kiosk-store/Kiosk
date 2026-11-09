@@ -3,6 +3,7 @@ body {
 	overflow-x: hidden !important;
 	max-width: 100vw !important;
 	position: relative;
+	background-color: var(--color-background, #f8fafc);
 }
 
 @import "tailwindcss";
@@ -325,10 +326,10 @@ html {
 	width: 100%;
 }
 
-/* Enable smooth scrolling on pointer devices without conflicting with iOS touch inertia */
+/* Native responsive scrolling — avoids compositor render lag on fast scrolls */
 @media (hover: hover) and (pointer: fine) {
 	html {
-		scroll-behavior: smooth;
+		scroll-behavior: auto;
 	}
 }
 
