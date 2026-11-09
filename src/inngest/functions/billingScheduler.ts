@@ -97,7 +97,7 @@ export async function processScheduledBillingJob() {
 				amount,
 				currency,
 				email: owner.email,
-				name: owner.name || "Kiosk Subscriber",
+				name: owner.name || "Kioosk Subscriber",
 				tx_ref,
 				redirect_url: `${appUrl}/dashboard/billing?payment=success&invoice=${invoiceNumber}`,
 				meta: {
@@ -199,7 +199,7 @@ export async function processScheduledBillingJob() {
 				amount,
 				currency,
 				email: owner.email,
-				name: owner.name || "Kiosk Subscriber",
+				name: owner.name || "Kioosk Subscriber",
 				tx_ref,
 				redirect_url: `${appUrl}/dashboard/billing?payment=success&invoice=${invoiceNumber}`,
 				meta: {

@@ -686,7 +686,7 @@ export default function VictorJeremiahStore({
 							target="_blank"
 							rel="noreferrer"
 							className="font-bold text-slate-700 hover:text-blue-600 underline">
-							Kiosk
+							Kioosk
 						</a>
 					</div>
 				</div>

@@ -20,7 +20,7 @@ const testimonials = [
 	},
 	{
 		quote:
-			"Our sales tripled within 60 days after migrating to the Kiosk platform. The mobile conversion experience is simply flawless.",
+			"Our sales tripled within 60 days after migrating to the Kioosk platform. The mobile conversion experience is simply flawless.",
 		name: "Michael Chen",
 		role: "Founder, TechFix",
 		rating: 5,

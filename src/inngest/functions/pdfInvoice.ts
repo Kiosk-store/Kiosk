@@ -54,7 +54,7 @@ export async function processPdfInvoiceJob(payload: PaymentCompletedPayload) {
 					</thead>
 					<tbody>
 						<tr>
-							<td style="padding: 10px;">Kiosk Subscription</td>
+							<td style="padding: 10px;">Kioosk Subscription</td>
 							<td style="padding: 10px;">${payload.plan}</td>
 							<td style="padding: 10px;">${payload.currency} ${payload.amount}.00</td>
 						</tr>
@@ -68,7 +68,7 @@ export async function processPdfInvoiceJob(payload: PaymentCompletedPayload) {
 	// Send Invoice Email
 	await sendEmail({
 		to: payload.userEmail,
-		subject: `Official Receipt #${invoiceNumber} for your Kiosk Subscription`,
+		subject: `Official Receipt #${invoiceNumber} for your Kioosk Subscription`,
 		html: htmlReceipt,
 	});
 

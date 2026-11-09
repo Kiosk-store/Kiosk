@@ -4,9 +4,9 @@ import type { Metadata } from "next";
 import Sidebar from "@/components/dashboard/Sidebar";
 
 export const metadata: Metadata = {
-	title: "Dashboard | Kiosk",
+	title: "Dashboard | Kioosk",
 	description:
-		"Manage your projects, billing, and settings from your Kiosk dashboard.",
+		"Manage your projects, billing, and settings from your Kioosk dashboard.",
 };
 
 export default function DashboardLayout({

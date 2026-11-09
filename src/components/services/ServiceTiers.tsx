@@ -29,7 +29,7 @@ const TIERS = [
 			"Interactive Google Map & Address",
 			"WhatsApp & Lead capture form",
 			"Basic SEO meta tags & sitemap",
-			"Free Kiosk subdomain hosting",
+			"Free Kioosk subdomain hosting",
 		],
 		panel: {
 			bg: "bg-gradient-to-br from-blue-50 via-indigo-50 to-sky-100 border-blue-200",

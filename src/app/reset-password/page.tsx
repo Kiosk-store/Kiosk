@@ -306,7 +306,7 @@ export default function ResetPasswordPage() {
 						K
 					</div>
 					<span className="font-extrabold tracking-tight text-slate-900 text-lg">
-						KIOSK
+						KIOOSK
 					</span>
 				</Link>
 
@@ -332,7 +332,7 @@ export default function ResetPasswordPage() {
 
 			{/* Footer Notice */}
 			<div className="w-full text-center z-10 py-4 text-[11px] text-slate-400">
-				<span>Protected by Kiosk 256-bit encryption.</span>
+				<span>Protected by Kioosk 256-bit encryption.</span>
 			</div>
 		</div>
 	);

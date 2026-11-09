@@ -19,7 +19,7 @@ const GUARANTEE_FEATURES: GuaranteeFeature[] = [
 	{
 		id: "subdomain",
 		number: "01",
-		title: "Free Kiosk Subdomain",
+		title: "Free Kioosk Subdomain",
 		badgeText: "SUBDOMAIN",
 		desc: "Launch immediately on your custom subdomain (yourname.kioosk.online) with zero setup friction.",
 		renderVisual: () => (
@@ -124,7 +124,7 @@ const GUARANTEE_FEATURES: GuaranteeFeature[] = [
 				</div>
 				<div className="z-10 bg-white border border-gray-200 rounded-lg px-3 py-1.5 flex items-center justify-between shadow-sm">
 					<div className="space-y-0.5">
-						<div className="text-[11px] font-bold text-gray-900 truncate">Your Business | Kiosk</div>
+						<div className="text-[11px] font-bold text-gray-900 truncate">Your Business | Kioosk</div>
 						<div className="text-[9px] font-mono text-gray-400">sitemap.xml · Google Verified</div>
 					</div>
 					<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
@@ -194,7 +194,7 @@ export default function StandardGuarantee() {
 
 				<ScrollReveal direction="up" delay={80}>
 					<h2 className="text-3xl sm:text-4xl md:text-[2.75rem] font-bold font-nohemi text-gray-900 tracking-tight leading-tight mb-4">
-						Included in every<br className="hidden sm:inline" /> Kiosk tier
+						Included in every<br className="hidden sm:inline" /> Kioosk tier
 					</h2>
 				</ScrollReveal>
 

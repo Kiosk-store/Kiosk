@@ -42,7 +42,7 @@ export async function sendEmail({
 	html,
 }: SendEmailPayload): Promise<{ success: boolean; id?: string; error?: string }> {
 	const apiKey = process.env.RESEND_API_KEY || RESEND_API_KEY;
-	const fromAddress = process.env.EMAIL_FROM || EMAIL_FROM || "Kiosk <noreply@kioosk.online>";
+	const fromAddress = process.env.EMAIL_FROM || EMAIL_FROM || "Kioosk <noreply@kioosk.online>";
 
 	if (!apiKey) {
 		console.log(`[EMAIL_DEV_FALLBACK] To: ${to} | Subject: ${subject}`);
@@ -158,7 +158,7 @@ export async function sendWelcomeEmail(toEmail: string, userName: string) {
 	const contentHtml = `
 		<p style="margin: 0 0 16px 0;">Hi ${userName},</p>
 		<p style="margin: 0 0 16px 0;">
-			Welcome to Kiosk. Your workspace is fully set up and ready to use.
+			Welcome to Kioosk. Your workspace is fully set up and ready to use.
 		</p>
 		<p style="margin: 0 0 16px 0;">
 			You can log in to your dashboard to submit your business details, view live website builds, and manage your online store:
@@ -172,7 +172,7 @@ export async function sendWelcomeEmail(toEmail: string, userName: string) {
 	`;
 
 	const html = renderEmailShell({
-		title: "Welcome to Kiosk",
+		title: "Welcome to Kioosk",
 		contentHtml,
 	});
 
@@ -324,7 +324,7 @@ export async function sendWebsiteLiveEmail(payload: WebsiteLiveEmailPayload) {
 		<ul style="margin: 0 0 24px 0; padding-left: 20px;">
 			<li>Add your website link to your Instagram, TikTok, and WhatsApp bio.</li>
 			<li>Customers can now browse your products/services and order directly to your WhatsApp.</li>
-			<li>You can manage your products and updates anytime from your Kiosk dashboard.</li>
+			<li>You can manage your products and updates anytime from your Kioosk dashboard.</li>
 		</ul>
 
 		<p style="margin: 0 0 16px 0;">
@@ -399,7 +399,7 @@ export async function sendPaymentRequestEmail({
 	dueDate: string;
 	paymentLink: string;
 }) {
-	const subject = `Invoice ${invoiceNumber}: Kiosk ${plan} Renewal`;
+	const subject = `Invoice ${invoiceNumber}: Kioosk ${plan} Renewal`;
 	const contentHtml = `
 		<p style="margin: 0 0 16px 0;">Hi ${userName},</p>
 		<p style="margin: 0 0 16px 0;">
@@ -531,11 +531,11 @@ export async function sendPasswordResetEmail({
 	userName: string;
 	resetUrl: string;
 }) {
-	const subject = "Reset Your Kiosk Password";
+	const subject = "Reset Your Kioosk Password";
 	const contentHtml = `
 		<p style="margin: 0 0 16px 0;">Hi ${userName || "there"},</p>
 		<p style="margin: 0 0 16px 0;">
-			We received a request to reset the password for your Kiosk account.
+			We received a request to reset the password for your Kioosk account.
 		</p>
 		<p style="margin: 0 0 16px 0;">
 			Click the link below to set a new password. This secure link will expire in <strong>1 hour</strong>:
@@ -609,11 +609,11 @@ export async function sendSupportTicketEmail(payload: SupportTicketPayload) {
 	});
 
 	// 2. Send automated confirmation receipt to customer
-	const clientSubject = `We received your inquiry: #${payload.ticketId} - Kiosk Support`;
+	const clientSubject = `We received your inquiry: #${payload.ticketId} - Kioosk Support`;
 	const clientContentHtml = `
 		<p style="margin: 0 0 16px 0;">Hi ${payload.name},</p>
 		<p style="margin: 0 0 16px 0;">
-			Thank you for reaching out to Kiosk Support. We have received your inquiry regarding <strong>"${payload.subject}"</strong>.
+			Thank you for reaching out to Kioosk Support. We have received your inquiry regarding <strong>"${payload.subject}"</strong>.
 		</p>
 		<div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px; margin: 18px 0;">
 			<p style="margin: 0 0 6px 0; font-size: 13px; color: #64748b;">Ticket Reference ID:</p>
@@ -749,7 +749,7 @@ export async function sendPlanTerminatedNoticeEmail({
 	plan: string;
 	reactivationLink: string;
 }) {
-	const subject = `Your Kiosk Subscription Plan Has Been Terminated: ${plan}`;
+	const subject = `Your Kioosk Subscription Plan Has Been Terminated: ${plan}`;
 	const contentHtml = `
 		<p style="margin: 0 0 16px 0;">Hi ${userName},</p>
 		<p style="margin: 0 0 16px 0;">

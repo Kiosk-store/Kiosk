@@ -43,7 +43,7 @@ export async function POST(request: Request) {
 		const customUser = await getAuthenticatedUser();
 		const userId = authSession?.user?.id || customUser?.id;
 		const userEmail = authSession?.user?.email || customUser?.email;
-		const userName = authSession?.user?.name || customUser?.name || "Kiosk Subscriber";
+		const userName = authSession?.user?.name || customUser?.name || "Kioosk Subscriber";
 
 		if (!userId || !userEmail) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

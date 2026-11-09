@@ -31,10 +31,10 @@ export default function NotFound() {
 				<Link
 					href="/"
 					className="flex items-center select-none group py-0.5"
-					aria-label="Kiosk Home">
+					aria-label="Kioosk Home">
 					<img
 						src="/KIOSK PNG2.png"
-						alt="Kiosk"
+						alt="Kioosk"
 						className="h-8 sm:h-9 w-auto max-w-[160px] sm:max-w-[190px] object-contain transition-transform duration-200 group-hover:scale-105"
 					/>
 				</Link>
@@ -87,7 +87,7 @@ export default function NotFound() {
 
 			{/* Minimal Footer */}
 			<footer className="relative z-10 w-full max-w-6xl mx-auto px-6 py-6 text-center text-xs text-slate-400">
-				<p>© {new Date().getFullYear()} Kiosk. All rights reserved.</p>
+				<p>© {new Date().getFullYear()} Kioosk. All rights reserved.</p>
 			</footer>
 		</div>
 	);

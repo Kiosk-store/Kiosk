@@ -76,7 +76,7 @@ export default function DashboardPage() {
 		},
 		{
 			id: "2",
-			title: "Welcome to Kiosk!",
+			title: "Welcome to Kioosk!",
 			message: "Your account setup has been completed successfully.",
 			time: "Today",
 			type: "content",
@@ -357,10 +357,10 @@ export default function DashboardPage() {
 				<Link
 					href="/"
 					className="flex items-center select-none group py-0.5"
-					aria-label="Kiosk Home">
+					aria-label="Kioosk Home">
 					<img
 						src="/KIOSK PNG2.png"
-						alt="Kiosk"
+						alt="Kioosk"
 						className="h-8 sm:h-9 w-auto max-w-[160px] sm:max-w-[190px] object-contain transition-transform duration-200 group-hover:scale-105"
 					/>
 				</Link>
@@ -488,7 +488,7 @@ export default function DashboardPage() {
 										{displayName}
 									</p>
 									<p className="text-[11px] text-gray-400 truncate mt-0.5 font-medium">
-										{user?.email || "user@kiosk.site"}
+										{user?.email || "user@kioosk.online"}
 									</p>
 								</div>
 
@@ -752,7 +752,7 @@ export default function DashboardPage() {
 									<Crown className="w-4 h-4" />
 								</div>
 								<h3 className="text-base font-bold font-nohemi text-gray-900 mb-1">
-									Kiosk Subscription
+									Kioosk Subscription
 								</h3>
 								<p className="text-xs text-gray-500 font-medium mb-4">
 									Add a Sales Funnel or E-commerce Store to your account anytime.
