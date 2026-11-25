@@ -8,9 +8,9 @@
 
 "use client";
 
-import React, { useState, useEffect, useMemo, Suspense } from "react";
+import React, { useState, useMemo, Suspense } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import {
 	Mail,
 	Lock,
@@ -25,28 +25,28 @@ import {
 } from "lucide-react";
 import PillButton from "@/components/PillButton";
 import LottiePlayer from "@/components/LottiePlayer";
+import HoneypotField from "@/components/HoneypotField";
+import TurnstileWidget, { TURNSTILE_SITE_KEY } from "@/components/TurnstileWidget";
 import { useAuth } from "@/context/AuthContext";
+import { useFormGuard } from "@/hooks/useFormGuard";
 
 function GetStartedContent() {
-	const router = useRouter();
 	const searchParams = useSearchParams();
 	const { login, signup, loginWithGoogle, error, clearError } = useAuth();
 
 	const urlError = searchParams?.get("error");
 	const urlTab = searchParams?.get("tab");
 
-	const [activeTab, setActiveTab] = useState<"signup" | "login">("signup");
+	const [activeTab, setActiveTab] = useState<"signup" | "login">(
+		urlTab === "login" ? "login" : "signup",
+	);
 	const [showPassword, setShowPassword] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
-
-	useEffect(() => {
-		if (urlTab === "login") {
-			setActiveTab("login");
-		}
-	}, [urlTab]);
+	const [localAuthError, setLocalAuthError] = useState<string | null>(null);
 
 	const displayError = useMemo(() => {
+		if (localAuthError) return localAuthError;
 		if (error) return error;
 		if (urlError === "Configuration") {
 			return "Google Sign-In is not configured for this environment. Please sign in with your email and password below.";
@@ -61,13 +61,21 @@ function GetStartedContent() {
 			return "An unexpected error occurred. Please sign in with email and password.";
 		}
 		return null;
-	}, [error, urlError]);
+	}, [localAuthError, error, urlError]);
 
 	// Forgot Password state
 	const [isForgotPassword, setIsForgotPassword] = useState(false);
 	const [forgotEmail, setForgotEmail] = useState("");
 	const [forgotSuccess, setForgotSuccess] = useState<string | null>(null);
 	const [forgotError, setForgotError] = useState<string | null>(null);
+
+	// Anti-spam form guards (signed load timestamps + hidden honeypots + Cloudflare Turnstile)
+	const signupGuard = useFormGuard("signup");
+	const forgotGuard = useFormGuard("forgot-password");
+	const [signupTurnstileToken, setSignupTurnstileToken] = useState("");
+	const [signupTurnstileReset, setSignupTurnstileReset] = useState(0);
+	const [forgotTurnstileToken, setForgotTurnstileToken] = useState("");
+	const [forgotTurnstileReset, setForgotTurnstileReset] = useState(0);
 
 	// Sign Up fields
 	const [signupName, setSignupName] = useState("");
@@ -81,10 +89,29 @@ function GetStartedContent() {
 	const handleSignupSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (isSubmitting) return;
-		setIsSubmitting(true);
+		setLocalAuthError(null);
 		clearError();
 
-		const success = await signup(signupName, signupEmail, signupPassword);
+		if (TURNSTILE_SITE_KEY && !signupTurnstileToken) {
+			setLocalAuthError("Please complete the security verification check before creating your account.");
+			return;
+		}
+
+		setIsSubmitting(true);
+
+		const formToken = await signupGuard.getFormToken();
+		const success = await signup(signupName, signupEmail, signupPassword, {
+			formToken,
+			website_hp: signupGuard.honeypot,
+			turnstileToken: signupTurnstileToken,
+			onTokenExpired: () => {
+				void signupGuard.refreshToken();
+			},
+			onTurnstileReset: () => {
+				setSignupTurnstileToken("");
+				setSignupTurnstileReset((n) => n + 1);
+			},
+		});
 		if (success) {
 			setIsSuccess(true);
 		}
@@ -95,6 +122,7 @@ function GetStartedContent() {
 		e.preventDefault();
 		if (isSubmitting) return;
 		setIsSubmitting(true);
+		setLocalAuthError(null);
 		clearError();
 
 		const success = await login(loginEmail, loginPassword);
@@ -107,22 +135,47 @@ function GetStartedContent() {
 	const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (isSubmitting || !forgotEmail) return;
-		setIsSubmitting(true);
 		setForgotError(null);
 		setForgotSuccess(null);
 
+		if (TURNSTILE_SITE_KEY && !forgotTurnstileToken) {
+			setForgotError("Please complete the security verification check before requesting a reset link.");
+			return;
+		}
+
+		setIsSubmitting(true);
+
 		try {
+			const formToken = await forgotGuard.getFormToken();
 			const res = await fetch("/api/auth/forgot-password", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ email: forgotEmail }),
+				body: JSON.stringify({
+					email: forgotEmail,
+					formToken,
+					website_hp: forgotGuard.honeypot,
+					turnstileToken: forgotTurnstileToken,
+				}),
 			});
 
 			const data = await res.json();
 
 			if (!res.ok) {
+				if (
+					data?.code === "FORM_TOKEN_EXPIRED" ||
+					data?.code === "FORM_TOKEN_INVALID"
+				) {
+					void forgotGuard.refreshToken();
+				}
+				if (data?.resetTurnstile || res.status >= 500) {
+					setForgotTurnstileToken("");
+					setForgotTurnstileReset((n) => n + 1);
+				}
 				setForgotError(data.error || "Failed to send reset email. Please try again.");
 			} else {
+				void forgotGuard.refreshToken();
+				setForgotTurnstileToken("");
+				setForgotTurnstileReset((n) => n + 1);
 				setForgotSuccess(
 					data.message ||
 						"If an account exists with this email, a password reset link has been sent.",
@@ -130,6 +183,8 @@ function GetStartedContent() {
 			}
 		} catch (err) {
 			console.error("[FORGOT_PASSWORD_ERROR]", err);
+			setForgotTurnstileToken("");
+			setForgotTurnstileReset((n) => n + 1);
 			setForgotError("A network error occurred. Please try again.");
 		} finally {
 			setIsSubmitting(false);
@@ -279,6 +334,11 @@ function GetStartedContent() {
 										key="form-signup"
 										onSubmit={handleSignupSubmit}
 										className="space-y-3.5 animate-in fade-in duration-300">
+										<HoneypotField
+											id="su-company-website"
+											value={signupGuard.honeypot}
+											onChange={signupGuard.setHoneypot}
+										/>
 										<div>
 											<label
 												htmlFor="su-name"
@@ -341,6 +401,7 @@ function GetStartedContent() {
 													id="su-pass"
 													type={showPassword ? "text" : "password"}
 													required
+													minLength={8}
 													placeholder="••••••••••••"
 													value={signupPassword}
 													onChange={(e) =>
@@ -361,7 +422,23 @@ function GetStartedContent() {
 													)}
 												</button>
 											</div>
+											<p className="mt-1 text-[11px] text-slate-400">
+												At least 8 characters with a letter and a number.
+											</p>
 										</div>
+
+										<TurnstileWidget
+											action="signup"
+											theme="light"
+											resetTrigger={signupTurnstileReset}
+											onVerify={(token) => {
+												setSignupTurnstileToken(token);
+												if (localAuthError) setLocalAuthError(null);
+												clearError();
+											}}
+											onExpire={() => setSignupTurnstileToken("")}
+											className="pt-1"
+										/>
 
 										<div className="pt-2">
 											<PillButton
@@ -426,9 +503,11 @@ function GetStartedContent() {
 												<button
 													type="button"
 													onClick={() => {
+														setLocalAuthError(null);
 														clearError();
 														setForgotError(null);
 														setForgotSuccess(null);
+														setForgotTurnstileToken("");
 														setForgotEmail(loginEmail);
 														setIsForgotPassword(true);
 													}}
@@ -495,6 +574,11 @@ function GetStartedContent() {
 										key="form-forgot"
 										onSubmit={handleForgotPasswordSubmit}
 										className="space-y-3.5 animate-in fade-in duration-300">
+										<HoneypotField
+											id="fp-company-website"
+											value={forgotGuard.honeypot}
+											onChange={forgotGuard.setHoneypot}
+										/>
 										<div className="p-3 bg-blue-50/70 border border-blue-200/60 rounded-xl space-y-1">
 											<div className="flex items-center gap-1.5 text-blue-700 font-bold text-xs">
 												<KeyRound className="w-3.5 h-3.5" />
@@ -541,6 +625,18 @@ function GetStartedContent() {
 											</div>
 										</div>
 
+										<TurnstileWidget
+											action="forgot-password"
+											theme="light"
+											resetTrigger={forgotTurnstileReset}
+											onVerify={(token) => {
+												setForgotTurnstileToken(token);
+												if (forgotError) setForgotError(null);
+											}}
+											onExpire={() => setForgotTurnstileToken("")}
+											className="pt-1"
+										/>
+
 										<div className="pt-2 space-y-2">
 											<PillButton
 												type="submit"
@@ -567,6 +663,7 @@ function GetStartedContent() {
 													setIsForgotPassword(false);
 													setForgotError(null);
 													setForgotSuccess(null);
+													setForgotTurnstileToken("");
 												}}
 												className="w-full py-2 text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
 												<ArrowLeft className="w-3.5 h-3.5" />
@@ -608,8 +705,11 @@ function GetStartedContent() {
 								<button
 									type="button"
 									onClick={() => {
+										setLocalAuthError(null);
 										clearError();
 										setIsForgotPassword(false);
+										setSignupTurnstileToken("");
+										setForgotTurnstileToken("");
 										setActiveTab(activeTab === "signup" ? "login" : "signup");
 									}}
 									className="text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors cursor-pointer underline hover:no-underline">

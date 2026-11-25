@@ -31,6 +31,9 @@ const envSchema = z.object({
 	NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: z.string().optional(),
 	CLOUDINARY_API_KEY: z.string().optional(),
 	CLOUDINARY_API_SECRET: z.string().optional(),
+	NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().optional(),
+	TURNSTILE_SECRET_KEY: z.string().optional(),
+	TURNSTILE_SECRET: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

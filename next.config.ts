@@ -4,12 +4,12 @@ import type { NextConfig } from "next";
 
 const cspHeader = `
     default-src 'self';
-    script-src 'self' 'unsafe-eval' 'unsafe-inline' https://fonts.googleapis.com;
+    script-src 'self' 'unsafe-eval' 'unsafe-inline' https://fonts.googleapis.com https://challenges.cloudflare.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     img-src 'self' blob: data: https://images.unsplash.com https://lh3.googleusercontent.com;
     font-src 'self' https://fonts.gstatic.com data:;
     connect-src 'self' https://* wss://*;
-    frame-src 'self';
+    frame-src 'self' https://challenges.cloudflare.com;
     object-src 'none';
     base-uri 'self';
     form-action 'self';

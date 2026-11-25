@@ -8,6 +8,10 @@ import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PillButton from "@/components/PillButton";
+import HoneypotField from "@/components/HoneypotField";
+import TurnstileWidget, { TURNSTILE_SITE_KEY } from "@/components/TurnstileWidget";
+import { useAuth } from "@/context/AuthContext";
+import { useFormGuard } from "@/hooks/useFormGuard";
 import { Send, Loader2 } from "lucide-react";
 
 interface FormState {
@@ -61,6 +65,10 @@ function ContactContent() {
 		}
 	}, [initialCat]);
 
+	const { user, isLoading: isAuthLoading, refreshUser } = useAuth();
+	const contactGuard = useFormGuard("contact");
+	const [turnstileToken, setTurnstileToken] = useState("");
+	const [turnstileReset, setTurnstileReset] = useState(0);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [submitError, setSubmitError] = useState<string | null>(null);
 	const [ticketResult, setTicketResult] = useState<{
@@ -77,31 +85,60 @@ function ContactContent() {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
+		if (isSubmitting) return;
 		setSubmitError(null);
+
+		if (TURNSTILE_SITE_KEY && !user && !turnstileToken) {
+			setSubmitError("Please complete the security verification check before sending your message.");
+			return;
+		}
+
 		setIsSubmitting(true);
 
 		try {
+			const formToken = await contactGuard.getFormToken();
 			const res = await fetch("/api/contact", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					...formData,
 					priority: "normal",
+					formToken,
+					website_hp: contactGuard.honeypot,
+					turnstileToken,
 				}),
 			});
 
 			const data = await res.json();
 
 			if (!res.ok) {
-				throw new Error(data.error || "Failed to submit your inquiry.");
+				if (
+					data?.code === "FORM_TOKEN_EXPIRED" ||
+					data?.code === "FORM_TOKEN_INVALID"
+				) {
+					void contactGuard.refreshToken();
+				}
+				if (data?.code === "TURNSTILE_REQUIRED" && user) {
+					void refreshUser(true);
+				}
+				if (data?.resetTurnstile || res.status >= 500) {
+					setTurnstileToken("");
+					setTurnstileReset((n) => n + 1);
+				}
+				setSubmitError(data.error || "Failed to submit your inquiry.");
+				return;
 			}
 
+			setTurnstileToken("");
+			setTurnstileReset((n) => n + 1);
 			setTicketResult({
 				ticketId: data.ticketId,
 				message: data.message,
 			});
 		} catch (err: unknown) {
 			const msg = err instanceof Error ? err.message : "An unexpected error occurred.";
+			setTurnstileToken("");
+			setTurnstileReset((n) => n + 1);
 			setSubmitError(msg);
 		} finally {
 			setIsSubmitting(false);
@@ -213,6 +250,9 @@ function ContactContent() {
 										message: "",
 										websiteUrl: "",
 									});
+									void contactGuard.refreshToken();
+									setTurnstileToken("");
+									setTurnstileReset((n) => n + 1);
 								}}
 								className="px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-colors cursor-pointer">
 								Send Another Message
@@ -223,6 +263,11 @@ function ContactContent() {
 					<form
 						onSubmit={handleSubmit}
 						className="p-6 sm:p-8 rounded-2xl border border-slate-200 bg-white space-y-5">
+						<HoneypotField
+							id="contact-company-website"
+							value={contactGuard.honeypot}
+							onChange={contactGuard.setHoneypot}
+						/>
 						<h3 className="text-lg font-bold font-nohemi text-slate-900">
 							Send a Message
 						</h3>
@@ -339,6 +384,19 @@ function ContactContent() {
 								className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600 resize-y"
 							/>
 						</div>
+
+						{!isAuthLoading && !user && (
+							<TurnstileWidget
+								action="contact"
+								theme="light"
+								resetTrigger={turnstileReset}
+								onVerify={(token) => {
+									setTurnstileToken(token);
+									if (submitError) setSubmitError(null);
+								}}
+								onExpire={() => setTurnstileToken("")}
+							/>
+						)}
 
 						<div className="pt-2">
 							<PillButton

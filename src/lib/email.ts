@@ -1,7 +1,8 @@
 /**
  * Resend Transactional Email Notification System (Plain-Text Clean Style)
  *
- * Clean, cardless, background-free typography email templates for Kiosk:
+ * Clean, cardless, background-free typography email templates for Kiosk with
+ * strict HTML escaping, URL scheme sanitization, and header injection protection:
  * 1. Welcome Greeting Email (`sendWelcomeEmail`)
  * 2. Admin Submission Alert (`sendWebsiteReviewNotificationToAdmin`)
  * 3. Client Submission Confirmation (`sendWebsiteReviewConfirmationToClient`)
@@ -16,6 +17,59 @@
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
 const EMAIL_FROM = process.env.EMAIL_FROM || "Kioosk <noreply@kioosk.online>";
+
+/**
+ * Escapes HTML special characters to prevent HTML injection / phishing payloads in email templates.
+ */
+export function escapeHtml(value: string | number | null | undefined): string {
+	if (value === null || value === undefined) return "";
+	return String(value)
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#39;");
+}
+
+/**
+ * Strips CR/LF and ASCII control characters from header fields (e.g. email Subject lines).
+ */
+export function sanitizeEmailHeader(value: string | null | undefined): string {
+	if (!value) return "";
+	return value.replace(/[\r\n\x00-\x1F\x7F]+/g, " ").trim();
+}
+
+/**
+ * Validates and HTML-escapes a URL for safe use inside an HTML `href` attribute.
+ * Only permits `http:` and `https:` URLs; blocks `javascript:`, `data:`, `vbscript:`, etc.
+ */
+export function sanitizeEmailUrl(
+	rawUrl: string | null | undefined,
+	fallback = "",
+): string {
+	const trimmed = (rawUrl || "").trim();
+	if (!trimmed) {
+		return fallback ? escapeHtml(fallback) : "";
+	}
+
+	const normalizedForSchemeCheck = trimmed.replace(/[\x00-\x20]+/g, "").toLowerCase();
+	const schemeMatch = /^([a-z][a-z0-9+.-]*):/i.exec(normalizedForSchemeCheck);
+	if (schemeMatch && schemeMatch[1] !== "http" && schemeMatch[1] !== "https") {
+		return fallback ? escapeHtml(fallback) : "";
+	}
+
+	const candidate = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+
+	try {
+		const parsed = new URL(candidate);
+		if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+			return fallback ? escapeHtml(fallback) : "";
+		}
+		return escapeHtml(parsed.toString());
+	} catch {
+		return fallback ? escapeHtml(fallback) : "";
+	}
+}
 
 /**
  * Resolves the active base application URL across local dev, preview branches, and production.
@@ -43,9 +97,11 @@ export async function sendEmail({
 }: SendEmailPayload): Promise<{ success: boolean; id?: string; error?: string }> {
 	const apiKey = process.env.RESEND_API_KEY || RESEND_API_KEY;
 	const fromAddress = process.env.EMAIL_FROM || EMAIL_FROM || "Kioosk <noreply@kioosk.online>";
+	const safeSubject = sanitizeEmailHeader(subject);
+	const safeTo = sanitizeEmailHeader(to);
 
 	if (!apiKey) {
-		console.log(`[EMAIL_DEV_FALLBACK] To: ${to} | Subject: ${subject}`);
+		console.log(`[EMAIL_DEV_FALLBACK] To: ${safeTo} | Subject: ${safeSubject}`);
 		return { success: true, id: `dev_mock_${crypto.randomUUID().slice(0, 8)}` };
 	}
 
@@ -58,13 +114,13 @@ export async function sendEmail({
 			},
 			body: JSON.stringify({
 				from: fromAddress,
-				to: [to],
-				subject,
+				to: [safeTo],
+				subject: safeSubject,
 				html,
 			}),
 		});
 
-		let data = await res.json();
+		let data = (await res.json()) as { id?: string; name?: string; message?: string };
 
 		// If rejected due to domain not being verified in Resend, automatically fallback to onboarding@resend.dev
 		if (
@@ -83,12 +139,12 @@ export async function sendEmail({
 				},
 				body: JSON.stringify({
 					from: "Kioosk <onboarding@resend.dev>",
-					to: [to],
-					subject,
+					to: [safeTo],
+					subject: safeSubject,
 					html,
 				}),
 			});
-			data = await res.json();
+			data = (await res.json()) as { id?: string; name?: string; message?: string };
 		}
 
 		if (!res.ok) {
@@ -97,9 +153,13 @@ export async function sendEmail({
 		}
 
 		return { success: true, id: data.id };
-	} catch (err: any) {
+	} catch (err: unknown) {
 		console.error("[EMAIL_DISPATCH_EXCEPTION]", err);
-		return { success: false, error: err?.message || "Unexpected network error during email dispatch" };
+		const message =
+			err instanceof Error
+				? err.message
+				: "Unexpected network error during email dispatch";
+		return { success: false, error: message };
 	}
 }
 
@@ -114,8 +174,13 @@ function renderEmailShell({
 	contentHtml: string;
 }) {
 	const appUrl = getAppUrl();
+	const safeAppHref = sanitizeEmailUrl(appUrl, "https://kioosk.online");
 	const logoBaseUrl = appUrl.includes("localhost") ? "https://kioosk.online" : appUrl;
-	const logoUrl = `${logoBaseUrl}/KIOSK%20PNG2.png`;
+	const safeLogoUrl = sanitizeEmailUrl(
+		`${logoBaseUrl}/KIOSK%20PNG2.png`,
+		"https://kioosk.online/KIOSK%20PNG2.png",
+	);
+	const safeTitle = escapeHtml(title);
 
 	return `
 		<!DOCTYPE html>
@@ -123,14 +188,14 @@ function renderEmailShell({
 			<head>
 				<meta charset="utf-8">
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				<title>${title}</title>
+				<title>${safeTitle}</title>
 			</head>
 			<body style="margin: 0; padding: 24px 16px; background-color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #111827; font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased;">
 				<div style="max-width: 580px; margin: 0 auto;">
 					<!-- Brand Logo Header -->
 					<div style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #f3f4f6;">
-						<a href="${appUrl}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: inline-block;">
-							<img src="${logoUrl}" alt="Kioosk" width="130" style="display: block; width: 130px; max-width: 130px; height: auto; border: 0; outline: none; text-decoration: none;" />
+						<a href="${safeAppHref}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: inline-block;">
+							<img src="${safeLogoUrl}" alt="Kioosk" width="130" style="display: block; width: 130px; max-width: 130px; height: auto; border: 0; outline: none; text-decoration: none;" />
 						</a>
 					</div>
 
@@ -154,9 +219,13 @@ function renderEmailShell({
  */
 export async function sendWelcomeEmail(toEmail: string, userName: string) {
 	const appUrl = getAppUrl();
+	const safeDashboardHref = sanitizeEmailUrl(`${appUrl}/dashboard`, "https://kioosk.online/dashboard");
+	const safeDashboardText = escapeHtml(`${appUrl}/dashboard`);
+	const safeUserName = escapeHtml(userName || "Valued User");
+
 	const subject = "Welcome to Kioosk - Your Workspace is Ready";
 	const contentHtml = `
-		<p style="margin: 0 0 16px 0;">Hi ${userName},</p>
+		<p style="margin: 0 0 16px 0;">Hi ${safeUserName},</p>
 		<p style="margin: 0 0 16px 0;">
 			Welcome to Kioosk. Your workspace is fully set up and ready to use.
 		</p>
@@ -164,7 +233,7 @@ export async function sendWelcomeEmail(toEmail: string, userName: string) {
 			You can log in to your dashboard to submit your business details, view live website builds, and manage your online store:
 		</p>
 		<p style="margin: 0 0 24px 0;">
-			👉 <a href="${appUrl}/dashboard" style="color: #004ac6; font-weight: 700; text-decoration: underline;">Open Your Kioosk Dashboard</a> (${appUrl}/dashboard)
+			👉 <a href="${safeDashboardHref}" style="color: #004ac6; font-weight: 700; text-decoration: underline;">Open Your Kioosk Dashboard</a> (${safeDashboardText})
 		</p>
 		<p style="margin: 0 0 16px 0;">
 			If you need any help getting started, simply reply directly to this email and our team will assist you.
@@ -210,10 +279,26 @@ export async function sendWebsiteReviewNotificationToAdmin(payload: WebsiteRevie
 		return { success: false, error: "Admin email not configured" };
 	}
 	const appUrl = getAppUrl();
-	const reviewUrl = payload.projectId
-		? `${appUrl}/admin/projects/${payload.projectId}`
+	const rawReviewUrl = payload.projectId
+		? `${appUrl}/admin/projects/${encodeURIComponent(payload.projectId)}`
 		: `${appUrl}/admin/projects`;
-	const subject = `[New Submission] ${payload.businessName} (${payload.plan.replace(/_/g, " ")})`;
+	const safeReviewHref = sanitizeEmailUrl(rawReviewUrl, "https://kioosk.online/admin/projects");
+	const safeReviewText = escapeHtml(rawReviewUrl);
+
+	const formattedPlan = payload.plan.replace(/_/g, " ");
+	const subject = sanitizeEmailHeader(
+		`[New Submission] ${payload.businessName} (${formattedPlan})`,
+	);
+
+	const safeBusinessName = escapeHtml(payload.businessName);
+	const safeTagline = escapeHtml(payload.tagline || "N/A");
+	const safePlan = escapeHtml(formattedPlan);
+	const safeTheme = escapeHtml(payload.themeMode || "Light");
+	const safeImagesCount = escapeHtml(payload.imagesCount || 0);
+	const safeClientName = escapeHtml(payload.clientName);
+	const safeClientEmail = escapeHtml(payload.clientEmail);
+	const safePhone = payload.contactPhone ? escapeHtml(payload.contactPhone) : "";
+	const safeWhatsapp = payload.whatsappLink ? escapeHtml(payload.whatsappLink) : "";
 
 	const contentHtml = `
 		<p style="margin: 0 0 16px 0;"><strong>New Client Submission Received:</strong></p>
@@ -223,24 +308,24 @@ export async function sendWebsiteReviewNotificationToAdmin(payload: WebsiteRevie
 
 		<p style="margin: 0 0 8px 0;"><strong>Business Details:</strong></p>
 		<ul style="margin: 0 0 20px 0; padding-left: 20px;">
-			<li><strong>Business:</strong> ${payload.businessName}</li>
-			<li><strong>Tagline:</strong> ${payload.tagline || "N/A"}</li>
-			<li><strong>Plan:</strong> ${payload.plan.replace(/_/g, " ")}</li>
-			<li><strong>Theme:</strong> ${payload.themeMode || "Light"}</li>
-			<li><strong>Assets:</strong> ${payload.imagesCount || 0} files uploaded</li>
+			<li><strong>Business:</strong> ${safeBusinessName}</li>
+			<li><strong>Tagline:</strong> ${safeTagline}</li>
+			<li><strong>Plan:</strong> ${safePlan}</li>
+			<li><strong>Theme:</strong> ${safeTheme}</li>
+			<li><strong>Assets:</strong> ${safeImagesCount} files uploaded</li>
 		</ul>
 
 		<p style="margin: 0 0 8px 0;"><strong>Client Contact:</strong></p>
 		<ul style="margin: 0 0 24px 0; padding-left: 20px;">
-			<li><strong>Name:</strong> ${payload.clientName}</li>
-			<li><strong>Email:</strong> ${payload.clientEmail}</li>
-			${payload.contactPhone ? `<li><strong>Phone:</strong> ${payload.contactPhone}</li>` : ""}
-			${payload.whatsappLink ? `<li><strong>WhatsApp:</strong> ${payload.whatsappLink}</li>` : ""}
+			<li><strong>Name:</strong> ${safeClientName}</li>
+			<li><strong>Email:</strong> ${safeClientEmail}</li>
+			${safePhone ? `<li><strong>Phone:</strong> ${safePhone}</li>` : ""}
+			${safeWhatsapp ? `<li><strong>WhatsApp:</strong> ${safeWhatsapp}</li>` : ""}
 		</ul>
 
 		<p style="margin: 0 0 16px 0;">
 			👉 Review this project in the Admin Hub:<br/>
-			<a href="${reviewUrl}" style="color: #004ac6; font-weight: 700; text-decoration: underline;">${reviewUrl}</a>
+			<a href="${safeReviewHref}" style="color: #004ac6; font-weight: 700; text-decoration: underline;">${safeReviewText}</a>
 		</p>
 	`;
 
@@ -262,15 +347,24 @@ export async function sendWebsiteReviewConfirmationToClient(
 	plan: string,
 ) {
 	const appUrl = getAppUrl();
-	const subject = `Details Received: ${businessName} is Now in Review`;
+	const safeProjectsHref = sanitizeEmailUrl(
+		`${appUrl}/dashboard/projects`,
+		"https://kioosk.online/dashboard/projects",
+	);
+	const safeProjectsText = escapeHtml(`${appUrl}/dashboard/projects`);
+	const subject = sanitizeEmailHeader(`Details Received: ${businessName} is Now in Review`);
+
+	const safeClientName = escapeHtml(clientName || "there");
+	const safeBusinessName = escapeHtml(businessName);
+	const safePlan = escapeHtml(plan.replace(/_/g, " "));
 
 	const contentHtml = `
-		<p style="margin: 0 0 16px 0;">Hi ${clientName || "there"},</p>
+		<p style="margin: 0 0 16px 0;">Hi ${safeClientName},</p>
 		<p style="margin: 0 0 16px 0;">
-			We have received your business details and brand assets for <strong>${businessName}</strong>.
+			We have received your business details and brand assets for <strong>${safeBusinessName}</strong>.
 		</p>
 		<p style="margin: 0 0 16px 0;">
-			Our fulfillment team is now setting up your <strong>${plan.replace(/_/g, " ")}</strong> website layout, connecting your subdomain, and testing your WhatsApp order flows.
+			Our fulfillment team is now setting up your <strong>${safePlan}</strong> website layout, connecting your subdomain, and testing your WhatsApp order flows.
 		</p>
 
 		<p style="margin: 0 0 8px 0;"><strong>What to expect next:</strong></p>
@@ -282,7 +376,7 @@ export async function sendWebsiteReviewConfirmationToClient(
 
 		<p style="margin: 0 0 16px 0;">
 			You can track progress anytime from your dashboard:<br/>
-			👉 <a href="${appUrl}/dashboard/projects" style="color: #004ac6; font-weight: 700; text-decoration: underline;">${appUrl}/dashboard/projects</a>
+			👉 <a href="${safeProjectsHref}" style="color: #004ac6; font-weight: 700; text-decoration: underline;">${safeProjectsText}</a>
 		</p>
 	`;
 
@@ -307,17 +401,27 @@ export interface WebsiteLiveEmailPayload {
  */
 export async function sendWebsiteLiveEmail(payload: WebsiteLiveEmailPayload) {
 	const appUrl = getAppUrl();
-	const subject = `Your Website is Live: ${payload.businessName}`;
+	const safeDashboardHref = sanitizeEmailUrl(
+		`${appUrl}/dashboard`,
+		"https://kioosk.online/dashboard",
+	);
+	const safeDashboardText = escapeHtml(`${appUrl}/dashboard`);
+	const safePublishedHref = sanitizeEmailUrl(payload.publishedUrl, "https://kioosk.online");
+	const safePublishedText = escapeHtml(payload.publishedUrl);
+	const safeClientName = escapeHtml(payload.clientName || "there");
+	const safeBusinessName = escapeHtml(payload.businessName);
+
+	const subject = sanitizeEmailHeader(`Your Website is Live: ${payload.businessName}`);
 
 	const contentHtml = `
-		<p style="margin: 0 0 16px 0;">Hi ${payload.clientName || "there"},</p>
+		<p style="margin: 0 0 16px 0;">Hi ${safeClientName},</p>
 		<p style="margin: 0 0 16px 0;">
-			Great news! Your <strong>${payload.businessName}</strong> website has completed review and is officially live on the internet.
+			Great news! Your <strong>${safeBusinessName}</strong> website has completed review and is officially live on the internet.
 		</p>
 
 		<p style="margin: 0 0 8px 0;"><strong>Your Live Website Link:</strong></p>
 		<p style="margin: 0 0 24px 0;">
-			👉 <a href="${payload.publishedUrl}" target="_blank" style="color: #004ac6; font-weight: 800; font-size: 16px; text-decoration: underline;">${payload.publishedUrl}</a>
+			👉 <a href="${safePublishedHref}" target="_blank" rel="noopener noreferrer" style="color: #004ac6; font-weight: 800; font-size: 16px; text-decoration: underline;">${safePublishedText}</a>
 		</p>
 
 		<p style="margin: 0 0 8px 0;"><strong>Next steps for your brand:</strong></p>
@@ -329,7 +433,7 @@ export async function sendWebsiteLiveEmail(payload: WebsiteLiveEmailPayload) {
 
 		<p style="margin: 0 0 16px 0;">
 			Access your dashboard:<br/>
-			👉 <a href="${appUrl}/dashboard" style="color: #004ac6; font-weight: 700; text-decoration: underline;">${appUrl}/dashboard</a>
+			👉 <a href="${safeDashboardHref}" style="color: #004ac6; font-weight: 700; text-decoration: underline;">${safeDashboardText}</a>
 		</p>
 	`;
 
@@ -352,20 +456,33 @@ export async function sendProjectStatusEmail(
 	publishedUrl?: string,
 ) {
 	const appUrl = getAppUrl();
-	const subject = `Update on ${projectName}: Status is ${status}`;
+	const safeProjectsHref = sanitizeEmailUrl(
+		`${appUrl}/dashboard/projects`,
+		"https://kioosk.online/dashboard/projects",
+	);
+	const safeProjectsText = escapeHtml(`${appUrl}/dashboard/projects`);
+	const safeUserName = escapeHtml(userName || "there");
+	const safeProjectName = escapeHtml(projectName);
+	const safeStatus = escapeHtml(status);
+	const safePublishedHref = publishedUrl ? sanitizeEmailUrl(publishedUrl) : "";
+	const safePublishedText = publishedUrl ? escapeHtml(publishedUrl) : "";
+
+	const subject = sanitizeEmailHeader(`Update on ${projectName}: Status is ${status}`);
 	const contentHtml = `
-		<p style="margin: 0 0 16px 0;">Hi ${userName},</p>
+		<p style="margin: 0 0 16px 0;">Hi ${safeUserName},</p>
 		<p style="margin: 0 0 16px 0;">
-			Your project <strong>${projectName}</strong> has been updated to: <strong>${status}</strong>.
+			Your project <strong>${safeProjectName}</strong> has been updated to: <strong>${safeStatus}</strong>.
 		</p>
 		${
-			publishedUrl
-				? `<p style="margin: 0 0 16px 0;">Published URL: <a href="${publishedUrl}" style="color: #004ac6; font-weight: 700; text-decoration: underline;">${publishedUrl}</a></p>`
-				: ""
+			safePublishedHref
+				? `<p style="margin: 0 0 16px 0;">Published URL: <a href="${safePublishedHref}" style="color: #004ac6; font-weight: 700; text-decoration: underline;">${safePublishedText}</a></p>`
+				: safePublishedText
+					? `<p style="margin: 0 0 16px 0;">Published URL: ${safePublishedText}</p>`
+					: ""
 		}
 		<p style="margin: 0 0 16px 0;">
 			👉 View details in your dashboard:<br/>
-			<a href="${appUrl}/dashboard/projects" style="color: #004ac6; font-weight: 700; text-decoration: underline;">${appUrl}/dashboard/projects</a>
+			<a href="${safeProjectsHref}" style="color: #004ac6; font-weight: 700; text-decoration: underline;">${safeProjectsText}</a>
 		</p>
 	`;
 
@@ -399,24 +516,33 @@ export async function sendPaymentRequestEmail({
 	dueDate: string;
 	paymentLink: string;
 }) {
-	const subject = `Invoice ${invoiceNumber}: Kioosk ${plan} Renewal`;
+	const subject = sanitizeEmailHeader(`Invoice ${invoiceNumber}: Kioosk ${plan} Renewal`);
+	const safeUserName = escapeHtml(userName || "there");
+	const safeInvoiceNumber = escapeHtml(invoiceNumber);
+	const safePlan = escapeHtml(plan);
+	const safeDueDate = escapeHtml(dueDate);
+	const safeCurrency = escapeHtml(currency);
+	const safeAmount = escapeHtml(amount);
+	const safePaymentHref = sanitizeEmailUrl(paymentLink, "https://kioosk.online/dashboard/billing");
+	const safePaymentText = escapeHtml(paymentLink);
+
 	const contentHtml = `
-		<p style="margin: 0 0 16px 0;">Hi ${userName},</p>
+		<p style="margin: 0 0 16px 0;">Hi ${safeUserName},</p>
 		<p style="margin: 0 0 16px 0;">
-			Your hosting and maintenance subscription for <strong>${plan}</strong> is ready for renewal.
+			Your hosting and maintenance subscription for <strong>${safePlan}</strong> is ready for renewal.
 		</p>
 
 		<p style="margin: 0 0 8px 0;"><strong>Invoice Summary:</strong></p>
 		<ul style="margin: 0 0 24px 0; padding-left: 20px;">
-			<li><strong>Invoice Number:</strong> ${invoiceNumber}</li>
-			<li><strong>Plan:</strong> ${plan}</li>
-			<li><strong>Due Date:</strong> ${dueDate}</li>
-			<li><strong>Total Amount:</strong> ${currency} ${amount}.00</li>
+			<li><strong>Invoice Number:</strong> ${safeInvoiceNumber}</li>
+			<li><strong>Plan:</strong> ${safePlan}</li>
+			<li><strong>Due Date:</strong> ${safeDueDate}</li>
+			<li><strong>Total Amount:</strong> ${safeCurrency} ${safeAmount}.00</li>
 		</ul>
 
 		<p style="margin: 0 0 16px 0;">
 			👉 Pay your invoice securely online:<br/>
-			<a href="${paymentLink}" style="color: #004ac6; font-weight: 700; font-size: 16px; text-decoration: underline;">Pay ${currency} ${amount}.00</a> (${paymentLink})
+			<a href="${safePaymentHref}" style="color: #004ac6; font-weight: 700; font-size: 16px; text-decoration: underline;">Pay ${safeCurrency} ${safeAmount}.00</a> (${safePaymentText})
 		</p>
 		<p style="margin: 0 0 16px 0; font-size: 13px; color: #6b7280;">
 			Supports Card, Bank Transfer, USSD, and Mobile Money.
@@ -453,18 +579,29 @@ export async function sendGracePeriodReminderEmail({
 	daysRemaining: number;
 	paymentLink: string;
 }) {
-	const subject = `Reminder: ${daysRemaining} Days Remaining for Invoice #${invoiceNumber}`;
+	const subject = sanitizeEmailHeader(
+		`Reminder: ${daysRemaining} Days Remaining for Invoice #${invoiceNumber}`,
+	);
+	const safeUserName = escapeHtml(userName || "there");
+	const safeInvoiceNumber = escapeHtml(invoiceNumber);
+	const safePlan = escapeHtml(plan);
+	const safeCurrency = escapeHtml(currency);
+	const safeAmount = escapeHtml(amount);
+	const safeDaysRemaining = escapeHtml(daysRemaining);
+	const safePaymentHref = sanitizeEmailUrl(paymentLink, "https://kioosk.online/dashboard/billing");
+	const safePaymentText = escapeHtml(paymentLink);
+
 	const contentHtml = `
-		<p style="margin: 0 0 16px 0;">Hi ${userName},</p>
+		<p style="margin: 0 0 16px 0;">Hi ${safeUserName},</p>
 		<p style="margin: 0 0 16px 0;">
-			This is a friendly reminder that renewal invoice <strong>#${invoiceNumber}</strong> (${currency} ${amount}.00) for your <strong>${plan}</strong> website remains pending.
+			This is a friendly reminder that renewal invoice <strong>#${safeInvoiceNumber}</strong> (${safeCurrency} ${safeAmount}.00) for your <strong>${safePlan}</strong> website remains pending.
 		</p>
 		<p style="margin: 0 0 20px 0;">
-			Your website remains active under our grace period. Please complete payment within the next <strong>${daysRemaining} days</strong> to keep your site online without interruption.
+			Your website remains active under our grace period. Please complete payment within the next <strong>${safeDaysRemaining} days</strong> to keep your site online without interruption.
 		</p>
 		<p style="margin: 0 0 16px 0;">
 			👉 Pay Invoice:<br/>
-			<a href="${paymentLink}" style="color: #004ac6; font-weight: 700; text-decoration: underline;">${paymentLink}</a>
+			<a href="${safePaymentHref}" style="color: #004ac6; font-weight: 700; text-decoration: underline;">${safePaymentText}</a>
 		</p>
 	`;
 
@@ -496,18 +633,27 @@ export async function sendSiteFlaggedNoticeEmail({
 	currency: string;
 	paymentLink: string;
 }) {
-	const subject = `Action Required: Website Renewal Expired for ${plan} #${invoiceNumber}`;
+	const subject = sanitizeEmailHeader(
+		`Action Required: Website Renewal Expired for ${plan} #${invoiceNumber}`,
+	);
+	const safeUserName = escapeHtml(userName || "there");
+	const safeInvoiceNumber = escapeHtml(invoiceNumber);
+	const safeCurrency = escapeHtml(currency);
+	const safeAmount = escapeHtml(amount);
+	const safePaymentHref = sanitizeEmailUrl(paymentLink, "https://kioosk.online/dashboard/billing");
+	const safePaymentText = escapeHtml(paymentLink);
+
 	const contentHtml = `
-		<p style="margin: 0 0 16px 0;">Hi ${userName},</p>
+		<p style="margin: 0 0 16px 0;">Hi ${safeUserName},</p>
 		<p style="margin: 0 0 16px 0;">
-			The renewal period for invoice <strong>#${invoiceNumber}</strong> (${currency} ${amount}.00) has expired.
+			The renewal period for invoice <strong>#${safeInvoiceNumber}</strong> (${safeCurrency} ${safeAmount}.00) has expired.
 		</p>
 		<p style="margin: 0 0 20px 0;">
 			Your website files, data, and configurations are secure. To reactivate your website immediately, please complete the renewal payment.
 		</p>
 		<p style="margin: 0 0 16px 0;">
 			👉 Reactivate Your Website:<br/>
-			<a href="${paymentLink}" style="color: #004ac6; font-weight: 700; text-decoration: underline;">${paymentLink}</a>
+			<a href="${safePaymentHref}" style="color: #004ac6; font-weight: 700; text-decoration: underline;">${safePaymentText}</a>
 		</p>
 	`;
 
@@ -532,8 +678,12 @@ export async function sendPasswordResetEmail({
 	resetUrl: string;
 }) {
 	const subject = "Reset Your Kioosk Password";
+	const safeUserName = escapeHtml(userName || "there");
+	const safeResetHref = sanitizeEmailUrl(resetUrl, "https://kioosk.online/get-started");
+	const safeResetText = escapeHtml(resetUrl);
+
 	const contentHtml = `
-		<p style="margin: 0 0 16px 0;">Hi ${userName || "there"},</p>
+		<p style="margin: 0 0 16px 0;">Hi ${safeUserName},</p>
 		<p style="margin: 0 0 16px 0;">
 			We received a request to reset the password for your Kioosk account.
 		</p>
@@ -541,7 +691,7 @@ export async function sendPasswordResetEmail({
 			Click the link below to set a new password. This secure link will expire in <strong>1 hour</strong>:
 		</p>
 		<p style="margin: 0 0 24px 0;">
-			👉 <a href="${resetUrl}" style="color: #004ac6; font-weight: 700; text-decoration: underline;">Reset Your Password</a> (${resetUrl})
+			👉 <a href="${safeResetHref}" style="color: #004ac6; font-weight: 700; text-decoration: underline;">Reset Your Password</a> (${safeResetText})
 		</p>
 		<p style="margin: 0; font-size: 13px; color: #6b7280;">
 			If you did not request a password reset, you can safely ignore this email. Your password will remain unchanged.
@@ -574,26 +724,47 @@ export interface SupportTicketPayload {
 export async function sendSupportTicketEmail(payload: SupportTicketPayload) {
 	const adminEmail = process.env.ADMIN_EMAIL || "support@kioosk.online";
 
+	const safeTicketId = escapeHtml(payload.ticketId);
+	const safeName = escapeHtml(payload.name);
+	const cleanEmail = sanitizeEmailHeader(payload.email);
+	const safeEmailText = escapeHtml(cleanEmail);
+	const safeMailtoHref = escapeHtml(`mailto:${cleanEmail}`);
+	const safePhone = payload.phone ? escapeHtml(payload.phone) : "";
+	const safeCategory = escapeHtml(payload.category);
+	const safePriority = escapeHtml(payload.priority.toUpperCase());
+	const safeSubjectText = escapeHtml(payload.subject);
+	const safeMessage = escapeHtml(payload.message);
+	const safeWebsiteHref = payload.websiteUrl ? sanitizeEmailUrl(payload.websiteUrl) : "";
+	const safeWebsiteText = payload.websiteUrl ? escapeHtml(payload.websiteUrl) : "";
+
 	// 1. Send alert notification to Support Admin
-	const adminSubject = `[Support Ticket #${payload.ticketId}] ${payload.priority.toUpperCase()}: ${payload.subject}`;
+	const adminSubject = sanitizeEmailHeader(
+		`[Support Ticket #${payload.ticketId}] ${payload.priority.toUpperCase()}: ${payload.subject}`,
+	);
 	const adminContentHtml = `
-		<p style="margin: 0 0 16px 0;"><strong>New Support Ticket #${payload.ticketId}</strong></p>
+		<p style="margin: 0 0 16px 0;"><strong>New Support Ticket #${safeTicketId}</strong></p>
 		<div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
-			<p style="margin: 0 0 8px 0;"><strong>Name:</strong> ${payload.name}</p>
-			<p style="margin: 0 0 8px 0;"><strong>Email:</strong> <a href="mailto:${payload.email}" style="color: #004ac6;">${payload.email}</a></p>
-			${payload.phone ? `<p style="margin: 0 0 8px 0;"><strong>Phone/WhatsApp:</strong> ${payload.phone}</p>` : ""}
-			<p style="margin: 0 0 8px 0;"><strong>Category:</strong> ${payload.category}</p>
-			<p style="margin: 0 0 8px 0;"><strong>Priority:</strong> ${payload.priority.toUpperCase()}</p>
-			${payload.websiteUrl ? `<p style="margin: 0 0 8px 0;"><strong>Website/URL:</strong> <a href="${payload.websiteUrl}" style="color: #004ac6;">${payload.websiteUrl}</a></p>` : ""}
+			<p style="margin: 0 0 8px 0;"><strong>Name:</strong> ${safeName}</p>
+			<p style="margin: 0 0 8px 0;"><strong>Email:</strong> <a href="${safeMailtoHref}" style="color: #004ac6;">${safeEmailText}</a></p>
+			${safePhone ? `<p style="margin: 0 0 8px 0;"><strong>Phone/WhatsApp:</strong> ${safePhone}</p>` : ""}
+			<p style="margin: 0 0 8px 0;"><strong>Category:</strong> ${safeCategory}</p>
+			<p style="margin: 0 0 8px 0;"><strong>Priority:</strong> ${safePriority}</p>
+			${
+				safeWebsiteHref
+					? `<p style="margin: 0 0 8px 0;"><strong>Website/URL:</strong> <a href="${safeWebsiteHref}" target="_blank" rel="noopener noreferrer" style="color: #004ac6;">${safeWebsiteText}</a></p>`
+					: safeWebsiteText
+						? `<p style="margin: 0 0 8px 0;"><strong>Website/URL:</strong> ${safeWebsiteText}</p>`
+						: ""
+			}
 		</div>
 
 		<p style="margin: 0 0 8px 0; font-weight: 700;">Message Content:</p>
 		<div style="background-color: #ffffff; border-left: 3px solid #004ac6; padding: 12px 16px; margin-bottom: 24px; font-family: monospace; font-size: 14px; white-space: pre-wrap; color: #1f2937;">
-			${payload.message.replace(/</g, "&lt;").replace(/>/g, "&gt;")}
+			${safeMessage}
 		</div>
 
 		<p style="margin: 0; font-size: 13px; color: #6b7280;">
-			Reply directly to <a href="mailto:${payload.email}" style="color: #004ac6;">${payload.email}</a> to assist this customer.
+			Reply directly to <a href="${safeMailtoHref}" style="color: #004ac6;">${safeEmailText}</a> to assist this customer.
 		</p>
 	`;
 
@@ -609,15 +780,17 @@ export async function sendSupportTicketEmail(payload: SupportTicketPayload) {
 	});
 
 	// 2. Send automated confirmation receipt to customer
-	const clientSubject = `We received your inquiry: #${payload.ticketId} - Kioosk Support`;
+	const clientSubject = sanitizeEmailHeader(
+		`We received your inquiry: #${payload.ticketId} - Kioosk Support`,
+	);
 	const clientContentHtml = `
-		<p style="margin: 0 0 16px 0;">Hi ${payload.name},</p>
+		<p style="margin: 0 0 16px 0;">Hi ${safeName},</p>
 		<p style="margin: 0 0 16px 0;">
-			Thank you for reaching out to Kioosk Support. We have received your inquiry regarding <strong>"${payload.subject}"</strong>.
+			Thank you for reaching out to Kioosk Support. We have received your inquiry regarding <strong>&quot;${safeSubjectText}&quot;</strong>.
 		</p>
 		<div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px; margin: 18px 0;">
 			<p style="margin: 0 0 6px 0; font-size: 13px; color: #64748b;">Ticket Reference ID:</p>
-			<p style="margin: 0; font-size: 16px; font-weight: 700; color: #004ac6;">#${payload.ticketId}</p>
+			<p style="margin: 0; font-size: 16px; font-weight: 700; color: #004ac6;">#${safeTicketId}</p>
 		</div>
 		<p style="margin: 0 0 16px 0;">
 			Our team has been notified and will review your request. Our typical response time is within <strong>2 to 4 hours</strong> during regular business operations.
@@ -633,7 +806,7 @@ export async function sendSupportTicketEmail(payload: SupportTicketPayload) {
 	});
 
 	return sendEmail({
-		to: payload.email,
+		to: cleanEmail,
 		subject: clientSubject,
 		html: clientHtml,
 	});
@@ -659,22 +832,33 @@ export async function sendRecurringPaymentSuccessEmail({
 	cardLast4?: string;
 	nextBillingDate: string;
 }) {
-	const subject = `Subscription Renewed: Your ${plan} Website is Active`;
+	const subject = sanitizeEmailHeader(`Subscription Renewed: Your ${plan} Website is Active`);
+	const safeUserName = escapeHtml(userName || "there");
+	const safePlan = escapeHtml(plan);
+	const safeCurrency = escapeHtml(currency);
+	const safeAmount = escapeHtml(amount);
+	const safeCardLast4 = cardLast4 ? escapeHtml(cardLast4) : "";
+	const safeNextBillingDate = escapeHtml(nextBillingDate);
+	const safeBillingHref = sanitizeEmailUrl(
+		`${getAppUrl()}/dashboard/billing`,
+		"https://kioosk.online/dashboard/billing",
+	);
+
 	const contentHtml = `
-		<p style="margin: 0 0 16px 0;">Hi ${userName},</p>
+		<p style="margin: 0 0 16px 0;">Hi ${safeUserName},</p>
 		<p style="margin: 0 0 16px 0;">
-			Your recurring subscription for your <strong>${plan}</strong> website has automatically renewed successfully.
+			Your recurring subscription for your <strong>${safePlan}</strong> website has automatically renewed successfully.
 		</p>
 		<div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
-			<p style="margin: 0 0 6px 0; font-size: 14px; color: #166534;"><strong>Amount Billed:</strong> ${currency} ${amount}.00</p>
-			${cardLast4 ? `<p style="margin: 0 0 6px 0; font-size: 14px; color: #166534;"><strong>Payment Card:</strong> •••• ${cardLast4}</p>` : ""}
-			<p style="margin: 0; font-size: 14px; color: #166534;"><strong>Next Renewal Date:</strong> ${nextBillingDate}</p>
+			<p style="margin: 0 0 6px 0; font-size: 14px; color: #166534;"><strong>Amount Billed:</strong> ${safeCurrency} ${safeAmount}.00</p>
+			${safeCardLast4 ? `<p style="margin: 0 0 6px 0; font-size: 14px; color: #166534;"><strong>Payment Card:</strong> •••• ${safeCardLast4}</p>` : ""}
+			<p style="margin: 0; font-size: 14px; color: #166534;"><strong>Next Renewal Date:</strong> ${safeNextBillingDate}</p>
 		</div>
 		<p style="margin: 0 0 16px 0;">
 			Your live website and custom domain remain online with zero downtime. You can view your invoice history and manage your billing settings anytime from your dashboard.
 		</p>
 		<p style="margin: 0 0 16px 0;">
-			👉 <a href="${getAppUrl()}/dashboard/billing" style="color: #004ac6; font-weight: 700; text-decoration: underline;">View Billing Dashboard</a>
+			👉 <a href="${safeBillingHref}" style="color: #004ac6; font-weight: 700; text-decoration: underline;">View Billing Dashboard</a>
 		</p>
 	`;
 
@@ -708,22 +892,32 @@ export async function sendRecurringPaymentFailedEmail({
 	paymentLink: string;
 	dueDate: string;
 }) {
-	const subject = `Urgent: Recurring Payment Failed for Your ${plan} Website`;
+	const subject = sanitizeEmailHeader(
+		`Urgent: Recurring Payment Failed for Your ${plan} Website`,
+	);
+	const safeUserName = escapeHtml(userName || "there");
+	const safePlan = escapeHtml(plan);
+	const safeCurrency = escapeHtml(currency);
+	const safeAmount = escapeHtml(amount);
+	const safeCardLast4 = cardLast4 ? escapeHtml(cardLast4) : "";
+	const safeDueDate = escapeHtml(dueDate);
+	const safePaymentHref = sanitizeEmailUrl(paymentLink, "https://kioosk.online/dashboard/billing");
+
 	const contentHtml = `
-		<p style="margin: 0 0 16px 0;">Hi ${userName},</p>
+		<p style="margin: 0 0 16px 0;">Hi ${safeUserName},</p>
 		<p style="margin: 0 0 16px 0;">
-			We attempted to renew your <strong>${plan}</strong> website subscription (${currency} ${amount}.00)${cardLast4 ? ` using your card ending in •••• ${cardLast4}` : ""}, but the charge could not be completed.
+			We attempted to renew your <strong>${safePlan}</strong> website subscription (${safeCurrency} ${safeAmount}.00)${safeCardLast4 ? ` using your card ending in •••• ${safeCardLast4}` : ""}, but the charge could not be completed.
 		</p>
 		<div style="background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
 			<p style="margin: 0; font-size: 14px; color: #92400e;">
-				<strong>Notice:</strong> If payment is not completed or recurring billing updated before <strong>${dueDate}</strong>, your plan will be terminated and your live website will be paused.
+				<strong>Notice:</strong> If payment is not completed or recurring billing updated before <strong>${safeDueDate}</strong>, your plan will be terminated and your live website will be paused.
 			</p>
 		</div>
 		<p style="margin: 0 0 16px 0;">
 			Please update your payment method or pay the renewal invoice immediately using the link below:
 		</p>
 		<p style="margin: 0 0 20px 0;">
-			👉 <a href="${paymentLink}" style="color: #004ac6; font-weight: 700; text-decoration: underline;">Pay Renewal & Update Payment Method</a>
+			👉 <a href="${safePaymentHref}" style="color: #004ac6; font-weight: 700; text-decoration: underline;">Pay Renewal & Update Payment Method</a>
 		</p>
 	`;
 
@@ -749,11 +943,21 @@ export async function sendPlanTerminatedNoticeEmail({
 	plan: string;
 	reactivationLink: string;
 }) {
-	const subject = `Your Kioosk Subscription Plan Has Been Terminated: ${plan}`;
+	const subject = sanitizeEmailHeader(
+		`Your Kioosk Subscription Plan Has Been Terminated: ${plan}`,
+	);
+	const safeUserName = escapeHtml(userName || "there");
+	const safePlan = escapeHtml(plan);
+	const safeReactivationHref = sanitizeEmailUrl(
+		reactivationLink,
+		"https://kioosk.online/dashboard/billing",
+	);
+	const safeReactivationText = escapeHtml(reactivationLink);
+
 	const contentHtml = `
-		<p style="margin: 0 0 16px 0;">Hi ${userName},</p>
+		<p style="margin: 0 0 16px 0;">Hi ${safeUserName},</p>
 		<p style="margin: 0 0 16px 0;">
-			Your 1-month subscription period for your <strong>${plan}</strong> website has ended and no active recurring payment was received. As a result, your subscription plan has been terminated and your live website is temporarily paused.
+			Your 1-month subscription period for your <strong>${safePlan}</strong> website has ended and no active recurring payment was received. As a result, your subscription plan has been terminated and your live website is temporarily paused.
 		</p>
 		<div style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
 			<p style="margin: 0 0 8px 0; font-size: 14px; color: #991b1b;">
@@ -767,7 +971,7 @@ export async function sendPlanTerminatedNoticeEmail({
 			To instantly reactivate your website and restore live visitors, please log in and restart your subscription:
 		</p>
 		<p style="margin: 0 0 24px 0;">
-			👉 <a href="${reactivationLink}" style="color: #004ac6; font-weight: 700; text-decoration: underline;">Reactivate Your Plan Now</a> (${reactivationLink})
+			👉 <a href="${safeReactivationHref}" style="color: #004ac6; font-weight: 700; text-decoration: underline;">Reactivate Your Plan Now</a> (${safeReactivationText})
 		</p>
 		<p style="margin: 0; font-size: 13px; color: #6b7280;">
 			If you have any questions or require assistance, reply directly to this email and our team will help you.
@@ -798,11 +1002,19 @@ export async function sendRecurringSetupReminderEmail({
 	expiryDate: string;
 	paymentLink: string;
 }) {
-	const subject = `Action Required: Your ${plan} 1-Month Subscription Expires on ${expiryDate}`;
+	const subject = sanitizeEmailHeader(
+		`Action Required: Your ${plan} 1-Month Subscription Expires on ${expiryDate}`,
+	);
+	const safeUserName = escapeHtml(userName || "there");
+	const safePlan = escapeHtml(plan);
+	const safeExpiryDate = escapeHtml(expiryDate);
+	const safePaymentHref = sanitizeEmailUrl(paymentLink, "https://kioosk.online/dashboard/billing");
+	const safePaymentText = escapeHtml(paymentLink);
+
 	const contentHtml = `
-		<p style="margin: 0 0 16px 0;">Hi ${userName},</p>
+		<p style="margin: 0 0 16px 0;">Hi ${safeUserName},</p>
 		<p style="margin: 0 0 16px 0;">
-			Your 1-month subscription for your <strong>${plan}</strong> website will expire on <strong>${expiryDate}</strong>.
+			Your 1-month subscription for your <strong>${safePlan}</strong> website will expire on <strong>${safeExpiryDate}</strong>.
 		</p>
 		<div style="background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
 			<p style="margin: 0; font-size: 14px; color: #92400e;">
@@ -811,7 +1023,7 @@ export async function sendRecurringSetupReminderEmail({
 		</div>
 		<p style="margin: 0 0 16px 0;">
 			👉 Renew & Enable Recurring Payment:<br/>
-			<a href="${paymentLink}" style="color: #004ac6; font-weight: 700; text-decoration: underline;">${paymentLink}</a>
+			<a href="${safePaymentHref}" style="color: #004ac6; font-weight: 700; text-decoration: underline;">${safePaymentText}</a>
 		</p>
 	`;
 

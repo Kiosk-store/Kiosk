@@ -6,24 +6,21 @@ import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { verifyPassword, loginInputSchema } from "@/lib/auth/password";
 import { createSession } from "@/lib/auth/session";
-import { checkRateLimit } from "@/lib/ratelimit";
+import { buildRateLimitHeaders, checkRateLimit } from "@/lib/ratelimit";
+import { getClientIp } from "@/lib/security/antispam";
 
 export async function POST(request: Request) {
 	try {
-		const ip = request.headers.get("x-forwarded-for") || "127.0.0.1";
+		const ip = getClientIp(request);
 
-		// 1. Rate Limiting Check (5 requests / 1 min for auth)
+		// 1. Rate Limiting Check (10 requests / 1 min for auth)
 		const rateLimit = await checkRateLimit(ip, "auth");
 		if (!rateLimit.success) {
 			return NextResponse.json(
 				{ error: "Too many login attempts. Please try again later." },
 				{
 					status: 429,
-					headers: {
-						"X-RateLimit-Limit": rateLimit.limit.toString(),
-						"X-RateLimit-Remaining": rateLimit.remaining.toString(),
-						"X-RateLimit-Reset": rateLimit.reset.toString(),
-					},
+					headers: buildRateLimitHeaders(rateLimit),
 				},
 			);
 		}

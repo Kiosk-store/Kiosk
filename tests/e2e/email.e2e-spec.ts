@@ -9,6 +9,9 @@ import {
 	sendGracePeriodReminderEmail,
 	sendSiteFlaggedNoticeEmail,
 	sendPasswordResetEmail,
+	escapeHtml,
+	sanitizeEmailHeader,
+	sanitizeEmailUrl,
 } from "../../src/lib/email";
 
 test.describe("Phase 4 Transactional Email Notification System (`src/lib/email.ts`)", () => {
@@ -133,5 +136,20 @@ test.describe("Phase 4 Transactional Email Notification System (`src/lib/email.t
 
 		expect(result.success).toBe(true);
 		expect(result.id).toBeDefined();
+	});
+
+	test("10. Email sanitizers escape HTML, strip CR/LF headers, and block unsafe URLs", () => {
+		expect(escapeHtml(`<a href="https://evil.test">Win & 'Now'</a>`)).toBe(
+			"&lt;a href=&quot;https://evil.test&quot;&gt;Win &amp; &#39;Now&#39;&lt;/a&gt;",
+		);
+		expect(sanitizeEmailHeader("Hello\r\nBcc: victim@example.com")).toBe(
+			"Hello Bcc: victim@example.com",
+		);
+		expect(sanitizeEmailUrl("javascript:alert(1)")).toBe("");
+		expect(sanitizeEmailUrl("data:text/html,<script>alert(1)</script>")).toBe("");
+		expect(sanitizeEmailUrl("mailto:victim@example.com")).toBe("");
+		expect(sanitizeEmailUrl("https://kioosk.online/dashboard")).toBe(
+			"https://kioosk.online/dashboard",
+		);
 	});
 });

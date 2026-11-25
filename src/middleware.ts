@@ -44,7 +44,14 @@ export async function middleware(request: NextRequest) {
 		request.headers.get("x-forwarded-host") ||
 		request.headers.get("host") ||
 		"localhost:3000";
-	const ip = request.headers.get("x-forwarded-for")?.split(",")[0] || "127.0.0.1";
+	const ip =
+		(process.env.TRUST_CLOUDFLARE_IP === "true"
+			? request.headers.get("cf-connecting-ip")?.trim()
+			: undefined) ||
+		request.headers.get("x-vercel-forwarded-for")?.split(",")[0]?.trim() ||
+		request.headers.get("x-real-ip")?.trim() ||
+		request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+		"127.0.0.1";
 
 	// ---------------------------------------------------------------------------
 	// 1. SESSION TOKEN EXTRACTION

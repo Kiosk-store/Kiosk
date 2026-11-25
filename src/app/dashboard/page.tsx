@@ -49,6 +49,7 @@ export default function DashboardPage() {
 	const [isQuickEditOpen, setIsQuickEditOpen] = useState(false);
 	const [supportMessage, setSupportMessage] = useState("");
 	const [supportSent, setSupportSent] = useState(false);
+	const [supportError, setSupportError] = useState<string | null>(null);
 	const [isSendingSupport, setIsSendingSupport] = useState(false);
 	const [supportTicketId, setSupportTicketId] = useState<string | null>(null);
 
@@ -185,7 +186,12 @@ export default function DashboardPage() {
 
 	const handleSendSupport = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!supportMessage.trim()) return;
+		if (isSendingSupport || !supportMessage.trim()) return;
+		if (supportMessage.trim().length < 10) {
+			setSupportError("Please enter at least 10 characters so our team can assist you.");
+			return;
+		}
+		setSupportError(null);
 		setIsSendingSupport(true);
 		try {
 			const res = await fetch("/api/contact", {
@@ -201,7 +207,11 @@ export default function DashboardPage() {
 					websiteUrl: activeProject?.publishedUrl || "",
 				}),
 			});
-			const data = await res.json();
+			const data = await res.json().catch(() => ({}));
+			if (!res.ok) {
+				setSupportError(data?.error || "Failed to send support ticket. Please try again.");
+				return;
+			}
 			if (data?.ticketId) {
 				setSupportTicketId(data.ticketId);
 			}
@@ -210,16 +220,12 @@ export default function DashboardPage() {
 				setSupportSent(false);
 				setSupportMessage("");
 				setSupportTicketId(null);
+				setSupportError(null);
 				setIsSupportOpen(false);
 			}, 3000);
 		} catch (err) {
 			console.error("Failed to send support ticket", err);
-			setSupportSent(true);
-			setTimeout(() => {
-				setSupportSent(false);
-				setSupportMessage("");
-				setIsSupportOpen(false);
-			}, 2500);
+			setSupportError("A network error occurred. Please try again or reach us on WhatsApp.");
 		} finally {
 			setIsSendingSupport(false);
 		}
@@ -960,6 +966,11 @@ export default function DashboardPage() {
 							</div>
 						) : (
 							<form onSubmit={handleSendSupport} className="space-y-4">
+								{supportError && (
+									<div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold">
+										{supportError}
+									</div>
+								)}
 								<div>
 									<label
 										htmlFor="sup-msg"
@@ -970,8 +981,12 @@ export default function DashboardPage() {
 										id="sup-msg"
 										rows={4}
 										required
+										minLength={10}
 										value={supportMessage}
-										onChange={(e) => setSupportMessage(e.target.value)}
+										onChange={(e) => {
+											setSupportMessage(e.target.value);
+											if (supportError) setSupportError(null);
+										}}
 										placeholder="Describe your question or request..."
 										className="w-full p-3 rounded-2xl border border-gray-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all placeholder:text-gray-400"
 									/>

@@ -17,6 +17,14 @@ export interface UserProfile {
 	projectUpdates?: boolean;
 }
 
+export interface SignupAntiSpamPayload {
+	formToken?: string;
+	website_hp?: string;
+	turnstileToken?: string;
+	onTokenExpired?: () => void;
+	onTurnstileReset?: () => void;
+}
+
 export interface AuthContextType {
 	user: UserProfile | null;
 	isLoading: boolean;
@@ -25,10 +33,15 @@ export interface AuthContextType {
 	setPaymentInProgress: (inProgress: boolean) => void;
 	clearError: () => void;
 	login: (email: string, password: string) => Promise<boolean>;
-	signup: (name: string, email: string, password: string) => Promise<boolean>;
+	signup: (
+		name: string,
+		email: string,
+		password: string,
+		antiSpam?: SignupAntiSpamPayload,
+	) => Promise<boolean>;
 	logout: () => Promise<void>;
 	loginWithGoogle: () => Promise<void>;
-	refreshUser: () => Promise<void>;
+	refreshUser: (silent?: boolean) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -65,9 +78,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 	const clearError = () => setError(null);
 
 	// Fetch current session on mount and periodic revalidation
-	const refreshUser = async () => {
+	const refreshUser = async (silent = false) => {
 		try {
-			setIsLoading(true);
+			if (!silent) {
+				setIsLoading(true);
+			}
 			const res = await fetch("/api/auth/me", { cache: "no-store" });
 			if (res.ok) {
 				const data = await res.json();
@@ -84,7 +99,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 		} catch (err) {
 			console.error("[AUTH_REFRESH_ERROR]", err);
 		} finally {
-			setIsLoading(false);
+			if (!silent) {
+				setIsLoading(false);
+			}
 		}
 	};
 
@@ -109,17 +126,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 	};
 
 	useEffect(() => {
-		refreshUser();
+		refreshUser(false);
 
-		// Check session validity periodically every 5 minutes
+		// Check session validity periodically every 5 minutes (silently, without toggling isLoading)
 		const interval = setInterval(() => {
-			refreshUser();
+			refreshUser(true);
 		}, 5 * 60 * 1000);
 
-		// Re-validate session when returning to tab/window
+		// Re-validate session when returning to tab/window without unmounting active form widgets
 		const handleFocus = () => {
 			if (document.visibilityState === "visible") {
-				refreshUser();
+				refreshUser(true);
 			}
 		};
 
@@ -173,6 +190,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 		name: string,
 		email: string,
 		password: string,
+		antiSpam?: SignupAntiSpamPayload,
 	): Promise<boolean> => {
 		try {
 			setError(null);
@@ -180,14 +198,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 			const res = await fetch("/api/auth/register", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ name, email, password }),
+				body: JSON.stringify({
+					name,
+					email,
+					password,
+					formToken: antiSpam?.formToken,
+					website_hp: antiSpam?.website_hp,
+					turnstileToken: antiSpam?.turnstileToken,
+				}),
 			});
 
 			const data = await res.json();
 
 			if (!res.ok) {
+				if (
+					data?.code === "FORM_TOKEN_EXPIRED" ||
+					data?.code === "FORM_TOKEN_INVALID"
+				) {
+					antiSpam?.onTokenExpired?.();
+				}
+
+				if (data?.resetTurnstile || res.status >= 500) {
+					antiSpam?.onTurnstileReset?.();
+				}
+
 				if (res.status === 429) {
-					setError("Too many registration attempts. Please wait 1 minute.");
+					setError(
+						data.error ||
+							"Too many registration attempts. Please try again later.",
+					);
 				} else {
 					setError(data.error || "Failed to create account.");
 				}
@@ -201,6 +240,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 			return true;
 		} catch (err) {
 			console.error("[SIGNUP_ACTION_ERROR]", err);
+			antiSpam?.onTurnstileReset?.();
 			setError("An unexpected network error occurred. Please try again.");
 			setIsLoading(false);
 			return false;
