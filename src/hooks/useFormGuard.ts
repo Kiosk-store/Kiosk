@@ -22,9 +22,11 @@ export function useFormGuard(scope: FormTokenScope): FormGuardState {
 	const [honeypot, setHoneypot] = useState("");
 	const tokenRef = useRef("");
 	const inflightRef = useRef<Promise<string> | null>(null);
+	const inflightIdRef = useRef(0);
 
 	const fetchToken = useCallback(
 		(signal?: AbortSignal): Promise<string> => {
+			const requestId = ++inflightIdRef.current;
 			const promise = (async () => {
 				try {
 					const res = await fetch(
@@ -47,7 +49,7 @@ export function useFormGuard(scope: FormTokenScope): FormGuardState {
 				} catch {
 					return "";
 				} finally {
-					if (inflightRef.current === promise) {
+					if (inflightIdRef.current === requestId) {
 						inflightRef.current = null;
 					}
 				}
